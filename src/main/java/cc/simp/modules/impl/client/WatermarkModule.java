@@ -29,10 +29,11 @@ public final class WatermarkModule extends Module {
     public final Listener<Render2DEvent> render2DEventListener = event -> {
         FontRenderer fontRenderer = mc.fontRendererObj;
         ScaledResolution sr = new ScaledResolution(mc);
+        float hue = (System.currentTimeMillis() % 3000) / 3000f;
 
         String text = "S" + EnumChatFormatting.GRAY + "imp " + EnumChatFormatting.WHITE + Simp.INSTANCE.BUILD + EnumChatFormatting.GRAY + " [" + EnumChatFormatting.WHITE + "FPS " + EnumChatFormatting.WHITE + Minecraft.getDebugFPS() + EnumChatFormatting.GRAY + "]";
 
-        fontRenderer.drawStringWithShadow(text, 2f, 2f, Color.RED.getRGB());
+        fontRenderer.drawStringWithShadow(text, 2f, 2f, Color.getHSBColor(hue, 0.55f, 0.9f).getRGB());
     };
 
 }
