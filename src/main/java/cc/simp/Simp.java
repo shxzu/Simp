@@ -2,6 +2,7 @@ package cc.simp;
 
 import cc.simp.commands.CommandHandler;
 import cc.simp.commands.impl.BindCommand;
+import cc.simp.commands.impl.BindsCommand;
 import cc.simp.commands.impl.HideCommand;
 import cc.simp.commands.impl.ToggleCommand;
 import cc.simp.event.Event;
@@ -53,6 +54,7 @@ public class Simp {
         commandHandler = new CommandHandler();
         commandHandler.commands.addAll(Arrays.asList(
                 new BindCommand(),
+                new BindsCommand(),
                 new ToggleCommand(),
                 new HideCommand()
         ));
