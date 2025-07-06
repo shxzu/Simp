@@ -68,9 +68,6 @@ public class Simp {
             }
             Minecraft.getMinecraft().displayGuiScreen(winClickGUI);
         }
-        moduleManager.getModules().stream()
-                .filter(module -> module.getKey() == event.getKey())
-                .forEach(Module::toggle);
     };
 
     public EventBus<Event> getEventBus() {
