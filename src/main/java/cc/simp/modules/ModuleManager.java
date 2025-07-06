@@ -3,6 +3,7 @@ package cc.simp.modules;
 import cc.simp.Simp;
 import cc.simp.event.impl.KeyPressEvent;
 import cc.simp.modules.impl.client.ArraylistModule;
+import cc.simp.modules.impl.client.TabGUIModule;
 import cc.simp.modules.impl.client.WatermarkModule;
 import cc.simp.modules.impl.movement.SpeedModule;
 import cc.simp.modules.impl.movement.SprintModule;
@@ -35,7 +36,8 @@ public final class ModuleManager {
 
                 // CLIENT
                 new WatermarkModule(),
-                new ArraylistModule()
+                new ArraylistModule(),
+                new TabGUIModule()
         );
         getModules().forEach(Module::reflectProperties);
 
