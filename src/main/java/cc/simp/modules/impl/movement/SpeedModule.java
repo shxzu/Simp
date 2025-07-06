@@ -21,6 +21,10 @@ public final class SpeedModule extends Module {
     private boolean wasOnGround;
     private int airTicks;
 
+    public SpeedModule() {
+        setSuffixListener(speedModeProperty);
+    }
+
     @EventLink
     public final Listener<MotionEvent> motionEventListener = event -> {
 
