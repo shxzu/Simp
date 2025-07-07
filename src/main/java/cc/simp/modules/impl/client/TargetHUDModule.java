@@ -14,7 +14,9 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiPlayerTabOverlay;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import org.lwjgl.opengl.GL11;
@@ -29,24 +31,24 @@ public final class TargetHUDModule extends Module {
 
     private final Property<Boolean> rainbowProperty = new Property<>("Rainbow", false);
 
-    private EntityPlayer getTarget() {
+    private EntityLivingBase getTarget() {
         KillAuraModule killAura = (KillAuraModule) Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class);
-        if (killAura != null && killAura.isEnabled() && KillAuraModule.target instanceof EntityPlayer) {
-            return (EntityPlayer) KillAuraModule.target;
+        if (killAura != null && killAura.isEnabled() && KillAuraModule.target != null) {
+            return KillAuraModule.target;
         }
         return null;
     }
 
     @EventLink
     public final Listener<Render2DEvent> render2DEventListener = event -> {
-        EntityPlayer target = getTarget();
+        EntityLivingBase target = getTarget();
         if (target == null) return;
 
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
 
         // Position calculations
-        int x = sr.getScaledWidth() / 2 + 10;
+        int x = sr.getScaledWidth() / 2 - 62;
         int y = sr.getScaledHeight() - 90;
 
         GL11.glPushMatrix();
@@ -56,7 +58,7 @@ public final class TargetHUDModule extends Module {
         drawRect(0, 0, 125, 36, new Color(0, 0, 0, 150).getRGB());
 
         // Name
-        fr.drawStringWithShadow(target.getGameProfile().getName(), 38, 2, -1);
+        fr.drawStringWithShadow(target.getName(), 38, 2, -1);
 
         // Health bar
         float health = target.getHealth();
@@ -98,7 +100,7 @@ public final class TargetHUDModule extends Module {
 
         // Player face
         GL11.glScaled(2.0f, 2.0f, 2.0f);
-        renderPlayerFace(target, 2, 2);
+        GuiInventory.drawEntityOnScreen(16, 32, 22, -target.rotationYaw, target.rotationPitch, target);
 
         GL11.glPopMatrix();
     };
@@ -107,21 +109,5 @@ public final class TargetHUDModule extends Module {
         if (percentage > 0.75f) return Color.GREEN;
         else if (percentage > 0.25f) return Color.YELLOW;
         else return Color.RED;
-    }
-
-    private void renderPlayerFace(EntityPlayer player, int x, int y) {
-        List<NetworkPlayerInfo> playerInfos = GuiPlayerTabOverlay.field_175252_a.sortedCopy(Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap());
-
-        for (NetworkPlayerInfo info : playerInfos) {
-            if (Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(info.getGameProfile().getId()) == player) {
-                Minecraft.getMinecraft().getTextureManager().bindTexture(info.getLocationSkin());
-                Gui.drawScaledCustomSizeModalRect(x, y, 8, 8, 8, 8, 32, 32, 64, 64);
-
-                if (player.isWearing(EnumPlayerModelParts.HAT)) {
-                    Gui.drawScaledCustomSizeModalRect(x, y, 40, 8, 8, 8, 32, 32, 64, 64);
-                }
-                break;
-            }
-        }
     }
 }
