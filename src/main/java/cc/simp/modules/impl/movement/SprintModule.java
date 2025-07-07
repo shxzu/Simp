@@ -14,7 +14,7 @@ import static cc.simp.utils.client.Util.mc;
 @ModuleInfo(label = "Sprint", category = ModuleCategory.MOVEMENT)
 public final class SprintModule extends Module {
 
-    private final Property<Boolean> omniProperty = new Property<>("Omni", false);
+    public final Property<Boolean> omniProperty = new Property<>("Omni", false);
 
     private int groundTicks;
 
