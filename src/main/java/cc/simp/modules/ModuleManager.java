@@ -4,9 +4,12 @@ import cc.simp.Simp;
 import cc.simp.event.impl.KeyPressEvent;
 import cc.simp.modules.impl.client.ArraylistModule;
 import cc.simp.modules.impl.client.TabGUIModule;
+import cc.simp.modules.impl.client.TargetHUDModule;
 import cc.simp.modules.impl.client.WatermarkModule;
+import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.movement.SpeedModule;
 import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.modules.impl.render.ChamsModule;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -23,6 +26,7 @@ public final class ModuleManager {
     public ModuleManager() {
         instanceMap = putInInstanceMap(
                 // COMBAT
+                new KillAuraModule(),
 
                 // PLAYER
 
@@ -33,10 +37,12 @@ public final class ModuleManager {
                 // EXPLOIT
 
                 // RENDER
+                new ChamsModule(),
 
                 // CLIENT
                 new WatermarkModule(),
                 new ArraylistModule(),
+                new TargetHUDModule(),
                 new TabGUIModule()
         );
         getModules().forEach(Module::reflectProperties);
