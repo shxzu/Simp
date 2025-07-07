@@ -7,11 +7,13 @@ import cc.simp.property.Property;
 import cc.simp.property.impl.BooleanProperty;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
+import cc.simp.utils.client.Logger;
 import cc.simp.utils.client.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
@@ -31,6 +33,7 @@ public class WindowClickGUI extends GuiScreen {
     private boolean draggingSlider = false;
     private Property<?> draggedProperty = null;
     private boolean isScrolling = false;
+    private Module listeningModule = null;
 
     // --- Window Position and Dragging ---
     private static double windowX, windowY;
@@ -126,11 +129,22 @@ public class WindowClickGUI extends GuiScreen {
         double moduleY = y + padding;
         int i = 0;
         for (Module module : Simp.INSTANCE.getModuleManager().getModulesForCategory(currentCategory)) {
-            String name = module.getLabel();
+            String name = (module == listeningModule) ? "Listening..." : module.getLabel();
             moduleBounds.put(module, new double[]{x + padding, moduleY, x + width - padding, moduleY + fontRenderer.FONT_HEIGHT});
             boolean isHovered = inBounds(mouseX, mouseY, moduleBounds.get(module));
-            int color = module.isEnabled() ? getRainbowColor(i * 80) : (selectedModule == module ? Color.WHITE.getRGB() : textColor.getRGB());
+            int color = module.isEnabled() ? getRainbowColor(i * 80) :
+                    (selectedModule == module ? Color.WHITE.getRGB() : textColor.getRGB());
+
+            // Draw module name
             fontRenderer.drawStringWithShadow(name, (float) (x + padding), (float) moduleY, color);
+
+            // Draw key bind if not listening and has a key bound
+            if (module != listeningModule && module.getKey() != 0) {
+                String keyName = Keyboard.getKeyName(module.getKey());
+                float keyX = (float) (x + width - padding - fontRenderer.getStringWidth(keyName));
+                fontRenderer.drawStringWithShadow("§7[" + keyName + "]", keyX, (float) moduleY, textColor.getRGB());
+            }
+
             moduleY += fontRenderer.FONT_HEIGHT + padding;
             i++;
         }
@@ -257,6 +271,18 @@ public class WindowClickGUI extends GuiScreen {
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         AtomicBoolean consumedClick = new AtomicBoolean(false);
+
+        // Handle key binding when middle clicking a module
+        if (mouseButton == 2) { // Middle click
+            for (Map.Entry<Module, double[]> entry : moduleBounds.entrySet()) {
+                if (inBounds(mouseX, mouseY, entry.getValue())) {
+                    listeningModule = entry.getKey();
+                    consumedClick.set(true);
+                    break;
+                }
+            }
+            if (consumedClick.get()) return;
+        }
 
         double dragHandleHeight = padding + 30;
         if (inBounds(mouseX, mouseY, new double[]{windowX, windowY, windowX + windowWidth, windowY + dragHandleHeight}) && openDropdown == null) {
@@ -397,6 +423,22 @@ public class WindowClickGUI extends GuiScreen {
         if (wheel != 0 && selectedModule != null) {
             targetPropertyScrollOffset = Math.max(0, Math.min(maxPropertyScroll, targetPropertyScrollOffset - wheel / 4.0f));
         }
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        if (listeningModule != null) {
+            if (keyCode == Keyboard.KEY_ESCAPE || keyCode == Keyboard.KEY_DELETE) {
+                listeningModule.setKey(Keyboard.KEY_NONE);
+                Logger.chatPrint("Removed keybind for " + listeningModule.getLabel());
+            } else {
+                listeningModule.setKey(keyCode);
+                Logger.chatPrint("Set keybind for " + listeningModule.getLabel() + " to " + Keyboard.getKeyName(keyCode));
+            }
+            listeningModule = null;
+            return;
+        }
+        super.keyTyped(typedChar, keyCode);
     }
 
     private void updateSliderValue(DoubleProperty property, int mouseX) {

@@ -7,6 +7,7 @@ import cc.simp.event.impl.render.overlay.Render2DEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.property.Property;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.gui.FontRenderer;
@@ -22,8 +23,7 @@ import static cc.simp.utils.client.Util.mc;
 @ModuleInfo(label = "Arraylist", category = ModuleCategory.CLIENT)
 public final class ArraylistModule extends Module {
 
-    private static final Map<Module, String> displayLabelCache = new HashMap<>();
-    private static List<Module> moduleCache;
+    private final Property<Boolean> leftProperty = new Property<>("Align left", false);
 
     public ArraylistModule() {
         toggle();
@@ -37,7 +37,7 @@ public final class ArraylistModule extends Module {
         ScaledResolution sr = new ScaledResolution(mc);
 
         float hue = (System.currentTimeMillis() % 3000) / 3000f;
-        boolean left = false; // Can be made configurable
+        boolean left = leftProperty.getValue(); // Can be made configurable
         int y = left ? 12 : 1;
 
         List<Module> modules = new CopyOnWriteArrayList<>();
