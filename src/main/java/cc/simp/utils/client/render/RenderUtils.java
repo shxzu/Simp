@@ -5,6 +5,8 @@ import cc.simp.utils.client.misc.MathUtils;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
+
 public class RenderUtils extends Util {
     public static double progressiveAnimation(double now, double desired, double speed) {
         double dif = Math.abs(now - desired);
@@ -120,6 +122,59 @@ public class RenderUtils extends Util {
     public static void endScissor() {
         // Disable scissor test
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
+    }
+
+    public static double interpolate(double old,
+                                     double now,
+                                     float partialTicks) {
+        return old + (now - old) * partialTicks;
+    }
+
+    public static float interpolate(float old,
+                                    float now,
+                                    float partialTicks) {
+
+        return old + (now - old) * partialTicks;
+    }
+
+    public static int getRainbowFromEntity(long currentMillis, int speed, int offset, boolean invert, float alpha) {
+        float time = ((currentMillis + (offset * 300L)) % speed) / (float) speed;
+        int rainbow = Color.HSBtoRGB(invert ? 1.0F - time : time, 0.9F, 0.9F);
+        int r = (rainbow >> 16) & 0xFF;
+        int g = (rainbow >> 8) & 0xFF;
+        int b = rainbow & 0xFF;
+        int a = (int) (alpha * 255.0F);
+        return ((a & 0xFF) << 24) |
+                ((r & 0xFF) << 16) |
+                ((g & 0xFF) << 8) |
+                (b & 0xFF);
+    }
+
+    public static int fadeBetween(int startColor, int endColor, float progress) {
+        if (progress > 1)
+            progress = 1 - progress % 1;
+
+        return fadeTo(startColor, endColor, progress);
+    }
+
+    public static int fadeBetween(int startColor, int endColor) {
+        return fadeBetween(startColor, endColor, (System.currentTimeMillis() % 2000) / 1000.0F);
+    }
+
+    public static int fadeTo(int startColor, int endColor, float progress) {
+        float invert = 1.0F - progress;
+        int r = (int) ((startColor >> 16 & 0xFF) * invert +
+                (endColor >> 16 & 0xFF) * progress);
+        int g = (int) ((startColor >> 8 & 0xFF) * invert +
+                (endColor >> 8 & 0xFF) * progress);
+        int b = (int) ((startColor & 0xFF) * invert +
+                (endColor & 0xFF) * progress);
+        int a = (int) ((startColor >> 24 & 0xFF) * invert +
+                (endColor >> 24 & 0xFF) * progress);
+        return ((a & 0xFF) << 24) |
+                ((r & 0xFF) << 16) |
+                ((g & 0xFF) << 8) |
+                (b & 0xFF);
     }
 
 }

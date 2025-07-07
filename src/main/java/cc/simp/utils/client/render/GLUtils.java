@@ -43,6 +43,14 @@ public class GLUtils {
         GlStateManager.disableTexture2D();
     }
 
+    public static void color(int color) {
+        glColor4ub(
+                (byte) (color >> 16 & 0xFF),
+                (byte) (color >> 8 & 0xFF),
+                (byte) (color & 0xFF),
+                (byte) (color >> 24 & 0xFF));
+    }
+
     public static void setup2DRendering() {
         setup2DRendering(true);
     }
