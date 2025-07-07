@@ -55,6 +55,8 @@ public final class KillAuraModule extends Module {
         float[] rotations = getRotations();
         event.setYaw(rotations[0]);
         event.setPitch(rotations[1]);
+        RotationUtils.serverYaw = event.getYaw();
+        RotationUtils.serverPitch = event.getPitch();
 
         if (!keepSprintProperty.getValue()) {
             handleSprinting(event.getYaw());
@@ -72,8 +74,7 @@ public final class KillAuraModule extends Module {
                 mc.playerController.attackEntity(mc.thePlayer, target);
 
                 if (keepSprintProperty.getValue()) {
-                    mc.thePlayer.setSprinting(mc.thePlayer.moveForward > 0 ||
-                            Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).omniProperty.getValue());
+                    mc.thePlayer.setSprinting(MovementUtils.canSprint(Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).omniProperty.getValue()));
                 }
 
                 lastAttackTime = currentTime;
@@ -120,19 +121,10 @@ public final class KillAuraModule extends Module {
     }
 
     private void handleSprinting(float yaw) {
-        if (mc.thePlayer.moveForward > 0 || Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).omniProperty.getValue()) {
-            double x = -MathHelper.sin(yaw * 0.017453292F);
-            double z = MathHelper.cos(yaw * 0.017453292F);
-            double relativeX = target.posX - mc.thePlayer.posX;
-            double relativeZ = target.posZ - mc.thePlayer.posZ;
-            boolean behind = (relativeX * x + relativeZ * z) < 0.0D;
-
-            mc.thePlayer.setSprinting(!behind && MovementUtils.canSprint(
-                    Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).omniProperty.getValue()
-            ));
-        } else {
-            mc.thePlayer.setSprinting(false);
-        }
+        double x = -MathHelper.sin(yaw * 0.017453292F);
+        double z = MathHelper.cos(yaw * 0.017453292F);
+        boolean behind = target.posX * x + target.posZ * z < 0.0D;
+        mc.thePlayer.setSprinting(!behind && MovementUtils.canSprint(Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).omniProperty.getValue()));
     }
 
     @Override
