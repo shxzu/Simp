@@ -2,9 +2,11 @@ package cc.simp.utils.client.mc;
 
 import cc.simp.event.impl.player.MotionEvent;
 import cc.simp.event.impl.player.MoveEvent;
+import cc.simp.event.impl.player.PlayerInputEvent;
 import cc.simp.utils.client.Util;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovementInput;
 import org.lwjgl.input.Keyboard;
 
@@ -145,4 +147,53 @@ public class MovementUtils extends Util {
     public static boolean isMoving() {
         return mc.thePlayer.movementInput.moveForward != 0.0F || mc.thePlayer.movementInput.moveStrafe != 0.0F;
     }
+
+    public static double direction(float rotationYaw, double moveForward, double moveStrafing) {
+        if (moveForward < 0F) rotationYaw += 180F;
+
+        float forward = 1F;
+
+        if (moveForward < 0F) forward = -0.5F;
+        else if (moveForward > 0F) forward = 0.5F;
+
+        if (moveStrafing > 0F) rotationYaw -= 90F * forward;
+        if (moveStrafing < 0F) rotationYaw += 90F * forward;
+
+        return Math.toRadians(rotationYaw);
+    }
+
+    public static void fixMovement(PlayerInputEvent event, float yaw) {
+        fixMovement(event, yaw, mc.thePlayer.rotationYaw);
+    }
+
+    public static void fixMovement(PlayerInputEvent event, float yaw, float playerYaw) {
+        float forward = event.getForward();
+        float strafe = event.getStrafe();
+
+        if (forward == 0 && strafe == 0) return;
+
+        double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(playerYaw, forward, strafe)));
+
+        float closestForward = 0, closestStrafe = 0;
+        float closestDifference = Float.MAX_VALUE;
+
+        for (float predictedForward = -1F; predictedForward <= 1F; predictedForward += 1F) {
+            for (float predictedStrafe = -1F; predictedStrafe <= 1F; predictedStrafe += 1F) {
+                if (predictedForward == 0 && predictedStrafe == 0) continue;
+
+                double predictedAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(yaw, predictedForward, predictedStrafe)));
+                double difference = Math.abs(MathHelper.wrapAngleTo180_double(angle - predictedAngle));
+
+                if (difference < closestDifference) {
+                    closestDifference = (float) difference;
+                    closestForward = predictedForward;
+                    closestStrafe = predictedStrafe;
+                }
+            }
+        }
+
+        event.setForward(closestForward);
+        event.setStrafe(closestStrafe);
+    }
+
 }

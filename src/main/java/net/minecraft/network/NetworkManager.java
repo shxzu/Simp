@@ -1,5 +1,7 @@
 package net.minecraft.network;
 
+import cc.simp.Simp;
+import cc.simp.event.impl.packet.PacketReceiveEvent;
 import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.Bootstrap;
@@ -135,17 +137,16 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
         this.closeChannel(chatcomponenttranslation);
     }
 
-    protected void channelRead0(ChannelHandlerContext p_channelRead0_1_, Packet p_channelRead0_2_) throws Exception
-    {
-        if (this.channel.isOpen())
-        {
-            try
-            {
+    protected void channelRead0(ChannelHandlerContext p_channelRead0_1_, Packet p_channelRead0_2_) throws Exception {
+        if (this.channel.isOpen()) {
+            try {
+                PacketReceiveEvent event = new PacketReceiveEvent(p_channelRead0_2_);
+                Simp.INSTANCE.getEventBus().post(event);
+                if (event.isCancelled()) {
+                    return;
+                }
                 p_channelRead0_2_.processPacket(this.packetListener);
-            }
-            catch (ThreadQuickExitException var4)
-            {
-                ;
+            } catch (ThreadQuickExitException var4) {
             }
         }
     }

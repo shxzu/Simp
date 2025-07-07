@@ -7,8 +7,10 @@ import cc.simp.modules.impl.client.TabGUIModule;
 import cc.simp.modules.impl.client.TargetHUDModule;
 import cc.simp.modules.impl.client.WatermarkModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
+import cc.simp.modules.impl.movement.MovementFixModule;
 import cc.simp.modules.impl.movement.SpeedModule;
 import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.modules.impl.render.AmbienceModule;
 import cc.simp.modules.impl.render.ChamsModule;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import io.github.nevalackin.homoBus.Listener;
@@ -33,10 +35,12 @@ public final class ModuleManager {
                 // MOVEMENT
                 new SprintModule(),
                 new SpeedModule(),
+                new MovementFixModule(),
 
                 // EXPLOIT
 
                 // RENDER
+                new AmbienceModule(),
                 new ChamsModule(),
 
                 // CLIENT
