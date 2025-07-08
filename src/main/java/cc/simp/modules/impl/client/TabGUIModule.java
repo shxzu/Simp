@@ -9,11 +9,11 @@ import cc.simp.modules.ModuleInfo;
 import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.property.impl.Representation;
+import cc.simp.utils.client.font.FontManager;
+import cc.simp.utils.client.font.TrueTypeFontRenderer;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import org.lwjgl.input.Keyboard;
 
@@ -30,6 +30,7 @@ public final class TabGUIModule extends Module {
     private final Property<Boolean> rainbowProperty = new Property<>("Rainbow", true);
     private final EnumProperty<Position> position = new EnumProperty<>("Position", Position.LEFT);
 
+    TrueTypeFontRenderer CFont = FontManager.CSGO_FR;
     private boolean inModules = false;
     private boolean inSettings = false;
     private int currentCategory = 0;
@@ -62,7 +63,7 @@ public final class TabGUIModule extends Module {
         if (mc.gameSettings.showDebugInfo) return;
 
         ScaledResolution sr = new ScaledResolution(mc);
-        FontRenderer fr = mc.fontRendererObj;
+        MinecraftFontRenderer fr = mc.minecraftFontRendererObj;
 
         // Update rainbow - use the same calculation as in ArraylistModule
         float hue = (System.currentTimeMillis() % 3000) / 3000f;
@@ -96,7 +97,11 @@ public final class TabGUIModule extends Module {
                         new Color(255, 255, 255, 40).getRGB());
             }
 
-            fr.drawStringWithShadow(category.name(), startX + 4, y, color.getRGB());
+            if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
+                CFont.drawStringWithShadow(category.name(), startX + 4, y, color.getRGB());
+            } else {
+                fr.drawStringWithShadow(category.name(), startX + 4, y, color.getRGB());
+            }
             y += 12;
             hue += 0.035f;
             if (hue > 1.0f) hue = 0.0f;
@@ -211,7 +216,7 @@ public final class TabGUIModule extends Module {
         }
     }
 
-    private void renderModuleList(FontRenderer fr, int x, int y, List<Module> modules) {
+    private void renderModuleList(MinecraftFontRenderer fr, int x, int y, List<Module> modules) {
         int width = 70;
         int height = modules.size() * 12 + 2;
         float hue = (System.currentTimeMillis() % 3000) / 3000f;
@@ -234,13 +239,23 @@ public final class TabGUIModule extends Module {
             // Module text
             String text = module.getLabel() + (module.getSuffix() != null ? " §7" + module.getSuffix() : "");
             Color rainbow = Color.getHSBColor(hue, 0.55f, 0.9f);
-            fr.drawStringWithShadow(text, x + 4, currentY,
-                    rainbowProperty.getValue() ? rainbow.getRGB() :
-                            module.isEnabled() ? -1 : Color.GRAY.getRGB());
+            if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
+                CFont.drawStringWithShadow(text, x + 4, currentY,
+                        rainbowProperty.getValue() ? rainbow.getRGB() :
+                                module.isEnabled() ? -1 : Color.GRAY.getRGB());
+            } else {
+                fr.drawStringWithShadow(text, x + 4, currentY,
+                        rainbowProperty.getValue() ? rainbow.getRGB() :
+                                module.isEnabled() ? -1 : Color.GRAY.getRGB());
+            }
 
             // Settings indicator
             if (!module.getElements().isEmpty()) {
-                fr.drawStringWithShadow("...", x + width - 10, currentY, Color.GRAY.getRGB());
+                if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
+                    CFont.drawStringWithShadow("...", x + width - 10, currentY, Color.GRAY.getRGB());
+                } else {
+                    fr.drawStringWithShadow("...", x + width - 10, currentY, Color.GRAY.getRGB());
+                }
             }
 
             currentY += 12;
@@ -249,7 +264,7 @@ public final class TabGUIModule extends Module {
         }
     }
 
-    private void renderSettings(FontRenderer fr, int x, int y, Module module) {
+    private void renderSettings(MinecraftFontRenderer fr, int x, int y, Module module) {
         List<Property<?>> properties = module.getElements();
         int width = 90;
         int height = properties.size() * 12 + 2;
@@ -278,8 +293,13 @@ public final class TabGUIModule extends Module {
             String value = getPropertyValue(property);
             String text = name + ": §7" + value;
 
-            fr.drawStringWithShadow(text, x + 4, currentY,
-                    rainbowProperty.getValue() ? rainbow.getRGB() : -1);
+            if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
+                CFont.drawStringWithShadow(text, x + 4, currentY,
+                        rainbowProperty.getValue() ? rainbow.getRGB() : -1);
+            } else {
+                fr.drawStringWithShadow(text, x + 4, currentY,
+                        rainbowProperty.getValue() ? rainbow.getRGB() : -1);
+            }
 
             currentY += 12;
             hue += 0.035f;

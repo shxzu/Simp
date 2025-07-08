@@ -2,10 +2,7 @@ package cc.simp.modules;
 
 import cc.simp.Simp;
 import cc.simp.event.impl.KeyPressEvent;
-import cc.simp.modules.impl.client.ArraylistModule;
-import cc.simp.modules.impl.client.TabGUIModule;
-import cc.simp.modules.impl.client.TargetHUDModule;
-import cc.simp.modules.impl.client.WatermarkModule;
+import cc.simp.modules.impl.client.*;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.movement.MovementFixModule;
 import cc.simp.modules.impl.movement.SpeedModule;
@@ -47,7 +44,8 @@ public final class ModuleManager {
                 new WatermarkModule(),
                 new ArraylistModule(),
                 new TargetHUDModule(),
-                new TabGUIModule()
+                new TabGUIModule(),
+                new FontManagerModule()
         );
         getModules().forEach(Module::reflectProperties);
 

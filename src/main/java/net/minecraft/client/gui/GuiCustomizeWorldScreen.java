@@ -943,9 +943,9 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
     {
         this.drawDefaultBackground();
         this.field_175349_r.drawScreen(mouseX, mouseY, partialTicks);
-        this.drawCenteredString(this.fontRendererObj, this.field_175341_a, this.width / 2, 2, 16777215);
-        this.drawCenteredString(this.fontRendererObj, this.field_175333_f, this.width / 2, 12, 16777215);
-        this.drawCenteredString(this.fontRendererObj, this.field_175335_g, this.width / 2, 22, 16777215);
+        this.drawCenteredString(this.minecraftFontRendererObj, this.field_175341_a, this.width / 2, 2, 16777215);
+        this.drawCenteredString(this.minecraftFontRendererObj, this.field_175333_f, this.width / 2, 12, 16777215);
+        this.drawCenteredString(this.minecraftFontRendererObj, this.field_175335_g, this.width / 2, 22, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         if (this.field_175339_B != 0)
@@ -970,9 +970,9 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
             worldrenderer.pos((double)(this.width / 2 + 90), 100.0D, 0.0D).tex(5.625D, 0.0D).color(64, 64, 64, 64).endVertex();
             worldrenderer.pos((double)(this.width / 2 - 90), 100.0D, 0.0D).tex(0.0D, 0.0D).color(64, 64, 64, 64).endVertex();
             tessellator.draw();
-            this.drawCenteredString(this.fontRendererObj, I18n.format("createWorld.customize.custom.confirmTitle", new Object[0]), this.width / 2, 105, 16777215);
-            this.drawCenteredString(this.fontRendererObj, I18n.format("createWorld.customize.custom.confirm1", new Object[0]), this.width / 2, 125, 16777215);
-            this.drawCenteredString(this.fontRendererObj, I18n.format("createWorld.customize.custom.confirm2", new Object[0]), this.width / 2, 135, 16777215);
+            this.drawCenteredString(this.minecraftFontRendererObj, I18n.format("createWorld.customize.custom.confirmTitle", new Object[0]), this.width / 2, 105, 16777215);
+            this.drawCenteredString(this.minecraftFontRendererObj, I18n.format("createWorld.customize.custom.confirm1", new Object[0]), this.width / 2, 125, 16777215);
+            this.drawCenteredString(this.minecraftFontRendererObj, I18n.format("createWorld.customize.custom.confirm2", new Object[0]), this.width / 2, 135, 16777215);
             this.field_175352_x.drawButton(this.mc, mouseX, mouseY);
             this.field_175351_y.drawButton(this.mc, mouseX, mouseY);
         }

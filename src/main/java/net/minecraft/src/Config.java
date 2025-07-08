@@ -71,7 +71,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.PixelFormat;
@@ -2171,7 +2170,7 @@ public class Config
         int k = minecraft.renderGlobal.getCountEntitiesRendered();
         int l = minecraft.renderGlobal.getCountTileEntitiesRendered();
         String s1 = "" + i + "/" + getFpsMin() + " fps, C: " + j + ", E: " + k + "+" + l + ", U: " + s;
-        minecraft.fontRendererObj.drawString(s1, 2, 2, -2039584);
+        minecraft.minecraftFontRendererObj.drawString(s1, 2, 2, -2039584);
     }
 
     public static int getFpsMin()

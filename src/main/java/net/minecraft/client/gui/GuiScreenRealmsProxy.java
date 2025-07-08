@@ -31,18 +31,18 @@ public class GuiScreenRealmsProxy extends GuiScreen
 
     public void func_154325_a(String p_154325_1_, int p_154325_2_, int p_154325_3_, int p_154325_4_)
     {
-        super.drawCenteredString(this.fontRendererObj, p_154325_1_, p_154325_2_, p_154325_3_, p_154325_4_);
+        super.drawCenteredString(this.minecraftFontRendererObj, p_154325_1_, p_154325_2_, p_154325_3_, p_154325_4_);
     }
 
     public void func_154322_b(String p_154322_1_, int p_154322_2_, int p_154322_3_, int p_154322_4_, boolean p_154322_5_)
     {
         if (p_154322_5_)
         {
-            super.drawString(this.fontRendererObj, p_154322_1_, p_154322_2_, p_154322_3_, p_154322_4_);
+            super.drawString(this.minecraftFontRendererObj, p_154322_1_, p_154322_2_, p_154322_3_, p_154322_4_);
         }
         else
         {
-            this.fontRendererObj.drawString(p_154322_1_, p_154322_2_, p_154322_3_, p_154322_4_);
+            this.minecraftFontRendererObj.drawString(p_154322_1_, p_154322_2_, p_154322_3_, p_154322_4_);
         }
     }
 
@@ -100,22 +100,22 @@ public class GuiScreenRealmsProxy extends GuiScreen
 
     public int func_154329_h()
     {
-        return this.fontRendererObj.FONT_HEIGHT;
+        return this.minecraftFontRendererObj.FONT_HEIGHT;
     }
 
     public int func_154326_c(String p_154326_1_)
     {
-        return this.fontRendererObj.getStringWidth(p_154326_1_);
+        return this.minecraftFontRendererObj.getStringWidth(p_154326_1_);
     }
 
     public void func_154319_c(String p_154319_1_, int p_154319_2_, int p_154319_3_, int p_154319_4_)
     {
-        this.fontRendererObj.drawStringWithShadow(p_154319_1_, (float)p_154319_2_, (float)p_154319_3_, p_154319_4_);
+        this.minecraftFontRendererObj.drawStringWithShadow(p_154319_1_, (float)p_154319_2_, (float)p_154319_3_, p_154319_4_);
     }
 
     public List<String> func_154323_a(String p_154323_1_, int p_154323_2_)
     {
-        return this.fontRendererObj.listFormattedStringToWidth(p_154323_1_, p_154323_2_);
+        return this.minecraftFontRendererObj.listFormattedStringToWidth(p_154323_1_, p_154323_2_);
     }
 
     public final void actionPerformed(GuiButton button) throws IOException

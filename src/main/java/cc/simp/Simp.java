@@ -11,6 +11,7 @@ import cc.simp.event.impl.game.ClientStartupEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleManager;
 import cc.simp.ui.click.window.WindowClickGUI;
+import cc.simp.utils.client.font.FontManager;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import io.github.nevalackin.homoBus.bus.impl.EventBus;
@@ -45,6 +46,9 @@ public class Simp {
 
     @EventLink
     public final Listener<ClientStartupEvent> onClientStart = e -> {
+
+        // Font Manager
+        FontManager.initTextures();
 
         // Module Manager
         moduleManager = new ModuleManager();

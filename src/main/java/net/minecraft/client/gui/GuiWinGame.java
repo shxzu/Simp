@@ -98,7 +98,7 @@ public class GuiWinGame extends GuiScreen
                         s3 = s.substring(j + s1.length());
                     }
 
-                    this.field_146582_i.addAll(this.mc.fontRendererObj.listFormattedStringToWidth(s, i));
+                    this.field_146582_i.addAll(this.mc.minecraftFontRendererObj.listFormattedStringToWidth(s, i));
                     this.field_146582_i.add("");
                 }
 
@@ -116,7 +116,7 @@ public class GuiWinGame extends GuiScreen
                 {
                     s = s.replaceAll("PLAYERNAME", this.mc.getSession().getUsername());
                     s = s.replaceAll("\t", "    ");
-                    this.field_146582_i.addAll(this.mc.fontRendererObj.listFormattedStringToWidth(s, i));
+                    this.field_146582_i.addAll(this.mc.minecraftFontRendererObj.listFormattedStringToWidth(s, i));
                     this.field_146582_i.add("");
                 }
 
@@ -198,12 +198,12 @@ public class GuiWinGame extends GuiScreen
 
                 if (s.startsWith("[C]"))
                 {
-                    this.fontRendererObj.drawStringWithShadow(s.substring(3), (float)(j + (i - this.fontRendererObj.getStringWidth(s.substring(3))) / 2), (float)l, 16777215);
+                    this.minecraftFontRendererObj.drawStringWithShadow(s.substring(3), (float)(j + (i - this.minecraftFontRendererObj.getStringWidth(s.substring(3))) / 2), (float)l, 16777215);
                 }
                 else
                 {
-                    this.fontRendererObj.fontRandom.setSeed((long)i1 * 4238972211L + (long)(this.field_146581_h / 4));
-                    this.fontRendererObj.drawStringWithShadow(s, (float)j, (float)l, 16777215);
+                    this.minecraftFontRendererObj.fontRandom.setSeed((long)i1 * 4238972211L + (long)(this.field_146581_h / 4));
+                    this.minecraftFontRendererObj.drawStringWithShadow(s, (float)j, (float)l, 16777215);
                 }
             }
 

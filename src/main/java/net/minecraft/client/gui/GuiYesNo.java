@@ -41,7 +41,7 @@ public class GuiYesNo extends GuiScreen
         this.buttonList.add(new GuiOptionButton(0, this.width / 2 - 155, this.height / 6 + 96, this.confirmButtonText));
         this.buttonList.add(new GuiOptionButton(1, this.width / 2 - 155 + 160, this.height / 6 + 96, this.cancelButtonText));
         this.field_175298_s.clear();
-        this.field_175298_s.addAll(this.fontRendererObj.listFormattedStringToWidth(this.messageLine2, this.width - 50));
+        this.field_175298_s.addAll(this.minecraftFontRendererObj.listFormattedStringToWidth(this.messageLine2, this.width - 50));
     }
 
     protected void actionPerformed(GuiButton button) throws IOException
@@ -52,13 +52,13 @@ public class GuiYesNo extends GuiScreen
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, this.messageLine1, this.width / 2, 70, 16777215);
+        this.drawCenteredString(this.minecraftFontRendererObj, this.messageLine1, this.width / 2, 70, 16777215);
         int i = 90;
 
         for (String s : this.field_175298_s)
         {
-            this.drawCenteredString(this.fontRendererObj, s, this.width / 2, i, 16777215);
-            i += this.fontRendererObj.FONT_HEIGHT;
+            this.drawCenteredString(this.minecraftFontRendererObj, s, this.width / 2, i, 16777215);
+            i += this.minecraftFontRendererObj.FONT_HEIGHT;
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);

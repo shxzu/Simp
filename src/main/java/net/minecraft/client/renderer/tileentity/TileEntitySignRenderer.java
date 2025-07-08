@@ -3,7 +3,7 @@ package net.minecraft.client.renderer.tileentity;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.gui.GuiUtilRenderComponents;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.client.model.ModelSign;
@@ -85,7 +85,7 @@ public class TileEntitySignRenderer extends TileEntitySpecialRenderer<TileEntity
 
         if (isRenderText(te))
         {
-            FontRenderer fontrenderer = this.getFontRenderer();
+            MinecraftFontRenderer fontrenderer = this.getFontRenderer();
             float f3 = 0.015625F * f;
             GlStateManager.translate(0.0F, 0.5F * f, 0.07F * f);
             GlStateManager.scale(f3, -f3, f3);

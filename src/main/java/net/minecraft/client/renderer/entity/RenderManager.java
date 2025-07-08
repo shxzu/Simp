@@ -7,7 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.model.ModelChicken;
 import net.minecraft.client.model.ModelCow;
 import net.minecraft.client.model.ModelHorse;
@@ -111,7 +111,7 @@ public class RenderManager
     private Map<Class, Render> entityRenderMap = Maps.newHashMap();
     private Map<String, RenderPlayer> skinMap = Maps.<String, RenderPlayer>newHashMap();
     private RenderPlayer playerRenderer;
-    private FontRenderer textRenderer;
+    private MinecraftFontRenderer textRenderer;
     private double renderPosX;
     private double renderPosY;
     private double renderPosZ;
@@ -237,7 +237,7 @@ public class RenderManager
         }
     }
 
-    public void cacheActiveRenderInfo(World worldIn, FontRenderer textRendererIn, Entity livingPlayerIn, Entity pointedEntityIn, GameSettings optionsIn, float partialTicks)
+    public void cacheActiveRenderInfo(World worldIn, MinecraftFontRenderer textRendererIn, Entity livingPlayerIn, Entity pointedEntityIn, GameSettings optionsIn, float partialTicks)
     {
         this.worldObj = worldIn;
         this.options = optionsIn;
@@ -488,7 +488,7 @@ public class RenderManager
         return d0 * d0 + d1 * d1 + d2 * d2;
     }
 
-    public FontRenderer getFontRenderer()
+    public MinecraftFontRenderer getFontRenderer()
     {
         return this.textRenderer;
     }

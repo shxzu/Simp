@@ -4,7 +4,7 @@ import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -64,7 +64,7 @@ public class TooltipManager
                                 k = 16719904;
                             }
 
-                            FontRenderer fontrenderer = Minecraft.getMinecraft().fontRendererObj;
+                            MinecraftFontRenderer fontrenderer = Minecraft.getMinecraft().minecraftFontRendererObj;
                             fontrenderer.drawStringWithShadow(s, (float)(rectangle.x + 5), (float)(rectangle.y + 5 + l * 11), k);
                         }
                     }

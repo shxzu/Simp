@@ -117,12 +117,12 @@ public class GuiAchievement extends Gui
 
             if (this.permanentNotification)
             {
-                this.mc.fontRendererObj.drawSplitString(this.achievementDescription, i + 30, j + 7, 120, -1);
+                this.mc.minecraftFontRendererObj.drawSplitString(this.achievementDescription, i + 30, j + 7, 120, -1);
             }
             else
             {
-                this.mc.fontRendererObj.drawString(this.achievementTitle, i + 30, j + 7, -256);
-                this.mc.fontRendererObj.drawString(this.achievementDescription, i + 30, j + 18, -1);
+                this.mc.minecraftFontRendererObj.drawString(this.achievementTitle, i + 30, j + 7, -256);
+                this.mc.minecraftFontRendererObj.drawString(this.achievementDescription, i + 30, j + 18, -1);
             }
 
             RenderHelper.enableGUIStandardItemLighting();

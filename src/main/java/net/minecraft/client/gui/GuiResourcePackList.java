@@ -17,13 +17,13 @@ public abstract class GuiResourcePackList extends GuiListExtended
         this.mc = mcIn;
         this.field_148204_l = p_i45055_4_;
         this.field_148163_i = false;
-        this.setHasListHeader(true, (int)((float)mcIn.fontRendererObj.FONT_HEIGHT * 1.5F));
+        this.setHasListHeader(true, (int)((float)mcIn.minecraftFontRendererObj.FONT_HEIGHT * 1.5F));
     }
 
     protected void drawListHeader(int p_148129_1_, int p_148129_2_, Tessellator p_148129_3_)
     {
         String s = EnumChatFormatting.UNDERLINE + "" + EnumChatFormatting.BOLD + this.getListHeader();
-        this.mc.fontRendererObj.drawString(s, p_148129_1_ + this.width / 2 - this.mc.fontRendererObj.getStringWidth(s) / 2, Math.min(this.top + 3, p_148129_2_), 16777215);
+        this.mc.minecraftFontRendererObj.drawString(s, p_148129_1_ + this.width / 2 - this.mc.minecraftFontRendererObj.getStringWidth(s) / 2, Math.min(this.top + 3, p_148129_2_), 16777215);
     }
 
     protected abstract String getListHeader();

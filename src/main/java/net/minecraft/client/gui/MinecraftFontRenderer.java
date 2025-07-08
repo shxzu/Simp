@@ -29,7 +29,7 @@ import net.optifine.util.FontUtils;
 import org.apache.commons.io.IOUtils;
 import org.lwjgl.opengl.GL11;
 
-public class FontRenderer implements IResourceManagerReloadListener
+public class MinecraftFontRenderer implements IResourceManagerReloadListener
 {
     private static final ResourceLocation[] unicodePageLocations = new ResourceLocation[256];
     private final int[] charWidth = new int[256];
@@ -60,7 +60,7 @@ public class FontRenderer implements IResourceManagerReloadListener
     private boolean blend = false;
     private GlBlendState oldBlendState = new GlBlendState();
 
-    public FontRenderer(GameSettings gameSettingsIn, ResourceLocation location, TextureManager textureManagerIn, boolean unicode)
+    public MinecraftFontRenderer(GameSettings gameSettingsIn, ResourceLocation location, TextureManager textureManagerIn, boolean unicode)
     {
         this.gameSettings = gameSettingsIn;
         this.locationFontTextureBase = location;

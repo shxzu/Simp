@@ -4,13 +4,12 @@ import cc.simp.Simp;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.property.Property;
-import cc.simp.property.impl.BooleanProperty;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
 import cc.simp.utils.client.Logger;
 import cc.simp.utils.client.render.RenderUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Keyboard;
@@ -24,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WindowClickGUI extends GuiScreen {
 
-    private final FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
+    private final MinecraftFontRenderer minecraftFontRenderer = Minecraft.getMinecraft().minecraftFontRendererObj;
     private ModuleCategory currentCategory = ModuleCategory.COMBAT;
     private Module selectedModule = null;
 
@@ -107,7 +106,7 @@ public class WindowClickGUI extends GuiScreen {
             drawSettingsPanel(mouseX, mouseY, innerX + moduleListWidth + padding, contentY, innerWidth - moduleListWidth - padding, contentHeight);
         }
 
-        fontRenderer.drawStringWithShadow(Simp.NAME + " " + Simp.BUILD, (float) (windowX + padding), (float) (windowY + windowHeight - fontRenderer.FONT_HEIGHT - 5), textColor.getRGB());
+        minecraftFontRenderer.drawStringWithShadow(Simp.NAME + " " + Simp.BUILD, (float) (windowX + padding), (float) (windowY + windowHeight - minecraftFontRenderer.FONT_HEIGHT - 5), textColor.getRGB());
     }
 
     private void drawCategoryButtons(int mouseX, int mouseY, double x, double y, double height) {
@@ -115,11 +114,11 @@ public class WindowClickGUI extends GuiScreen {
         int i = 0;
         for (ModuleCategory category : ModuleCategory.values()) {
             String name = category.name();
-            double textWidth = fontRenderer.getStringWidth(name);
+            double textWidth = minecraftFontRenderer.getStringWidth(name);
             categoryBounds.put(category, new double[]{categoryX, y, categoryX + textWidth, y + height});
             boolean isHovered = inBounds(mouseX, mouseY, categoryBounds.get(category));
             int color = (currentCategory == category) ? getRainbowColor(i * 120) : (isHovered ? Color.WHITE.getRGB() : textColor.getRGB());
-            fontRenderer.drawStringWithShadow(name, (float) categoryX, (float) (y + (height - fontRenderer.FONT_HEIGHT) / 2), color);
+            minecraftFontRenderer.drawStringWithShadow(name, (float) categoryX, (float) (y + (height - minecraftFontRenderer.FONT_HEIGHT) / 2), color);
             categoryX += textWidth + padding * 2;
             i++;
         }
@@ -130,31 +129,31 @@ public class WindowClickGUI extends GuiScreen {
         int i = 0;
         for (Module module : Simp.INSTANCE.getModuleManager().getModulesForCategory(currentCategory)) {
             String name = (module == listeningModule) ? "Listening..." : module.getLabel();
-            moduleBounds.put(module, new double[]{x + padding, moduleY, x + width - padding, moduleY + fontRenderer.FONT_HEIGHT});
+            moduleBounds.put(module, new double[]{x + padding, moduleY, x + width - padding, moduleY + minecraftFontRenderer.FONT_HEIGHT});
             boolean isHovered = inBounds(mouseX, mouseY, moduleBounds.get(module));
             int color = module.isEnabled() ? getRainbowColor(i * 80) :
                     (selectedModule == module ? Color.WHITE.getRGB() : textColor.getRGB());
 
             // Draw module name
-            fontRenderer.drawStringWithShadow(name, (float) (x + padding), (float) moduleY, color);
+            minecraftFontRenderer.drawStringWithShadow(name, (float) (x + padding), (float) moduleY, color);
 
             // Draw key bind if not listening and has a key bound
             if (module != listeningModule && module.getKey() != 0) {
                 String keyName = Keyboard.getKeyName(module.getKey());
-                float keyX = (float) (x + width - padding - fontRenderer.getStringWidth(keyName));
-                fontRenderer.drawStringWithShadow("§7[" + keyName + "]", keyX, (float) moduleY, textColor.getRGB());
+                float keyX = (float) (x + width - padding - minecraftFontRenderer.getStringWidth(keyName));
+                minecraftFontRenderer.drawStringWithShadow("§7[" + keyName + "]", keyX, (float) moduleY, textColor.getRGB());
             }
 
-            moduleY += fontRenderer.FONT_HEIGHT + padding;
+            moduleY += minecraftFontRenderer.FONT_HEIGHT + padding;
             i++;
         }
     }
 
     private void drawSettingsPanel(int mouseX, int mouseY, double x, double y, double width, double height) {
         Gui.drawRect((int) x, (int) y, (int) (x + width), (int) (y + height), headerColor.getRGB());
-        fontRenderer.drawStringWithShadow(selectedModule.getDescription() + " Settings", (float) (x + padding), (float) (y + padding), textColor.getRGB());
-        double propertiesAreaY = y + fontRenderer.FONT_HEIGHT + padding * 2;
-        double propertiesAreaHeight = height - (fontRenderer.FONT_HEIGHT + padding * 3);
+        minecraftFontRenderer.drawStringWithShadow(selectedModule.getDescription() + " Settings", (float) (x + padding), (float) (y + padding), textColor.getRGB());
+        double propertiesAreaY = y + minecraftFontRenderer.FONT_HEIGHT + padding * 2;
+        double propertiesAreaHeight = height - (minecraftFontRenderer.FONT_HEIGHT + padding * 3);
 
         RenderUtils.startScissor((float) x, (float) propertiesAreaY, (float) width, (float) propertiesAreaHeight);
         double logicalPropertyY = propertiesAreaY;
@@ -165,7 +164,7 @@ public class WindowClickGUI extends GuiScreen {
             double propertyHeight = getPropertyHeight(property);
             propertyBounds.put(property, new double[]{x, logicalPropertyY, x + width, logicalPropertyY + propertyHeight});
             double drawnY = logicalPropertyY - propertyScrollOffset;
-            fontRenderer.drawStringWithShadow(property.getLabel(), (float) (x + padding), (float) (drawnY + 4), textColor.getRGB());
+            minecraftFontRenderer.drawStringWithShadow(property.getLabel(), (float) (x + padding), (float) (drawnY + 4), textColor.getRGB());
             if (property.getType() == Boolean.class) {
                 drawBooleanProperty(property, x + width - padding - 15, drawnY + 2, i);
             } else if (property instanceof EnumProperty) {
@@ -208,7 +207,7 @@ public class WindowClickGUI extends GuiScreen {
         if (property instanceof DoubleProperty) return 40;
         if (property instanceof EnumProperty && property == openDropdown) {
             EnumProperty<?> enumProp = (EnumProperty<?>) property;
-            return 25 + (enumProp.getValues().length * (fontRenderer.FONT_HEIGHT + 8)) + 5;
+            return 25 + (enumProp.getValues().length * (minecraftFontRenderer.FONT_HEIGHT + 8)) + 5;
         }
         return 25;
     }
@@ -222,9 +221,9 @@ public class WindowClickGUI extends GuiScreen {
     }
 
     private void drawEnumProperty(EnumProperty<?> property, double x, double y, double width) {
-        double height = fontRenderer.FONT_HEIGHT + 8;
+        double height = minecraftFontRenderer.FONT_HEIGHT + 8;
         Gui.drawRect((int) x, (int) y, (int) (x + width), (int) (y + height), componentBgColor.getRGB());
-        fontRenderer.drawStringWithShadow(property.getValue().toString(), (float) (x + 5), (float) (y + 4), textColor.getRGB());
+        minecraftFontRenderer.drawStringWithShadow(property.getValue().toString(), (float) (x + 5), (float) (y + 4), textColor.getRGB());
         RenderUtils.drawArrow((float) (x + width - 12), (float) (y + height / 2 - 2), 4, openDropdown == property ? RenderUtils.ArrowDirection.UP : RenderUtils.ArrowDirection.DOWN, textColor.getRGB());
     }
 
@@ -239,11 +238,11 @@ public class WindowClickGUI extends GuiScreen {
         optionBounds.clear();
         double optionY = y;
         for (Object enumValue : openDropdown.getValues()) {
-            double optionHeight = fontRenderer.FONT_HEIGHT + 8;
+            double optionHeight = minecraftFontRenderer.FONT_HEIGHT + 8;
             optionBounds.put(enumValue, new double[]{x, optionY, x + width, optionY + optionHeight});
             boolean isHovered = inBounds(mouseX, mouseY, optionBounds.get(enumValue));
             Gui.drawRect((int)x, (int)optionY, (int)(x+width), (int)(optionY + optionHeight), isHovered ? dropdownHoverColor.getRGB() : componentBgColor.getRGB());
-            fontRenderer.drawStringWithShadow(enumValue.toString(), (float) (x + 5), (float) (optionY + 4), textColor.getRGB());
+            minecraftFontRenderer.drawStringWithShadow(enumValue.toString(), (float) (x + 5), (float) (optionY + 4), textColor.getRGB());
             optionY += optionHeight;
         }
     }
@@ -263,7 +262,7 @@ public class WindowClickGUI extends GuiScreen {
         RenderUtils.drawCircle(x + (width * percentage), sliderY + 3, 4, bgColor.getRGB());
 
         String valueText = String.format("%.2f", value);
-        fontRenderer.drawStringWithShadow(valueText, (float) (x + width - fontRenderer.getStringWidth(valueText)), (float) (sliderY - 12), textColor.getRGB());
+        minecraftFontRenderer.drawStringWithShadow(valueText, (float) (x + width - minecraftFontRenderer.getStringWidth(valueText)), (float) (sliderY - 12), textColor.getRGB());
 
         sliderBounds.put(property, new double[]{x, sliderY, x + width, sliderY + 6});
     }

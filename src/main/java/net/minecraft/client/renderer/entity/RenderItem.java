@@ -21,7 +21,7 @@ import net.minecraft.block.BlockStoneSlabNew;
 import net.minecraft.block.BlockTallGrass;
 import net.minecraft.block.BlockWall;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.ItemMeshDefinition;
@@ -565,12 +565,12 @@ public class RenderItem implements IResourceManagerReloadListener
         }
     }
 
-    public void renderItemOverlays(FontRenderer fr, ItemStack stack, int xPosition, int yPosition)
+    public void renderItemOverlays(MinecraftFontRenderer fr, ItemStack stack, int xPosition, int yPosition)
     {
         this.renderItemOverlayIntoGUI(fr, stack, xPosition, yPosition, (String)null);
     }
 
-    public void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text)
+    public void renderItemOverlayIntoGUI(MinecraftFontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text)
     {
         if (stack != null)
         {

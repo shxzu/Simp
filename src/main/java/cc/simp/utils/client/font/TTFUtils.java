@@ -10,7 +10,7 @@ public class TTFUtils extends Util {
     public static Font getFontFromLocation(String fileName, int size) {
         try {
             return Font.createFont(Font.TRUETYPE_FONT, mc.getResourceManager()
-                            .getResource(new ResourceLocation("radium/fonts/" + fileName))
+                            .getResource(new ResourceLocation("simp/fonts/" + fileName))
                             .getInputStream())
                     .deriveFont(Font.PLAIN, size);
         } catch (FontFormatException | IOException ignored) {

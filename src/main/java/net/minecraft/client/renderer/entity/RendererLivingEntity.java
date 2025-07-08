@@ -8,7 +8,7 @@ import java.nio.FloatBuffer;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelSpider;
 import net.minecraft.client.renderer.GLAllocation;
@@ -277,7 +277,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
 
             if (scoreplayerteam != null)
             {
-                String s = FontRenderer.getFormatFromString(scoreplayerteam.getColorPrefix());
+                String s = MinecraftFontRenderer.getFormatFromString(scoreplayerteam.getColorPrefix());
 
                 if (s.length() >= 2)
                 {
@@ -670,7 +670,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
 
                     if (entity.isSneaking())
                     {
-                        FontRenderer fontrenderer = this.getFontRendererFromRenderManager();
+                        MinecraftFontRenderer fontrenderer = this.getFontRendererFromRenderManager();
                         GlStateManager.pushMatrix();
                         GlStateManager.translate((float)x, (float)y + entity.height + 0.5F - (entity.isChild() ? entity.height / 2.0F : 0.0F), (float)z);
                         GL11.glNormal3f(0.0F, 1.0F, 0.0F);

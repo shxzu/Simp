@@ -11,7 +11,7 @@ public final class FontManager {
     public static final TrueTypeFontRenderer SMALL_FR =
             new TrueTypeFontRenderer(TTFUtils.getFontFromLocation("font.ttf", 18), true, true);
     public static final TrueTypeFontRenderer CSGO_FR = new TrueTypeFontRenderer(
-            new Font("Tahoma", Font.BOLD, 11), true, false);
+            new Font("Tahoma", Font.PLAIN, 18), true, true);
     public static final TrueTypeFontRenderer FN_FR = new TrueTypeFontRenderer(
             TTFUtils.getFontFromLocation("Burbank.ttf", 36), true, false);
     public static final TrueTypeFontRenderer SP_FR = new TrueTypeFontRenderer(

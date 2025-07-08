@@ -29,11 +29,11 @@ public class GuiStreamIndicator
             if (i > 0)
             {
                 String s = "" + i;
-                int j = this.mc.fontRendererObj.getStringWidth(s);
+                int j = this.mc.minecraftFontRendererObj.getStringWidth(s);
                 int k = 20;
                 int l = p_152437_1_ - j - 1;
                 int i1 = p_152437_2_ + 20 - 1;
-                int j1 = p_152437_2_ + 20 + this.mc.fontRendererObj.FONT_HEIGHT - 1;
+                int j1 = p_152437_2_ + 20 + this.mc.minecraftFontRendererObj.FONT_HEIGHT - 1;
                 GlStateManager.disableTexture2D();
                 Tessellator tessellator = Tessellator.getInstance();
                 WorldRenderer worldrenderer = tessellator.getWorldRenderer();
@@ -45,7 +45,7 @@ public class GuiStreamIndicator
                 worldrenderer.pos((double)l, (double)i1, 0.0D).endVertex();
                 tessellator.draw();
                 GlStateManager.enableTexture2D();
-                this.mc.fontRendererObj.drawString(s, p_152437_1_ - j, p_152437_2_ + 20, 16777215);
+                this.mc.minecraftFontRendererObj.drawString(s, p_152437_1_ - j, p_152437_2_ + 20, 16777215);
             }
 
             this.render(p_152437_1_, p_152437_2_, this.func_152440_b(), 0);

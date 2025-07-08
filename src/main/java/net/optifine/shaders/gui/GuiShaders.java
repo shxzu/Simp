@@ -343,17 +343,17 @@ public class GuiShaders extends GuiScreenOF
             this.updateTimer += 20;
         }
 
-        this.drawCenteredString(this.fontRendererObj, this.screenTitle + " ", this.width / 2, 15, 16777215);
+        this.drawCenteredString(this.minecraftFontRendererObj, this.screenTitle + " ", this.width / 2, 15, 16777215);
         String s = "OpenGL: " + Shaders.glVersionString + ", " + Shaders.glVendorString + ", " + Shaders.glRendererString;
-        int i = this.fontRendererObj.getStringWidth(s);
+        int i = this.minecraftFontRendererObj.getStringWidth(s);
 
         if (i < this.width - 5)
         {
-            this.drawCenteredString(this.fontRendererObj, s, this.width / 2, this.height - 40, 8421504);
+            this.drawCenteredString(this.minecraftFontRendererObj, s, this.width / 2, this.height - 40, 8421504);
         }
         else
         {
-            this.drawString(this.fontRendererObj, s, 5, this.height - 40, 8421504);
+            this.drawString(this.minecraftFontRendererObj, s, 5, this.height - 40, 8421504);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
@@ -373,7 +373,7 @@ public class GuiShaders extends GuiScreenOF
 
     public void drawCenteredString(String text, int x, int y, int color)
     {
-        this.drawCenteredString(this.fontRendererObj, text, x, y, color);
+        this.drawCenteredString(this.minecraftFontRendererObj, text, x, y, color);
     }
 
     public static String toStringOnOff(boolean value)

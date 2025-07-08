@@ -1,6 +1,6 @@
 package net.optifine.shaders.gui;
 
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -118,7 +118,7 @@ public class GuiShaderOptions extends GuiScreenOF
         }
         else
         {
-            FontRenderer fontrenderer = Config.getMinecraft().fontRendererObj;
+            MinecraftFontRenderer fontrenderer = Config.getMinecraft().minecraftFontRendererObj;
 
             for (int i = fontrenderer.getStringWidth(": " + Lang.getOff()) + 5; fontrenderer.getStringWidth(s) + i >= btnWidth && s.length() > 0; s = s.substring(0, s.length() - 1))
             {
@@ -249,11 +249,11 @@ public class GuiShaderOptions extends GuiScreenOF
 
         if (this.screenText != null)
         {
-            this.drawCenteredString(this.fontRendererObj, this.screenText, this.width / 2, 15, 16777215);
+            this.drawCenteredString(this.minecraftFontRendererObj, this.screenText, this.width / 2, 15, 16777215);
         }
         else
         {
-            this.drawCenteredString(this.fontRendererObj, this.title, this.width / 2, 15, 16777215);
+            this.drawCenteredString(this.minecraftFontRendererObj, this.title, this.width / 2, 15, 16777215);
         }
 
         super.drawScreen(x, y, f);

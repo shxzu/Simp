@@ -186,7 +186,7 @@ public class GuiVideoSettings extends GuiScreenOF
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, this.screenTitle, this.width / 2, 15, 16777215);
+        this.drawCenteredString(this.minecraftFontRendererObj, this.screenTitle, this.width / 2, 15, 16777215);
         String s = Config.getVersion();
         String s1 = "HD_U";
 
@@ -205,10 +205,10 @@ public class GuiVideoSettings extends GuiScreenOF
             s = "OptiFine M6_pre2 Light";
         }
 
-        this.drawString(this.fontRendererObj, s, 2, this.height - 10, 8421504);
+        this.drawString(this.minecraftFontRendererObj, s, 2, this.height - 10, 8421504);
         String s2 = "Minecraft 1.8.9";
-        int i = this.fontRendererObj.getStringWidth(s2);
-        this.drawString(this.fontRendererObj, s2, this.width - i - 2, this.height - 10, 8421504);
+        int i = this.minecraftFontRendererObj.getStringWidth(s2);
+        this.drawString(this.minecraftFontRendererObj, s2, this.width - i - 2, this.height - 10, 8421504);
         super.drawScreen(mouseX, mouseY, partialTicks);
         this.tooltipManager.drawTooltips(mouseX, mouseY, this.buttonList);
     }

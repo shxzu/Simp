@@ -127,7 +127,7 @@ public class GuiControls extends GuiScreen
     {
         this.drawDefaultBackground();
         this.keyBindingList.drawScreen(mouseX, mouseY, partialTicks);
-        this.drawCenteredString(this.fontRendererObj, this.screenTitle, this.width / 2, 8, 16777215);
+        this.drawCenteredString(this.minecraftFontRendererObj, this.screenTitle, this.width / 2, 8, 16777215);
         boolean flag = true;
 
         for (KeyBinding keybinding : this.options.keyBindings)

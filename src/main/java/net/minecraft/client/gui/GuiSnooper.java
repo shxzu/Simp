@@ -30,7 +30,7 @@ public class GuiSnooper extends GuiScreen
         String s = I18n.format("options.snooper.desc", new Object[0]);
         java.util.List<String> list = Lists.<String>newArrayList();
 
-        for (String s1 : this.fontRendererObj.listFormattedStringToWidth(s, this.width - 30))
+        for (String s1 : this.minecraftFontRendererObj.listFormattedStringToWidth(s, this.width - 30))
         {
             list.add(s1);
         }
@@ -45,7 +45,7 @@ public class GuiSnooper extends GuiScreen
         for (Entry<String, String> entry : (new TreeMap<String, String>(this.mc.getPlayerUsageSnooper().getCurrentStats())).entrySet())
         {
             this.field_146604_g.add((flag ? "C " : "") + (String)entry.getKey());
-            this.field_146609_h.add(this.fontRendererObj.trimStringToWidth((String)entry.getValue(), this.width - 220));
+            this.field_146609_h.add(this.minecraftFontRendererObj.trimStringToWidth((String)entry.getValue(), this.width - 220));
         }
 
         if (flag)
@@ -53,7 +53,7 @@ public class GuiSnooper extends GuiScreen
             for (Entry<String, String> entry1 : (new TreeMap<String, String>(this.mc.getIntegratedServer().getPlayerUsageSnooper().getCurrentStats())).entrySet())
             {
                 this.field_146604_g.add("S " + (String)entry1.getKey());
-                this.field_146609_h.add(this.fontRendererObj.trimStringToWidth((String)entry1.getValue(), this.width - 220));
+                this.field_146609_h.add(this.minecraftFontRendererObj.trimStringToWidth((String)entry1.getValue(), this.width - 220));
             }
         }
 
@@ -89,13 +89,13 @@ public class GuiSnooper extends GuiScreen
     {
         this.drawDefaultBackground();
         this.field_146606_s.drawScreen(mouseX, mouseY, partialTicks);
-        this.drawCenteredString(this.fontRendererObj, this.field_146610_i, this.width / 2, 8, 16777215);
+        this.drawCenteredString(this.minecraftFontRendererObj, this.field_146610_i, this.width / 2, 8, 16777215);
         int i = 22;
 
         for (String s : this.field_146607_r)
         {
-            this.drawCenteredString(this.fontRendererObj, s, this.width / 2, i, 8421504);
-            i += this.fontRendererObj.FONT_HEIGHT;
+            this.drawCenteredString(this.minecraftFontRendererObj, s, this.width / 2, i, 8421504);
+            i += this.minecraftFontRendererObj.FONT_HEIGHT;
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
@@ -105,7 +105,7 @@ public class GuiSnooper extends GuiScreen
     {
         public List()
         {
-            super(GuiSnooper.this.mc, GuiSnooper.this.width, GuiSnooper.this.height, 80, GuiSnooper.this.height - 40, GuiSnooper.this.fontRendererObj.FONT_HEIGHT + 1);
+            super(GuiSnooper.this.mc, GuiSnooper.this.width, GuiSnooper.this.height, 80, GuiSnooper.this.height - 40, GuiSnooper.this.minecraftFontRendererObj.FONT_HEIGHT + 1);
         }
 
         protected int getSize()
@@ -128,8 +128,8 @@ public class GuiSnooper extends GuiScreen
 
         protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int mouseXIn, int mouseYIn)
         {
-            GuiSnooper.this.fontRendererObj.drawString((String)GuiSnooper.this.field_146604_g.get(entryID), 10, p_180791_3_, 16777215);
-            GuiSnooper.this.fontRendererObj.drawString((String)GuiSnooper.this.field_146609_h.get(entryID), 230, p_180791_3_, 16777215);
+            GuiSnooper.this.minecraftFontRendererObj.drawString((String)GuiSnooper.this.field_146604_g.get(entryID), 10, p_180791_3_, 16777215);
+            GuiSnooper.this.minecraftFontRendererObj.drawString((String)GuiSnooper.this.field_146609_h.get(entryID), 230, p_180791_3_, 16777215);
         }
 
         protected int getScrollBarX()

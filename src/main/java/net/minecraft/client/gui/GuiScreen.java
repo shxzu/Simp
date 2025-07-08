@@ -56,7 +56,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     protected List<GuiButton> buttonList = Lists.<GuiButton>newArrayList();
     protected List<GuiLabel> labelList = Lists.<GuiLabel>newArrayList();
     public boolean allowUserInput;
-    protected FontRenderer fontRendererObj;
+    protected MinecraftFontRenderer minecraftFontRendererObj;
     private GuiButton selectedButton;
     private int eventButton;
     private long lastMouseEvent;
@@ -160,7 +160,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
 
             for (String s : textLines)
             {
-                int j = this.fontRendererObj.getStringWidth(s);
+                int j = this.minecraftFontRendererObj.getStringWidth(s);
 
                 if (j > i)
                 {
@@ -205,7 +205,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
             for (int k1 = 0; k1 < textLines.size(); ++k1)
             {
                 String s1 = (String)textLines.get(k1);
-                this.fontRendererObj.drawStringWithShadow(s1, (float)l1, (float)i2, -1);
+                this.minecraftFontRendererObj.drawStringWithShadow(s1, (float)l1, (float)i2, -1);
 
                 if (k1 == 0)
                 {
@@ -309,7 +309,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
 
                     if (s1 != null)
                     {
-                        list.addAll(this.fontRendererObj.listFormattedStringToWidth(s1, 150));
+                        list.addAll(this.minecraftFontRendererObj.listFormattedStringToWidth(s1, 150));
                     }
 
                     this.drawHoveringText(list, x, y);
@@ -476,7 +476,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     {
         this.mc = mc;
         this.itemRender = mc.getRenderItem();
-        this.fontRendererObj = mc.fontRendererObj;
+        this.minecraftFontRendererObj = mc.minecraftFontRendererObj;
         this.width = width;
         this.height = height;
         this.buttonList.clear();

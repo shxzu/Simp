@@ -505,7 +505,7 @@ public class GameSettings
         if (settingsOption == GameSettings.Options.FORCE_UNICODE_FONT)
         {
             this.forceUnicodeFont = !this.forceUnicodeFont;
-            this.mc.fontRendererObj.setUnicodeFlag(this.mc.getLanguageManager().isCurrentLocaleUnicode() || this.forceUnicodeFont);
+            this.mc.minecraftFontRendererObj.setUnicodeFlag(this.mc.getLanguageManager().isCurrentLocaleUnicode() || this.forceUnicodeFont);
         }
 
         if (settingsOption == GameSettings.Options.FBO_ENABLE)
@@ -1866,8 +1866,8 @@ public class GameSettings
         if (p_setOptionValueOF_1_ == GameSettings.Options.CUSTOM_FONTS)
         {
             this.ofCustomFonts = !this.ofCustomFonts;
-            this.mc.fontRendererObj.onResourceManagerReload(Config.getResourceManager());
-            this.mc.standardGalacticFontRenderer.onResourceManagerReload(Config.getResourceManager());
+            this.mc.minecraftFontRendererObj.onResourceManagerReload(Config.getResourceManager());
+            this.mc.standardGalacticMinecraftFontRenderer.onResourceManagerReload(Config.getResourceManager());
         }
 
         if (p_setOptionValueOF_1_ == GameSettings.Options.CUSTOM_COLORS)

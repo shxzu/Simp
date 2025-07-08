@@ -162,8 +162,8 @@ public class GuiBeacon extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         RenderHelper.disableStandardItemLighting();
-        this.drawCenteredString(this.fontRendererObj, I18n.format("tile.beacon.primary", new Object[0]), 62, 10, 14737632);
-        this.drawCenteredString(this.fontRendererObj, I18n.format("tile.beacon.secondary", new Object[0]), 169, 10, 14737632);
+        this.drawCenteredString(this.minecraftFontRendererObj, I18n.format("tile.beacon.primary", new Object[0]), 62, 10, 14737632);
+        this.drawCenteredString(this.minecraftFontRendererObj, I18n.format("tile.beacon.secondary", new Object[0]), 169, 10, 14737632);
 
         for (GuiButton guibutton : this.buttonList)
         {

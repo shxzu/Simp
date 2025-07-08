@@ -12,7 +12,7 @@ import net.minecraft.util.MathHelper;
 public class GuiTextField extends Gui
 {
     private final int id;
-    private final FontRenderer fontRendererInstance;
+    private final MinecraftFontRenderer minecraftFontRendererInstance;
     public int xPosition;
     public int yPosition;
     private final int width;
@@ -33,10 +33,10 @@ public class GuiTextField extends Gui
     private GuiPageButtonList.GuiResponder field_175210_x;
     private Predicate<String> validator = Predicates.<String>alwaysTrue();
 
-    public GuiTextField(int componentId, FontRenderer fontrendererObj, int x, int y, int par5Width, int par6Height)
+    public GuiTextField(int componentId, MinecraftFontRenderer fontrendererObj, int x, int y, int par5Width, int par6Height)
     {
         this.id = componentId;
-        this.fontRendererInstance = fontrendererObj;
+        this.minecraftFontRendererInstance = fontrendererObj;
         this.xPosition = x;
         this.yPosition = y;
         this.width = par5Width;
@@ -444,8 +444,8 @@ public class GuiTextField extends Gui
                 i -= 4;
             }
 
-            String s = this.fontRendererInstance.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
-            this.setCursorPosition(this.fontRendererInstance.trimStringToWidth(s, i).length() + this.lineScrollOffset);
+            String s = this.minecraftFontRendererInstance.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
+            this.setCursorPosition(this.minecraftFontRendererInstance.trimStringToWidth(s, i).length() + this.lineScrollOffset);
         }
     }
 
@@ -462,7 +462,7 @@ public class GuiTextField extends Gui
             int i = this.isEnabled ? this.enabledColor : this.disabledColor;
             int j = this.cursorPosition - this.lineScrollOffset;
             int k = this.selectionEnd - this.lineScrollOffset;
-            String s = this.fontRendererInstance.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
+            String s = this.minecraftFontRendererInstance.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
             boolean flag = j >= 0 && j <= s.length();
             boolean flag1 = this.isFocused && this.cursorCounter / 6 % 2 == 0 && flag;
             int l = this.enableBackgroundDrawing ? this.xPosition + 4 : this.xPosition;
@@ -477,7 +477,7 @@ public class GuiTextField extends Gui
             if (s.length() > 0)
             {
                 String s1 = flag ? s.substring(0, j) : s;
-                j1 = this.fontRendererInstance.drawStringWithShadow(s1, (float)l, (float)i1, i);
+                j1 = this.minecraftFontRendererInstance.drawStringWithShadow(s1, (float)l, (float)i1, i);
             }
 
             boolean flag2 = this.cursorPosition < this.text.length() || this.text.length() >= this.getMaxStringLength();
@@ -495,25 +495,25 @@ public class GuiTextField extends Gui
 
             if (s.length() > 0 && flag && j < s.length())
             {
-                j1 = this.fontRendererInstance.drawStringWithShadow(s.substring(j), (float)j1, (float)i1, i);
+                j1 = this.minecraftFontRendererInstance.drawStringWithShadow(s.substring(j), (float)j1, (float)i1, i);
             }
 
             if (flag1)
             {
                 if (flag2)
                 {
-                    Gui.drawRect(k1, i1 - 1, k1 + 1, i1 + 1 + this.fontRendererInstance.FONT_HEIGHT, -3092272);
+                    Gui.drawRect(k1, i1 - 1, k1 + 1, i1 + 1 + this.minecraftFontRendererInstance.FONT_HEIGHT, -3092272);
                 }
                 else
                 {
-                    this.fontRendererInstance.drawStringWithShadow("_", (float)k1, (float)i1, i);
+                    this.minecraftFontRendererInstance.drawStringWithShadow("_", (float)k1, (float)i1, i);
                 }
             }
 
             if (k != j)
             {
-                int l1 = l + this.fontRendererInstance.getStringWidth(s.substring(0, k));
-                this.drawCursorVertical(k1, i1 - 1, l1 - 1, i1 + 1 + this.fontRendererInstance.FONT_HEIGHT);
+                int l1 = l + this.minecraftFontRendererInstance.getStringWidth(s.substring(0, k));
+                this.drawCursorVertical(k1, i1 - 1, l1 - 1, i1 + 1 + this.minecraftFontRendererInstance.FONT_HEIGHT);
             }
         }
     }
@@ -646,7 +646,7 @@ public class GuiTextField extends Gui
 
         this.selectionEnd = p_146199_1_;
 
-        if (this.fontRendererInstance != null)
+        if (this.minecraftFontRendererInstance != null)
         {
             if (this.lineScrollOffset > i)
             {
@@ -654,12 +654,12 @@ public class GuiTextField extends Gui
             }
 
             int j = this.getWidth();
-            String s = this.fontRendererInstance.trimStringToWidth(this.text.substring(this.lineScrollOffset), j);
+            String s = this.minecraftFontRendererInstance.trimStringToWidth(this.text.substring(this.lineScrollOffset), j);
             int k = s.length() + this.lineScrollOffset;
 
             if (p_146199_1_ == this.lineScrollOffset)
             {
-                this.lineScrollOffset -= this.fontRendererInstance.trimStringToWidth(this.text, j, true).length();
+                this.lineScrollOffset -= this.minecraftFontRendererInstance.trimStringToWidth(this.text, j, true).length();
             }
 
             if (p_146199_1_ > k)

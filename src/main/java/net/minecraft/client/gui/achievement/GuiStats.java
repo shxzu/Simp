@@ -138,13 +138,13 @@ public class GuiStats extends GuiScreen implements IProgressMeter
         if (this.doesGuiPauseGame)
         {
             this.drawDefaultBackground();
-            this.drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingStats", new Object[0]), this.width / 2, this.height / 2, 16777215);
-            this.drawCenteredString(this.fontRendererObj, lanSearchStates[(int)(Minecraft.getSystemTime() / 150L % (long)lanSearchStates.length)], this.width / 2, this.height / 2 + this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
+            this.drawCenteredString(this.minecraftFontRendererObj, I18n.format("multiplayer.downloadingStats", new Object[0]), this.width / 2, this.height / 2, 16777215);
+            this.drawCenteredString(this.minecraftFontRendererObj, lanSearchStates[(int)(Minecraft.getSystemTime() / 150L % (long)lanSearchStates.length)], this.width / 2, this.height / 2 + this.minecraftFontRendererObj.FONT_HEIGHT * 2, 16777215);
         }
         else
         {
             this.displaySlot.drawScreen(mouseX, mouseY, partialTicks);
-            this.drawCenteredString(this.fontRendererObj, this.screenTitle, this.width / 2, 20, 16777215);
+            this.drawCenteredString(this.minecraftFontRendererObj, this.screenTitle, this.width / 2, 20, 16777215);
             super.drawScreen(mouseX, mouseY, partialTicks);
         }
     }
@@ -325,12 +325,12 @@ public class GuiStats extends GuiScreen implements IProgressMeter
             if (p_148209_1_ != null)
             {
                 String s = p_148209_1_.format(GuiStats.this.field_146546_t.readStat(p_148209_1_));
-                GuiStats.this.drawString(GuiStats.this.fontRendererObj, s, p_148209_2_ - GuiStats.this.fontRendererObj.getStringWidth(s), p_148209_3_ + 5, p_148209_4_ ? 16777215 : 9474192);
+                GuiStats.this.drawString(GuiStats.this.minecraftFontRendererObj, s, p_148209_2_ - GuiStats.this.minecraftFontRendererObj.getStringWidth(s), p_148209_3_ + 5, p_148209_4_ ? 16777215 : 9474192);
             }
             else
             {
                 String s1 = "-";
-                GuiStats.this.drawString(GuiStats.this.fontRendererObj, s1, p_148209_2_ - GuiStats.this.fontRendererObj.getStringWidth(s1), p_148209_3_ + 5, p_148209_4_ ? 16777215 : 9474192);
+                GuiStats.this.drawString(GuiStats.this.minecraftFontRendererObj, s1, p_148209_2_ - GuiStats.this.minecraftFontRendererObj.getStringWidth(s1), p_148209_3_ + 5, p_148209_4_ ? 16777215 : 9474192);
             }
         }
 
@@ -379,9 +379,9 @@ public class GuiStats extends GuiScreen implements IProgressMeter
                     {
                         int k = p_148142_1_ + 12;
                         int l = p_148142_2_ - 12;
-                        int i1 = GuiStats.this.fontRendererObj.getStringWidth(s);
+                        int i1 = GuiStats.this.minecraftFontRendererObj.getStringWidth(s);
                         GuiStats.this.drawGradientRect(k - 3, l - 3, k + i1 + 3, l + 8 + 3, -1073741824, -1073741824);
-                        GuiStats.this.fontRendererObj.drawStringWithShadow(s, (float)k, (float)l, -1);
+                        GuiStats.this.minecraftFontRendererObj.drawStringWithShadow(s, (float)k, (float)l, -1);
                     }
                 }
             }
@@ -400,9 +400,9 @@ public class GuiStats extends GuiScreen implements IProgressMeter
                 {
                     int i = p_148213_2_ + 12;
                     int j = p_148213_3_ - 12;
-                    int k = GuiStats.this.fontRendererObj.getStringWidth(s1);
+                    int k = GuiStats.this.minecraftFontRendererObj.getStringWidth(s1);
                     GuiStats.this.drawGradientRect(i - 3, j - 3, i + k + 3, j + 8 + 3, -1073741824, -1073741824);
-                    GuiStats.this.fontRendererObj.drawStringWithShadow(s1, (float)i, (float)j, -1);
+                    GuiStats.this.minecraftFontRendererObj.drawStringWithShadow(s1, (float)i, (float)j, -1);
                 }
             }
         }
@@ -594,9 +594,9 @@ public class GuiStats extends GuiScreen implements IProgressMeter
         protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int mouseXIn, int mouseYIn)
         {
             StatBase statbase = (StatBase)StatList.generalStats.get(entryID);
-            GuiStats.this.drawString(GuiStats.this.fontRendererObj, statbase.getStatName().getUnformattedText(), p_180791_2_ + 2, p_180791_3_ + 1, entryID % 2 == 0 ? 16777215 : 9474192);
+            GuiStats.this.drawString(GuiStats.this.minecraftFontRendererObj, statbase.getStatName().getUnformattedText(), p_180791_2_ + 2, p_180791_3_ + 1, entryID % 2 == 0 ? 16777215 : 9474192);
             String s = statbase.format(GuiStats.this.field_146546_t.readStat(statbase));
-            GuiStats.this.drawString(GuiStats.this.fontRendererObj, s, p_180791_2_ + 2 + 213 - GuiStats.this.fontRendererObj.getStringWidth(s), p_180791_3_ + 1, entryID % 2 == 0 ? 16777215 : 9474192);
+            GuiStats.this.drawString(GuiStats.this.minecraftFontRendererObj, s, p_180791_2_ + 2 + 213 - GuiStats.this.minecraftFontRendererObj.getStringWidth(s), p_180791_3_ + 1, entryID % 2 == 0 ? 16777215 : 9474192);
         }
     }
 
@@ -737,7 +737,7 @@ public class GuiStats extends GuiScreen implements IProgressMeter
 
         public StatsMobsList(Minecraft mcIn)
         {
-            super(mcIn, GuiStats.this.width, GuiStats.this.height, 32, GuiStats.this.height - 64, GuiStats.this.fontRendererObj.FONT_HEIGHT * 4);
+            super(mcIn, GuiStats.this.width, GuiStats.this.height, 32, GuiStats.this.height - 64, GuiStats.this.minecraftFontRendererObj.FONT_HEIGHT * 4);
             this.setShowSelectionBox(false);
 
             for (EntityList.EntityEggInfo entitylist$entityegginfo : EntityList.entityEggs.values())
@@ -765,7 +765,7 @@ public class GuiStats extends GuiScreen implements IProgressMeter
 
         protected int getContentHeight()
         {
-            return this.getSize() * GuiStats.this.fontRendererObj.FONT_HEIGHT * 4;
+            return this.getSize() * GuiStats.this.minecraftFontRendererObj.FONT_HEIGHT * 4;
         }
 
         protected void drawBackground()
@@ -792,9 +792,9 @@ public class GuiStats extends GuiScreen implements IProgressMeter
                 s2 = I18n.format("stat.entityKilledBy.none", new Object[] {s});
             }
 
-            GuiStats.this.drawString(GuiStats.this.fontRendererObj, s, p_180791_2_ + 2 - 10, p_180791_3_ + 1, 16777215);
-            GuiStats.this.drawString(GuiStats.this.fontRendererObj, s1, p_180791_2_ + 2, p_180791_3_ + 1 + GuiStats.this.fontRendererObj.FONT_HEIGHT, i == 0 ? 6316128 : 9474192);
-            GuiStats.this.drawString(GuiStats.this.fontRendererObj, s2, p_180791_2_ + 2, p_180791_3_ + 1 + GuiStats.this.fontRendererObj.FONT_HEIGHT * 2, j == 0 ? 6316128 : 9474192);
+            GuiStats.this.drawString(GuiStats.this.minecraftFontRendererObj, s, p_180791_2_ + 2 - 10, p_180791_3_ + 1, 16777215);
+            GuiStats.this.drawString(GuiStats.this.minecraftFontRendererObj, s1, p_180791_2_ + 2, p_180791_3_ + 1 + GuiStats.this.minecraftFontRendererObj.FONT_HEIGHT, i == 0 ? 6316128 : 9474192);
+            GuiStats.this.drawString(GuiStats.this.minecraftFontRendererObj, s2, p_180791_2_ + 2, p_180791_3_ + 1 + GuiStats.this.minecraftFontRendererObj.FONT_HEIGHT * 2, j == 0 ? 6316128 : 9474192);
         }
     }
 }

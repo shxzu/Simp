@@ -4,7 +4,7 @@ import com.mojang.authlib.exceptions.InvalidCredentialsException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.Random;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -19,11 +19,11 @@ public class GuiScreenCapeOF extends GuiScreenOF
     private long messageHideTimeMs;
     private String linkUrl;
     private GuiButtonOF buttonCopyLink;
-    private FontRenderer fontRenderer;
+    private MinecraftFontRenderer minecraftFontRenderer;
 
     public GuiScreenCapeOF(GuiScreen parentScreenIn)
     {
-        this.fontRenderer = Config.getMinecraft().fontRendererObj;
+        this.minecraftFontRenderer = Config.getMinecraft().minecraftFontRendererObj;
         this.parentScreen = parentScreenIn;
     }
 
@@ -120,11 +120,11 @@ public class GuiScreenCapeOF extends GuiScreenOF
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRenderer, this.title, this.width / 2, 20, 16777215);
+        this.drawCenteredString(this.minecraftFontRenderer, this.title, this.width / 2, 20, 16777215);
 
         if (this.message != null)
         {
-            this.drawCenteredString(this.fontRenderer, this.message, this.width / 2, this.height / 6 + 60, 16777215);
+            this.drawCenteredString(this.minecraftFontRenderer, this.message, this.width / 2, this.height / 6 + 60, 16777215);
 
             if (System.currentTimeMillis() > this.messageHideTimeMs)
             {

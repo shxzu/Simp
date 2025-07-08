@@ -879,7 +879,7 @@ public class GuiIngame extends Gui
         if (BossStatus.bossName != null && BossStatus.statusBarTime > 0)
         {
             --BossStatus.statusBarTime;
-            FontRenderer fontrenderer = this.mc.fontRendererObj;
+            MinecraftFontRenderer fontrenderer = this.mc.minecraftFontRendererObj;
             ScaledResolution scaledresolution = new ScaledResolution(this.mc);
             int i = scaledresolution.getScaledWidth();
             int j = 182;
@@ -1036,7 +1036,7 @@ public class GuiIngame extends Gui
                 GlStateManager.popMatrix();
             }
 
-            this.itemRenderer.renderItemOverlays(this.mc.fontRendererObj, itemstack, xPos, yPos);
+            this.itemRenderer.renderItemOverlays(this.mc.minecraftFontRendererObj, itemstack, xPos, yPos);
         }
     }
 
@@ -1153,9 +1153,9 @@ public class GuiIngame extends Gui
         return this.updateCounter;
     }
 
-    public FontRenderer getFontRenderer()
+    public MinecraftFontRenderer getFontRenderer()
     {
-        return this.mc.fontRendererObj;
+        return this.mc.minecraftFontRendererObj;
     }
 
     public GuiSpectator getSpectatorGui()

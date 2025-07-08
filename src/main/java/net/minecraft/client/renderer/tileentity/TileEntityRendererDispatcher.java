@@ -3,7 +3,7 @@ package net.minecraft.client.renderer.tileentity;
 import com.google.common.collect.Maps;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
@@ -35,7 +35,7 @@ public class TileEntityRendererDispatcher
 {
     public Map<Class, TileEntitySpecialRenderer> mapSpecialRenderers = Maps.newHashMap();
     public static TileEntityRendererDispatcher instance = new TileEntityRendererDispatcher();
-    public FontRenderer fontRenderer;
+    public MinecraftFontRenderer minecraftFontRenderer;
     public static double staticPlayerX;
     public static double staticPlayerY;
     public static double staticPlayerZ;
@@ -88,7 +88,7 @@ public class TileEntityRendererDispatcher
         return tileEntityIn != null && !tileEntityIn.isInvalid() ? this.getSpecialRendererByClass(tileEntityIn.getClass()) : null;
     }
 
-    public void cacheActiveRenderInfo(World worldIn, TextureManager textureManagerIn, FontRenderer fontrendererIn, Entity entityIn, float partialTicks)
+    public void cacheActiveRenderInfo(World worldIn, TextureManager textureManagerIn, MinecraftFontRenderer fontrendererIn, Entity entityIn, float partialTicks)
     {
         if (this.worldObj != worldIn)
         {
@@ -97,7 +97,7 @@ public class TileEntityRendererDispatcher
 
         this.renderEngine = textureManagerIn;
         this.entity = entityIn;
-        this.fontRenderer = fontrendererIn;
+        this.minecraftFontRenderer = fontrendererIn;
         this.entityYaw = entityIn.prevRotationYaw + (entityIn.rotationYaw - entityIn.prevRotationYaw) * partialTicks;
         this.entityPitch = entityIn.prevRotationPitch + (entityIn.rotationPitch - entityIn.prevRotationPitch) * partialTicks;
         this.entityX = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double)partialTicks;
@@ -195,9 +195,9 @@ public class TileEntityRendererDispatcher
         this.worldObj = worldIn;
     }
 
-    public FontRenderer getFontRenderer()
+    public MinecraftFontRenderer getFontRenderer()
     {
-        return this.fontRenderer;
+        return this.minecraftFontRenderer;
     }
 
     public void preDrawBatch()

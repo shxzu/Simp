@@ -21,12 +21,12 @@ public class GuiLabel extends Gui
     private int field_146169_o;
     private int field_146166_p;
     private int field_146165_q;
-    private FontRenderer fontRenderer;
+    private MinecraftFontRenderer minecraftFontRenderer;
     private int field_146163_s;
 
-    public GuiLabel(FontRenderer fontRendererObj, int p_i45540_2_, int p_i45540_3_, int p_i45540_4_, int p_i45540_5_, int p_i45540_6_, int p_i45540_7_)
+    public GuiLabel(MinecraftFontRenderer minecraftFontRendererObj, int p_i45540_2_, int p_i45540_3_, int p_i45540_4_, int p_i45540_5_, int p_i45540_6_, int p_i45540_7_)
     {
-        this.fontRenderer = fontRendererObj;
+        this.minecraftFontRenderer = minecraftFontRendererObj;
         this.field_175204_i = p_i45540_2_;
         this.field_146162_g = p_i45540_3_;
         this.field_146174_h = p_i45540_4_;
@@ -67,11 +67,11 @@ public class GuiLabel extends Gui
             {
                 if (this.centered)
                 {
-                    this.drawCenteredString(this.fontRenderer, (String)this.field_146173_k.get(k), this.field_146162_g + this.field_146167_a / 2, j + k * 10, this.field_146168_n);
+                    this.drawCenteredString(this.minecraftFontRenderer, (String)this.field_146173_k.get(k), this.field_146162_g + this.field_146167_a / 2, j + k * 10, this.field_146168_n);
                 }
                 else
                 {
-                    this.drawString(this.fontRenderer, (String)this.field_146173_k.get(k), this.field_146162_g, j + k * 10, this.field_146168_n);
+                    this.drawString(this.minecraftFontRenderer, (String)this.field_146173_k.get(k), this.field_146162_g, j + k * 10, this.field_146168_n);
                 }
             }
         }

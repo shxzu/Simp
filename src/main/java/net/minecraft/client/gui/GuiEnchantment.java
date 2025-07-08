@@ -50,8 +50,8 @@ public class GuiEnchantment extends GuiContainer
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        this.fontRendererObj.drawString(this.field_175380_I.getDisplayName().getUnformattedText(), 12, 5, 4210752);
-        this.fontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
+        this.minecraftFontRendererObj.drawString(this.field_175380_I.getDisplayName().getUnformattedText(), 12, 5, 4210752);
+        this.minecraftFontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
 
     public void updateScreen()
@@ -165,7 +165,7 @@ public class GuiEnchantment extends GuiContainer
             else
             {
                 String s1 = "" + l1;
-                FontRenderer fontrenderer = this.mc.standardGalacticFontRenderer;
+                MinecraftFontRenderer fontrenderer = this.mc.standardGalacticMinecraftFontRenderer;
                 int i2 = 6839882;
 
                 if ((k < l + 1 || this.mc.thePlayer.experienceLevel < l1) && !this.mc.thePlayer.capabilities.isCreativeMode)
@@ -195,7 +195,7 @@ public class GuiEnchantment extends GuiContainer
                     i2 = 8453920;
                 }
 
-                fontrenderer = this.mc.fontRendererObj;
+                fontrenderer = this.mc.minecraftFontRendererObj;
                 fontrenderer.drawStringWithShadow(s1, (float)(j1 + 86 - fontrenderer.getStringWidth(s1)), (float)(j + 16 + 19 * l + 7), i2);
             }
         }

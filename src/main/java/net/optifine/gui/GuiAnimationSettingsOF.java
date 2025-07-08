@@ -81,7 +81,7 @@ public class GuiAnimationSettingsOF extends GuiScreen
     public void drawScreen(int x, int y, float f)
     {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, this.title, this.width / 2, 15, 16777215);
+        this.drawCenteredString(this.minecraftFontRendererObj, this.title, this.width / 2, 15, 16777215);
         super.drawScreen(x, y, f);
     }
 }

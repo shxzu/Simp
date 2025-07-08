@@ -3,7 +3,7 @@ package net.optifine.gui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.src.Config;
@@ -103,7 +103,7 @@ public class TooltipProviderShaderOptions extends TooltipProviderOptions
 
     private String[] makeTooltipLines(int width, List<String> args)
     {
-        FontRenderer fontrenderer = Config.getMinecraft().fontRendererObj;
+        MinecraftFontRenderer fontrenderer = Config.getMinecraft().minecraftFontRendererObj;
         List<String> list = new ArrayList();
 
         for (int i = 0; i < args.size(); ++i)
