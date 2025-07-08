@@ -1,5 +1,6 @@
 package net.minecraft.client.gui;
 
+import cc.simp.utils.client.font.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -139,7 +140,17 @@ public class Gui
         GlStateManager.enableTexture2D();
     }
 
-    public void drawCenteredString(MinecraftFontRenderer minecraftFontRendererIn, String text, int x, int y, int color)
+    public static void drawCustomCenteredString(FontRenderer minecraftFontRendererIn, String text, int x, int y, int color)
+    {
+        minecraftFontRendererIn.drawStringWithShadow(text, (float)(x - minecraftFontRendererIn.getWidth(text) / 2), (float)y, color);
+    }
+
+    public void drawCustomString(FontRenderer minecraftFontRendererIn, String text, int x, int y, int color)
+    {
+        minecraftFontRendererIn.drawStringWithShadow(text, (float)x, (float)y, color);
+    }
+
+    public static void drawCenteredString(MinecraftFontRenderer minecraftFontRendererIn, String text, int x, int y, int color)
     {
         minecraftFontRendererIn.drawStringWithShadow(text, (float)(x - minecraftFontRendererIn.getStringWidth(text) / 2), (float)y, color);
     }

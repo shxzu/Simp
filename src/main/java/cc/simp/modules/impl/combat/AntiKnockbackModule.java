@@ -42,6 +42,10 @@ public final class AntiKnockbackModule extends Module {
         BLATANT,
     }
 
+    public AntiKnockbackModule() {
+        setSuffixListener(modeProperty);
+    }
+
     @EventLink
     public final Listener<PacketReceiveEvent> packetReceiveEventListener = event -> {
         if (modeProperty.getValue() == Mode.HYPIXEL) {
@@ -68,9 +72,6 @@ public final class AntiKnockbackModule extends Module {
 
     @EventLink
     private final Listener<MotionEvent> motitonEventListener = event -> {
-
-        setSuffixListener(modeProperty);
-
         if (modeProperty.getValue() == Mode.JUMP) {
             if (mc.thePlayer.hurtTime >= 8) {
                 mc.gameSettings.keyBindJump.setPressed(true);
@@ -99,17 +100,13 @@ public final class AntiKnockbackModule extends Module {
                         mc.thePlayer.motionX *= 0.8;
                         mc.thePlayer.motionZ *= 0.8;
                     }
-                    // so this little shit won't spam the fucking chat with random values x1000
-                    if (((EntityLivingBase) event.target).hurtTime != 0)
-                        Logger.chatPrint(String.format("Reduced %.3f %.3f", mc.thePlayer.motionX, mc.thePlayer.motionZ));
+                    Logger.chatPrint(String.format("Reduced %.3f %.3f", mc.thePlayer.motionX, mc.thePlayer.motionZ));
                 }
             } else {
                 if (event.target instanceof EntityLivingBase && mc.thePlayer.hurtTime > 0) {
                     mc.thePlayer.motionX *= 0.6;
                     mc.thePlayer.motionZ *= 0.6;
-                    // once again smh
-                    if (((EntityLivingBase) event.target).hurtTime != 0)
-                        Logger.chatPrint(String.format("Reduced %.3f %.3f", mc.thePlayer.motionX, mc.thePlayer.motionZ));
+                    Logger.chatPrint(String.format("Reduced %.3f %.3f", mc.thePlayer.motionX, mc.thePlayer.motionZ));
                 }
             }
         }

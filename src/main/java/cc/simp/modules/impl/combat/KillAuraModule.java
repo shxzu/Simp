@@ -40,6 +40,10 @@ public final class KillAuraModule extends Module {
         ALL
     }
 
+    public KillAuraModule() {
+        setSuffixListener(targetTypeProperty);
+    }
+    
     public static EntityLivingBase target;
     private long lastAttackTime;
 
