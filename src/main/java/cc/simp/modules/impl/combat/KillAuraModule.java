@@ -24,7 +24,7 @@ import java.util.Comparator;
 
 import static cc.simp.utils.client.Util.mc;
 
-@ModuleInfo(label = "KillAura", category = ModuleCategory.COMBAT)
+@ModuleInfo(label = "Kill Aura", category = ModuleCategory.COMBAT)
 public final class KillAuraModule extends Module {
 
     private final Property<Boolean> raytraceProperty = new Property<>("Raytrace", false);
@@ -58,10 +58,6 @@ public final class KillAuraModule extends Module {
         RotationUtils.serverYaw = event.getYaw();
         RotationUtils.serverPitch = event.getPitch();
 
-        if (!keepSprintProperty.getValue()) {
-            handleSprinting(event.getYaw());
-        }
-
         if (event.isPre()) {
             if (raytraceProperty.getValue()) {
                 MovingObjectPosition trace = mc.objectMouseOver;
@@ -75,6 +71,12 @@ public final class KillAuraModule extends Module {
 
                 if (keepSprintProperty.getValue()) {
                     mc.thePlayer.setSprinting(MovementUtils.canSprint(Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).omniProperty.getValue()));
+                } else {
+                    if (mc.thePlayer.isSprinting()) {
+                        mc.thePlayer.motionX *= 0.6D;
+                        mc.thePlayer.motionZ *= 0.6D;
+                        mc.thePlayer.setSprinting(false);
+                    }
                 }
 
                 lastAttackTime = currentTime;

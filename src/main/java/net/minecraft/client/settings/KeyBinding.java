@@ -89,6 +89,20 @@ public class KeyBinding implements Comparable<KeyBinding>
         return this.keyCategory;
     }
 
+    public void setPressed(boolean pressed)
+    {
+        if (pressed && !this.pressed)
+        {
+            this.pressTime = 20;
+        }
+        else if (!pressed)
+        {
+            this.unpressKey();
+        }
+
+        this.pressed = pressed;
+    }
+
     public boolean isPressed()
     {
         if (this.pressTime == 0)

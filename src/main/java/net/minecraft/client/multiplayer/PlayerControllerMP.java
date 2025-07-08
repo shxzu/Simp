@@ -1,5 +1,7 @@
 package net.minecraft.client.multiplayer;
 
+import cc.simp.Simp;
+import cc.simp.event.impl.player.AttackEvent;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -438,6 +440,12 @@ public class PlayerControllerMP
 
     public void attackEntity(EntityPlayer playerIn, Entity targetEntity)
     {
+        AttackEvent attackEntityEvent = new AttackEvent(targetEntity);
+        Simp.INSTANCE.getEventBus().post(attackEntityEvent);
+
+        if(attackEntityEvent.isCancelled())
+            return;
+
         this.syncCurrentPlayItem();
         this.netClientHandler.addToSendQueue(new C02PacketUseEntity(targetEntity, C02PacketUseEntity.Action.ATTACK));
 

@@ -1,6 +1,7 @@
 package net.minecraft.client.network;
 
 import cc.simp.Simp;
+import cc.simp.event.impl.entity.EntitySwingEvent;
 import cc.simp.event.impl.packet.PacketSendEvent;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
@@ -781,6 +782,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
             if (packetIn.getAnimationType() == 0)
             {
                 EntityLivingBase entitylivingbase = (EntityLivingBase)entity;
+                Simp.INSTANCE.getEventBus().post(new EntitySwingEvent(entitylivingbase));
                 entitylivingbase.swingItem();
             }
             else if (packetIn.getAnimationType() == 1)

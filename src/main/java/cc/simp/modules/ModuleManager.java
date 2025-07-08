@@ -3,6 +3,7 @@ package cc.simp.modules;
 import cc.simp.Simp;
 import cc.simp.event.impl.KeyPressEvent;
 import cc.simp.modules.impl.client.*;
+import cc.simp.modules.impl.combat.AntiKnockbackModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.movement.MovementFixModule;
 import cc.simp.modules.impl.movement.SpeedModule;
@@ -26,6 +27,7 @@ public final class ModuleManager {
         instanceMap = putInInstanceMap(
                 // COMBAT
                 new KillAuraModule(),
+                new AntiKnockbackModule(),
 
                 // PLAYER
 

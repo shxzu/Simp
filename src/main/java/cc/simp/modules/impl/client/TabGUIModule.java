@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 import static cc.simp.utils.client.Util.mc;
 import static net.minecraft.client.gui.Gui.drawRect;
 
-@ModuleInfo(label = "TabGUI", category = ModuleCategory.CLIENT)
+@ModuleInfo(label = "Tab GUI", category = ModuleCategory.CLIENT)
 public final class TabGUIModule extends Module {
 
     private final Property<Boolean> rainbowProperty = new Property<>("Rainbow", true);

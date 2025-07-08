@@ -25,7 +25,7 @@ import java.awt.*;
 import static cc.simp.utils.client.Util.mc;
 import static net.minecraft.client.gui.Gui.drawRect;
 
-@ModuleInfo(label = "TargetHUD", category = ModuleCategory.CLIENT, description = "Displays information about the current target of KillAura")
+@ModuleInfo(label = "Target HUD", category = ModuleCategory.CLIENT, description = "Displays information about the current target of KillAura")
 public final class TargetHUDModule extends Module {
 
     private final EnumProperty<TargetHUDType> targetHudTypeProperty = new EnumProperty<>("HUD Type", TargetHUDType.SIMP);
