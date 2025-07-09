@@ -6,9 +6,13 @@ import cc.simp.modules.impl.client.*;
 import cc.simp.modules.impl.combat.AntiKnockbackModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.movement.MovementFixModule;
+import cc.simp.modules.impl.movement.NoSlowdownModule;
 import cc.simp.modules.impl.movement.SpeedModule;
 import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.modules.impl.player.ScaffoldModule;
+import cc.simp.modules.impl.player.SmoothRotationsModule;
 import cc.simp.modules.impl.render.AmbienceModule;
+import cc.simp.modules.impl.render.BlockAnimationsModule;
 import cc.simp.modules.impl.render.ChamsModule;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import io.github.nevalackin.homoBus.Listener;
@@ -25,20 +29,25 @@ public final class ModuleManager {
 
     public ModuleManager() {
         instanceMap = putInInstanceMap(
+
                 // COMBAT
                 new KillAuraModule(),
                 new AntiKnockbackModule(),
 
                 // PLAYER
+                new ScaffoldModule(),
+                new SmoothRotationsModule(),
 
                 // MOVEMENT
                 new SprintModule(),
                 new SpeedModule(),
+                new NoSlowdownModule(),
                 new MovementFixModule(),
 
                 // EXPLOIT
 
                 // RENDER
+                new BlockAnimationsModule(),
                 new AmbienceModule(),
                 new ChamsModule(),
 
@@ -48,6 +57,7 @@ public final class ModuleManager {
                 new TargetHUDModule(),
                 new TabGUIModule(),
                 new FontManagerModule()
+
         );
         getModules().forEach(Module::reflectProperties);
 

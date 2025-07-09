@@ -2,6 +2,7 @@ package net.minecraft.client.entity;
 
 import cc.simp.Simp;
 import cc.simp.commands.CommandHandler;
+import cc.simp.event.impl.player.ItemSlowdownEvent;
 import cc.simp.event.impl.player.MotionEvent;
 import cc.simp.event.impl.player.MoveEvent;
 import cc.simp.event.impl.player.SprintEvent;
@@ -687,10 +688,12 @@ public class EntityPlayerSP extends AbstractClientPlayer
         boolean flag2 = this.movementInput.moveForward >= f;
         this.movementInput.updatePlayerMoveState();
 
-        if (this.isUsingItem() && !this.isRiding())
-        {
-            this.movementInput.moveStrafe *= 0.2F;
-            this.movementInput.moveForward *= 0.2F;
+        final ItemSlowdownEvent slowDownEvent = new ItemSlowdownEvent(0.2F, 0.2F);
+        Simp.INSTANCE.getEventBus().post(slowDownEvent);
+
+        if (!slowDownEvent.isCancelled() && this.isUsingItem() && !this.isRiding()) {
+            this.movementInput.moveStrafe *= slowDownEvent.getStrafeMultiplier();
+            this.movementInput.moveForward *= slowDownEvent.getForwardMultiplier();
             this.sprintToggleTimer = 0;
         }
 

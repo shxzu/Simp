@@ -1,18 +1,22 @@
 package cc.simp.utils.client.mc;
 
+import cc.simp.Simp;
 import cc.simp.event.impl.player.MotionEvent;
-import cc.simp.event.impl.player.MoveEvent;
 import cc.simp.event.impl.player.PlayerInputEvent;
+import cc.simp.event.impl.player.StrafeEvent;
+import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.utils.client.Util;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovementInput;
-import org.lwjgl.input.Keyboard;
-
-import java.util.Collections;
 
 public class MovementUtils extends Util {
+
+    public static float yaw = 0;
+    public static float prevYaw = 0;
+    public static float pitch = 0;
+    public static float prevPitch = 0;
 
     private static boolean isMovingEnoughForSprint() {
         MovementInput movementInput = mc.thePlayer.movementInput;
@@ -139,7 +143,7 @@ public class MovementUtils extends Util {
         return mc.thePlayer == null ? 0 : Math.sqrt(mc.thePlayer.motionX * mc.thePlayer.motionX
                 + mc.thePlayer.motionZ * mc.thePlayer.motionZ);
     }
-    
+
     public static boolean isOnGround() {
         return mc.thePlayer.onGround && mc.thePlayer.isCollidedVertically;
     }
@@ -162,11 +166,11 @@ public class MovementUtils extends Util {
         return Math.toRadians(rotationYaw);
     }
 
-    public static void fixMovement(PlayerInputEvent event, float yaw) {
-        fixMovement(event, yaw, mc.thePlayer.rotationYaw);
+    public static void fixKillAuraMovement(PlayerInputEvent event, float yaw) {
+        fixKillAuraMovement(event, yaw, mc.thePlayer.rotationYaw);
     }
 
-    public static void fixMovement(PlayerInputEvent event, float yaw, float playerYaw) {
+    public static void fixKillAuraMovement(PlayerInputEvent event, float yaw, float playerYaw) {
         float forward = event.getForward();
         float strafe = event.getStrafe();
 
@@ -192,6 +196,62 @@ public class MovementUtils extends Util {
             }
         }
 
+        event.setForward(closestForward);
+        event.setStrafe(closestStrafe);
+    }
+
+    public static void fixScaffoldMovement(StrafeEvent event) {
+
+
+        if (mc.thePlayer == null || mc.theWorld == null) {
+            return;
+        }
+
+        prevYaw = Simp.INSTANCE.getRotationHandler().getPrevServerYaw();
+        prevPitch = Simp.INSTANCE.getRotationHandler().getPrevServerPitch();
+
+        prevYaw = yaw;
+        prevPitch = pitch;
+
+        float[] patchedRots = RotationUtils.getPatchedAndCappedRots(new float[] { prevYaw, prevPitch },
+                new float[] { Simp.INSTANCE.getRotationHandler().getServerYaw(), Simp.INSTANCE.getRotationHandler().getServerPitch() }, 90);
+
+        if (patchedRots == null) {
+            yaw = mc.thePlayer.rotationYaw;
+            pitch = mc.thePlayer.rotationPitch;
+        }
+
+        yaw = patchedRots[0];
+        pitch = patchedRots[1];
+
+        float forward = event.getForward();
+        float strafe = event.getStrafe();
+
+        final double angle = MathHelper.wrapAngleTo180_double(
+                Math.toDegrees(MovementUtils.direction(Simp.INSTANCE.getRotationHandler().getServerYaw(), forward, strafe)));
+
+        if (forward == 0 && strafe == 0) {
+            return;
+        }
+
+        float closestForward = 0, closestStrafe = 0, closestDifference = Float.MAX_VALUE;
+
+        for (float predictedForward = -1F; predictedForward <= 1F; predictedForward += 1F) {
+            for (float predictedStrafe = -1F; predictedStrafe <= 1F; predictedStrafe += 1F) {
+                if (predictedStrafe == 0 && predictedForward == 0)
+                    continue;
+
+                final double predictedAngle = MathHelper.wrapAngleTo180_double(
+                        Math.toDegrees(MovementUtils.direction(yaw, predictedForward, predictedStrafe)));
+                final double difference = Math.abs(angle - predictedAngle);
+
+                if (difference < closestDifference) {
+                    closestDifference = (float) difference;
+                    closestForward = predictedForward;
+                    closestStrafe = predictedStrafe;
+                }
+            }
+        }
         event.setForward(closestForward);
         event.setStrafe(closestStrafe);
     }

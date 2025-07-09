@@ -8,6 +8,7 @@ import cc.simp.commands.impl.ToggleCommand;
 import cc.simp.event.Event;
 import cc.simp.event.impl.KeyPressEvent;
 import cc.simp.event.impl.game.ClientStartupEvent;
+import cc.simp.handlers.RotationHandler;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleManager;
 import cc.simp.ui.click.window.WindowClickGUI;
@@ -32,6 +33,7 @@ public class Simp {
     private ModuleManager moduleManager;
     private EventBus<Event> eventBus;
     private CommandHandler commandHandler;
+    private RotationHandler rotationHandler;
     private WindowClickGUI winClickGUI;
 
     public static void start() {
@@ -64,6 +66,10 @@ public class Simp {
         ));
         getEventBus().subscribe(commandHandler);
 
+        // Rotation Handler
+        rotationHandler = new RotationHandler();
+        getEventBus().subscribe(rotationHandler);
+
     };
 
     @EventLink
@@ -90,6 +96,10 @@ public class Simp {
 
     public CommandHandler getCommandHandler() {
        return commandHandler;
+    }
+
+    public RotationHandler getRotationHandler() {
+        return rotationHandler;
     }
 
 }

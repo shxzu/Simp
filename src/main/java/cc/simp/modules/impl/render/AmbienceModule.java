@@ -36,11 +36,6 @@ public final class AmbienceModule extends Module {
         setSuffixListener(timeProperty);
         if (mc.theWorld == null)
             return;
-        WorldInfo worldinfo = mc.theWorld.getWorldInfo();
-        if (mc.isSingleplayer()) {
-            World world = MinecraftServer.getServer().worldServers[0];
-            worldinfo = world.getWorldInfo();
-        }
         switch (timeProperty.getValue()) {
             case DAY:
                 mc.theWorld.setWorldTime(1000);
@@ -50,11 +45,8 @@ public final class AmbienceModule extends Module {
                 break;
         }
         if (rainProperty.getValue()) {
-            worldinfo.setCleanWeatherTime(0);
-            worldinfo.setRainTime(Integer.MAX_VALUE);
-            worldinfo.setThunderTime(Integer.MAX_VALUE);
-            worldinfo.setRaining(true);
-            worldinfo.setThundering(true);
+            mc.theWorld.setRainStrength(1);
+            mc.theWorld.setThunderStrength(1);
         }
     };
 

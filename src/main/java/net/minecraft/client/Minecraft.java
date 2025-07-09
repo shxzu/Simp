@@ -1371,7 +1371,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         }
     }
 
-    private void clickMouse()
+    public void clickMouse()
     {
         if (this.leftClickCounter <= 0)
         {
@@ -1415,7 +1415,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     }
 
     @SuppressWarnings("incomplete-switch")
-    private void rightClickMouse()
+    public void rightClickMouse()
     {
         if (!this.playerController.getIsHittingBlock())
         {

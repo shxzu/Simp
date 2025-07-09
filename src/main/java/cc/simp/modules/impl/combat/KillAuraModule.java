@@ -1,24 +1,31 @@
 package cc.simp.modules.impl.combat;
 
 import cc.simp.Simp;
+import cc.simp.event.impl.packet.PacketSendEvent;
 import cc.simp.event.impl.player.MotionEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.modules.impl.player.SmoothRotationsModule;
 import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
 import cc.simp.utils.client.mc.MovementUtils;
+import cc.simp.utils.client.mc.PlayerUtils;
+import cc.simp.utils.client.mc.RaytraceUtils;
 import cc.simp.utils.client.mc.RotationUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 
 import java.util.Comparator;
 
@@ -27,11 +34,12 @@ import static cc.simp.utils.client.Util.mc;
 @ModuleInfo(label = "Kill Aura", category = ModuleCategory.COMBAT)
 public final class KillAuraModule extends Module {
 
-    private final Property<Boolean> raytraceProperty = new Property<>("Raytrace", false);
-    private final Property<Boolean> keepSprintProperty = new Property<>("KeepSprint", false);
+    private final DoubleProperty attackDelayProperty = new DoubleProperty("Attack Delay", 100, 0, 1000, 10);
     public static DoubleProperty rangeProperty = new DoubleProperty("Range", 3, 3, 6, 0.1);
     private final EnumProperty<TargetType> targetTypeProperty = new EnumProperty<>("Target", TargetType.PLAYERS);
-    private final DoubleProperty attackDelayProperty = new DoubleProperty("Attack Delay", 100, 0, 1000, 10);
+    private final EnumProperty<AutoBlockType> autoBlockTypeProperty = new EnumProperty<>("Auto Block", AutoBlockType.FAKE);
+    private final Property<Boolean> keepSprintProperty = new Property<>("KeepSprint", false);
+    private final Property<Boolean> raytraceProperty = new Property<>("Raytrace", false);
 
     public enum TargetType {
         PLAYERS,
@@ -40,12 +48,19 @@ public final class KillAuraModule extends Module {
         ALL
     }
 
+    public enum AutoBlockType {
+        NONE,
+        FAKE,
+        VANILLA
+    }
+
     public KillAuraModule() {
         setSuffixListener(targetTypeProperty);
     }
-    
+
     public static EntityLivingBase target;
     private long lastAttackTime;
+    private boolean rotated = false;
 
     @EventLink
     public final Listener<MotionEvent> motionEventListener = event -> {
@@ -56,20 +71,23 @@ public final class KillAuraModule extends Module {
             return;
         }
 
-        float[] rotations = getRotations();
-        event.setYaw(rotations[0]);
-        event.setPitch(rotations[1]);
-        RotationUtils.serverYaw = event.getYaw();
-        RotationUtils.serverPitch = event.getPitch();
+        if(Simp.INSTANCE.getModuleManager().getModule(SmoothRotationsModule.class).isEnabled()) {
+            event.setYaw(RotationUtils.smoothYaw(getRotations()[0]));
+            event.setPitch(RotationUtils.smoothPitch(getRotations()[1]));
+        } else {
+            event.setYaw(getRotations()[0]);
+            event.setPitch(getRotations()[1]);
+        }
+        rotated = true;
 
         if (event.isPre()) {
-            if (raytraceProperty.getValue()) {
-                MovingObjectPosition trace = mc.objectMouseOver;
-                if (trace == null || trace.entityHit != target) return;
-            }
-
             long currentTime = System.nanoTime();
             if (currentTime - lastAttackTime >= attackDelayProperty.getValue() * 1_000_000) {
+
+                if (raytraceProperty.getValue()) {
+                    if (!isLookingAtEntity(Simp.INSTANCE.getRotationHandler().getServerYaw(), Simp.INSTANCE.getRotationHandler().getServerPitch())) return;
+                }
+
                 mc.thePlayer.swingItem();
                 mc.playerController.attackEntity(mc.thePlayer, target);
 
@@ -86,6 +104,15 @@ public final class KillAuraModule extends Module {
                 lastAttackTime = currentTime;
             }
         }
+    };
+
+    @EventLink
+    public final Listener<PacketSendEvent> packetSendEventListener = event -> {
+        if (!rotated) return;
+        if (raytraceProperty.getValue() && target != null) {
+            if (!isLookingAtEntity(Simp.INSTANCE.getRotationHandler().getServerYaw(), Simp.INSTANCE.getRotationHandler().getServerPitch())) return;
+        }
+        autoBlock(event);
     };
 
     private void updateTarget() {
@@ -126,15 +153,62 @@ public final class KillAuraModule extends Module {
         return RotationUtils.getClosestRotations(target, 0.03f);
     }
 
-    private void handleSprinting(float yaw) {
-        double x = -MathHelper.sin(yaw * 0.017453292F);
-        double z = MathHelper.cos(yaw * 0.017453292F);
-        boolean behind = target.posX * x + target.posZ * z < 0.0D;
-        mc.thePlayer.setSprinting(!behind && MovementUtils.canSprint(Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).omniProperty.getValue()));
+    private boolean isLookingAtEntity(final float yaw, final float pitch) {
+        final double range = rangeProperty.getValue();
+        final Vec3 src = mc.thePlayer.getPositionEyes(1.0F);
+        final Vec3 rotationVec = Entity.getVectorForRotation(pitch, yaw);
+        final Vec3 dest = src.addVector(rotationVec.xCoord * range, rotationVec.yCoord * range, rotationVec.zCoord * range);
+        final MovingObjectPosition obj = mc.theWorld.rayTraceBlocks(src, dest,
+                false, false, true);
+        if (obj == null) return false;
+        if (obj.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+            return false;
+        }
+        return target.getEntityBoundingBox().expand(0.1F, 0.1F, 0.1F).calculateIntercept(src, dest) != null;
+    }
+
+    public void autoBlock(PacketSendEvent event) {
+
+        boolean autoBlocking = false;
+
+        if (target == null || !PlayerUtils.isHoldingSword()) return;
+
+        switch (autoBlockTypeProperty.getValue()) {
+            case FAKE:
+                mc.thePlayer.setItemInUse(mc.thePlayer.inventory.getCurrentItem(), 32678);
+                autoBlocking = true;
+                if (event.getPacket() instanceof C08PacketPlayerBlockPlacement) {
+                    final C08PacketPlayerBlockPlacement wrapper = (C08PacketPlayerBlockPlacement) event.getPacket();
+
+                    if (wrapper.getPlacedBlockDirection() == 255) {
+                        event.setCancelled(true);
+                    }
+                } else if (event.getPacket() instanceof C07PacketPlayerDigging) {
+                    C07PacketPlayerDigging wrapper = ((C07PacketPlayerDigging) event.getPacket());
+
+                    if (wrapper.getStatus() == C07PacketPlayerDigging.Action.RELEASE_USE_ITEM) {
+                        event.setCancelled(true);
+                    }
+                }
+                break;
+            case NONE:
+
+                break;
+            case VANILLA:
+                mc.thePlayer.setItemInUse(mc.thePlayer.inventory.getCurrentItem(), 32678);
+                autoBlocking = true;
+                break;
+        }
+
+        if (target == null && autoBlocking) {
+            mc.thePlayer.clearItemInUse();
+        }
+
     }
 
     @Override
     public void onDisable() {
+        rotated = false;
         target = null;
     }
 }

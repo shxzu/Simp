@@ -1,5 +1,7 @@
 package net.minecraft.client.renderer;
 
+import cc.simp.Simp;
+import cc.simp.modules.impl.render.BlockAnimationsModule;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -315,6 +317,7 @@ public class ItemRenderer
             float f1 = abstractclientplayer.getSwingProgress(partialTicks);
             float f2 = abstractclientplayer.prevRotationPitch + (abstractclientplayer.rotationPitch - abstractclientplayer.prevRotationPitch) * partialTicks;
             float f3 = abstractclientplayer.prevRotationYaw + (abstractclientplayer.rotationYaw - abstractclientplayer.prevRotationYaw) * partialTicks;
+            float var16 = MathHelper.sin(MathHelper.sqrt_float(f1) * 3.1415927F);
             this.rotateArroundXAndY(f2, f3);
             this.setLightMapFromPlayer(abstractclientplayer);
             this.rotateWithPlayerRotations((EntityPlayerSP)abstractclientplayer, partialTicks);
@@ -344,8 +347,46 @@ public class ItemRenderer
                             break;
 
                         case BLOCK:
-                            this.transformFirstPersonItem(f, 0.0F);
-                            this.doBlockTransformations();
+                            if (Simp.INSTANCE.getModuleManager().getModule(BlockAnimationsModule.class).isEnabled()) {
+                                switch (BlockAnimationsModule.animationModeProperty.getValue()) {
+                                    case SIMP:
+                                        GlStateManager.translate(0, -0.08, 0);
+                                        GlStateManager.translate(0.41F, -0.25F, -0.5555557F);
+                                        GlStateManager.translate(0.0F, 0, 0.0F);
+                                        GlStateManager.rotate(56.0F, 0f, 1.5F, 0.0F);
+                                        float f9 = MathHelper.sin(MathHelper.sqrt_float(f1) * (float) Math.PI);
+                                        GlStateManager.rotate(f9 * -95.0F, 1.0F, 0.0F, 0.0F);
+                                        float size = 0.285f;
+                                        GlStateManager.scale(size, size, size);
+                                        this.doBlockTransformations();
+                                        break;
+                                    case OLD:
+                                        this.transformFirstPersonItem(f, f1);
+                                        GlStateManager.translate(0, 0.3, 0);
+                                        this.doBlockTransformations();
+                                        break;
+                                    case EXHIBITION:
+                                        this.transformFirstPersonItem(f / 2, 0);
+                                        GlStateManager.rotate(-var16 * 40.0F / 2.0F, var16 / 2.0F, -0.0F, 9.0F);
+                                        GlStateManager.rotate(-var16 * 30.0F, 1.0F, var16 / 2.0F, -0.0F);
+                                        this.doBlockTransformations();
+                                        GL11.glTranslatef(-0.05F, this.mc.thePlayer.isSneaking() ? -0F : 0.0F, 0.1F);
+                                        break;
+                                    case NOVOLINE:
+                                        this.transformFirstPersonItem(f / 1.5F, 0.0F);
+                                        GlStateManager.translate(-0.5F, 0.2F, 0.0F);
+                                        GlStateManager.rotate(30.0F, 0.0F, 1.0F, 0.0F);
+                                        GlStateManager.rotate(-80.0F, 1.0F, 0.0F, 0.0F);
+                                        GlStateManager.rotate(60.0F, 0.0F, 1.0F, 0.0F);
+                                        GlStateManager.translate(-0.05F, 0.3F, 0.3F);
+                                        GlStateManager.rotate(-var16 * 140.0F, 8.0F, 0.0F, 8.0F);
+                                        GlStateManager.rotate(var16 * 90.0F, 8.0F, 0.0F, 8.0F);
+                                        break;
+                                }
+                            } else {
+                                this.transformFirstPersonItem(f, 0.0F);
+                                this.doBlockTransformations();
+                            }
                             break;
 
                         case BOW:

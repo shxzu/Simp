@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 public class MathUtils extends Util {
+
     public static double roundToDecimalPlace(double value, double inc) {
         final double halfOfInc = inc / 2.0D;
         final double floored = StrictMath.floor(value / inc) * inc;
@@ -18,4 +19,10 @@ public class MathUtils extends Util {
                     .stripTrailingZeros()
                     .doubleValue();
     }
+
+    public static int getRandomNumberUsingNextInt(int min, int max) {
+        java.util.Random random = new java.util.Random();
+        return random.nextInt(max - min) + min;
+    }
+
 }

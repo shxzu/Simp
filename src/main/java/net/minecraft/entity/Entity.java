@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+
+import cc.simp.Simp;
+import cc.simp.event.impl.player.SafeWalkEvent;
+import cc.simp.event.impl.player.StrafeEvent;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -12,6 +16,7 @@ import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockPattern;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.CommandResultStats;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.crash.CrashReport;
@@ -123,6 +128,7 @@ public abstract class Entity implements ICommandSender
     private boolean invulnerable;
     protected UUID entityUniqueID;
     private final CommandResultStats cmdResultStats;
+    public int offGroundTicks, onGroundTicks;
 
     public int getEntityId()
     {
@@ -257,6 +263,13 @@ public abstract class Entity implements ICommandSender
 
     public void onUpdate()
     {
+        if (this.onGround) {
+            offGroundTicks = 0;
+            onGroundTicks++;
+        } else {
+            onGroundTicks = 0;
+            offGroundTicks++;
+        }
         this.onEntityUpdate();
     }
 
@@ -451,7 +464,11 @@ public abstract class Entity implements ICommandSender
             double d3 = x;
             double d4 = y;
             double d5 = z;
-            boolean flag = this.onGround && this.isSneaking() && this instanceof EntityPlayer;
+
+            SafeWalkEvent event = new SafeWalkEvent();
+            if (this instanceof EntityPlayerSP)
+                Simp.INSTANCE.getEventBus().post(event);
+            boolean flag = this.onGround && (this.isSneaking() || event.isCancelled()) && this instanceof EntityPlayer;
 
             if (flag)
             {
@@ -1007,26 +1024,30 @@ public abstract class Entity implements ICommandSender
         return this.worldObj.isMaterialInBB(this.getEntityBoundingBox().expand(-0.10000000149011612D, -0.4000000059604645D, -0.10000000149011612D), Material.lava);
     }
 
-    public void moveFlying(float strafe, float forward, float friction)
-    {
-        float f = strafe * strafe + forward * forward;
+    public void moveFlying(float strafe, float forward, float friction) {
+        StrafeEvent event = new StrafeEvent(this.rotationYaw, strafe, forward, friction);
+        Simp.INSTANCE.getEventBus().post(event);
+        if (!event.isCancelled()) {
+            strafe = event.getStrafe();
+            forward = event.getForward();
+            friction = event.getFriction();
+            float finalYaw = this instanceof EntityPlayerSP ? event.getYaw() : this.rotationYaw;
+            float f = strafe * strafe + forward * forward;
+            if (f >= 1.0E-4F) {
+                f = MathHelper.sqrt_float(f);
+                if (f < 1.0F) {
+                    f = 1.0F;
+                }
 
-        if (f >= 1.0E-4F)
-        {
-            f = MathHelper.sqrt_float(f);
-
-            if (f < 1.0F)
-            {
-                f = 1.0F;
+                f = friction / f;
+                strafe *= f;
+                forward *= f;
+                float f1 = MathHelper.sin(finalYaw * 3.1415927F / 180.0F);
+                float f2 = MathHelper.cos(finalYaw * 3.1415927F / 180.0F);
+                this.motionX += (double)(strafe * f2 - forward * f1);
+                this.motionZ += (double)(forward * f2 + strafe * f1);
             }
 
-            f = friction / f;
-            strafe = strafe * f;
-            forward = forward * f;
-            float f1 = MathHelper.sin(this.rotationYaw * (float)Math.PI / 180.0F);
-            float f2 = MathHelper.cos(this.rotationYaw * (float)Math.PI / 180.0F);
-            this.motionX += (double)(strafe * f2 - forward * f1);
-            this.motionZ += (double)(forward * f2 + strafe * f1);
         }
     }
 
@@ -1214,7 +1235,7 @@ public abstract class Entity implements ICommandSender
         }
     }
 
-    protected final Vec3 getVectorForRotation(float pitch, float yaw)
+    public static final Vec3 getVectorForRotation(float pitch, float yaw)
     {
         float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
         float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);

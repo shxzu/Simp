@@ -64,6 +64,9 @@ public class AltManagerGui extends GuiScreen {
     private void loadAltsFromFile() {
     	File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
         File file = new File(dir, "alts.txt");
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
         if (!file.exists()) {
             try {
                 file.createNewFile();
