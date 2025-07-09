@@ -6,14 +6,15 @@ import cc.simp.utils.client.Logger;
 import cc.simp.utils.client.Util;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
+import net.minecraft.block.BlockSlab;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.util.Random;
 
@@ -22,10 +23,12 @@ public class ScaffoldUtils extends Util {
 
         private final BlockPos position;
         private final EnumFacing facing;
+        private final Vec3 hitVec;
 
-        public BlockCache(final BlockPos position, final EnumFacing facing) {
+        public BlockCache(final BlockPos position, final EnumFacing facing, Vec3 hitVec) {
             this.position = position;
             this.facing = facing;
+            this.hitVec = hitVec;
         }
 
         public BlockPos getPosition() {
@@ -35,10 +38,14 @@ public class ScaffoldUtils extends Util {
         public EnumFacing getFacing() {
             return this.facing;
         }
+
+        public Vec3 getHitVec() {
+            return this.hitVec;
+        }
     }
 
     public static double getYLevel() {
-        if (!ScaffoldModule.keepYProperty.getValue() || ScaffoldModule.canSpeedProperty.getValue()
+        if (!ScaffoldModule.keepYProperty.getValue() || ScaffoldModule.allowSpeedModuleProperty.getValue()
                 && !Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) {
             return mc.thePlayer.posY - 1.0;
         }
@@ -60,7 +67,7 @@ public class ScaffoldUtils extends Util {
                                 final BlockPos block = blockPos.offset(direction);
                                 final Material material = mc.theWorld.getBlockState(block).getBlock().getMaterial();
                                 if (material.isSolid() && !material.isLiquid()) {
-                                    return new BlockCache(block, direction.getOpposite());
+                                    return new BlockCache(block, direction.getOpposite(), getVec3(block, direction.getOpposite()));
                                 }
                             }
                         }
@@ -69,6 +76,28 @@ public class ScaffoldUtils extends Util {
             }
         }
         return null;
+    }
+
+    private static Vec3 getVec3(BlockPos pos, EnumFacing face) {
+        double x = (double) pos.getX() + 0.5;
+        double y = (double) pos.getY() + 0.5;
+        double z = (double) pos.getZ() + 0.5;
+        x += (double) face.getFrontOffsetX() / 2.0;
+        z += (double) face.getFrontOffsetZ() / 2.0;
+        y += (double) face.getFrontOffsetY() / 2.0;
+        if (face == EnumFacing.UP || face == EnumFacing.DOWN) {
+            x += new Random().nextDouble() / 2.0 - 0.25;
+            z += new Random().nextDouble() / 2.0 - 0.25;
+        } else {
+            y += new Random().nextDouble() / 2.0 - 0.25;
+        }
+        if (face == EnumFacing.WEST || face == EnumFacing.EAST) {
+            z += new Random().nextDouble() / 2.0 - 0.25;
+        }
+        if (face == EnumFacing.SOUTH || face == EnumFacing.NORTH) {
+            x += new Random().nextDouble() / 2.0 - 0.25;
+        }
+        return new Vec3(x, y, z);
     }
 
     public static int getBlockSlot() {
@@ -132,67 +161,6 @@ public class ScaffoldUtils extends Util {
     public static boolean isAirBlock(final BlockPos blockPos) {
         final Block block = Minecraft.getMinecraft().theWorld.getBlockState(blockPos).getBlock();
         return block instanceof BlockAir;
-    }
-
-    public static Vec3 getVec3(BlockPos pos, EnumFacing face) {
-        double x = (double) pos.getX() + 0.5;
-        double y = (double) pos.getY() + 0.5;
-        double z = (double) pos.getZ() + 0.5;
-        x += (double) face.getFrontOffsetX() / 2.0;
-        z += (double) face.getFrontOffsetZ() / 2.0;
-        y += (double) face.getFrontOffsetY() / 2.0;
-        if (face == EnumFacing.UP || face == EnumFacing.DOWN) {
-            x += new Random().nextDouble() / 2.0 - 0.25;
-            z += new Random().nextDouble() / 2.0 - 0.25;
-        } else {
-            y += new Random().nextDouble() / 2.0 - 0.25;
-        }
-        if (face == EnumFacing.WEST || face == EnumFacing.EAST) {
-            z += new Random().nextDouble() / 2.0 - 0.25;
-        }
-        if (face == EnumFacing.SOUTH || face == EnumFacing.NORTH) {
-            x += new Random().nextDouble() / 2.0 - 0.25;
-        }
-        return new Vec3(x, y, z);
-    }
-
-    public static Vec3 getRaycastedVec3(BlockCache cache, float finalRotationYaw, float finalRotationPitch) {
-        Vec3 hitVec = new Vec3(cache.getPosition().getX() + Math.random(), cache.getPosition().getY() + Math.random(),
-                cache.getPosition().getZ() + Math.random());
-
-        final boolean movingObjectPosition = RaytraceUtils.isOnBlockForVec3(cache.getPosition(), true);
-
-        switch (cache.getFacing()) {
-            case DOWN:
-                hitVec.yCoord = cache.getPosition().getY();
-                break;
-
-            case UP:
-                hitVec.yCoord = cache.getPosition().getY() + 1;
-                break;
-
-            case NORTH:
-                hitVec.zCoord = cache.getPosition().getZ();
-                break;
-
-            case EAST:
-                hitVec.xCoord = cache.getPosition().getX() + 1;
-                break;
-
-            case SOUTH:
-                hitVec.zCoord = cache.getPosition().getZ() + 1;
-                break;
-
-            case WEST:
-                hitVec.xCoord = cache.getPosition().getX();
-                break;
-        }
-
-        if (!movingObjectPosition) {
-            return getVec3(cache.getPosition(), cache.getFacing());
-        }
-
-        return hitVec;
     }
 
     public static float getYaw() {

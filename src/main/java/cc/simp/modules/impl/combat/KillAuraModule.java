@@ -94,11 +94,7 @@ public final class KillAuraModule extends Module {
                 if (keepSprintProperty.getValue()) {
                     mc.thePlayer.setSprinting(MovementUtils.canSprint(Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).omniProperty.getValue()));
                 } else {
-                    if (mc.thePlayer.isSprinting()) {
-                        mc.thePlayer.motionX *= 0.6D;
-                        mc.thePlayer.motionZ *= 0.6D;
-                        mc.thePlayer.setSprinting(false);
-                    }
+
                 }
 
                 lastAttackTime = currentTime;

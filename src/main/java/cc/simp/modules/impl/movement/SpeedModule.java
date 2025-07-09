@@ -21,6 +21,7 @@ public final class SpeedModule extends Module {
     private final EnumProperty<SpeedMode> speedModeProperty = new EnumProperty<>("Mode", SpeedMode.LEGIT);
     private final EnumProperty<IntaveMode> intaveModeProperty = new EnumProperty<>("Intave Mode", IntaveMode.MOTION, () -> speedModeProperty.getValue() == SpeedMode.INTAVE);
     public final Property<Boolean> intaveTimerProperty = new Property<>("Timer", false, () -> speedModeProperty.getValue() == SpeedMode.INTAVE);
+    public final Property<Boolean> fullStopProperty = new Property<>("Stop on Disable", true);
 
     private boolean wasOnGround;
     private int airTicks;
@@ -123,6 +124,9 @@ public final class SpeedModule extends Module {
             // future proof method! (original method used shit that didnt bypass in intave 13 but did in 14. so
             // it was most likely to flag in future versions.) p.s. u flag celery sometimes but its really rare..
 
+            if (mc.isSingleplayer())
+                return;
+
             if (mc.gameSettings.keyBindJump.isPressed())
                 return;
 
@@ -141,5 +145,16 @@ public final class SpeedModule extends Module {
             }
         }
     };
+
+    @Override
+    public void onDisable() {
+        if (intaveTimerProperty.getValue()) {
+            mc.timer.timerSpeed = 1.0f;
+        }
+        if(fullStopProperty.getValue()) {
+            mc.thePlayer.motionX *= 0;
+            mc.thePlayer.motionZ *= 0;
+        }
+    }
 
 }

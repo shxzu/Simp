@@ -9,6 +9,8 @@ import cc.simp.modules.impl.movement.MovementFixModule;
 import cc.simp.modules.impl.movement.NoSlowdownModule;
 import cc.simp.modules.impl.movement.SpeedModule;
 import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.modules.impl.player.ChestStealerModule;
+import cc.simp.modules.impl.player.InventoryManagerModule;
 import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.modules.impl.player.SmoothRotationsModule;
 import cc.simp.modules.impl.render.AmbienceModule;
@@ -36,6 +38,8 @@ public final class ModuleManager {
 
                 // PLAYER
                 new ScaffoldModule(),
+                new ChestStealerModule(),
+                new InventoryManagerModule(),
                 new SmoothRotationsModule(),
 
                 // MOVEMENT

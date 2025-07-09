@@ -1,13 +1,12 @@
 package cc.simp;
 
 import cc.simp.commands.CommandHandler;
-import cc.simp.commands.impl.BindCommand;
-import cc.simp.commands.impl.BindsCommand;
-import cc.simp.commands.impl.HideCommand;
-import cc.simp.commands.impl.ToggleCommand;
+import cc.simp.commands.impl.*;
+import cc.simp.config.ConfigManager;
 import cc.simp.event.Event;
 import cc.simp.event.impl.KeyPressEvent;
 import cc.simp.event.impl.game.ClientStartupEvent;
+import cc.simp.handlers.BackGroundHandler;
 import cc.simp.handlers.RotationHandler;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleManager;
@@ -33,8 +32,10 @@ public class Simp {
     private ModuleManager moduleManager;
     private EventBus<Event> eventBus;
     private CommandHandler commandHandler;
+    private static ConfigManager configManager;
     private RotationHandler rotationHandler;
     private WindowClickGUI winClickGUI;
+    private BackGroundHandler backGroundHandler;
 
     public static void start() {
         Display.setTitle(NAME + " " + BUILD);
@@ -62,13 +63,23 @@ public class Simp {
                 new BindCommand(),
                 new BindsCommand(),
                 new ToggleCommand(),
+                new ConfigCommand(),
                 new HideCommand()
         ));
         getEventBus().subscribe(commandHandler);
 
+        // Config Manager
+        configManager = new ConfigManager();
+
         // Rotation Handler
         rotationHandler = new RotationHandler();
         getEventBus().subscribe(rotationHandler);
+
+        configManager.loadConfig("default");
+
+        // Background Handler
+        backGroundHandler = new BackGroundHandler();
+        getEventBus().subscribe(backGroundHandler);
 
     };
 
@@ -98,8 +109,19 @@ public class Simp {
        return commandHandler;
     }
 
+    public static ConfigManager getConfigManager() {
+        return configManager;
+    }
+
     public RotationHandler getRotationHandler() {
         return rotationHandler;
+    }
+
+    public static <T> T requireNonNull(T obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException();
+        }
+        return obj;
     }
 
 }

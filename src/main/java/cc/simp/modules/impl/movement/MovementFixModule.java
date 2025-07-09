@@ -18,11 +18,12 @@ import io.github.nevalackin.homoBus.annotations.EventLink;
 public final class MovementFixModule extends Module {
 
     public final Property<Boolean> killAuraProperty = new Property<>("Work on Kill Aura", true);
+    public final Property<Boolean> strictProperty = new Property<>("Strict on Kill Aura", true, killAuraProperty::getValue);
     public final Property<Boolean> scaffoldProperty = new Property<>("Work on Scaffold", true);
 
     @EventLink
     public final Listener<PlayerInputEvent> playerInputEventListener = event -> {
-        if(killAuraProperty.getValue() && KillAuraModule.target != null) {
+        if(killAuraProperty.getValue() && KillAuraModule.target != null && !strictProperty.getValue()) {
             MovementUtils.fixKillAuraMovement(event, Simp.INSTANCE.getRotationHandler().getServerYaw());
         }
     };
@@ -30,6 +31,9 @@ public final class MovementFixModule extends Module {
     public final Listener<StrafeEvent> strafeEventListener = event -> {
         if(scaffoldProperty.getValue() && Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) {
             MovementUtils.fixScaffoldMovement(event);
+        }
+        if(killAuraProperty.getValue() && KillAuraModule.target != null && strictProperty.getValue()) {
+            event.setYaw(Simp.INSTANCE.getRotationHandler().getServerYaw());
         }
     };
 }

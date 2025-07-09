@@ -6,13 +6,12 @@ import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
 import cc.simp.property.impl.MultiSelectEnumProperty;
 import cc.simp.utils.client.Manager;
+import cc.simp.config.Serializable;
 import cc.simp.utils.client.misc.StringUtils;
 import cc.simp.utils.client.render.Translate;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Supplier;
@@ -109,6 +108,7 @@ public class Module extends Manager<Property<?>> implements Toggleable, Serializ
         this.key = key;
     }
 
+
     @Override
     public boolean isEnabled() {
         return enabled;
@@ -144,6 +144,77 @@ public class Module extends Manager<Property<?>> implements Toggleable, Serializ
 
     @Override
     public void onDisable() {
+    }
+
+    @Override
+    public JsonObject save() {
+        JsonObject object = new JsonObject();
+        object.addProperty("toggled", isEnabled());
+        object.addProperty("key", getKey());
+        object.addProperty("hidden", isHidden());
+        List<Property<?>> properties = getElements();
+        if (!properties.isEmpty()) {
+            JsonObject propertiesObject = new JsonObject();
+
+            for (Property<?> property : properties) {
+                if (property instanceof DoubleProperty) {
+                    propertiesObject.addProperty(property.getLabel(), ((DoubleProperty) property).getValue());
+                } else if (property instanceof EnumProperty) {
+                    EnumProperty<?> enumProperty = (EnumProperty<?>) property;
+                    propertiesObject.add(property.getLabel(), new JsonPrimitive(enumProperty.getValue().name()));
+                } else if (property instanceof MultiSelectEnumProperty) {
+                    MultiSelectEnumProperty<?> multiSelect = (MultiSelectEnumProperty<?>) property;
+                    final JsonArray array = new JsonArray();
+                    for (Enum<?> e : multiSelect.getValues()) {
+                        array.add(new JsonPrimitive(e.name()));
+                    }
+                    propertiesObject.add(property.getLabel(), array);
+                } else if (property.getType() == Boolean.class) {
+                    propertiesObject.addProperty(property.getLabel(), (Boolean) property.getValue());
+                } else if (property.getType() == Integer.class) {
+                    propertiesObject.addProperty(property.getLabel(), Integer.toHexString((Integer) property.getValue()));
+                } else if (property.getType() == String.class) {
+                    propertiesObject.addProperty(property.getLabel(), (String) property.getValue());
+                }
+            }
+
+            object.add("Properties", propertiesObject);
+        }
+        return object;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void load(JsonObject object) {
+        if (object.has("toggled"))
+            setEnabled(object.get("toggled").getAsBoolean());
+
+        if (object.has("key"))
+            setKey(object.get("key").getAsInt());
+
+        if (object.has("hidden"))
+            setHidden(object.get("hidden").getAsBoolean());
+
+        if (object.has("Properties") && !getElements().isEmpty()) {
+            JsonObject propertiesObject = object.getAsJsonObject("Properties");
+            for (Property<?> property : getElements()) {
+                if (propertiesObject.has(property.getLabel())) {
+                    if (property instanceof DoubleProperty) {
+                        ((DoubleProperty) property).setValue(propertiesObject.get(property.getLabel()).getAsDouble());
+                    } else if (property instanceof EnumProperty) {
+                        findEnumValue(property, propertiesObject);
+                    } else if (property instanceof MultiSelectEnumProperty) {
+
+                    } else if (property.getValue() instanceof Boolean) {
+                        ((Property<Boolean>) property).setValue(propertiesObject.get(property.getLabel()).getAsBoolean());
+                    } else if (property.getValue() instanceof Integer) {
+                        ((Property<Integer>) property).setValue((int) Long.parseLong(propertiesObject.get(property.getLabel()).getAsString(), 16));
+                    } else if (property.getValue() instanceof String) {
+                        ((Property<String>) property).setValue(propertiesObject.get(property.getLabel()).getAsString());
+                    }
+                }
+            }
+        }
     }
 
     private static <T extends Enum<T>> void findEnumValue(Property<?> property, JsonObject propertiesObject) {
