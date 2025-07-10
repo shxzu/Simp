@@ -2226,6 +2226,11 @@ public abstract class Entity implements ICommandSender
         return EnumFacing.getHorizontal(MathHelper.floor_double((double)(this.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3);
     }
 
+    public EnumFacing getServerSidedHorizontalFacing()
+    {
+        return EnumFacing.getHorizontal(MathHelper.floor_double((double)(Simp.INSTANCE.getRotationHandler().getServerYaw() * 4.0F / 360.0F) + 0.5D) & 3);
+    }
+
     protected HoverEvent getHoverEvent()
     {
         NBTTagCompound nbttagcompound = new NBTTagCompound();

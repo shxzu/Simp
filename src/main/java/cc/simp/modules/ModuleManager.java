@@ -5,10 +5,7 @@ import cc.simp.event.impl.KeyPressEvent;
 import cc.simp.modules.impl.client.*;
 import cc.simp.modules.impl.combat.AntiKnockbackModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
-import cc.simp.modules.impl.movement.MovementFixModule;
-import cc.simp.modules.impl.movement.NoSlowdownModule;
-import cc.simp.modules.impl.movement.SpeedModule;
-import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.modules.impl.movement.*;
 import cc.simp.modules.impl.player.ChestStealerModule;
 import cc.simp.modules.impl.player.InventoryManagerModule;
 import cc.simp.modules.impl.player.ScaffoldModule;
@@ -45,6 +42,7 @@ public final class ModuleManager {
                 // MOVEMENT
                 new SprintModule(),
                 new SpeedModule(),
+                new FlightModule(),
                 new NoSlowdownModule(),
                 new MovementFixModule(),
 
@@ -58,6 +56,7 @@ public final class ModuleManager {
                 // CLIENT
                 new WatermarkModule(),
                 new ArraylistModule(),
+                new PlayerInfoModule(),
                 new TargetHUDModule(),
                 new TabGUIModule(),
                 new FontManagerModule()

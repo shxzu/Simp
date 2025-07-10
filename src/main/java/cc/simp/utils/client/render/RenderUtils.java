@@ -3,6 +3,9 @@ package cc.simp.utils.client.render;
 import cc.simp.utils.client.Util;
 import cc.simp.utils.client.misc.MathUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -124,10 +127,10 @@ public class RenderUtils extends Util {
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
 
-    public static double interpolate(double old,
-                                     double now,
-                                     float partialTicks) {
-        return old + (now - old) * partialTicks;
+    public static void drawImage(ResourceLocation resourceLocation, float x, float y, float imgWidth, float imgHeight) {
+        GlStateManager.color(1, 1, 1, 1);
+        mc.getTextureManager().bindTexture(resourceLocation);
+        Gui.drawModalRectWithCustomSizedTexture(x, y, 0, 0, imgWidth, imgHeight, imgWidth, imgHeight);
     }
 
     public static float interpolate(float old,

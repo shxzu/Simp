@@ -15,6 +15,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import org.apache.commons.lang3.RandomUtils;
+import org.lwjgl.util.vector.Vector2f;
 
 import java.util.Random;
 
@@ -163,32 +164,32 @@ public class ScaffoldUtils extends Util {
         return block instanceof BlockAir;
     }
 
-    public static float getYaw() {
-        float n = 0.0f;
-        final double moveForward = mc.thePlayer.movementInput.moveForward;
-        final double moveStrafe = mc.thePlayer.movementInput.moveStrafe;
+    public static float getYaw(float yaw) {
+        Vector2f from = new Vector2f((float) mc.thePlayer.lastTickPosX, (float) mc.thePlayer.lastTickPosZ),
+                to = new Vector2f((float) mc.thePlayer.posX, (float) mc.thePlayer.posZ),
+                diff = new Vector2f(to.x - from.x, to.y - from.y);
 
-        if (moveForward == 0.0 && moveStrafe == 0.0) {
-            n = 180.0f;// Not moving, default yaw
-        } else if (moveForward > 0.0) {
-            if (moveStrafe > 0.0) {
-                n = 135.0f;// Moving diagonally forward-right
-            } else if (moveStrafe < 0.0) {
-                n = 225.0f;// Moving diagonally forward-left
-            } else {
-                n = 180.0f;// Moving straight forward
-            }
-        } else if (moveForward < 0.0) {
-            if (moveStrafe > 0.0) {
-                n = 135.0f * 2;// Moving diagonally backward-right
-            } else if (moveStrafe < 0.0) {
-                n = 225.0f * 2;// Moving diagonally backward-left
-            } else {
-                n = -180.0f * 2;// Moving straight backward
-            }
+        double x = diff.x, z = diff.y;
+        if (x != 0 && z != 0) {
+            yaw = (float) Math.toDegrees((Math.atan2(-x, z) + MathHelper.PI2) % MathHelper.PI2);
         }
+        return yaw;
+    }
 
-        return mc.thePlayer.rotationYaw + n;
+    public static float getHypixelNCPYaw() {
+        float yaw = MovementUtils.getDirection();
+        float upperCandidate;
+        float lowerCandidate;
+        float snapped = (float)Math.round(yaw / 45.0f) * 45.0f;
+        if (Math.abs(snapped % 90.0f) < 0.001f) {
+            lowerCandidate = snapped - 115.0f;
+            upperCandidate = snapped + 115.0f;
+        } else {
+            lowerCandidate = snapped - 145.0f;
+            upperCandidate = snapped + 145.0f;
+        }
+        snapped = Math.abs(yaw - lowerCandidate) <= Math.abs(upperCandidate - yaw) ? lowerCandidate : upperCandidate;
+        return snapped;
     }
 
 }

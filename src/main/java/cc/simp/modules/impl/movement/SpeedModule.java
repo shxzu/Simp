@@ -41,7 +41,7 @@ public final class SpeedModule extends Module {
     @EventLink
     public final Listener<MotionEvent> motionEventListener = event -> {
 
-        if (mc.gameSettings.keyBindJump.isKeyDown()) return;
+        if (mc.gameSettings.keyBindJump.isKeyDown() && speedModeProperty.getValue() != SpeedMode.LEGIT) return;
         if (event.isPost()) return;
 
         switch (speedModeProperty.getValue()) {
@@ -70,11 +70,7 @@ public final class SpeedModule extends Module {
                 }
                 break;
             case LEGIT:
-                if (MovementUtils.isMoving()) {
-                    if (MovementUtils.isOnGround()) {
-                        mc.thePlayer.jump();
-                    }
-                }
+                mc.gameSettings.keyBindJump.setPressed(MovementUtils.isMoving() && MovementUtils.isOnGround());
                 break;
             case INTAVE:
                 if (intaveModeProperty.getValue() == IntaveMode.MOTION) {
@@ -155,6 +151,7 @@ public final class SpeedModule extends Module {
             mc.thePlayer.motionX *= 0;
             mc.thePlayer.motionZ *= 0;
         }
+        if(speedModeProperty.getValue() == SpeedMode.LEGIT && mc.gameSettings.keyBindJump.isPressed()) mc.gameSettings.keyBindJump.setPressed(false);
     }
 
 }

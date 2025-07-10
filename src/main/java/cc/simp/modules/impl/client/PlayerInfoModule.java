@@ -8,6 +8,7 @@ import cc.simp.modules.ModuleInfo;
 import cc.simp.property.Property;
 import cc.simp.utils.client.font.FontManager;
 import cc.simp.utils.client.font.TrueTypeFontRenderer;
+import cc.simp.utils.client.mc.MovementUtils;
 import cc.simp.utils.client.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -18,17 +19,13 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 
 import java.awt.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static cc.simp.utils.client.Util.mc;
 
-@ModuleInfo(label = "Watermark", category = ModuleCategory.CLIENT)
-public final class WatermarkModule extends Module {
+@ModuleInfo(label = "Player Info", category = ModuleCategory.CLIENT)
+public final class PlayerInfoModule extends Module {
 
-    private final Property<Boolean> logoProperty = new Property<>("Show Client Logo", true);
-
-    public WatermarkModule() {
+    public PlayerInfoModule() {
         toggle();
     }
 
@@ -38,20 +35,13 @@ public final class WatermarkModule extends Module {
         TrueTypeFontRenderer CFont = FontManager.CSGO_FR;
         ScaledResolution sr = new ScaledResolution(mc);
         float hue = (System.currentTimeMillis() % 3000) / 3000f;
-        SimpleDateFormat sdfDate = new SimpleDateFormat("hh:mm a");
-        Date now = new Date();
-        String strDate = sdfDate.format(now);
-
-        String text = "S" + EnumChatFormatting.GRAY + "imp " + EnumChatFormatting.WHITE + Simp.INSTANCE.BUILD + EnumChatFormatting.GRAY + " [" + EnumChatFormatting.WHITE + strDate + EnumChatFormatting.GRAY + "]";
 
         if(FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
-            CFont.drawStringWithShadow(text, 2, 2, Color.getHSBColor(hue, 0.55f, 0.9f).getRGB());
+            CFont.drawStringWithShadow(EnumChatFormatting.GRAY + " [" + EnumChatFormatting.WHITE + "FPS " + EnumChatFormatting.WHITE + Minecraft.getDebugFPS() + EnumChatFormatting.GRAY + "]", sr.getScaledWidth() / 1.062f, sr.getScaledHeight() - 25, -1);
+            CFont.drawStringWithShadow(EnumChatFormatting.GRAY + " [" + EnumChatFormatting.WHITE + "BPS " + EnumChatFormatting.WHITE + MovementUtils.calculateBPS() + EnumChatFormatting.GRAY + "]", sr.getScaledWidth() / 1.062f, sr.getScaledHeight() - 15, -1);
         } else {
-            minecraftFontRenderer.drawString(text, 2, 2, Color.getHSBColor(hue, 0.55f, 0.9f).getRGB());
-        }
-
-        if(logoProperty.getValue()) {
-            RenderUtils.drawImage(new ResourceLocation("simp/images/logo.png"), 2f, sr.getScaledHeight() - 102, 100, 100);
+            minecraftFontRenderer.drawStringWithShadow(EnumChatFormatting.GRAY + " [" + EnumChatFormatting.WHITE + "FPS " + EnumChatFormatting.WHITE + Minecraft.getDebugFPS() + EnumChatFormatting.GRAY + "]", sr.getScaledWidth() / 1.062f, sr.getScaledHeight() - 25, -1);
+            minecraftFontRenderer.drawStringWithShadow(EnumChatFormatting.GRAY + " [" + EnumChatFormatting.WHITE + "BPS " + EnumChatFormatting.WHITE + MovementUtils.calculateBPS() + EnumChatFormatting.GRAY + "]", sr.getScaledWidth() / 1.062f, sr.getScaledHeight() - 15, -1);
         }
     };
 

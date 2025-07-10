@@ -12,6 +12,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -85,6 +87,8 @@ public class WindowClickGUI extends GuiScreen {
 
         drawRect(0, 0, this.width, this.height, new Color(0, 0, 0, 140).getRGB());
         drawRect((float) windowX, (float) windowY, (float) (windowX + windowWidth), (float) (windowY + windowHeight), bgColor.getRGB());
+
+        RenderUtils.drawImage(new ResourceLocation("simp/images/logo.png"), 2f, this.height - 102, 100, 100);
 
         double innerX = windowX + padding;
         double innerY = windowY + padding;

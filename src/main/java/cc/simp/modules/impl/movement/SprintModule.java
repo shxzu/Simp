@@ -1,9 +1,12 @@
 package cc.simp.modules.impl.movement;
 
+import cc.simp.Simp;
 import cc.simp.event.impl.player.MoveEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.modules.impl.combat.KillAuraModule;
+import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.property.Property;
 import cc.simp.utils.client.mc.MovementUtils;
 import io.github.nevalackin.homoBus.Listener;
@@ -16,8 +19,6 @@ public final class SprintModule extends Module {
 
     public final Property<Boolean> omniProperty = new Property<>("Omni", false);
 
-    private int groundTicks;
-
     public SprintModule() {
         toggle();
     }
@@ -25,6 +26,14 @@ public final class SprintModule extends Module {
     @EventLink
     public final Listener<MoveEvent> moveEventListener = event -> {
         final boolean canSprint = MovementUtils.canSprint(omniProperty.getValue());
-        mc.thePlayer.setSprinting(canSprint);
+        if (MovementUtils.isMoving()) {
+            if (!Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) {
+                    if(!omniProperty.getValue()) {
+                        mc.gameSettings.keyBindSprint.setPressed(true);
+                    } else {
+                        mc.thePlayer.setSprinting(canSprint);
+                    }
+            } else mc.gameSettings.keyBindSprint.setPressed(false);
+        }
     };
 }

@@ -20,6 +20,7 @@ import cc.simp.utils.client.misc.MathUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.Vec3;
 
 import static cc.simp.utils.client.Util.mc;
@@ -129,7 +130,6 @@ public final class ScaffoldModule extends Module {
             mc.thePlayer.setSprinting(MovementUtils.canSprint(true));
         } else {
             mc.thePlayer.setSprinting(false);
-            mc.getNetHandler().sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
         }
     }
 
@@ -154,22 +154,21 @@ public final class ScaffoldModule extends Module {
 
     public static float[] getRotationsForPlacement() {
         float[] rotations = new float[2];
-        rotations[0] = ScaffoldUtils.getYaw();
+        rotations[0] = MovementUtils.getDirection() - 180;
 
         switch (rotationsProperty.getValue()) {
             case NORMAL:
-                if (currentBlockCache == null || currentBlockCache.getHitVec() == null) {
-                    rotations[1] = NORMAL_PITCH;
-                    break;
+                rotations[1] = NORMAL_PITCH;
+                if (currentBlockCache != null) {
+                    for (float possiblePitch = 90; possiblePitch > 30; possiblePitch -= possiblePitch > (mc.thePlayer
+                            .isPotionActive(Potion.moveSpeed) ? 60 : 80) ? 1 : 10) {
+                        if (RaytraceUtils.isOnBlock(currentBlockCache.getFacing(), currentBlockCache.getPosition(), true, mc.playerController.getBlockReachDistance(),
+                                rotations[0], possiblePitch)) {
+                            rotations[1] = possiblePitch;
+                        }
+                    }
+
                 }
-
-                final Vec3 hitVec = currentBlockCache.getHitVec();
-                final double xDif = hitVec.xCoord - mc.thePlayer.posX;
-                final double zDif = hitVec.zCoord - mc.thePlayer.posZ;
-                final double yDif = hitVec.yCoord - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
-                final double xzDist = StrictMath.sqrt(xDif * xDif + zDif * zDif);
-
-                rotations[1] = (float) (-(StrictMath.atan2(yDif, xzDist) * 180.0D / StrictMath.PI));
                 break;
             case VULCAN:
                 rotations[1] = VULCAN_PITCH;

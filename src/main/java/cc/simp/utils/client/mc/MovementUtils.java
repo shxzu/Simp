@@ -256,4 +256,33 @@ public class MovementUtils extends Util {
         event.setStrafe(closestStrafe);
     }
 
+    public static float getDirection() {
+        if (MovementUtils.mc.thePlayer == null) {
+            return 0.0f;
+        }
+        float yaw = MovementUtils.mc.thePlayer.rotationYaw;
+        boolean forward = MovementUtils.mc.gameSettings.keyBindForward.isKeyDown();
+        boolean back = MovementUtils.mc.gameSettings.keyBindBack.isKeyDown();
+        boolean left = MovementUtils.mc.gameSettings.keyBindLeft.isKeyDown();
+        boolean right = MovementUtils.mc.gameSettings.keyBindRight.isKeyDown();
+        float result = 0.0f;
+        if (forward) {
+            result = left && !right ? -45.0f : (right && !left ? 45.0f : 0.0f);
+        } else if (back) {
+            result = left && !right ? -135.0f : (right && !left ? 135.0f : 180.0f);
+        } else if (left && !right) {
+            result = -90.0f;
+        } else if (right && !left) {
+            result = 90.0f;
+        }
+        float direction = yaw + result;
+        direction = (direction % 360.0f + 360.0f) % 360.0f;
+        return direction;
+    }
+
+    public static double calculateBPS() {
+        double bps = (Math.hypot(mc.thePlayer.posX - mc.thePlayer.prevPosX, mc.thePlayer.posZ - mc.thePlayer.prevPosZ) * mc.timer.timerSpeed) * 20;
+        return Math.round(bps * 100.0) / 100.0;
+    }
+
 }
