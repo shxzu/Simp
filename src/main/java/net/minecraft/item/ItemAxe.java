@@ -13,6 +13,7 @@ public class ItemAxe extends ItemTool
     protected ItemAxe(Item.ToolMaterial material)
     {
         super(3.0F, material, EFFECTIVE_ON);
+        this.coolDownTicks = 25;
     }
 
     public float getStrVsBlock(ItemStack stack, Block state)

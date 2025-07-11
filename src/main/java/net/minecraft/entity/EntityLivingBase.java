@@ -1,5 +1,7 @@
 package net.minecraft.entity;
 
+import cc.simp.Simp;
+import cc.simp.event.impl.player.JumpEvent;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
@@ -12,6 +14,8 @@ import java.util.UUID;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
@@ -50,6 +54,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import sun.nio.ch.SelectorImpl;
 
 public abstract class EntityLivingBase extends Entity
 {
@@ -1324,20 +1329,21 @@ public abstract class EntityLivingBase extends Entity
 
     protected void jump()
     {
-        this.motionY = (double)this.getJumpUpwardsMotion();
-
-        if (this.isPotionActive(Potion.jump))
-        {
-            this.motionY += (double)((float)(this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F);
+        final JumpEvent event = new JumpEvent(this.rotationYaw, this.getJumpUpwardsMotion());
+        Simp.INSTANCE.getEventBus().post(event);
+        if (event.isCancelled()) {
+            return;
         }
-
-        if (this.isSprinting())
-        {
-            float f = this.rotationYaw * 0.017453292F;
-            this.motionX -= (double)(MathHelper.sin(f) * 0.2F);
-            this.motionZ += (double)(MathHelper.cos(f) * 0.2F);
+        final float finalYaw = (this instanceof EntityPlayerSP) ? event.getYaw() : this.rotationYaw;
+        this.motionY = event.getMotionY();
+        if (this.isPotionActive(Potion.jump)) {
+            this.motionY += (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1f;
         }
-
+        if (this.isSprinting()) {
+            final float f = finalYaw * 0.017453292f;
+            this.motionX -= MathHelper.sin(f) * 0.2f;
+            this.motionZ += MathHelper.cos(f) * 0.2f;
+        }
         this.isAirBorne = true;
     }
 

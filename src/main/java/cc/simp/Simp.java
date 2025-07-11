@@ -8,8 +8,9 @@ import cc.simp.event.impl.KeyPressEvent;
 import cc.simp.event.impl.game.ClientStartupEvent;
 import cc.simp.handlers.BackGroundHandler;
 import cc.simp.handlers.RotationHandler;
-import cc.simp.modules.Module;
 import cc.simp.modules.ModuleManager;
+import cc.simp.modules.impl.client.ClickGUIModule;
+import cc.simp.ui.click.astolfo.AstolfoClickGUI;
 import cc.simp.ui.click.window.WindowClickGUI;
 import cc.simp.utils.client.font.FontManager;
 import io.github.nevalackin.homoBus.Listener;
@@ -35,6 +36,7 @@ public class Simp {
     private static ConfigManager configManager;
     private RotationHandler rotationHandler;
     private WindowClickGUI winClickGUI;
+    private AstolfoClickGUI astolfoClickGUI;
     private BackGroundHandler backGroundHandler;
 
     public static void start() {
@@ -85,11 +87,20 @@ public class Simp {
 
     @EventLink
     private final Listener<KeyPressEvent> keyPressEventListener = event -> {
-        if (event.getKey() == Keyboard.KEY_RSHIFT) {
-            if (winClickGUI == null) {
-                winClickGUI = new WindowClickGUI();
+        if(ClickGUIModule.clickGuiStyleProperty.getValue() == ClickGUIModule.ClickGUIStyle.SIMP) {
+            if (event.getKey() == Keyboard.KEY_RSHIFT) {
+                if (winClickGUI == null) {
+                    winClickGUI = new WindowClickGUI();
+                }
+                Minecraft.getMinecraft().displayGuiScreen(winClickGUI);
             }
-            Minecraft.getMinecraft().displayGuiScreen(winClickGUI);
+        } else if(ClickGUIModule.clickGuiStyleProperty.getValue() == ClickGUIModule.ClickGUIStyle.ASTOLFO) {
+            if (event.getKey() == Keyboard.KEY_RSHIFT) {
+                if (astolfoClickGUI == null) {
+                    astolfoClickGUI = new AstolfoClickGUI();
+                }
+                Minecraft.getMinecraft().displayGuiScreen(astolfoClickGUI);
+            }
         }
     };
 

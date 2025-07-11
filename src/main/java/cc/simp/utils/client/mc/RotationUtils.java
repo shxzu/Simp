@@ -3,6 +3,7 @@ package cc.simp.utils.client.mc;
 import cc.simp.Simp;
 import cc.simp.modules.impl.player.SmoothRotationsModule;
 import cc.simp.utils.client.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
@@ -14,8 +15,17 @@ public class RotationUtils extends Util {
     public static float currentYaw = mc.thePlayer.rotationYaw;
     public static float currentPitch = mc.thePlayer.rotationPitch;
 
+    public static double getMouseGCD() {
+        final float sens = Minecraft.getMinecraft().gameSettings.mouseSensitivity * 0.6F + 0.2F;
+        final float pow = sens * sens * sens * 8.0F;
+        return (double) pow * 0.15;
+    }
+
     public static float smoothRotation(float from, float to, float speed) {
         float f = MathHelper.wrapAngleTo180_float(to - from);
+        final float dif = to - from;
+        final double gcd = getMouseGCD();
+        to -= (float) (dif % gcd);
         if (f > speed) {
             f = speed;
         }
@@ -28,14 +38,14 @@ public class RotationUtils extends Util {
     public static float smoothPitch(float Pitch) {
         int value = SmoothRotationsModule.rotSpeed.getValue().intValue();
         float pitch;
-        pitch = smoothRotation(Simp.INSTANCE.getRotationHandler().getPrevServerPitch(), Pitch, 10 * value);
+        pitch = smoothRotation(Simp.INSTANCE.getRotationHandler().getPrevServerPitch(), Pitch, 10 * MathUtils.getRandomFloat(value, value));
         return pitch;
     }
 
     public static float smoothYaw(float Yaw) {
         int value = SmoothRotationsModule.rotSpeed.getValue().intValue();
         float yaw;
-        yaw = smoothRotation(Simp.INSTANCE.getRotationHandler().getPrevServerYaw(), Yaw, 10 * value);
+        yaw = smoothRotation(Simp.INSTANCE.getRotationHandler().getPrevServerYaw(), Yaw, 10 * MathUtils.getRandomFloat(value, value));
         return yaw;
     }
 

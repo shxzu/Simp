@@ -1,15 +1,13 @@
 package cc.simp.modules.impl.client;
 
 import cc.simp.Simp;
-import cc.simp.event.impl.render.overlay.Render2DEvent;
+import cc.simp.event.impl.render.Render2DEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.property.Property;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.utils.client.font.FontManager;
-import cc.simp.utils.client.font.TrueTypeFontRenderer;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.Minecraft;
@@ -34,6 +32,10 @@ public final class TargetHUDModule extends Module {
     public enum TargetHUDType {
         SIMP,
         ASTOLFO
+    }
+
+    public TargetHUDModule() {
+        toggle();
     }
 
     private EntityLivingBase getTarget() {

@@ -108,9 +108,9 @@ public class AltManagerGui extends GuiScreen {
         this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
 
         drawRect(BOX_X, BOX_Y, BOX_X + BOX_WIDTH, BOX_Y + TOP_BOX_HEIGHT, new Color(30, 30, 30, 180).getRGB());
-        FontManager.CSGO_FR.drawString("Current User:", BOX_X + 5, BOX_Y + 5, Color.WHITE.getRGB());
+        FontManager.TAHOMA.drawString("Current User:", BOX_X + 5, BOX_Y + 5, Color.WHITE.getRGB());
         String currentUser = Minecraft.getMinecraft().getSession().getUsername();
-        FontManager.CSGO_FR.drawString(currentUser, BOX_X + 5, BOX_Y + 20, Color.LIGHT_GRAY.getRGB());
+        FontManager.TAHOMA.drawString(currentUser, BOX_X + 5, BOX_Y + 20, Color.LIGHT_GRAY.getRGB());
 
         int listX = BOX_X + 5;
         int listY = BOX_Y + TOP_BOX_HEIGHT + 5;
@@ -128,7 +128,7 @@ public class AltManagerGui extends GuiScreen {
             String altName = alts.get(altIndex).split("\\|")[1];
 
             boolean hovered = mouseX >= listX && mouseX <= listX + listWidth && mouseY >= entryY && mouseY <= entryY + ENTRY_HEIGHT;
-            FontManager.CSGO_FR.drawString(altName, listX + 5, entryY + 8, Color.WHITE.getRGB());
+            FontManager.TAHOMA.drawString(altName, listX + 5, entryY + 8, Color.WHITE.getRGB());
             if (hovered) {
                 drawRect(listX, entryY, listX + listWidth, entryY + ENTRY_HEIGHT, new Color(0, 0, 0, 200).getRGB());
 
@@ -163,7 +163,7 @@ public class AltManagerGui extends GuiScreen {
     private void drawHoverButton(int x, int y, String label) {
         int w = 50, h = 20;
         drawRect(x, y, x + w, y + h, new Color(80, 80, 80, 220).getRGB());
-        FontManager.CSGO_FR.drawString(label, x + 8, y + 6, Color.WHITE.getRGB());
+        FontManager.TAHOMA.drawString(label, x + 8, y + 6, Color.WHITE.getRGB());
     }
 
     private void enableScissor(int x, int y, int width, int height) {

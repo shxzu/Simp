@@ -16,6 +16,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11; // Required for more advanced rendering like rounded rects
 
 import java.awt.*;
 import java.io.IOException;
@@ -51,14 +52,14 @@ public class WindowClickGUI extends GuiScreen {
     private double scrollStartY = 0;
     private double scrollStartOffset = 0;
 
-    // Color Palette (Skeet.cc inspired)
-    private final Color bgColor = new Color(25, 25, 25);
-    private final Color headerColor = new Color(35, 35, 35);
-    private final Color textColor = new Color(200, 200, 200);
-    private final int accentColor = getRainbowColor(0); // Rainbow accent
-    private final Color componentBgColor = new Color(45, 45, 45);
-    private final Color dropdownHoverColor = new Color(55, 55, 55);
-    private final Color outlineColor = new Color(60, 60, 60);
+    // Custom Color Palette (Based on the provided image aesthetic)
+    float hue = (System.currentTimeMillis() % 3000) / 3000f;
+    private final Color primaryBgColor = new Color(30, 30, 30, 230); // Main window background, slightly transparent
+    private final Color secondaryBgColor = new Color(40, 40, 40, 230); // Section backgrounds
+    private final Color hoverColor = new Color(60, 60, 60, 230); // Hover state for clickable elements
+    private final Color textColor = new Color(220, 220, 220); // General text color
+    private final Color mutedTextColor = new Color(150, 150, 150); // Muted text for keybinds
+    private final Color borderColor = new Color(50, 50, 50, 230); // Subtle borders
 
     // UI Element Bounds
     private final Map<ModuleCategory, double[]> categoryBounds = new HashMap<>();
@@ -70,6 +71,7 @@ public class WindowClickGUI extends GuiScreen {
 
     // Layout constants
     private final double padding = 8.0;
+    private final double borderRadius = 5.0; // For rounded corners
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -85,100 +87,124 @@ public class WindowClickGUI extends GuiScreen {
 
         propertyScrollOffset = RenderUtils.lerp((float)propertyScrollOffset, (float)targetPropertyScrollOffset, 0.15f);
 
+        // Draw dim background
         drawRect(0, 0, this.width, this.height, new Color(0, 0, 0, 140).getRGB());
-        drawRect((float) windowX, (float) windowY, (float) (windowX + windowWidth), (float) (windowY + windowHeight), bgColor.getRGB());
 
-        RenderUtils.drawImage(new ResourceLocation("simp/images/logo.png"), 2f, this.height - 102, 100, 100);
+        // Draw main window with rounded corners
+        drawRoundedRect((float) windowX, (float) windowY, (float) (windowX + windowWidth), (float) (windowY + windowHeight), (float) borderRadius, primaryBgColor.getRGB());
+        drawRoundedRectOutline((float) windowX, (float) windowY, (float) (windowX + windowWidth), (float) (windowY + windowHeight), (float) borderRadius, 1.0f, borderColor.getRGB());
+
 
         double innerX = windowX + padding;
         double innerY = windowY + padding;
         double innerWidth = windowWidth - padding * 2;
         double innerHeight = windowHeight - padding * 2;
 
+        // Category section
         double categorySectionHeight = 30;
-        Gui.drawRect((int) innerX, (int) innerY, (int) (innerX + innerWidth), (int) (innerY + categorySectionHeight), headerColor.getRGB());
+        drawRoundedRect((float) innerX, (float) innerY, (float) (innerX + innerWidth), (float) (innerY + categorySectionHeight), (float) (borderRadius / 2), secondaryBgColor.getRGB());
         drawCategoryButtons(mouseX, mouseY, innerX, innerY, categorySectionHeight);
 
         double contentY = innerY + categorySectionHeight + padding;
         double contentHeight = innerHeight - categorySectionHeight - padding;
         double moduleListWidth = innerWidth / 3;
 
-        Gui.drawRect((int) innerX, (int) contentY, (int) (innerX + moduleListWidth), (int) (contentY + contentHeight), headerColor.getRGB());
+        // Module list background
+        drawRoundedRect((float) innerX, (float) contentY, (float) (innerX + moduleListWidth), (float) (contentY + contentHeight), (float) (borderRadius / 2), secondaryBgColor.getRGB());
         drawModuleList(innerX, contentY, moduleListWidth, mouseX, mouseY);
 
         if (selectedModule != null) {
             drawSettingsPanel(mouseX, mouseY, innerX + moduleListWidth + padding, contentY, innerWidth - moduleListWidth - padding, contentHeight);
         }
 
-        minecraftFontRenderer.drawStringWithShadow(Simp.NAME + " " + Simp.BUILD, (float) (windowX + padding), (float) (windowY + windowHeight - minecraftFontRenderer.FONT_HEIGHT - 5), textColor.getRGB());
+        // Draw SIMP version text
+        minecraftFontRenderer.drawStringWithShadow(Simp.NAME + " " + Simp.BUILD, (float) (windowX + padding), (float) (windowY + windowHeight - minecraftFontRenderer.FONT_HEIGHT - 5), mutedTextColor.getRGB());
     }
 
     private void drawCategoryButtons(int mouseX, int mouseY, double x, double y, double height) {
         double categoryX = x + padding;
-        int i = 0;
         for (ModuleCategory category : ModuleCategory.values()) {
             String name = category.name();
             double textWidth = minecraftFontRenderer.getStringWidth(name);
-            categoryBounds.put(category, new double[]{categoryX, y, categoryX + textWidth, y + height});
+            double btnWidth = textWidth + padding * 2;
+            double btnHeight = height - padding;
+            double btnY = y + (height - btnHeight) / 2;
+
+            categoryBounds.put(category, new double[]{categoryX, btnY, categoryX + btnWidth, btnY + btnHeight});
             boolean isHovered = inBounds(mouseX, mouseY, categoryBounds.get(category));
-            int color = (currentCategory == category) ? getRainbowColor(i * 120) : (isHovered ? Color.WHITE.getRGB() : textColor.getRGB());
-            minecraftFontRenderer.drawStringWithShadow(name, (float) categoryX, (float) (y + (height - minecraftFontRenderer.FONT_HEIGHT) / 2), color);
-            categoryX += textWidth + padding * 2;
-            i++;
+
+            int bgColor = currentCategory == category ? Color.getHSBColor(hue, 0.55f, 0.9f).getRGB() : (isHovered ? hoverColor.getRGB() : secondaryBgColor.getRGB());
+            drawRoundedRect((float) categoryX, (float) btnY, (float) (categoryX + btnWidth), (float) (btnY + btnHeight), (float) (borderRadius / 2), bgColor);
+
+            int color = textColor.getRGB();
+            minecraftFontRenderer.drawStringWithShadow(name, (float) (categoryX + padding), (float) (btnY + (btnHeight - minecraftFontRenderer.FONT_HEIGHT) / 2), color);
+            categoryX += btnWidth + padding;
         }
     }
 
     private void drawModuleList(double x, double y, double width, int mouseX, int mouseY) {
         double moduleY = y + padding;
-        int i = 0;
         for (Module module : Simp.INSTANCE.getModuleManager().getModulesForCategory(currentCategory)) {
             String name = (module == listeningModule) ? "Listening..." : module.getLabel();
-            moduleBounds.put(module, new double[]{x + padding, moduleY, x + width - padding, moduleY + minecraftFontRenderer.FONT_HEIGHT});
+            double moduleHeight = minecraftFontRenderer.FONT_HEIGHT + padding;
+
+            moduleBounds.put(module, new double[]{x + padding, moduleY, x + width - padding, moduleY + moduleHeight});
             boolean isHovered = inBounds(mouseX, mouseY, moduleBounds.get(module));
-            int color = module.isEnabled() ? getRainbowColor(i * 80) :
-                    (selectedModule == module ? Color.WHITE.getRGB() : textColor.getRGB());
 
-            // Draw module name
-            minecraftFontRenderer.drawStringWithShadow(name, (float) (x + padding), (float) moduleY, color);
-
-            // Draw key bind if not listening and has a key bound
-            if (module != listeningModule && module.getKey() != 0) {
-                String keyName = Keyboard.getKeyName(module.getKey());
-                float keyX = (float) (x + width - padding - minecraftFontRenderer.getStringWidth(keyName));
-                minecraftFontRenderer.drawStringWithShadow("§7[" + keyName + "]", keyX, (float) moduleY, textColor.getRGB());
+            int bgColor = secondaryBgColor.getRGB();
+            if (module.isEnabled()) {
+                bgColor = Color.getHSBColor(hue, 0.55f, 0.9f).getRGB(); // Active module background
+            } else if (selectedModule == module) {
+                bgColor = hoverColor.getRGB(); // Selected but not active module
+            } else if (isHovered) {
+                bgColor = hoverColor.getRGB(); // Hovered module
             }
 
-            moduleY += minecraftFontRenderer.FONT_HEIGHT + padding;
-            i++;
+            drawRoundedRect((float) (x + padding), (float) moduleY, (float) (x + width - padding), (float) (moduleY + moduleHeight), (float) (borderRadius / 2), bgColor);
+
+            int color = textColor.getRGB();
+            minecraftFontRenderer.drawStringWithShadow(name, (float) (x + padding * 2), (float) (moduleY + padding / 2), color);
+
+            // Draw key bind
+            if (module != listeningModule && module.getKey() != 0) {
+                String keyName = Keyboard.getKeyName(module.getKey());
+                float keyX = (float) (x + width - padding * 2 - minecraftFontRenderer.getStringWidth("§7[" + keyName + "]"));
+                minecraftFontRenderer.drawStringWithShadow("§7[" + keyName + "]", keyX, (float) (moduleY + padding / 2), mutedTextColor.getRGB());
+            }
+
+            moduleY += moduleHeight + padding;
         }
     }
 
     private void drawSettingsPanel(int mouseX, int mouseY, double x, double y, double width, double height) {
-        Gui.drawRect((int) x, (int) y, (int) (x + width), (int) (y + height), headerColor.getRGB());
+        drawRoundedRect((float) x, (float) y, (float) (x + width), (float) (y + height), (float) (borderRadius / 2), secondaryBgColor.getRGB());
         minecraftFontRenderer.drawStringWithShadow(selectedModule.getDescription() + " Settings", (float) (x + padding), (float) (y + padding), textColor.getRGB());
+
         double propertiesAreaY = y + minecraftFontRenderer.FONT_HEIGHT + padding * 2;
         double propertiesAreaHeight = height - (minecraftFontRenderer.FONT_HEIGHT + padding * 3);
 
         RenderUtils.startScissor((float) x, (float) propertiesAreaY, (float) width, (float) propertiesAreaHeight);
         double logicalPropertyY = propertiesAreaY;
         double totalPropertiesHeight = 0;
-        int i = 0;
         for (Property<?> property : selectedModule.getElements()) {
             if (!property.isAvailable()) continue;
             double propertyHeight = getPropertyHeight(property);
             propertyBounds.put(property, new double[]{x, logicalPropertyY, x + width, logicalPropertyY + propertyHeight});
             double drawnY = logicalPropertyY - propertyScrollOffset;
-            minecraftFontRenderer.drawStringWithShadow(property.getLabel(), (float) (x + padding), (float) (drawnY + 4), textColor.getRGB());
+
+            // Draw property background
+            drawRoundedRect((float) (x + padding), (float) (drawnY + 2), (float) (x + width - padding), (float) (drawnY + propertyHeight - 2), (float) (borderRadius / 2), primaryBgColor.getRGB());
+
+            minecraftFontRenderer.drawStringWithShadow(property.getLabel(), (float) (x + padding * 2), (float) (drawnY + 4), textColor.getRGB());
             if (property.getType() == Boolean.class) {
-                drawBooleanProperty(property, x + width - padding - 15, drawnY + 2, i);
+                drawBooleanProperty(property, x + width - padding - 20, drawnY + 4);
             } else if (property instanceof EnumProperty) {
-                drawEnumProperty((EnumProperty<?>) property, x + width - padding - 100, drawnY, 90);
+                drawEnumProperty((EnumProperty<?>) property, x + width - padding - 110, drawnY + 2, 100);
             } else if (property instanceof DoubleProperty) {
-                drawDoubleProperty((DoubleProperty) property, x + padding, drawnY + 18, width - padding * 2, i);
+                drawDoubleProperty((DoubleProperty) property, x + padding * 2, drawnY + 18, width - padding * 4);
             }
             logicalPropertyY += propertyHeight;
             totalPropertiesHeight += propertyHeight;
-            i++;
         }
         RenderUtils.endScissor();
 
@@ -195,14 +221,16 @@ public class WindowClickGUI extends GuiScreen {
     }
 
     private void drawScrollBar(double x, double propertiesAreaY, double width, double propertiesAreaHeight, double totalPropertiesHeight) {
-        double scrollBarWidth = 4;
+        double scrollBarWidth = 6;
         double scrollBarX = x + width - scrollBarWidth - 2;
         double visibleRatio = propertiesAreaHeight / totalPropertiesHeight;
         double handleHeight = Math.max(20, propertiesAreaHeight * visibleRatio);
         double handleY = propertiesAreaY + (propertyScrollOffset / maxPropertyScroll) * (propertiesAreaHeight - handleHeight);
 
-        Gui.drawRect((int) scrollBarX, (int) propertiesAreaY, (int) (scrollBarX + scrollBarWidth), (int) (propertiesAreaY + propertiesAreaHeight), componentBgColor.getRGB());
-        Gui.drawRect((int) scrollBarX, (int) handleY, (int) (scrollBarX + scrollBarWidth), (int) (handleY + handleHeight), accentColor);
+        // Scrollbar track
+        drawRoundedRect((float) scrollBarX, (float) propertiesAreaY, (float) (scrollBarX + scrollBarWidth), (float) (propertiesAreaY + propertiesAreaHeight), (float) (scrollBarWidth / 2), primaryBgColor.getRGB());
+        // Scrollbar handle
+        drawRoundedRect((float) scrollBarX, (float) handleY, (float) (scrollBarX + scrollBarWidth), (float) (handleY + handleHeight), (float) (scrollBarWidth / 2), Color.getHSBColor(hue, 0.55f, 0.9f).getRGB());
 
         scrollBarHitbox = new double[]{scrollBarX, propertiesAreaY, scrollBarX + scrollBarWidth, propertiesAreaY + propertiesAreaHeight};
     }
@@ -216,17 +244,19 @@ public class WindowClickGUI extends GuiScreen {
         return 25;
     }
 
-    private void drawBooleanProperty(Property property, double x, double y, int rainbowIndex) {
-        Gui.drawRect((int) x, (int) y, (int) (x + 12), (int) (y + 12), outlineColor.getRGB());
-        Gui.drawRect((int) x + 1, (int) y + 1, (int) (x + 11), (int) (y + 11), componentBgColor.getRGB());
+    private void drawBooleanProperty(Property property, double x, double y) {
+        double boxSize = 14;
+        drawRoundedRect((float) x, (float) y, (float) (x + boxSize), (float) (y + boxSize), (float) (borderRadius / 2), borderColor.getRGB());
         if ((boolean) property.getValue()) {
-            Gui.drawRect((int) x + 3, (int) y + 3, (int) (x + 9), (int) (y + 9), accentColor);
+            drawRoundedRect((float) (x + 2), (float) (y + 2), (float) (x + boxSize - 2), (float) (y + boxSize - 2), (float) (borderRadius / 3), Color.getHSBColor(hue, 0.55f, 0.9f).getRGB());
+        } else {
+            drawRoundedRect((float) (x + 2), (float) (y + 2), (float) (x + boxSize - 2), (float) (y + boxSize - 2), (float) (borderRadius / 3), hoverColor.darker().getRGB());
         }
     }
 
     private void drawEnumProperty(EnumProperty<?> property, double x, double y, double width) {
         double height = minecraftFontRenderer.FONT_HEIGHT + 8;
-        Gui.drawRect((int) x, (int) y, (int) (x + width), (int) (y + height), componentBgColor.getRGB());
+        drawRoundedRect((float) x, (float) y, (float) (x + width), (float) (y + height), (float) (borderRadius / 2), hoverColor.getRGB());
         minecraftFontRenderer.drawStringWithShadow(property.getValue().toString(), (float) (x + 5), (float) (y + 4), textColor.getRGB());
         RenderUtils.drawArrow((float) (x + width - 12), (float) (y + height / 2 - 2), 4, openDropdown == property ? RenderUtils.ArrowDirection.UP : RenderUtils.ArrowDirection.DOWN, textColor.getRGB());
     }
@@ -234,9 +264,9 @@ public class WindowClickGUI extends GuiScreen {
     private void drawEnumDropdown(int mouseX, int mouseY) {
         double[] mainBounds = propertyBounds.get(openDropdown);
         if (mainBounds == null) return;
-        double x = mainBounds[2] - padding - 100;
+        double x = mainBounds[2] - padding - 110;
         double y = (mainBounds[1] - propertyScrollOffset) + 25;
-        double width = 90;
+        double width = 100;
         enumOptionBounds.putIfAbsent(openDropdown, new HashMap<>());
         Map<Object, double[]> optionBounds = enumOptionBounds.get(openDropdown);
         optionBounds.clear();
@@ -245,30 +275,35 @@ public class WindowClickGUI extends GuiScreen {
             double optionHeight = minecraftFontRenderer.FONT_HEIGHT + 8;
             optionBounds.put(enumValue, new double[]{x, optionY, x + width, optionY + optionHeight});
             boolean isHovered = inBounds(mouseX, mouseY, optionBounds.get(enumValue));
-            Gui.drawRect((int)x, (int)optionY, (int)(x+width), (int)(optionY + optionHeight), isHovered ? dropdownHoverColor.getRGB() : componentBgColor.getRGB());
+            drawRoundedRect((float)x, (float)optionY, (float)(x+width), (float)(optionY + optionHeight), (float) (borderRadius / 3), isHovered ? Color.getHSBColor(hue, 0.55f, 0.9f).darker().getRGB() : secondaryBgColor.getRGB());
             minecraftFontRenderer.drawStringWithShadow(enumValue.toString(), (float) (x + 5), (float) (optionY + 4), textColor.getRGB());
             optionY += optionHeight;
         }
     }
 
-    private void drawDoubleProperty(DoubleProperty property, double x, double y, double width, int rainbowIndex) {
+    private void drawDoubleProperty(DoubleProperty property, double x, double y, double width) {
         double min = property.getMin();
         double max = property.getMax();
         double value = property.getValue();
         double percentage = (value - min) / (max - min);
 
-        // Adjust y position for scrolling
         double sliderY = y;
+        double sliderHeight = 6;
 
-        Gui.drawRect((int) x, (int) sliderY, (int) (x + width), (int) (sliderY + 6), componentBgColor.getRGB());
-        Gui.drawRect((int) x, (int) sliderY, (int) (x + (width * percentage)), (int) (sliderY + 6), accentColor);
-        RenderUtils.drawCircle(x + (width * percentage), sliderY + 3, 5, accentColor);
-        RenderUtils.drawCircle(x + (width * percentage), sliderY + 3, 4, bgColor.getRGB());
+        // Slider track
+        drawRoundedRect((float) x, (float) sliderY, (float) (x + width), (float) (sliderY + sliderHeight), (float) (sliderHeight / 2), primaryBgColor.darker().getRGB());
+        // Slider fill
+        drawRoundedRect((float) x, (float) sliderY, (float) (x + (width * percentage)), (float) (sliderY + sliderHeight), (float) (sliderHeight / 2), Color.getHSBColor(hue, 0.55f, 0.9f).getRGB());
+
+        // Slider thumb (circle)
+        drawCircle((float) (x + (width * percentage)), (float) (sliderY + sliderHeight / 2), (float) (sliderHeight * 0.8), Color.getHSBColor(hue, 0.55f, 0.9f).getRGB());
+        drawCircle((float) (x + (width * percentage)), (float) (sliderY + sliderHeight / 2), (float) (sliderHeight * 0.5), primaryBgColor.getRGB());
+
 
         String valueText = String.format("%.2f", value);
         minecraftFontRenderer.drawStringWithShadow(valueText, (float) (x + width - minecraftFontRenderer.getStringWidth(valueText)), (float) (sliderY - 12), textColor.getRGB());
 
-        sliderBounds.put(property, new double[]{x, sliderY, x + width, sliderY + 6});
+        sliderBounds.put(property, new double[]{x, sliderY, x + width, sliderY + sliderHeight});
     }
 
     @Override
@@ -367,7 +402,7 @@ public class WindowClickGUI extends GuiScreen {
                     Property<?> property = entry.getKey();
                     double[] bounds = entry.getValue();
                     double visibleY = bounds[1] - propertyScrollOffset;
-                    double componentHeight = 25;
+                    double componentHeight = getPropertyHeight(property); // Use actual property height
                     if (mouseY >= visibleY && mouseY <= visibleY + componentHeight) {
                         handlePropertyClick(property);
                         consumedClick.set(true);
@@ -469,10 +504,38 @@ public class WindowClickGUI extends GuiScreen {
         return mouseX >= bounds[0] && mouseX <= bounds[2] && mouseY >= bounds[1] && mouseY <= bounds[3];
     }
 
-    // Gamesense-style rainbow accent
-    private int getRainbowColor(int offset) {
-        float speed = 2000f;
-        float hue = ((System.currentTimeMillis() + offset) % (int)speed) / speed;
-        return Color.HSBtoRGB(hue, 0.7f, 1.0f);
+    /**
+     * Placeholder for drawing a rounded rectangle.
+     * You will need to implement the actual OpenGL rendering for this.
+     * This typically involves GL11.glBegin(GL11.GL_POLYGON) and calculating vertices.
+     */
+    private void drawRoundedRect(float x, float y, float x2, float y2, float radius, int color) {
+        // TODO: Implement actual OpenGL rendering for rounded rectangles
+        // For now, this will draw a regular rectangle.
+        Gui.drawRect((int)x, (int)y, (int)x2, (int)y2, color);
+    }
+
+    /**
+     * Placeholder for drawing a rounded rectangle outline.
+     * You will need to implement the actual OpenGL rendering for this.
+     */
+    private void drawRoundedRectOutline(float x, float y, float x2, float y2, float radius, float lineWidth, int color) {
+        // TODO: Implement actual OpenGL rendering for rounded rectangle outlines
+        // For now, this will draw a regular rectangle outline.
+        // This is a simplified representation. Actual implementation would involve GL11.glLineWidth, etc.
+        Gui.drawRect((int)x, (int)y, (int)x2, (int)(y + lineWidth), color); // Top
+        Gui.drawRect((int)x, (int)(y2 - lineWidth), (int)x2, (int)y2, color); // Bottom
+        Gui.drawRect((int)x, (int)y, (int)(x + lineWidth), (int)y2, color); // Left
+        Gui.drawRect((int)(x2 - lineWidth), (int)y, (int)x2, (int)y2, color); // Right
+    }
+
+    /**
+     * Placeholder for drawing a circle.
+     * You will need to implement the actual OpenGL rendering for this.
+     */
+    private void drawCircle(float x, float y, float radius, int color) {
+        // TODO: Implement actual OpenGL rendering for circles
+        // For now, this is just a placeholder.
+        RenderUtils.drawCircle(x, y, radius, color); // Assuming RenderUtils has a working circle drawing method
     }
 }

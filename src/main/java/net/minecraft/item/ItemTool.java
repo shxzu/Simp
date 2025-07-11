@@ -21,6 +21,7 @@ public class ItemTool extends Item
     {
         this.toolMaterial = material;
         this.effectiveBlocks = effectiveBlocks;
+        this.coolDownTicks = 20;
         this.maxStackSize = 1;
         this.setMaxDamage(material.getMaxUses());
         this.efficiencyOnProperMaterial = material.getEfficiencyOnProperMaterial();

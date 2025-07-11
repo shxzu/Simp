@@ -176,6 +176,36 @@ public class ScaffoldUtils extends Util {
         return yaw;
     }
 
+
+    public static float getScaffoldFixedYaw() {
+        float realYaw = mc.thePlayer.rotationYaw;
+        if (mc.gameSettings.keyBindBack.isPressed()) {
+            realYaw += 180.0f;
+            if (mc.gameSettings.keyBindLeft.isPressed()) {
+                realYaw += 45.0f;
+            }
+            else if (mc.gameSettings.keyBindRight.isPressed()) {
+                realYaw -= 45.0f;
+            }
+        }
+        else if (mc.gameSettings.keyBindForward.isPressed()) {
+            realYaw -= 180.0f;
+            if (mc.gameSettings.keyBindLeft.isPressed()) {
+                realYaw -= 45.0f;
+            }
+            else if (mc.gameSettings.keyBindRight.isPressed()) {
+                realYaw += 45.0f;
+            }
+        }
+        else if (mc.gameSettings.keyBindRight.isPressed()) {
+            realYaw += 90.0f;
+        }
+        else if (mc.gameSettings.keyBindLeft.isPressed()) {
+            realYaw -= 90.0f;
+        }
+        return realYaw;
+    }
+
     public static float getHypixelNCPYaw() {
         float yaw = MovementUtils.getDirection();
         float upperCandidate;

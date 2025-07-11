@@ -1,7 +1,7 @@
 package net.minecraft.client.gui;
 
 import cc.simp.Simp;
-import cc.simp.event.impl.render.overlay.Render2DEvent;
+import cc.simp.event.impl.render.Render2DEvent;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;

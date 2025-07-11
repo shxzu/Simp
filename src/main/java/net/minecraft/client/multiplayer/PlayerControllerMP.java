@@ -452,6 +452,9 @@ public class PlayerControllerMP
         if (this.currentGameType != WorldSettings.GameType.SPECTATOR)
         {
             playerIn.attackTargetEntityWithCurrentItem(targetEntity);
+            if (playerIn instanceof EntityPlayerSP) {
+                this.mc.thePlayer.resetCooldown();
+            }
         }
     }
 

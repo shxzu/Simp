@@ -1,12 +1,20 @@
 package net.minecraft.client.gui;
 
 import cc.simp.utils.client.font.FontRenderer;
+import cc.simp.utils.client.render.ColorUtils;
+import cc.simp.utils.client.render.GLUtils;
+import cc.simp.utils.client.render.RenderUtils;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.awt.*;
+
+import static org.lwjgl.opengl.GL11.GL_QUADS;
 
 public class Gui
 {
@@ -15,7 +23,7 @@ public class Gui
     public static final ResourceLocation icons = new ResourceLocation("textures/gui/icons.png");
     protected float zLevel;
 
-    protected void drawHorizontalLine(int startX, int endX, int y, int color)
+    public static void drawHorizontalLine(int startX, int endX, int y, int color)
     {
         if (endX < startX)
         {
@@ -27,7 +35,7 @@ public class Gui
         drawRect(startX, y, endX + 1, y + 1, color);
     }
 
-    protected void drawVerticalLine(int x, int startY, int endY, int color)
+    public static void drawVerticalLine(int x, int startY, int endY, int color)
     {
         if (endY < startY)
         {
@@ -109,6 +117,29 @@ public class Gui
         tessellator.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
+    }
+
+    public static void drawRect2(double x, double y, double width, double height, int color) {
+        Pair<Color, Color> colors = Pair.of(new Color(228, 143, 255), new Color(255, 113, 82));
+        GlStateManager.color(1, 1, 1, 1);
+        RenderUtils.color(
+                ColorUtils.interpolateColorsBackAndForth(15, 15 * 5, colors.getLeft(), colors.getRight(), false)
+                        .getRGB(),
+                255 / 255f);
+        RenderUtils.setAlphaLimit(0);
+        GLUtils.setup2DRendering(true);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+
+        worldrenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        worldrenderer.pos(x, y, 0.0D).color(color).endVertex();
+        worldrenderer.pos(x, y + height, 0.0D).color(color).endVertex();
+        worldrenderer.pos(x + width, y + height, 0.0D).color(color).endVertex();
+        worldrenderer.pos(x + width, y, 0.0D).color(color).endVertex();
+        tessellator.draw();
+
+        GLUtils.end2DRendering();
     }
 
     protected void drawGradientRect(int left, int top, int right, int bottom, int startColor, int endColor)

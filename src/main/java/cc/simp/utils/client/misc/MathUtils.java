@@ -4,6 +4,7 @@ import cc.simp.utils.client.Util;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.security.SecureRandom;
 
 public class MathUtils extends Util {
 
@@ -23,6 +24,15 @@ public class MathUtils extends Util {
     public static int getRandomNumberUsingNextInt(int min, int max) {
         java.util.Random random = new java.util.Random();
         return random.nextInt(max - min) + min;
+    }
+
+    public static double nextSecureInt(final int origin, final int bound) {
+        if (origin == bound) {
+            return origin;
+        }
+        final SecureRandom secureRandom = new SecureRandom();
+        final int difference = bound - origin;
+        return origin + secureRandom.nextInt(difference);
     }
 
 }

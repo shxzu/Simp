@@ -2,10 +2,10 @@ package net.minecraft.client.entity;
 
 import cc.simp.Simp;
 import cc.simp.commands.CommandHandler;
-import cc.simp.event.impl.player.ItemSlowdownEvent;
-import cc.simp.event.impl.player.MotionEvent;
-import cc.simp.event.impl.player.MoveEvent;
-import cc.simp.event.impl.player.SprintEvent;
+import cc.simp.event.impl.player.*;
+import cc.simp.modules.impl.player.ScaffoldModule;
+import cc.simp.utils.client.mc.MovementUtils;
+import cc.simp.utils.client.mc.ScaffoldUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MovingSoundMinecartRiding;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -48,13 +48,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatFileWriter;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.MovementInput;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 
@@ -69,6 +63,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
     private float lastReportedPitch;
     private boolean serverSneakState;
     private boolean serverSprintState;
+    public int ticksSinceLastSwing;
     private int positionUpdateTicks;
     private boolean hasValidHealth;
     private String clientBrand;
@@ -134,10 +129,15 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
     @Override
     public void moveEntity(double x, double y, double z) {
-        final MoveEvent moveEvent = new MoveEvent(x, y, z);
-        Simp.INSTANCE.getEventBus().post(moveEvent);
-        if (moveEvent.isCancelled()) return;
-        super.moveEntity(moveEvent.getX(), moveEvent.getY(), moveEvent.getZ());
+        final MoveEvent eventMoveEntity = new MoveEvent(x, y, z);
+        Simp.INSTANCE.getEventBus().post(eventMoveEntity);
+        x = eventMoveEntity.getX();
+        y = eventMoveEntity.getY();
+        z = eventMoveEntity.getZ();
+        if (eventMoveEntity.isCancelled()) {
+            return;
+        }
+        super.moveEntity(x, y, z);
     }
 
     public void onUpdatePlayer() {
@@ -263,6 +263,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
     public void swingItem()
     {
+        this.mc.thePlayer.resetCooldown();
         super.swingItem();
         this.sendQueue.addToSendQueue(new C0APacketAnimation());
     }
@@ -452,6 +453,10 @@ public class EntityPlayerSP extends AbstractClientPlayer
     {
         super.setSprinting(sprinting);
         this.sprintingTicksLeft = sprinting ? 600 : 0;
+    }
+
+    public void resetCooldown() {
+        this.ticksSinceLastSwing = 0;
     }
 
     public void setXPStats(float currentXP, int maxXP, int level)
@@ -686,7 +691,39 @@ public class EntityPlayerSP extends AbstractClientPlayer
         boolean flag1 = this.movementInput.sneak;
         float f = 0.8F;
         boolean flag2 = this.movementInput.moveForward >= f;
+        final float forward = this.movementInput.moveForward;
+        final float strafe = this.movementInput.moveStrafe;
         this.movementInput.updatePlayerMoveState();
+
+        SilentMotionEvent silentMotionEvent = new SilentMotionEvent(Simp.INSTANCE.getRotationHandler().getServerYaw());
+        if(Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) silentMotionEvent = new SilentMotionEvent(ScaffoldUtils.getScaffoldFixedYaw());
+
+        Simp.INSTANCE.getEventBus().post(silentMotionEvent);
+        if (silentMotionEvent.isSilent()) {
+            final float[] floats = MovementUtils.handleMovementFix(this.movementInput.moveStrafe, this.movementInput.moveForward, silentMotionEvent.getYaw(), silentMotionEvent.isAdvanced());
+            final float diffForward = forward - floats[1];
+            final float diffStrafe = strafe - floats[0];
+            if (this.movementInput.sneak) {
+                this.movementInput.moveStrafe = MathHelper.clamp_float(floats[0], -0.3f, 0.3f);
+                this.movementInput.moveForward = MathHelper.clamp_float(floats[1], -0.3f, 0.3f);
+            }
+            else {
+                if (diffForward >= 2.0f) {
+                    floats[1] = 0.0f;
+                }
+                if (diffForward <= -2.0f) {
+                    floats[1] = 0.0f;
+                }
+                if (diffStrafe >= 2.0f) {
+                    floats[0] = 0.0f;
+                }
+                if (diffStrafe <= -2.0f) {
+                    floats[0] = 0.0f;
+                }
+                this.movementInput.moveStrafe = MathHelper.clamp_float(floats[0], -1.0f, 1.0f);
+                this.movementInput.moveForward = MathHelper.clamp_float(floats[1], -1.0f, 1.0f);
+            }
+        }
 
         final ItemSlowdownEvent slowDownEvent = new ItemSlowdownEvent(0.2F, 0.2F);
         Simp.INSTANCE.getEventBus().post(slowDownEvent);

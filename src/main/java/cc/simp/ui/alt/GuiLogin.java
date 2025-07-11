@@ -47,7 +47,7 @@ public class GuiLogin extends GuiScreen {
         Gui.drawRect(0, 0, this.width, this.height, new Color(0, 0, 0).getRGB());
         this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
         this.username.drawTextBox();
-        Gui.drawCustomCenteredString(FontManager.CSGO_FR, "Username", (int)(this.width / 2), (int)(sr.getScaledHeight() / 2 - 65), -1);
+        Gui.drawCustomCenteredString(FontManager.TAHOMA, "Username", (int)(this.width / 2), (int)(sr.getScaledHeight() / 2 - 65), -1);
         super.drawScreen(x2, y2, z2);
     }
 

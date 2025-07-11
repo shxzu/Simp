@@ -59,7 +59,8 @@ public final class ModuleManager {
                 new PlayerInfoModule(),
                 new TargetHUDModule(),
                 new TabGUIModule(),
-                new FontManagerModule()
+                new FontManagerModule(),
+                new ClickGUIModule()
 
         );
         getModules().forEach(Module::reflectProperties);

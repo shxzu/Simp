@@ -19,6 +19,7 @@ public class ItemSword extends Item
 
     public ItemSword(Item.ToolMaterial material)
     {
+        this.coolDownTicks = 12;
         this.material = material;
         this.maxStackSize = 1;
         this.setMaxDamage(material.getMaxUses());

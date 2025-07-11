@@ -496,6 +496,10 @@ public class WorldRenderer
         return this.color((int)(red * 255.0F), (int)(green * 255.0F), (int)(blue * 255.0F), (int)(alpha * 255.0F));
     }
 
+    public WorldRenderer color(int colorHex) {
+        return this.color(colorHex >> 16 & 255, colorHex >> 8 & 255, colorHex & 255, colorHex >> 24 & 255);
+    }
+
     public WorldRenderer color(int red, int green, int blue, int alpha)
     {
         if (this.noColor)

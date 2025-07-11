@@ -53,6 +53,7 @@ public class Item
     protected static Random itemRand = new Random();
     protected int maxStackSize = 64;
     private int maxDamage;
+    public int coolDownTicks = 3;
     protected boolean bFull3D;
     protected boolean hasSubtypes;
     private Item containerItem;

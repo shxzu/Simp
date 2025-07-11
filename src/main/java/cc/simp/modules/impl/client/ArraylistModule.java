@@ -1,7 +1,7 @@
 package cc.simp.modules.impl.client;
 
 import cc.simp.Simp;
-import cc.simp.event.impl.render.overlay.Render2DEvent;
+import cc.simp.event.impl.render.Render2DEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -23,7 +23,8 @@ import static cc.simp.utils.client.Util.mc;
 @ModuleInfo(label = "Arraylist", category = ModuleCategory.CLIENT)
 public final class ArraylistModule extends Module {
 
-    private final Property<Boolean> leftProperty = new Property<>("Align left", false);
+    private final Property<Boolean> leftProperty = new Property<>("Align Left", false);
+    private final Property<Boolean> importantProperty = new Property<>("Only Important", false);
 
     public ArraylistModule() {
         toggle();
@@ -34,7 +35,7 @@ public final class ArraylistModule extends Module {
         if (mc.gameSettings.showDebugInfo) return;
 
         MinecraftFontRenderer minecraftFontRenderer = mc.minecraftFontRendererObj;
-        TrueTypeFontRenderer CFont = FontManager.CSGO_FR;
+        TrueTypeFontRenderer CFont = FontManager.TAHOMA;
         ScaledResolution sr = new ScaledResolution(mc);
 
         float hue = (System.currentTimeMillis() % 3000) / 3000f;
@@ -46,12 +47,13 @@ public final class ArraylistModule extends Module {
         // Collect enabled modules
         for (Module module : Simp.INSTANCE.getModuleManager().getModules()) {
             if (module.isEnabled()) {
-                modules.add(module);
+                if (!importantProperty.getValue() || (module.getCategory() != ModuleCategory.CLIENT && module.getCategory() != ModuleCategory.RENDER))
+                    modules.add(module);
             }
         }
 
         // Sort modules by width
-        if(FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
+        if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
             modules.sort(Comparator.comparingDouble(m ->
                     -CFont.getWidth(m.getUpdatedSuffix() != null ?
                             m.getLabel() + " " + m.getUpdatedSuffix() :
@@ -71,10 +73,11 @@ public final class ArraylistModule extends Module {
 
             String text = module.getLabel() + (module.getUpdatedSuffix() != null ? " §7" + module.getUpdatedSuffix() : "");
             float x = left ? 2.0f : sr.getScaledWidth() - minecraftFontRenderer.getStringWidth(text) - 1.0f;
-            if(FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) x = left ? 2.0f : sr.getScaledWidth() - CFont.getWidth(text) - 1.0f;
+            if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA)
+                x = left ? 2.0f : sr.getScaledWidth() - CFont.getWidth(text) - 1.0f;
 
             Color rainbow = Color.getHSBColor(hue, 0.55f, 0.9f);
-            if(FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
+            if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
                 CFont.drawStringWithShadow(text, x, y, rainbow.getRGB());
             } else {
                 minecraftFontRenderer.drawStringWithShadow(text, x, y, rainbow.getRGB());

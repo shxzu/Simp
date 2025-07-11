@@ -10,6 +10,9 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
+import static cc.simp.utils.client.render.GLUtils.color;
+import static org.lwjgl.opengl.GL11.*;
+
 public class RenderUtils extends Util {
     public static double progressiveAnimation(double now, double desired, double speed) {
         double dif = Math.abs(now - desired);
@@ -39,8 +42,8 @@ public class RenderUtils extends Util {
     public static void drawArrow(float x, float y, float size, ArrowDirection direction, int color) {
         GL11.glPushMatrix();
         GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL_LINE_SMOOTH);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glLineWidth(2.0f);
 
@@ -67,8 +70,8 @@ public class RenderUtils extends Util {
         GL11.glEnd();
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        glDisable(GL11.GL_BLEND);
+        glDisable(GL_LINE_SMOOTH);
         GL11.glPopMatrix();
     }
 
@@ -79,18 +82,68 @@ public class RenderUtils extends Util {
         float a = (color >> 24 & 255) / 255.0F;
 
         GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL_LINE_SMOOTH);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glColor4f(r, g, b, a);
         GL11.glBegin(GL11.GL_TRIANGLE_FAN);
         for (int i = 0; i <= 360; i++) {
-            GL11.glVertex2d(x + Math.sin(i * Math.PI / 180) * radius, y + Math.cos(i * Math.PI / 180) * radius);
+            glVertex2d(x + Math.sin(i * Math.PI / 180) * radius, y + Math.cos(i * Math.PI / 180) * radius);
         }
         GL11.glEnd();
-        GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        glDisable(GL_LINE_SMOOTH);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
+        glDisable(GL11.GL_BLEND);
+    }
+
+    public static void drawBorder(float x, float y, float width, float height, final float outlineThickness, int outlineColor) {
+        // Enable line smoothing for anti-aliasing
+        glEnable(GL_LINE_SMOOTH);
+        // Set the line color (assuming 'color' utility correctly sets glColor4f)
+        color(outlineColor);
+
+        // Setup 2D rendering (e.g., orthographic projection, disable depth test)
+        GLUtils.setup2DRendering();
+
+        // Set the thickness of the line
+        glLineWidth(outlineThickness);
+
+        // Use GL_LINE_LOOP to draw a connected rectangle outline
+        glBegin(GL_LINE_LOOP);
+        // Top-left corner
+        glVertex2d(x, y);
+        // Top-right corner
+        glVertex2d(x + width, y);
+        // Bottom-right corner
+        glVertex2d(x + width, y + height);
+        // Bottom-left corner
+        glVertex2d(x, y + height);
+        glEnd();
+
+        // End 2D rendering (restore previous OpenGL state)
+        GLUtils.end2DRendering();
+
+        // Disable line smoothing
+        glDisable(GL_LINE_SMOOTH);
+    }
+
+    // This will set the alpha limit to a specified value ranging from 0-1
+    public static void setAlphaLimit(float limit) {
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL_GREATER, (float) (limit * .01));
+    }
+
+    // This method colors the next avalible texture with a specified alpha value ranging from 0-1
+    public static void color(int color, float alpha) {
+        float r = (float) (color >> 16 & 255) / 255.0F;
+        float g = (float) (color >> 8 & 255) / 255.0F;
+        float b = (float) (color & 255) / 255.0F;
+        GlStateManager.color(r, g, b, alpha);
+    }
+
+    // Colors the next texture without a specified alpha value
+    public static void color(int color) {
+        color(color, (float) (color >> 24 & 255) / 255.0F);
     }
 
     // A simple lerp function for smooth animations
@@ -124,7 +177,7 @@ public class RenderUtils extends Util {
      */
     public static void endScissor() {
         // Disable scissor test
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
+        glDisable(GL11.GL_SCISSOR_TEST);
     }
 
     public static void drawImage(ResourceLocation resourceLocation, float x, float y, float imgWidth, float imgHeight) {

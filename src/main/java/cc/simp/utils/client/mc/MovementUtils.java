@@ -6,10 +6,13 @@ import cc.simp.event.impl.player.PlayerInputEvent;
 import cc.simp.event.impl.player.StrafeEvent;
 import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.utils.client.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovementInput;
+
+import java.util.ArrayList;
 
 public class MovementUtils extends Util {
 
@@ -166,94 +169,160 @@ public class MovementUtils extends Util {
         return Math.toRadians(rotationYaw);
     }
 
-    public static void fixKillAuraMovement(PlayerInputEvent event, float yaw) {
-        fixKillAuraMovement(event, yaw, mc.thePlayer.rotationYaw);
+    public static double[] getMotion(final double speed, final float strafe, final float forward, final float yaw) {
+        final float friction = (float)speed;
+        final float f1 = MathHelper.sin(yaw * 3.1415927f / 180.0f);
+        final float f2 = MathHelper.cos(yaw * 3.1415927f / 180.0f);
+        final double motionX = strafe * friction * f2 - forward * friction * f1;
+        final double motionZ = forward * friction * f2 + strafe * friction * f1;
+        return new double[] { motionX, motionZ };
     }
 
-    public static void fixKillAuraMovement(PlayerInputEvent event, float yaw, float playerYaw) {
-        float forward = event.getForward();
-        float strafe = event.getStrafe();
-
-        if (forward == 0 && strafe == 0) return;
-
-        double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(playerYaw, forward, strafe)));
-
-        float closestForward = 0, closestStrafe = 0;
-        float closestDifference = Float.MAX_VALUE;
-
-        for (float predictedForward = -1F; predictedForward <= 1F; predictedForward += 1F) {
-            for (float predictedStrafe = -1F; predictedStrafe <= 1F; predictedStrafe += 1F) {
-                if (predictedForward == 0 && predictedStrafe == 0) continue;
-
-                double predictedAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(yaw, predictedForward, predictedStrafe)));
-                double difference = Math.abs(MathHelper.wrapAngleTo180_double(angle - predictedAngle));
-
-                if (difference < closestDifference) {
-                    closestDifference = (float) difference;
-                    closestForward = predictedForward;
-                    closestStrafe = predictedStrafe;
-                }
+    public static float[] handleMovementFix(final float strafe, final float forward, final float yaw, final boolean advanced) {
+        final Minecraft mc = Minecraft.getMinecraft();
+        final float diff = MathHelper.wrapAngleTo180_float(yaw - mc.thePlayer.rotationYaw);
+        float newForward = 0.0f;
+        float newStrafe = 0.0f;
+        if (!advanced) {
+            if (diff >= 22.5 && diff < 67.5) {
+                newStrafe += strafe;
+                newForward += forward;
+                newStrafe -= forward;
+                newForward += strafe;
+            }
+            else if (diff >= 67.5 && diff < 112.5) {
+                newStrafe -= forward;
+                newForward += strafe;
+            }
+            else if (diff >= 112.5 && diff < 157.5) {
+                newStrafe -= strafe;
+                newForward -= forward;
+                newStrafe -= forward;
+                newForward += strafe;
+            }
+            else if (diff >= 157.5 || diff <= -157.5) {
+                newStrafe -= strafe;
+                newForward -= forward;
+            }
+            else if (diff > -157.5 && diff <= -112.5) {
+                newStrafe -= strafe;
+                newForward -= forward;
+                newStrafe += forward;
+                newForward -= strafe;
+            }
+            else if (diff > -112.5 && diff <= -67.5) {
+                newStrafe += forward;
+                newForward -= strafe;
+            }
+            else if (diff > -67.5 && diff <= -22.5) {
+                newStrafe += strafe;
+                newForward += forward;
+                newStrafe += forward;
+                newForward -= strafe;
+            }
+            else {
+                newStrafe += strafe;
+                newForward += forward;
+            }
+            return new float[] { newStrafe, newForward };
+        }
+        double[] realMotion = getMotion(0.22, strafe, forward, Simp.INSTANCE.getRotationHandler().getServerYaw());
+        if(Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) realMotion = getMotion(0.22, strafe, forward, ScaffoldUtils.getScaffoldFixedYaw());
+        final double[] array;
+        final double[] realPos = array = new double[] { mc.thePlayer.posX, mc.thePlayer.posZ };
+        final int n = 0;
+        array[n] += realMotion[0];
+        final double[] array2 = realPos;
+        final int n2 = 1;
+        array2[n2] += realMotion[1];
+        final ArrayList<float[]> possibleForwardStrafe = new ArrayList<float[]>();
+        int i = 0;
+        boolean b = false;
+        while (!b) {
+            newForward = 0.0f;
+            newStrafe = 0.0f;
+            if (i == 0) {
+                newStrafe += strafe;
+                newForward += forward;
+                newStrafe -= forward;
+                newForward += strafe;
+                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
+            }
+            else if (i == 1) {
+                newStrafe -= forward;
+                newForward += strafe;
+                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
+            }
+            else if (i == 2) {
+                newStrafe -= strafe;
+                newForward -= forward;
+                newStrafe -= forward;
+                newForward += strafe;
+                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
+            }
+            else if (i == 3) {
+                newStrafe -= strafe;
+                newForward -= forward;
+                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
+            }
+            else if (i == 4) {
+                newStrafe -= strafe;
+                newForward -= forward;
+                newStrafe += forward;
+                newForward -= strafe;
+                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
+            }
+            else if (i == 5) {
+                newStrafe += forward;
+                newForward -= strafe;
+                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
+            }
+            else if (i == 6) {
+                newStrafe += strafe;
+                newForward += forward;
+                newStrafe += forward;
+                newForward -= strafe;
+                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
+            }
+            else {
+                newStrafe += strafe;
+                newForward += forward;
+                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
+                b = true;
+            }
+            ++i;
+        }
+        double distance = 5000.0;
+        float[] floats = new float[2];
+        for (final float[] flo : possibleForwardStrafe) {
+            if (flo[0] > 1.0f) {
+                flo[0] = 1.0f;
+            }
+            else if (flo[0] < -1.0f) {
+                flo[0] = -1.0f;
+            }
+            if (flo[1] > 1.0f) {
+                flo[1] = 1.0f;
+            }
+            else if (flo[1] < -1.0f) {
+                flo[1] = -1.0f;
+            }
+            final double[] motion2;
+            final double[] motion = motion2 = getMotion(0.22, flo[1], flo[0], mc.thePlayer.rotationYaw);
+            final int n3 = 0;
+            motion2[n3] += mc.thePlayer.posX;
+            final double[] array3 = motion;
+            final int n4 = 1;
+            array3[n4] += mc.thePlayer.posZ;
+            final double diffX = Math.abs(realPos[0] - motion[0]);
+            final double diffZ = Math.abs(realPos[1] - motion[1]);
+            final double d0 = diffX * diffX + diffZ * diffZ;
+            if (d0 < distance) {
+                distance = d0;
+                floats = flo;
             }
         }
-
-        event.setForward(closestForward);
-        event.setStrafe(closestStrafe);
-    }
-
-    public static void fixScaffoldMovement(StrafeEvent event) {
-
-
-        if (mc.thePlayer == null || mc.theWorld == null) {
-            return;
-        }
-
-        prevYaw = Simp.INSTANCE.getRotationHandler().getPrevServerYaw();
-        prevPitch = Simp.INSTANCE.getRotationHandler().getPrevServerPitch();
-
-        prevYaw = yaw;
-        prevPitch = pitch;
-
-        float[] patchedRots = RotationUtils.getPatchedAndCappedRots(new float[] { prevYaw, prevPitch },
-                new float[] { Simp.INSTANCE.getRotationHandler().getServerYaw(), Simp.INSTANCE.getRotationHandler().getServerPitch() }, 90);
-
-        if (patchedRots == null) {
-            yaw = mc.thePlayer.rotationYaw;
-            pitch = mc.thePlayer.rotationPitch;
-        }
-
-        yaw = patchedRots[0];
-        pitch = patchedRots[1];
-
-        float forward = event.getForward();
-        float strafe = event.getStrafe();
-
-        final double angle = MathHelper.wrapAngleTo180_double(
-                Math.toDegrees(MovementUtils.direction(Simp.INSTANCE.getRotationHandler().getServerYaw(), forward, strafe)));
-
-        if (forward == 0 && strafe == 0) {
-            return;
-        }
-
-        float closestForward = 0, closestStrafe = 0, closestDifference = Float.MAX_VALUE;
-
-        for (float predictedForward = -1F; predictedForward <= 1F; predictedForward += 1F) {
-            for (float predictedStrafe = -1F; predictedStrafe <= 1F; predictedStrafe += 1F) {
-                if (predictedStrafe == 0 && predictedForward == 0)
-                    continue;
-
-                final double predictedAngle = MathHelper.wrapAngleTo180_double(
-                        Math.toDegrees(MovementUtils.direction(yaw, predictedForward, predictedStrafe)));
-                final double difference = Math.abs(angle - predictedAngle);
-
-                if (difference < closestDifference) {
-                    closestDifference = (float) difference;
-                    closestForward = predictedForward;
-                    closestStrafe = predictedStrafe;
-                }
-            }
-        }
-        event.setForward(closestForward);
-        event.setStrafe(closestStrafe);
+        return new float[] { floats[1], floats[0] };
     }
 
     public static float getDirection() {

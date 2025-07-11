@@ -1,24 +1,18 @@
 package cc.simp.modules.impl.client;
 
-import cc.simp.Simp;
-import cc.simp.event.impl.render.overlay.Render2DEvent;
+import cc.simp.event.impl.render.Render2DEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.property.Property;
 import cc.simp.utils.client.font.FontManager;
 import cc.simp.utils.client.font.TrueTypeFontRenderer;
 import cc.simp.utils.client.mc.MovementUtils;
-import cc.simp.utils.client.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.ResourceLocation;
-
-import java.awt.*;
 
 import static cc.simp.utils.client.Util.mc;
 
@@ -32,7 +26,7 @@ public final class PlayerInfoModule extends Module {
     @EventLink
     public final Listener<Render2DEvent> render2DEventListener = event -> {
         MinecraftFontRenderer minecraftFontRenderer = mc.minecraftFontRendererObj;
-        TrueTypeFontRenderer CFont = FontManager.CSGO_FR;
+        TrueTypeFontRenderer CFont = FontManager.TAHOMA;
         ScaledResolution sr = new ScaledResolution(mc);
         float hue = (System.currentTimeMillis() % 3000) / 3000f;
 

@@ -68,7 +68,7 @@ public class GuiLoginMicrosoft extends GuiScreen {
         this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
         this.username.drawTextBox();
         this.password.drawTextBox();
-        GuiLoginMicrosoft.drawCustomCenteredString(FontManager.CSGO_FR, statusString, (int)(this.width / 2), (int)(sr.getScaledHeight() / 2 - 65), -1);
+        GuiLoginMicrosoft.drawCustomCenteredString(FontManager.TAHOMA, statusString, (int)(this.width / 2), (int)(sr.getScaledHeight() / 2 - 65), -1);
         if(!didTheThing) {
         	statusString = "Email & Password";
         } else {

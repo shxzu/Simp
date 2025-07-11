@@ -1,7 +1,9 @@
 package net.minecraft.client.renderer;
 
 import cc.simp.Simp;
+import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.render.BlockAnimationsModule;
+import cc.simp.utils.client.mc.PlayerUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -330,16 +332,18 @@ public class ItemRenderer
                 {
                     this.renderItemMap(abstractclientplayer, f2, f, f1);
                 }
-                else if (abstractclientplayer.getItemInUseCount() > 0)
+
+                else if (abstractclientplayer.getItemInUseCount() > 0 || KillAuraModule.autoBlocking)
                 {
                     EnumAction enumaction = this.itemToRender.getItemUseAction();
+
+                    if(Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && KillAuraModule.autoBlockTypeProperty.getValue() == KillAuraModule.AutoBlockType.FAKE && KillAuraModule.target != null && PlayerUtils.isHoldingSword()) enumaction = EnumAction.BLOCK;
 
                     switch (enumaction)
                     {
                         case NONE:
                             this.transformFirstPersonItem(f, 0.0F);
                             break;
-
                         case EAT:
                         case DRINK:
                             this.performDrinking(abstractclientplayer, partialTicks);

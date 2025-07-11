@@ -1,4 +1,4 @@
-package cc.simp.event.impl.render.overlay;
+package cc.simp.event.impl.render;
 
 import cc.simp.event.Event;
 import net.minecraft.client.gui.ScaledResolution;

@@ -13,6 +13,7 @@ public class ItemPickaxe extends ItemTool
     protected ItemPickaxe(Item.ToolMaterial material)
     {
         super(2.0F, material, EFFECTIVE_ON);
+        this.coolDownTicks = 16;
     }
 
     public boolean canHarvestBlock(Block blockIn)

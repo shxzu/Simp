@@ -2,7 +2,7 @@ package cc.simp.modules.impl.client;
 
 import cc.simp.Simp;
 import cc.simp.event.impl.KeyPressEvent;
-import cc.simp.event.impl.render.overlay.Render2DEvent;
+import cc.simp.event.impl.render.Render2DEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -30,7 +30,7 @@ public final class TabGUIModule extends Module {
     private final Property<Boolean> rainbowProperty = new Property<>("Rainbow", true);
     private final EnumProperty<Position> position = new EnumProperty<>("Position", Position.LEFT);
 
-    TrueTypeFontRenderer CFont = FontManager.CSGO_FR;
+    TrueTypeFontRenderer CFont = FontManager.TAHOMA;
     private boolean inModules = false;
     private boolean inSettings = false;
     private int currentCategory = 0;

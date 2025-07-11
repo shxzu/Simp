@@ -1,5 +1,6 @@
 package cc.simp.utils.client.font;
 
+import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -117,9 +118,11 @@ public class TrueTypeFontRenderer implements FontRenderer {
         graphics.fillRect(0, 0, characterImage.getWidth(), characterImage.getHeight());
         graphics.setColor(Color.WHITE);
         // Setup rendering hints
-        if (antiAlias)
-            graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                                      RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        if (antiAlias) {
+            graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        }
 
         if (fracMetrics)
             graphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
