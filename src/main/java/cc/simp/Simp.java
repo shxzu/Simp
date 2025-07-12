@@ -6,8 +6,8 @@ import cc.simp.config.ConfigManager;
 import cc.simp.event.Event;
 import cc.simp.event.impl.KeyPressEvent;
 import cc.simp.event.impl.game.ClientStartupEvent;
-import cc.simp.handlers.BackGroundHandler;
-import cc.simp.handlers.RotationHandler;
+import cc.simp.managers.BackgroundManager;
+import cc.simp.managers.RotationManager;
 import cc.simp.modules.ModuleManager;
 import cc.simp.modules.impl.client.ClickGUIModule;
 import cc.simp.ui.click.astolfo.AstolfoClickGUI;
@@ -34,10 +34,10 @@ public class Simp {
     private EventBus<Event> eventBus;
     private CommandHandler commandHandler;
     private static ConfigManager configManager;
-    private RotationHandler rotationHandler;
+    private RotationManager rotationManager;
     private WindowClickGUI winClickGUI;
     private AstolfoClickGUI astolfoClickGUI;
-    private BackGroundHandler backGroundHandler;
+    private BackgroundManager backgroundManager;
 
     public static void start() {
         Display.setTitle(NAME + " " + BUILD);
@@ -74,14 +74,14 @@ public class Simp {
         configManager = new ConfigManager();
 
         // Rotation Handler
-        rotationHandler = new RotationHandler();
-        getEventBus().subscribe(rotationHandler);
+        rotationManager = new RotationManager();
+        getEventBus().subscribe(rotationManager);
 
         configManager.loadConfig("default");
 
         // Background Handler
-        backGroundHandler = new BackGroundHandler();
-        getEventBus().subscribe(backGroundHandler);
+        backgroundManager = new BackgroundManager();
+        getEventBus().subscribe(backgroundManager);
 
     };
 
@@ -124,8 +124,12 @@ public class Simp {
         return configManager;
     }
 
-    public RotationHandler getRotationHandler() {
-        return rotationHandler;
+    public RotationManager getRotationManager() {
+        return rotationManager;
+    }
+
+    public BackgroundManager getBackgroundManager() {
+        return backgroundManager;
     }
 
     public static <T> T requireNonNull(T obj) {

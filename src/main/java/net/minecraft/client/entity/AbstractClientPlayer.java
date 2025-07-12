@@ -1,5 +1,7 @@
 package net.minecraft.client.entity;
 
+import cc.simp.Simp;
+import cc.simp.managers.RotationManager;
 import com.mojang.authlib.GameProfile;
 import java.io.File;
 import net.minecraft.client.Minecraft;
@@ -208,8 +210,14 @@ public abstract class AbstractClientPlayer extends EntityPlayer
         this.reloadCapeTimeMs = p_setReloadCapeTimeMs_1_;
     }
 
-    public Vec3 getLook(float partialTicks)
-    {
+    @Override
+    public Vec3 getLook(final float partialTicks) {
+        if (this instanceof EntityPlayerSP) {
+            final RotationManager rotationManager = Simp.INSTANCE.getRotationManager();
+            if (rotationManager.isRotating()) {
+                return this.getVectorForRotation(rotationManager.getClientPitch(), rotationManager.getClientYaw());
+            }
+        }
         return this.getVectorForRotation(this.rotationPitch, this.rotationYaw);
     }
 }

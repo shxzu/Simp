@@ -4,71 +4,22 @@ import cc.simp.event.CancellableEvent;
 
 public final class MotionEvent extends CancellableEvent {
 
-    private final float prevYaw, prevPitch;
-    private final double prevPosX, prevPosY, prevPosZ;
-    private double posX, posY, posZ;
-    private float yaw, pitch;
-    private boolean ground;
+    public double posX;
+    public double posY;
+    public double posZ;
+    public float yaw;
+    public float pitch;
+    public boolean onGround;
     private boolean pre;
-    private boolean rotating;
-    public MotionEvent(float prevYaw, float prevPitch,
-                       double posX, double posY, double posZ,
-                       double prevPosX, double prevPosY, double prevPosZ,
-                       float yaw, float pitch,
-                       boolean ground) {
-        this.prevYaw = prevYaw;
-        this.prevPitch = prevPitch;
+
+    public MotionEvent(double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
         this.posX = posX;
         this.posY = posY;
         this.posZ = posZ;
-        this.prevPosX = prevPosX;
-        this.prevPosY = prevPosY;
-        this.prevPosZ = prevPosZ;
         this.yaw = yaw;
         this.pitch = pitch;
-        this.ground = ground;
+        this.onGround = onGround;
         this.pre = true;
-    }
-
-    public double getPrevPosX() {
-        return prevPosX;
-    }
-
-    public double getPrevPosY() {
-        return prevPosY;
-    }
-
-    public double getPrevPosZ() {
-        return prevPosZ;
-    }
-
-    public boolean isRotating() {
-        return rotating;
-    }
-
-    public float getPrevYaw() {
-        return prevYaw;
-    }
-
-    public float getPrevPitch() {
-        return prevPitch;
-    }
-
-    public boolean isPre() {
-        return pre;
-    }
-
-    public boolean isPost() {
-        if(!pre) return true;
-        return false;
-    }
-
-    public void setPre() {
-        this.pre = true;
-    }
-
-    public void setPost() {
-        this.pre = false;
     }
 
     public double getPosX() {
@@ -99,16 +50,7 @@ public final class MotionEvent extends CancellableEvent {
         return yaw;
     }
 
-    public boolean hasMoved() {
-        final double xDif = prevPosX - posX;
-        final double yDif = prevPosY - posY;
-        final double zDif = prevPosZ - posZ;
-
-        return Math.sqrt(xDif * xDif + yDif * yDif + zDif * zDif) > 1.0E-5D;
-    }
-
     public void setYaw(float yaw) {
-        this.rotating = this.yaw - yaw != 0.0F;
         this.yaw = yaw;
     }
 
@@ -117,15 +59,31 @@ public final class MotionEvent extends CancellableEvent {
     }
 
     public void setPitch(float pitch) {
-        this.rotating = this.pitch - pitch != 0.0F;
         this.pitch = pitch;
     }
 
     public boolean isOnGround() {
-        return ground;
+        return onGround;
     }
 
-    public void setOnGround(boolean ground) {
-        this.ground = ground;
+    public void setOnGround(boolean onGround) {
+        this.onGround = onGround;
+    }
+
+    public boolean isPre() {
+        return pre;
+    }
+
+    public boolean isPost() {
+        if(!pre) return true;
+        return false;
+    }
+
+    public void setPre() {
+        this.pre = true;
+    }
+
+    public void setPost() {
+        this.pre = false;
     }
 }

@@ -2,7 +2,6 @@ package cc.simp.utils.client.mc;
 
 import cc.simp.Simp;
 import cc.simp.event.impl.player.MotionEvent;
-import cc.simp.event.impl.player.PlayerInputEvent;
 import cc.simp.event.impl.player.StrafeEvent;
 import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.utils.client.Util;
@@ -178,6 +177,84 @@ public class MovementUtils extends Util {
         return new double[] { motionX, motionZ };
     }
 
+    public static void silentRotationStrafe(final StrafeEvent event, final float yaw) {
+        final int dif = (int)((MathHelper.wrapAngleTo180_float(MovementUtils.mc.thePlayer.rotationYaw - yaw - 23.5f - 135.0f) + 180.0f) / 45.0f);
+        final float strafe = event.getStrafe();
+        final float forward = event.getForward();
+        final float friction = event.getFriction();
+        float calcForward = 0.0f;
+        float calcStrafe = 0.0f;
+        switch (dif) {
+            case 0: {
+                calcForward = forward;
+                calcStrafe = strafe;
+                break;
+            }
+            case 1: {
+                calcForward += forward;
+                calcStrafe -= forward;
+                calcForward += strafe;
+                calcStrafe += strafe;
+                break;
+            }
+            case 2: {
+                calcForward = strafe;
+                calcStrafe = -forward;
+                break;
+            }
+            case 3: {
+                calcForward -= forward;
+                calcStrafe -= forward;
+                calcForward += strafe;
+                calcStrafe -= strafe;
+                break;
+            }
+            case 4: {
+                calcForward = -forward;
+                calcStrafe = -strafe;
+                break;
+            }
+            case 5: {
+                calcForward -= forward;
+                calcStrafe += forward;
+                calcForward -= strafe;
+                calcStrafe -= strafe;
+                break;
+            }
+            case 6: {
+                calcForward = -strafe;
+                calcStrafe = forward;
+                break;
+            }
+            case 7: {
+                calcForward += forward;
+                calcStrafe += forward;
+                calcForward -= strafe;
+                calcStrafe += strafe;
+                break;
+            }
+        }
+        if (calcForward > 1.0f || (calcForward < 0.9f && calcForward > 0.3f) || calcForward < -1.0f || (calcForward > -0.9f && calcForward < -0.3f)) {
+            calcForward *= 0.5f;
+        }
+        if (calcStrafe > 1.0f || (calcStrafe < 0.9f && calcStrafe > 0.3f) || calcStrafe < -1.0f || (calcStrafe > -0.9f && calcStrafe < -0.3f)) {
+            calcStrafe *= 0.5f;
+        }
+        float f = calcStrafe * calcStrafe + calcForward * calcForward;
+        if (f >= 1.0E-4f) {
+            if ((f = MathHelper.sqrt_float(f)) < 1.0f) {
+                f = 1.0f;
+            }
+            f = friction / f;
+            final float f2 = MathHelper.sin(yaw * 3.1415927f / 180.0f);
+            final float f3 = MathHelper.cos(yaw * 3.1415927f / 180.0f);
+            final EntityPlayerSP thePlayer = MovementUtils.mc.thePlayer;
+            thePlayer.motionX += (calcStrafe *= f) * f3 - (calcForward *= f) * f2;
+            final EntityPlayerSP thePlayer2 = MovementUtils.mc.thePlayer;
+            thePlayer2.motionZ += calcForward * f3 + calcStrafe * f2;
+        }
+    }
+
     public static float[] handleMovementFix(final float strafe, final float forward, final float yaw, final boolean advanced) {
         final Minecraft mc = Minecraft.getMinecraft();
         final float diff = MathHelper.wrapAngleTo180_float(yaw - mc.thePlayer.rotationYaw);
@@ -226,8 +303,8 @@ public class MovementUtils extends Util {
             }
             return new float[] { newStrafe, newForward };
         }
-        double[] realMotion = getMotion(0.22, strafe, forward, Simp.INSTANCE.getRotationHandler().getServerYaw());
-        if(Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) realMotion = getMotion(0.22, strafe, forward, ScaffoldUtils.getScaffoldFixedYaw());
+        final float baseYaw = Simp.INSTANCE.getRotationManager().isRotating() ? Simp.INSTANCE.getRotationManager().getClientYaw() : mc.thePlayer.rotationYaw;
+        double[] realMotion = getMotion(0.22, strafe, forward, baseYaw);
         final double[] array;
         final double[] realPos = array = new double[] { mc.thePlayer.posX, mc.thePlayer.posZ };
         final int n = 0;

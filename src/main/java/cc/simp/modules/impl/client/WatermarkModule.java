@@ -46,7 +46,7 @@ public final class WatermarkModule extends Module {
         if(FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
             CFont.drawStringWithShadow(text, 2, 2, Color.getHSBColor(hue, 0.55f, 0.9f).getRGB());
         } else {
-            minecraftFontRenderer.drawString(text, 2, 2, Color.getHSBColor(hue, 0.55f, 0.9f).getRGB());
+            minecraftFontRenderer.drawStringWithShadow(text, 2, 2, Color.getHSBColor(hue, 0.55f, 0.9f).getRGB());
         }
 
         if(logoProperty.getValue()) {

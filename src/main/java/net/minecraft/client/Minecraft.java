@@ -6,6 +6,7 @@ import cc.simp.event.impl.game.ClientStartupEvent;
 import cc.simp.event.impl.game.PreClientStartupEvent;
 import cc.simp.event.impl.player.ClickEvent;
 import cc.simp.event.impl.world.TickEvent;
+import cc.simp.event.impl.world.WorldLoadEvent;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -1682,6 +1683,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
             if (this.thePlayer != null) {
                 final TickEvent eventTick = new TickEvent();
                 Simp.INSTANCE.getEventBus().post(eventTick);
+                ++thePlayer.ticksSinceLastSwing;
                 ++this.joinPlayerCounter;
                 if (this.joinPlayerCounter == 30) {
                     this.joinPlayerCounter = 0;
@@ -1865,6 +1867,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
             this.thePlayer.movementInput = new MovementInputFromOptions(this.gameSettings);
             this.playerController.setPlayerCapabilities(this.thePlayer);
             this.renderViewEntity = this.thePlayer;
+            Simp.INSTANCE.getEventBus().post(new WorldLoadEvent());
         } else {
             this.saveLoader.flushCache();
             this.thePlayer = null;

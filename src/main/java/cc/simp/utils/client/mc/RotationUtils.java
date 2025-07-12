@@ -1,7 +1,7 @@
 package cc.simp.utils.client.mc;
 
 import cc.simp.Simp;
-import cc.simp.modules.impl.player.SmoothRotationsModule;
+import cc.simp.modules.impl.player.ClientRotationsModule;
 import cc.simp.utils.client.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -9,7 +9,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.optifine.util.MathUtils;
-import org.lwjgl.util.vector.Vector2f;
 
 public class RotationUtils extends Util {
     public static float currentYaw = mc.thePlayer.rotationYaw;
@@ -33,20 +32,6 @@ public class RotationUtils extends Util {
             f = -speed;
         }
         return from + f;
-    }
-
-    public static float smoothPitch(float Pitch) {
-        int value = SmoothRotationsModule.rotSpeed.getValue().intValue();
-        float pitch;
-        pitch = smoothRotation(Simp.INSTANCE.getRotationHandler().getPrevServerPitch(), Pitch, 10 * MathUtils.getRandomFloat(value, value));
-        return pitch;
-    }
-
-    public static float smoothYaw(float Yaw) {
-        int value = SmoothRotationsModule.rotSpeed.getValue().intValue();
-        float yaw;
-        yaw = smoothRotation(Simp.INSTANCE.getRotationHandler().getPrevServerYaw(), Yaw, 10 * MathUtils.getRandomFloat(value, value));
-        return yaw;
     }
 
     public static float[] getClosestRotations(Entity entity, float jitterAmount) {

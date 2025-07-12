@@ -8,6 +8,10 @@ import java.security.SecureRandom;
 
 public class MathUtils extends Util {
 
+    public static float lerp(final float from, final float to, final float speed) {
+        return from + (to - from) * speed;
+    }
+
     public static double roundToDecimalPlace(double value, double inc) {
         final double halfOfInc = inc / 2.0D;
         final double floored = StrictMath.floor(value / inc) * inc;

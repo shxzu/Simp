@@ -19,9 +19,7 @@ import cc.simp.utils.client.mc.ScaffoldUtils;
 import cc.simp.utils.client.misc.MathUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
-import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.Vec3;
 
 import static cc.simp.utils.client.Util.mc;
 
@@ -103,12 +101,10 @@ public final class ScaffoldModule extends Module {
 
             // Rotations Setup
             float[] rotations = getRotationsForPlacement();
-            if (Simp.INSTANCE.getModuleManager().getModule(SmoothRotationsModule.class).isEnabled()) {
-                event.setYaw(RotationUtils.smoothYaw(rotations[0]));
-                event.setPitch(RotationUtils.smoothPitch(rotations[1]));
+            if (Simp.INSTANCE.getModuleManager().getModule(ClientRotationsModule.class).isEnabled()) {
+                Simp.INSTANCE.getRotationManager().rotateToward(rotations[0], rotations[1], ClientRotationsModule.rotSpeed.getValue().floatValue());
             } else {
-                event.setYaw(rotations[0]);
-                event.setPitch(rotations[1]);
+                Simp.INSTANCE.getRotationManager().rotateToward(rotations[0], rotations[1], 60f);
             }
             rotatedThisTick = true;
 
@@ -189,15 +185,15 @@ public final class ScaffoldModule extends Module {
             if (raytraceProperty.getValue()) {
                 if (raytraceStrictProperty.getValue()) {
                     if (RaytraceUtils.isOnBlock(currentBlockCache.getFacing(), currentBlockCache.getPosition(), true,
-                            RAYTRACE_DISTANCE, Simp.INSTANCE.getRotationHandler().getServerYaw(),
-                            Simp.INSTANCE.getRotationHandler().getServerPitch())) {
+                            RAYTRACE_DISTANCE, Simp.INSTANCE.getRotationManager().getClientYaw(),
+                            Simp.INSTANCE.getRotationManager().getClientPitch())) {
                         mc.rightClickMouse();
                         performedAction = true;
                     }
                 } else {
                     if (RaytraceUtils.isOnBlock(currentBlockCache.getFacing(), currentBlockCache.getPosition(), false,
-                            RAYTRACE_DISTANCE, Simp.INSTANCE.getRotationHandler().getServerYaw(),
-                            Simp.INSTANCE.getRotationHandler().getServerPitch())) {
+                            RAYTRACE_DISTANCE, Simp.INSTANCE.getRotationManager().getClientYaw(),
+                            Simp.INSTANCE.getRotationManager().getClientPitch())) {
                         performedAction = attemptPlaceBlock(currentBlockCache);
                     }
                 }

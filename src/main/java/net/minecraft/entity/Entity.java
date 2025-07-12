@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 import cc.simp.Simp;
 import cc.simp.event.impl.player.SafeWalkEvent;
 import cc.simp.event.impl.player.StrafeEvent;
+import cc.simp.managers.RotationManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -1221,18 +1222,24 @@ public abstract class Entity implements ICommandSender
         }
     }
 
-    public Vec3 getLook(float partialTicks)
-    {
-        if (partialTicks == 1.0F)
-        {
+    public Vec3 getLook(final float partialTicks) {
+        if (this instanceof EntityPlayerSP) {
+            final RotationManager rotationManager = Simp.INSTANCE.getRotationManager();
+            if (rotationManager.isRotating()) {
+                if (partialTicks == 1.0f) {
+                    return this.getVectorForRotation(rotationManager.getClientPitch(), rotationManager.getClientYaw());
+                }
+                final float f = rotationManager.getPrevClientPitch() + (rotationManager.getClientPitch() - rotationManager.getPrevClientPitch()) * partialTicks;
+                final float f2 = rotationManager.getPrevClientYaw() + (rotationManager.getClientYaw() - rotationManager.getPrevClientYaw()) * partialTicks;
+                return this.getVectorForRotation(f, f2);
+            }
+        }
+        if (partialTicks == 1.0f) {
             return this.getVectorForRotation(this.rotationPitch, this.rotationYaw);
         }
-        else
-        {
-            float f = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * partialTicks;
-            float f1 = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * partialTicks;
-            return this.getVectorForRotation(f, f1);
-        }
+        final float f3 = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * partialTicks;
+        final float f4 = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * partialTicks;
+        return this.getVectorForRotation(f3, f4);
     }
 
     public static final Vec3 getVectorForRotation(float pitch, float yaw)
@@ -2224,11 +2231,6 @@ public abstract class Entity implements ICommandSender
     public EnumFacing getHorizontalFacing()
     {
         return EnumFacing.getHorizontal(MathHelper.floor_double((double)(this.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3);
-    }
-
-    public EnumFacing getServerSidedHorizontalFacing()
-    {
-        return EnumFacing.getHorizontal(MathHelper.floor_double((double)(Simp.INSTANCE.getRotationHandler().getServerYaw() * 4.0F / 360.0F) + 0.5D) & 3);
     }
 
     protected HoverEvent getHoverEvent()

@@ -32,6 +32,7 @@ public class AstolfoModuleButton extends AstolfoButton {
         int count = 0;
 
         for(Property<?> set : module.getElements()) {
+            if (!set.isAvailable()) continue;
             if(set.getType() ==  Boolean.class) astolfoButtons.add(new AstolfoBooleanButton(x, startY + 18*count, width, 9, (Property<Boolean>) set, color));
             if(set instanceof EnumProperty) astolfoButtons.add(new AstolfoModeButton(x, startY + 18*count, width, 9, (EnumProperty<?>)set, color));
             if(set instanceof DoubleProperty) astolfoButtons.add(new AstolfoNumberButton(x, startY + 18*count, width, 9, (DoubleProperty)set, color));

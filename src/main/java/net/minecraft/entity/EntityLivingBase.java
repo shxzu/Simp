@@ -2,6 +2,13 @@ package net.minecraft.entity;
 
 import cc.simp.Simp;
 import cc.simp.event.impl.player.JumpEvent;
+import cc.simp.event.impl.player.PreUpdateEvent;
+import cc.simp.managers.RotationManager;
+import cc.simp.modules.impl.combat.KillAuraModule;
+import cc.simp.modules.impl.movement.MovementFixModule;
+import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.modules.impl.player.ClientRotationsModule;
+import cc.simp.utils.client.mc.MovementUtils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
@@ -14,7 +21,6 @@ import java.util.UUID;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -54,7 +60,8 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import sun.nio.ch.SelectorImpl;
+
+import static cc.simp.utils.client.Util.mc;
 
 public abstract class EntityLivingBase extends Entity
 {
@@ -1327,20 +1334,28 @@ public abstract class EntityLivingBase extends Entity
         return 0.42F;
     }
 
-    protected void jump()
-    {
-        final JumpEvent event = new JumpEvent(this.rotationYaw, this.getJumpUpwardsMotion());
-        Simp.INSTANCE.getEventBus().post(event);
-        if (event.isCancelled()) {
-            return;
-        }
-        final float finalYaw = (this instanceof EntityPlayerSP) ? event.getYaw() : this.rotationYaw;
-        this.motionY = event.getMotionY();
+    protected void jump() {
+        this.motionY = this.getJumpUpwardsMotion();
         if (this.isPotionActive(Potion.jump)) {
             this.motionY += (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1f;
         }
         if (this.isSprinting()) {
-            final float f = finalYaw * 0.017453292f;
+            float forward = 0.0f;
+            if (mc.gameSettings.keyBindForward.isKeyDown()) {
+                ++forward;
+            }
+            if (mc.gameSettings.keyBindBack.isKeyDown()) {
+                --forward;
+            }
+            float strafe = 0.0f;
+            if (mc.gameSettings.keyBindRight.isKeyDown()) {
+                --strafe;
+            }
+            if (mc.gameSettings.keyBindLeft.isKeyDown()) {
+                ++strafe;
+            }
+            final float yaw = (Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).isEnabled() && SprintModule.omniProperty.getValue() && this instanceof EntityPlayerSP) ? ((float) MovementUtils.getDirection()) : ((Simp.INSTANCE.getModuleManager().getModule(MovementFixModule.class).isEnabled() && Simp.INSTANCE.getRotationManager().isRotating() && this instanceof EntityPlayerSP) ? Simp.INSTANCE.getRotationManager().getClientYaw() : this.rotationYaw);
+            final float f = yaw * 0.017453292f;
             this.motionX -= MathHelper.sin(f) * 0.2f;
             this.motionZ += MathHelper.cos(f) * 0.2f;
         }
@@ -1655,35 +1670,34 @@ public abstract class EntityLivingBase extends Entity
         this.movedDistance += f2;
     }
 
-    protected float updateDistance(float p_110146_1_, float p_110146_2_)
-    {
-        float f = MathHelper.wrapAngleTo180_float(p_110146_1_ - this.renderYawOffset);
-        this.renderYawOffset += f * 0.3F;
-        float f1 = MathHelper.wrapAngleTo180_float(this.rotationYaw - this.renderYawOffset);
-        boolean flag = f1 < -90.0F || f1 >= 90.0F;
-
-        if (f1 < -75.0F)
-        {
-            f1 = -75.0F;
+    protected float updateDistance(float p_110146_1_, float p_110146_2_) {
+        final ClientRotationsModule rotationsModule = Simp.INSTANCE.getModuleManager().getModule(ClientRotationsModule.class);
+        final RotationManager rotationManager = Simp.INSTANCE.getRotationManager();
+        float fakeRotationYaw = this.rotationYaw;
+        if (rotationsModule.isEnabled() && rotationManager.isRotating() && this instanceof EntityPlayerSP) {
+            if (this.swingProgress > 0.0f) {
+                p_110146_1_ = rotationManager.getClientYaw();
+            }
+            fakeRotationYaw = rotationManager.getClientYaw();
+            this.rotationYawHead = rotationManager.getClientYaw();
         }
-
-        if (f1 >= 75.0F)
-        {
-            f1 = 75.0F;
+        final float f = MathHelper.wrapAngleTo180_float(p_110146_1_ - this.renderYawOffset);
+        this.renderYawOffset += f * 0.3f;
+        float f2 = MathHelper.wrapAngleTo180_float(fakeRotationYaw - this.renderYawOffset);
+        final boolean flag = f2 < -90.0f || f2 >= 90.0f;
+        if (f2 < -75.0f) {
+            f2 = -75.0f;
         }
-
-        this.renderYawOffset = this.rotationYaw - f1;
-
-        if (f1 * f1 > 2500.0F)
-        {
-            this.renderYawOffset += f1 * 0.2F;
+        if (f2 >= 75.0f) {
+            f2 = 75.0f;
         }
-
-        if (flag)
-        {
-            p_110146_2_ *= -1.0F;
+        this.renderYawOffset = fakeRotationYaw - f2;
+        if (f2 * f2 > 2500.0f) {
+            this.renderYawOffset += f2 * 0.2f;
         }
-
+        if (flag) {
+            p_110146_2_ *= -1.0f;
+        }
         return p_110146_2_;
     }
 
@@ -1745,6 +1759,15 @@ public abstract class EntityLivingBase extends Entity
         }
 
         this.worldObj.theProfiler.endSection();
+        if (this instanceof EntityPlayerSP) {
+            final RotationManager rotationManager = Simp.INSTANCE.getRotationManager();
+            rotationManager.tick();
+            final PreUpdateEvent event = new PreUpdateEvent();
+            Simp.INSTANCE.getEventBus().post(event);
+            if (event.isCancelled()) {
+                return;
+            }
+        }
         this.worldObj.theProfiler.startSection("jump");
 
         if (this.isJumping)
@@ -1892,18 +1915,27 @@ public abstract class EntityLivingBase extends Entity
         return this.getLook(1.0F);
     }
 
-    public Vec3 getLook(float partialTicks)
-    {
-        if (partialTicks == 1.0F)
-        {
-            return this.getVectorForRotation(this.rotationPitch, this.rotationYawHead);
+    @Override
+    public Vec3 getLook(final float partialTicks) {
+        float yaw = this.rotationYawHead;
+        float pitch = this.rotationPitch;
+        float prevYaw = this.prevRotationYawHead;
+        float prevPitch = this.prevRotationPitch;
+        if (this instanceof EntityPlayerSP) {
+            final RotationManager rotationManager = Simp.INSTANCE.getRotationManager();
+            if (rotationManager.isRotating()) {
+                yaw = rotationManager.getClientYaw();
+                pitch = rotationManager.getClientPitch();
+                prevYaw = rotationManager.getPrevClientYaw();
+                prevPitch = rotationManager.getPrevClientPitch();
+            }
         }
-        else
-        {
-            float f = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * partialTicks;
-            float f1 = this.prevRotationYawHead + (this.rotationYawHead - this.prevRotationYawHead) * partialTicks;
-            return this.getVectorForRotation(f, f1);
+        if (partialTicks == 1.0f) {
+            return this.getVectorForRotation(pitch, yaw);
         }
+        final float f = prevPitch + (pitch - prevPitch) * partialTicks;
+        final float f2 = prevYaw + (yaw - prevYaw) * partialTicks;
+        return this.getVectorForRotation(f, f2);
     }
 
     public float getSwingProgress(float partialTickTime)
