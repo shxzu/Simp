@@ -6,6 +6,7 @@ import cc.simp.event.impl.player.MotionEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.modules.impl.movement.MovementFixModule;
 import cc.simp.modules.impl.movement.SprintModule;
 import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.modules.impl.player.ClientRotationsModule;
@@ -41,7 +42,7 @@ public final class KillAuraModule extends Module {
     public static EnumProperty<AutoBlockType> autoBlockTypeProperty = new EnumProperty<>("Auto Block", AutoBlockType.FAKE);
     private final Property<Boolean> legitTimingsProperty = new Property<>("Legit Timings", true);
     private final Property<Boolean> keepSprintProperty = new Property<>("Keep Sprint", false);
-    private final Property<Boolean> sprintRotationFixProperty = new Property<>("Sprint Rotation Fix", false, () -> keepSprintProperty.getValue() == false);
+    private final Property<Boolean> sprintRotationFixProperty = new Property<>("Sprint Rotation Fix", false, () -> keepSprintProperty.getValue() == false && !Simp.INSTANCE.getModuleManager().getModule(MovementFixModule.class).isEnabled() && !MovementFixModule.killAuraProperty.getValue());
 
     public enum TargetType {
         PLAYERS,
@@ -81,14 +82,10 @@ public final class KillAuraModule extends Module {
         }
 
         if (event.isPre()) {
-            if (Simp.INSTANCE.getModuleManager().getModule(ClientRotationsModule.class).isEnabled()) {
-                Simp.INSTANCE.getRotationManager().faceEntity(target, ClientRotationsModule.rotSpeed.getValue().floatValue());
-            } else {
-                Simp.INSTANCE.getRotationManager().faceEntity(target, 60f);
-            }
+            Simp.INSTANCE.getRotationManager().faceEntity(target, ClientRotationsModule.rotSpeed.getValue().floatValue());
             rotated = true;
 
-            if(sprintRotationFixProperty.getValue() && !keepSprintProperty.getValue()) {
+            if(sprintRotationFixProperty.getValue() && !keepSprintProperty.getValue() && !Simp.INSTANCE.getModuleManager().getModule(MovementFixModule.class).isEnabled() && !MovementFixModule.killAuraProperty.getValue()) {
                 handleSprinting(Simp.INSTANCE.getRotationManager().getClientYaw());
             }
 
@@ -229,7 +226,7 @@ public final class KillAuraModule extends Module {
 
     private void handleSprinting(float targetYaw) {
         // Only apply fix if we are actually sprinting
-        if (!mc.thePlayer.isSprinting()) {
+        if (!mc.thePlayer.isSprinting() || !mc.gameSettings.keyBindSprint.isPressed()) {
             return;
         }
 
@@ -240,6 +237,7 @@ public final class KillAuraModule extends Module {
         // If the turn required is greater than the threshold, stop sprinting
         if (yawDifference > 30) {
             mc.thePlayer.setSprinting(false);
+            mc.gameSettings.keyBindSprint.setPressed(false);
             // Optionally, add a slight delay before allowing sprinting again if needed
         }
     }

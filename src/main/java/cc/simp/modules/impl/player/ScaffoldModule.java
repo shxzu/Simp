@@ -41,10 +41,12 @@ public final class ScaffoldModule extends Module {
 
     private enum Rotations {
         NORMAL,
+        STATIC,
+        HYPIXEL,
         VULCAN;
     }
 
-    private static final float NORMAL_PITCH = 82;
+    private static final float NORMAL_PITCH = 82.5f;
     private static final float VULCAN_PITCH = 78;
     private static final float RAYTRACE_DISTANCE = 4.5f;
     private static final int RANDOM_DELAY_MIN = 1;
@@ -101,11 +103,7 @@ public final class ScaffoldModule extends Module {
 
             // Rotations Setup
             float[] rotations = getRotationsForPlacement();
-            if (Simp.INSTANCE.getModuleManager().getModule(ClientRotationsModule.class).isEnabled()) {
-                Simp.INSTANCE.getRotationManager().rotateToward(rotations[0], rotations[1], ClientRotationsModule.rotSpeed.getValue().floatValue());
-            } else {
-                Simp.INSTANCE.getRotationManager().rotateToward(rotations[0], rotations[1], 60f);
-            }
+            Simp.INSTANCE.getRotationManager().rotateToward(rotations[0], rotations[1], ClientRotationsModule.rotSpeed.getValue().floatValue());
             rotatedThisTick = true;
 
             // Place The Block
@@ -150,10 +148,10 @@ public final class ScaffoldModule extends Module {
 
     public static float[] getRotationsForPlacement() {
         float[] rotations = new float[2];
-        rotations[0] = MovementUtils.getDirection() - 180;
 
         switch (rotationsProperty.getValue()) {
             case NORMAL:
+                rotations[0] = MovementUtils.getDirection() - 180;
                 rotations[1] = NORMAL_PITCH;
                 if (currentBlockCache != null) {
                     for (float possiblePitch = 90; possiblePitch > 30; possiblePitch -= possiblePitch > (mc.thePlayer
@@ -163,10 +161,27 @@ public final class ScaffoldModule extends Module {
                             rotations[1] = possiblePitch;
                         }
                     }
-
                 }
                 break;
+            case HYPIXEL:
+                rotations[0] = ScaffoldUtils.getHypixelNCPYaw();
+                rotations[1] = NORMAL_PITCH;
+                if (currentBlockCache != null) {
+                    for (float possiblePitch = 90; possiblePitch > 30; possiblePitch -= possiblePitch > (mc.thePlayer
+                            .isPotionActive(Potion.moveSpeed) ? 60 : 80) ? 1 : 10) {
+                        if (RaytraceUtils.isOnBlock(currentBlockCache.getFacing(), currentBlockCache.getPosition(), true, mc.playerController.getBlockReachDistance(),
+                                rotations[0], possiblePitch)) {
+                            rotations[1] = possiblePitch;
+                        }
+                    }
+                }
+                break;
+            case STATIC:
+                rotations[0] = MovementUtils.getDirection() - 180;
+                rotations[1] = NORMAL_PITCH;
+                break;
             case VULCAN:
+                rotations[0] = MovementUtils.getDirection() - 180;
                 rotations[1] = VULCAN_PITCH;
                 break;
         }
@@ -187,8 +202,7 @@ public final class ScaffoldModule extends Module {
                     if (RaytraceUtils.isOnBlock(currentBlockCache.getFacing(), currentBlockCache.getPosition(), true,
                             RAYTRACE_DISTANCE, Simp.INSTANCE.getRotationManager().getClientYaw(),
                             Simp.INSTANCE.getRotationManager().getClientPitch())) {
-                        mc.rightClickMouse();
-                        performedAction = true;
+                        performedAction = attemptPlaceBlock(currentBlockCache);
                     }
                 } else {
                     if (RaytraceUtils.isOnBlock(currentBlockCache.getFacing(), currentBlockCache.getPosition(), false,

@@ -5,11 +5,9 @@ import cc.simp.event.impl.KeyPressEvent;
 import cc.simp.modules.impl.client.*;
 import cc.simp.modules.impl.combat.AntiKnockbackModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
+import cc.simp.modules.impl.combat.TimerRangeModule;
 import cc.simp.modules.impl.movement.*;
-import cc.simp.modules.impl.player.ChestStealerModule;
-import cc.simp.modules.impl.player.InventoryManagerModule;
-import cc.simp.modules.impl.player.ScaffoldModule;
-import cc.simp.modules.impl.player.ClientRotationsModule;
+import cc.simp.modules.impl.player.*;
 import cc.simp.modules.impl.render.AmbienceModule;
 import cc.simp.modules.impl.render.BlockAnimationsModule;
 import cc.simp.modules.impl.render.ChamsModule;
@@ -32,11 +30,14 @@ public final class ModuleManager {
                 // COMBAT
                 new KillAuraModule(),
                 new AntiKnockbackModule(),
+                new TimerRangeModule(),
 
                 // PLAYER
                 new ScaffoldModule(),
+                new NoFallDamageModule(),
                 new ChestStealerModule(),
                 new InventoryManagerModule(),
+                new AutoToolModule(),
                 new ClientRotationsModule(),
 
                 // MOVEMENT

@@ -20,7 +20,7 @@ import static cc.simp.utils.client.Util.mc;
 @ModuleInfo(label = "Movement Fix", category = ModuleCategory.MOVEMENT)
 public final class MovementFixModule extends Module {
 
-    public final Property<Boolean> killAuraProperty = new Property<>("Work on Kill Aura", true);
+    public static final Property<Boolean> killAuraProperty = new Property<>("Work on Kill Aura", true);
     public final Property<Boolean> scaffoldProperty = new Property<>("Work on Scaffold", true);
 
     @EventLink
@@ -33,7 +33,7 @@ public final class MovementFixModule extends Module {
                 MovementUtils.handleMovementFix(event.getStrafe(), event.getForward(), event.getYaw(), true);
             }
         }
-        if(killAuraProperty.getValue() && Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled()) {
+        if(killAuraProperty.getValue() && Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && KillAuraModule.target != null) {
             if (Simp.INSTANCE.getRotationManager().isRotating()) {
                 event.setCancelled();
                 MovementUtils.silentRotationStrafe(event, Simp.INSTANCE.getRotationManager().getClientYaw());

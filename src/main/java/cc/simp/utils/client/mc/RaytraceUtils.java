@@ -4,6 +4,7 @@ import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.utils.client.Util;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.*;
@@ -38,6 +39,56 @@ public class RaytraceUtils extends Util {
         final Vec3 vec31 = Entity.getVectorForRotation(pitch, yaw);
         final Vec3 vec32 = vec3.addVector(vec31.xCoord * blockReachDistance, vec31.yCoord * blockReachDistance, vec31.zCoord * blockReachDistance);
         return mc.theWorld.rayTraceBlocks(vec3, vec32, false, false, false);
+    }
+
+    public static Entity rayTrace(final double range, final float[] rotations) {
+        if (RotationUtils.mc.objectMouseOver.entityHit != null) {
+            return RotationUtils.mc.objectMouseOver.entityHit;
+        }
+        final Vec3 vec3 = Minecraft.getMinecraft().thePlayer.getPositionEyes(1.0f);
+        final Vec3 vec4 = RotationUtils.mc.thePlayer.getVectorForRotation(rotations[1], rotations[0]);
+        final Vec3 vec5 = vec3.addVector(vec4.xCoord * range, vec4.yCoord * range, vec4.zCoord * range);
+        Entity pointedEntity = null;
+        final float f = 1.0f;
+        final List<?> list = Minecraft.getMinecraft().theWorld.getEntitiesInAABBexcluding(Minecraft.getMinecraft().getRenderViewEntity(), Minecraft.getMinecraft().getRenderViewEntity().getEntityBoundingBox().addCoord(vec4.xCoord * range, vec4.yCoord * range, vec4.zCoord * range).expand(f, f, f), Predicates.and((Predicate<? super Entity>)EntitySelectors.NOT_SPECTATING, Entity::canBeCollidedWith));
+        double d2 = range;
+        for (final Object o : list) {
+            final Entity entity1 = (Entity)o;
+            final float f2 = entity1.getCollisionBorderSize();
+            final AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand(f2, f2, f2);
+            final MovingObjectPosition movingobjectposition = axisalignedbb.calculateIntercept(vec3, vec5);
+            if (axisalignedbb.isVecInside(vec3)) {
+                if (d2 < 0.0) {
+                    continue;
+                }
+                pointedEntity = entity1;
+                d2 = 0.0;
+            }
+            else {
+                if (movingobjectposition == null) {
+                    continue;
+                }
+                final double d3 = vec3.distanceTo(movingobjectposition.hitVec);
+                if (d3 >= d2 && d2 != 0.0) {
+                    continue;
+                }
+                boolean flag2 = false;
+                if (Reflector.ForgeEntity_canRiderInteract.exists()) {
+                    flag2 = Reflector.callBoolean(entity1, Reflector.ForgeEntity_canRiderInteract, new Object[0]);
+                }
+                if (entity1 == Minecraft.getMinecraft().getRenderViewEntity().ridingEntity && !flag2) {
+                    if (d2 != 0.0) {
+                        continue;
+                    }
+                    pointedEntity = entity1;
+                }
+                else {
+                    pointedEntity = entity1;
+                    d2 = d3;
+                }
+            }
+        }
+        return pointedEntity;
     }
 
     public static MovingObjectPosition getMouseOver(float[] rotation, final double range)

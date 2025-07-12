@@ -146,6 +146,14 @@ public class MovementUtils extends Util {
                 + mc.thePlayer.motionZ * mc.thePlayer.motionZ);
     }
 
+    public static double getBaseMoveSpeed() {
+        double baseSpeed = 0.2873;
+        if (MovementUtils.mc.thePlayer.isPotionActive(Potion.moveSpeed)) {
+            baseSpeed *= 1.0 + 0.2 * (MovementUtils.mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1);
+        }
+        return baseSpeed;
+    }
+
     public static boolean isOnGround() {
         return mc.thePlayer.onGround && mc.thePlayer.isCollidedVertically;
     }
@@ -178,74 +186,57 @@ public class MovementUtils extends Util {
     }
 
     public static void silentRotationStrafe(final StrafeEvent event, final float yaw) {
-        final int dif = (int)((MathHelper.wrapAngleTo180_float(MovementUtils.mc.thePlayer.rotationYaw - yaw - 23.5f - 135.0f) + 180.0f) / 45.0f);
+        float currentFriction = event.getFriction();
+        boolean sprintWasBrokenThisTick = false;
+
+        float currentYaw = mc.thePlayer.rotationYaw;
+        float yawDifference = Math.abs(MathHelper.wrapAngleTo180_float(currentYaw - yaw));
+
+        if (mc.thePlayer.isSprinting() && mc.gameSettings.keyBindSprint.isPressed() && yawDifference > 30) {
+            mc.thePlayer.setSprinting(false);
+            mc.gameSettings.keyBindSprint.setPressed(false);
+            sprintWasBrokenThisTick = true;
+        }
+
+        final int dif = (int)((MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw - yaw - 23.5f - 135.0f) + 180.0f) / 45.0f);
         final float strafe = event.getStrafe();
         final float forward = event.getForward();
-        final float friction = event.getFriction();
+
         float calcForward = 0.0f;
         float calcStrafe = 0.0f;
+
         switch (dif) {
-            case 0: {
-                calcForward = forward;
-                calcStrafe = strafe;
-                break;
-            }
-            case 1: {
-                calcForward += forward;
-                calcStrafe -= forward;
-                calcForward += strafe;
-                calcStrafe += strafe;
-                break;
-            }
-            case 2: {
-                calcForward = strafe;
-                calcStrafe = -forward;
-                break;
-            }
-            case 3: {
-                calcForward -= forward;
-                calcStrafe -= forward;
-                calcForward += strafe;
-                calcStrafe -= strafe;
-                break;
-            }
-            case 4: {
-                calcForward = -forward;
-                calcStrafe = -strafe;
-                break;
-            }
-            case 5: {
-                calcForward -= forward;
-                calcStrafe += forward;
-                calcForward -= strafe;
-                calcStrafe -= strafe;
-                break;
-            }
-            case 6: {
-                calcForward = -strafe;
-                calcStrafe = forward;
-                break;
-            }
-            case 7: {
-                calcForward += forward;
-                calcStrafe += forward;
-                calcForward -= strafe;
-                calcStrafe += strafe;
-                break;
-            }
+            case 0: { calcForward = forward; calcStrafe = strafe; break; }
+            case 1: { calcForward += forward; calcStrafe -= forward; calcForward += strafe; calcStrafe += strafe; break; }
+            case 2: { calcForward = strafe; calcStrafe = -forward; break; }
+            case 3: { calcForward -= forward; calcStrafe -= forward; calcForward += strafe; calcStrafe -= strafe; break; }
+            case 4: { calcForward = -forward; calcStrafe = -strafe; break; }
+            case 5: { calcForward -= forward; calcStrafe += forward; calcForward -= strafe; calcStrafe -= strafe; break; }
+            case 6: { calcForward = -strafe; calcStrafe = forward; break; }
+            case 7: { calcForward += forward; calcStrafe += forward; calcForward -= strafe; calcStrafe += strafe; break; }
         }
+
         if (calcForward > 1.0f || (calcForward < 0.9f && calcForward > 0.3f) || calcForward < -1.0f || (calcForward > -0.9f && calcForward < -0.3f)) {
             calcForward *= 0.5f;
         }
         if (calcStrafe > 1.0f || (calcStrafe < 0.9f && calcStrafe > 0.3f) || calcStrafe < -1.0f || (calcStrafe > -0.9f && calcStrafe < -0.3f)) {
             calcStrafe *= 0.5f;
         }
+
         float f = calcStrafe * calcStrafe + calcForward * calcForward;
         if (f >= 1.0E-4f) {
             if ((f = MathHelper.sqrt_float(f)) < 1.0f) {
                 f = 1.0f;
             }
-            f = friction / f;
+
+            if (sprintWasBrokenThisTick) {
+                final double sprintingSpeedBPS = 5.61;
+                final double nonSprintingSpeedBPS = 4.32;
+                final double speedRatio = nonSprintingSpeedBPS / sprintingSpeedBPS;
+                currentFriction = (float)(currentFriction * speedRatio);
+            }
+
+            f = currentFriction / f;
             final float f2 = MathHelper.sin(yaw * 3.1415927f / 180.0f);
             final float f3 = MathHelper.cos(yaw * 3.1415927f / 180.0f);
             final EntityPlayerSP thePlayer = MovementUtils.mc.thePlayer;
@@ -255,151 +246,104 @@ public class MovementUtils extends Util {
         }
     }
 
+
     public static float[] handleMovementFix(final float strafe, final float forward, final float yaw, final boolean advanced) {
-        final Minecraft mc = Minecraft.getMinecraft();
-        final float diff = MathHelper.wrapAngleTo180_float(yaw - mc.thePlayer.rotationYaw);
+        final float diff = MathHelper.wrapAngleTo180_float(yaw - mc.thePlayer.rotationYaw); // Difference between intended yaw and actual player yaw
         float newForward = 0.0f;
         float newStrafe = 0.0f;
-        if (!advanced) {
-            if (diff >= 22.5 && diff < 67.5) {
+
+        if (!advanced) { // Non-advanced (simpler, angle-based) movement fix
+            if (diff >= 22.5 && diff < 67.5) { // Forward-right quadrant
                 newStrafe += strafe;
                 newForward += forward;
+                newStrafe -= forward; // Adjust strafe for forward input
+                newForward += strafe; // Adjust forward for strafe input
+            } else if (diff >= 67.5 && diff < 112.5) { // Right quadrant
                 newStrafe -= forward;
                 newForward += strafe;
-            }
-            else if (diff >= 67.5 && diff < 112.5) {
-                newStrafe -= forward;
-                newForward += strafe;
-            }
-            else if (diff >= 112.5 && diff < 157.5) {
+            } else if (diff >= 112.5 && diff < 157.5) { // Backward-right quadrant
                 newStrafe -= strafe;
                 newForward -= forward;
                 newStrafe -= forward;
                 newForward += strafe;
-            }
-            else if (diff >= 157.5 || diff <= -157.5) {
+            } else if (diff >= 157.5 || diff <= -157.5) { // Backward quadrant
                 newStrafe -= strafe;
                 newForward -= forward;
-            }
-            else if (diff > -157.5 && diff <= -112.5) {
+            } else if (diff > -157.5 && diff <= -112.5) { // Backward-left quadrant
                 newStrafe -= strafe;
                 newForward -= forward;
                 newStrafe += forward;
                 newForward -= strafe;
-            }
-            else if (diff > -112.5 && diff <= -67.5) {
+            } else if (diff > -112.5 && diff <= -67.5) { // Left quadrant
                 newStrafe += forward;
                 newForward -= strafe;
-            }
-            else if (diff > -67.5 && diff <= -22.5) {
+            } else if (diff > -67.5 && diff <= -22.5) { // Forward-left quadrant
                 newStrafe += strafe;
                 newForward += forward;
                 newStrafe += forward;
                 newForward -= strafe;
-            }
-            else {
+            } else { // Forward quadrant (or very small diff)
                 newStrafe += strafe;
                 newForward += forward;
             }
-            return new float[] { newStrafe, newForward };
+            return new float[]{newStrafe, newForward}; // Return adjusted strafe, forward
         }
-        final float baseYaw = Simp.INSTANCE.getRotationManager().isRotating() ? Simp.INSTANCE.getRotationManager().getClientYaw() : mc.thePlayer.rotationYaw;
-        double[] realMotion = getMotion(0.22, strafe, forward, baseYaw);
-        final double[] array;
-        final double[] realPos = array = new double[] { mc.thePlayer.posX, mc.thePlayer.posZ };
-        final int n = 0;
-        array[n] += realMotion[0];
-        final double[] array2 = realPos;
-        final int n2 = 1;
-        array2[n2] += realMotion[1];
-        final ArrayList<float[]> possibleForwardStrafe = new ArrayList<float[]>();
-        int i = 0;
-        boolean b = false;
-        while (!b) {
-            newForward = 0.0f;
-            newStrafe = 0.0f;
-            if (i == 0) {
-                newStrafe += strafe;
-                newForward += forward;
-                newStrafe -= forward;
-                newForward += strafe;
-                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
-            }
-            else if (i == 1) {
-                newStrafe -= forward;
-                newForward += strafe;
-                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
-            }
-            else if (i == 2) {
-                newStrafe -= strafe;
-                newForward -= forward;
-                newStrafe -= forward;
-                newForward += strafe;
-                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
-            }
-            else if (i == 3) {
-                newStrafe -= strafe;
-                newForward -= forward;
-                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
-            }
-            else if (i == 4) {
-                newStrafe -= strafe;
-                newForward -= forward;
-                newStrafe += forward;
-                newForward -= strafe;
-                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
-            }
-            else if (i == 5) {
-                newStrafe += forward;
-                newForward -= strafe;
-                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
-            }
-            else if (i == 6) {
-                newStrafe += strafe;
-                newForward += forward;
-                newStrafe += forward;
-                newForward -= strafe;
-                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
-            }
-            else {
-                newStrafe += strafe;
-                newForward += forward;
-                possibleForwardStrafe.add(new float[] { newForward, newStrafe });
-                b = true;
-            }
-            ++i;
-        }
-        double distance = 5000.0;
-        float[] floats = new float[2];
-        for (final float[] flo : possibleForwardStrafe) {
-            if (flo[0] > 1.0f) {
-                flo[0] = 1.0f;
-            }
-            else if (flo[0] < -1.0f) {
-                flo[0] = -1.0f;
-            }
-            if (flo[1] > 1.0f) {
-                flo[1] = 1.0f;
-            }
-            else if (flo[1] < -1.0f) {
-                flo[1] = -1.0f;
-            }
-            final double[] motion2;
-            final double[] motion = motion2 = getMotion(0.22, flo[1], flo[0], mc.thePlayer.rotationYaw);
-            final int n3 = 0;
-            motion2[n3] += mc.thePlayer.posX;
-            final double[] array3 = motion;
-            final int n4 = 1;
-            array3[n4] += mc.thePlayer.posZ;
-            final double diffX = Math.abs(realPos[0] - motion[0]);
-            final double diffZ = Math.abs(realPos[1] - motion[1]);
-            final double d0 = diffX * diffX + diffZ * diffZ;
-            if (d0 < distance) {
-                distance = d0;
-                floats = flo;
+
+        // Advanced movement fix (brute-force check of all input combinations)
+        // Use the intended yaw for the "real" (desired) motion calculation
+        final float intendedYawForRealMotion = Simp.INSTANCE.getRotationManager().isRotating() ? Simp.INSTANCE.getRotationManager().getClientYaw() : mc.thePlayer.rotationYaw;
+        // Use a base speed (0.22 is a common walking speed value) for comparison
+        double[] realMotion = getMotion(0.22, strafe, forward, intendedYawForRealMotion);
+
+        // Calculate the target real position based on desired motion from intended yaw
+        final double[] realPos = new double[] { mc.thePlayer.posX + realMotion[0], mc.thePlayer.posZ + realMotion[1] };
+
+        final ArrayList<float[]> possibleForwardStrafe = new ArrayList<>();
+
+        // Generate all 8 cardinal/intercardinal movement input combinations
+        // Values are [forward, strafe] for this list of possible inputs
+        possibleForwardStrafe.add(new float[] { 1.0f, 0.0f });   // W
+        possibleForwardStrafe.add(new float[] { -1.0f, 0.0f });  // S
+        possibleForwardStrafe.add(new float[] { 0.0f, 1.0f });   // A
+        possibleForwardStrafe.add(new float[] { 0.0f, -1.0f });  // D
+        possibleForwardStrafe.add(new float[] { 1.0f, 1.0f });   // WA
+        possibleForwardStrafe.add(new float[] { 1.0f, -1.0f });  // WD
+        possibleForwardStrafe.add(new float[] { -1.0f, 1.0f });  // SA
+        possibleForwardStrafe.add(new float[] { -1.0f, -1.0f }); // SD
+        // Also add no movement (for completeness, though might not be the best match usually)
+        possibleForwardStrafe.add(new float[] { 0.0f, 0.0f });
+
+
+        double minDistanceSq = Double.MAX_VALUE;
+        float[] bestFloats = new float[2]; // Stores [forward, strafe] for the best match
+
+        for (final float[] currentInputs : possibleForwardStrafe) {
+            // Clamp inputs to [-1.0, 1.0] if not already normalized
+            float currentForward = MathHelper.clamp_float(currentInputs[0], -1.0f, 1.0f);
+            float currentStrafe = MathHelper.clamp_float(currentInputs[1], -1.0f, 1.0f);
+
+            // Calculate motion for *this* input combination using player's *actual* rotationYaw
+            // This is the key: we simulate what Minecraft *would* do with these inputs given the player's server yaw
+            final double[] simulatedMotion = getMotion(0.22, currentStrafe, currentForward, mc.thePlayer.rotationYaw);
+
+            // Predict player's next position with this simulated motion
+            double simulatedPosX = mc.thePlayer.posX + simulatedMotion[0];
+            double simulatedPosZ = mc.thePlayer.posZ + simulatedMotion[1];
+
+            // Calculate squared distance between where we *want* to go (realPos - calculated using intended yaw)
+            // and where this simulated movement would take us (simulatedPosX/Z - calculated using actual server yaw)
+            final double diffX = realPos[0] - simulatedPosX;
+            final double diffZ = realPos[1] - simulatedPosZ;
+            final double distanceSq = diffX * diffX + diffZ * diffZ;
+
+            if (distanceSq < minDistanceSq) {
+                minDistanceSq = distanceSq;
+                bestFloats = new float[]{currentInputs[0], currentInputs[1]}; // Store the [forward, strafe] that gave the best match
             }
         }
-        return new float[] { floats[1], floats[0] };
+        // Return adjusted strafe, forward. Note the original code returned floats[1] (forward) then floats[0] (strafe)
+        // This suggests bestFloats stores [forward, strafe] internally and needs swapping for the return type.
+        return new float[]{bestFloats[1], bestFloats[0]}; // Return adjusted {strafe, forward}
     }
 
     public static float getDirection() {

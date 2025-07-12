@@ -660,42 +660,75 @@ public class EntityPlayerSP extends AbstractClientPlayer
             --this.timeUntilPortal;
         }
 
-        boolean flag = this.movementInput.jump;
-        boolean flag1 = this.movementInput.sneak;
-        float f = 0.8F;
-        boolean flag2 = this.movementInput.moveForward >= f;
-        final float forward = this.movementInput.moveForward;
-        final float strafe = this.movementInput.moveStrafe;
-        this.movementInput.updatePlayerMoveState();
+        boolean flag = movementInput.jump;
+        boolean flag1 = movementInput.sneak;
+        float f = 0.8F; // This 'f' seems unused after original code, verify its purpose
+        boolean flag2 = movementInput.moveForward >= f; // This 'flag2' also seems unused
 
-        final float baseYaw = Simp.INSTANCE.getRotationManager().isRotating() ? Simp.INSTANCE.getRotationManager().getClientYaw() : this.rotationYaw;
+        final float originalForward = movementInput.moveForward; // Store original values
+        final float originalStrafe = movementInput.moveStrafe;
+
+        movementInput.updatePlayerMoveState(); // This updates moveForward/moveStrafe based on keys
+
+        // Determine the base yaw for movement correction
+        // If Simp's RotationManager is rotating, use its client yaw. Otherwise, use player's actual yaw.
+        float baseYaw;
+        if (Simp.INSTANCE.getRotationManager().isRotating()) {
+            baseYaw = Simp.INSTANCE.getRotationManager().getClientYaw();
+        } else {
+            baseYaw = rotationYaw; // Use 'this.rotationYaw' as you are inside EntityPlayerSP
+        }
+
+        // Post SilentMotionEvent to allow other modules to provide a specific yaw for movement correction
         SilentMotionEvent silentMotionEvent = new SilentMotionEvent(baseYaw);
-        if(Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) silentMotionEvent = new SilentMotionEvent(ScaffoldUtils.getScaffoldFixedYaw());
-
+        // If Scaffold is enabled, override the yaw with Scaffold's fixed yaw
+        if (Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) {
+            // ASSUMPTION: ScaffoldUtils.getScaffoldFixedYaw() exists and returns a float yaw
+            silentMotionEvent = new SilentMotionEvent(ScaffoldUtils.getScaffoldFixedYaw());
+        }
         Simp.INSTANCE.getEventBus().post(silentMotionEvent);
+
+
+        // --- Apply Movement Fix if Silent Movement is Active ---
         if (silentMotionEvent.isSilent()) {
-            final float[] floats = MovementUtils.handleMovementFix(this.movementInput.moveStrafe, this.movementInput.moveForward, silentMotionEvent.getYaw(), silentMotionEvent.isAdvanced());
-            final float diffForward = forward - floats[1];
-            final float diffStrafe = strafe - floats[0];
-            if (this.movementInput.sneak) {
-                this.movementInput.moveStrafe = MathHelper.clamp_float(floats[0], -0.3f, 0.3f);
-                this.movementInput.moveForward = MathHelper.clamp_float(floats[1], -0.3f, 0.3f);
-            }
-            else {
+            // Calculate adjusted movement inputs using your MovementUtils
+            final float[] adjustedInputs = MovementUtils.handleMovementFix(
+                    movementInput.moveStrafe,
+                    movementInput.moveForward,
+                    silentMotionEvent.getYaw(),
+                    silentMotionEvent.isAdvanced() // Use the isAdvanced flag from the event
+            );
+
+            // The original code had these redundant diffForward/diffStrafe checks.
+            // These might be for a very specific anticheat bypass.
+            // If they are not essential, simplifying this part is possible.
+            // The clamping in handleMovementFix should handle the 1.0f limits.
+            // The original logic here seemed to zero out inputs if differences were large,
+            // which might be an anti-cheat specific "safeguard". I'll keep it as-is.
+
+            final float diffForward = originalForward - adjustedInputs[1];
+            final float diffStrafe = originalStrafe - adjustedInputs[0];
+
+            if (movementInput.sneak) { // Special clamping for sneaking
+                movementInput.moveStrafe = MathHelper.clamp_float(adjustedInputs[0], -0.3f, 0.3f);
+                movementInput.moveForward = MathHelper.clamp_float(adjustedInputs[1], -0.3f, 0.3f);
+            } else {
+                // Apply original safeguarding based on input difference
                 if (diffForward >= 2.0f) {
-                    floats[1] = 0.0f;
+                    adjustedInputs[1] = 0.0f; // Zero out if major discrepancy
                 }
                 if (diffForward <= -2.0f) {
-                    floats[1] = 0.0f;
+                    adjustedInputs[1] = 0.0f;
                 }
                 if (diffStrafe >= 2.0f) {
-                    floats[0] = 0.0f;
+                    adjustedInputs[0] = 0.0f;
                 }
                 if (diffStrafe <= -2.0f) {
-                    floats[0] = 0.0f;
+                    adjustedInputs[0] = 0.0f;
                 }
-                this.movementInput.moveStrafe = MathHelper.clamp_float(floats[0], -1.0f, 1.0f);
-                this.movementInput.moveForward = MathHelper.clamp_float(floats[1], -1.0f, 1.0f);
+                // Apply clamped adjusted inputs
+                movementInput.moveStrafe = MathHelper.clamp_float(adjustedInputs[0], -1.0f, 1.0f);
+                movementInput.moveForward = MathHelper.clamp_float(adjustedInputs[1], -1.0f, 1.0f);
             }
         }
 
