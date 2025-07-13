@@ -30,7 +30,8 @@ public final class MovementFixModule extends Module {
         }
         if (scaffoldProperty.getValue() && Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) {
             if (Simp.INSTANCE.getRotationManager().isRotating()) {
-                MovementUtils.handleMovementFix(event.getStrafe(), event.getForward(), event.getYaw(), true);
+                event.setCancelled();
+                MovementUtils.silentRotationStrafe(event, Simp.INSTANCE.getRotationManager().getClientYaw());
             }
         }
         if(killAuraProperty.getValue() && Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && KillAuraModule.target != null) {
