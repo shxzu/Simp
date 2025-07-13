@@ -32,13 +32,13 @@ public final class SprintModule extends Module {
                 float currentYaw = mc.thePlayer.rotationYaw;
                 float yawDifference = Math.abs(MathHelper.wrapAngleTo180_float(currentYaw - Simp.INSTANCE.getRotationManager().getClientYaw()));
                 if(!omniProperty.getValue()) {
-                        if (!mc.gameSettings.keyBindSprint.isPressed() && !(yawDifference > 30) && !Simp.INSTANCE.getRotationManager().isRotating() && KillAuraModule.target == null) {
+                        if (!(yawDifference > 30) && !Simp.INSTANCE.getRotationManager().isRotating() && KillAuraModule.target == null) {
                             mc.gameSettings.keyBindSprint.setPressed(true);
                         } else {
                             mc.gameSettings.keyBindSprint.setPressed(false);
                         }
                     } else {
-                        if (!mc.thePlayer.isSprinting() && !(yawDifference > 30) && !Simp.INSTANCE.getRotationManager().isRotating() && KillAuraModule.target == null) {
+                        if (!(yawDifference > 30) && !Simp.INSTANCE.getRotationManager().isRotating() && KillAuraModule.target == null) {
                             mc.thePlayer.setSprinting(canSprint);
                         } else {
                             mc.thePlayer.setSprinting(false);
