@@ -5,10 +5,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.concurrent.CompletableFuture;
 
 import cc.simp.ui.alt.AltManagerGui;
 import cc.simp.ui.alt.SessionChanger;
 import cc.simp.utils.client.font.FontManager;
+import net.minecraft.util.Session;
 import org.lwjgl.input.Keyboard;
 
 import fr.litarvan.openauth.microsoft.MicrosoftAuthResult;
@@ -24,21 +26,21 @@ import net.minecraft.client.resources.I18n;
 
 public class GuiLoginMicrosoft extends GuiScreen {
     private GuiTextField username, password;
-    
+
     public String statusString;
-    
-    public static boolean didTheThing = false; 
+
+    public static boolean didTheThing = false;
 
     @Override
     protected void actionPerformed(final GuiButton button) {
         if (button.id == 0) {
-            if(this.username.getText().equals("")) {
-            	MicrosoftAuthenticator authenticator = new MicrosoftAuthenticator();
-            	try {
-					MicrosoftAuthResult result = authenticator.loginWithWebview();
-				} catch (MicrosoftAuthenticationException e) {
-					e.printStackTrace();
-				}
+            if (this.username.getText().equals("")) {
+                MicrosoftAuthenticator authenticator = new MicrosoftAuthenticator();
+                try {
+                    MicrosoftAuthResult result = authenticator.loginWithWebview();
+                } catch (MicrosoftAuthenticationException e) {
+                    e.printStackTrace();
+                }
             } else {
                 SessionChanger.getInstance().setUserMicrosoft(this.username.getText(), this.password.getText());
                 saveAltToFile(this.username.getText(), this.password.getText(), Minecraft.getMinecraft().session.getUsername());
@@ -47,17 +49,17 @@ public class GuiLoginMicrosoft extends GuiScreen {
 
         }
         if (button.id == 1) {
-        	 try {
-                 MicrosoftOAuthTranslation microsoftOAuth2 = new MicrosoftOAuthTranslation();
-                 microsoftOAuth2.getAccessToken();
-                 didTheThing = true;
-             } catch (Exception exception) {
-                 exception.printStackTrace();
-             }
-
+            Session auth = this.createMsSession();
+            if (auth == null) {
+                didTheThing = false;
+                return;
+            } else {
+                mc.session = auth;
+                didTheThing = true;
+            }
         }
         if (button.id == 2) {
-        	this.mc.displayGuiScreen(new AltManagerGui());
+            this.mc.displayGuiScreen(new AltManagerGui());
         }
     }
 
@@ -68,11 +70,11 @@ public class GuiLoginMicrosoft extends GuiScreen {
         this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
         this.username.drawTextBox();
         this.password.drawTextBox();
-        GuiLoginMicrosoft.drawCustomCenteredString(FontManager.TAHOMA, statusString, (int)(this.width / 2), (int)(sr.getScaledHeight() / 2 - 65), -1);
-        if(!didTheThing) {
-        	statusString = "Email & Password";
+        GuiLoginMicrosoft.drawCustomCenteredString(FontManager.TAHOMA, statusString, (int) (this.width / 2), (int) (sr.getScaledHeight() / 2 - 65), -1);
+        if (!didTheThing) {
+            statusString = "Email & Password";
         } else {
-        	statusString = "Logged Into: " + Minecraft.getMinecraft().session.getUsername() + "!";
+            statusString = "Logged Into: " + Minecraft.getMinecraft().session.getUsername() + "!";
         }
         super.drawScreen(x2, y2, z2);
     }
@@ -94,8 +96,7 @@ public class GuiLoginMicrosoft extends GuiScreen {
     protected void keyTyped(final char character, final int key) {
         try {
             super.keyTyped(character, key);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         if (character == '\t' && !this.username.isFocused()) {
@@ -109,11 +110,11 @@ public class GuiLoginMicrosoft extends GuiScreen {
         if (character == '\r') {
             this.actionPerformed(this.buttonList.get(0));
         }
-        
-        if(didTheThing) {
-        	didTheThing = false;
+
+        if (didTheThing) {
+            didTheThing = false;
         }
-        
+
         this.username.textboxKeyTyped(character, key);
         this.password.textboxKeyTyped(character, key);
     }
@@ -122,8 +123,7 @@ public class GuiLoginMicrosoft extends GuiScreen {
     protected void mouseClicked(final int x2, final int y2, final int button) {
         try {
             super.mouseClicked(x2, y2, button);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         this.username.mouseClicked(x2, y2, button);
@@ -141,9 +141,9 @@ public class GuiLoginMicrosoft extends GuiScreen {
         this.username.updateCursorCounter();
         this.password.updateCursorCounter();
     }
-    
+
     private void saveAltToFile(String email, String password, String sessionUsername) {
-    	File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
         File file = new File(dir, "alts.txt");
 
         try (FileWriter fw = new FileWriter(file, true); PrintWriter out = new PrintWriter(fw)) {
@@ -151,6 +151,31 @@ public class GuiLoginMicrosoft extends GuiScreen {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void saveAltToFileOAuth(String username, String uuid, String token) {
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File file = new File(dir, "alts.txt");
+
+        try (FileWriter fw = new FileWriter(file, true); PrintWriter out = new PrintWriter(fw)) {
+            out.println("microsoftOAuth|" + username + "|" + uuid + "|" + token);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Session createMsSession() {
+        statusString = "Awaiting for response for Microsoft login...";
+        CompletableFuture<Session> future = new CompletableFuture<>();
+        MicrosoftOAuthTranslation.getRefreshToken(refreshToken -> {
+            if (refreshToken != null) {
+                System.out.println("Refresh token: " + refreshToken);
+                MicrosoftOAuthTranslation.LoginData login = MicrosoftOAuthTranslation.login(refreshToken);
+                future.complete(new Session(login.username, login.uuid, login.mcToken, "microsoft"));
+                saveAltToFileOAuth(login.username, login.uuid, login.mcToken);
+            }
+        });
+        return future.join();
     }
 
 }

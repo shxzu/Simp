@@ -9,9 +9,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 import cc.simp.ui.alt.microsoft.GuiLoginMicrosoft;
 import cc.simp.utils.client.font.FontManager;
+import net.minecraft.util.Session;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -261,6 +263,15 @@ public class AltManagerGui extends GuiScreen {
                 String email = parts[2];
                 String pass = parts[3];
                 SessionChanger.getInstance().setUserMicrosoft(email, pass);
+            }
+        } else if (alt.startsWith("microsoftOAuth|")) {
+            String[] parts = alt.split("\\|");
+            CompletableFuture<Session> future = new CompletableFuture<>();
+            if (parts.length >= 3) {
+                String username = parts[1];
+                String uuid = parts[2];
+                String token = parts[3];
+                future.complete(new Session(username, uuid, token, "microsoft"));
             }
         }
     }
