@@ -11,6 +11,7 @@ import cc.simp.property.Property;
 import cc.simp.utils.client.mc.MovementUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
+import net.minecraft.util.MathHelper;
 
 import static cc.simp.utils.client.Util.mc;
 
@@ -28,10 +29,20 @@ public final class SprintModule extends Module {
         final boolean canSprint = MovementUtils.canSprint(omniProperty.getValue());
         if (MovementUtils.isMoving()) {
             if (!Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) {
-                    if(!omniProperty.getValue()) {
-                        mc.gameSettings.keyBindSprint.setPressed(true);
+                float currentYaw = mc.thePlayer.rotationYaw;
+                float yawDifference = Math.abs(MathHelper.wrapAngleTo180_float(currentYaw - Simp.INSTANCE.getRotationManager().getClientYaw()));
+                if(!omniProperty.getValue()) {
+                        if (!mc.gameSettings.keyBindSprint.isPressed() && !(yawDifference > 30) && !Simp.INSTANCE.getRotationManager().isRotating() && KillAuraModule.target == null) {
+                            mc.gameSettings.keyBindSprint.setPressed(true);
+                        } else {
+                            mc.gameSettings.keyBindSprint.setPressed(false);
+                        }
                     } else {
-                        mc.thePlayer.setSprinting(canSprint);
+                        if (!mc.thePlayer.isSprinting() && !(yawDifference > 30) && !Simp.INSTANCE.getRotationManager().isRotating() && KillAuraModule.target == null) {
+                            mc.thePlayer.setSprinting(canSprint);
+                        } else {
+                            mc.thePlayer.setSprinting(false);
+                        }
                     }
             } else mc.gameSettings.keyBindSprint.setPressed(false);
         }
