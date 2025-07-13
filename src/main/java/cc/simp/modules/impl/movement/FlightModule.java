@@ -11,17 +11,20 @@ import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
 import cc.simp.utils.client.mc.MovementUtils;
+import cc.simp.utils.client.misc.MathUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
-import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
+import net.minecraft.network.play.client.*;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static cc.simp.utils.client.Util.mc;
 
@@ -77,13 +80,13 @@ public final class FlightModule extends Module {
                 }
                 break;
             case HYPIXEL_PREDICTION:
-                if (mc.thePlayer == null) {
-                    return;
+                if(mc.thePlayer.ticksExisted % 4 == 0) {
+                    mc.thePlayer.motionY = 0.42;
+                    mc.timer.timerSpeed = 0.6f;
+                } else {
+                    mc.thePlayer.motionY = 0.0;
+                    mc.timer.timerSpeed = 1.0f;
                 }
-                mc.thePlayer.capabilities.isFlying = true;
-                mc.thePlayer.motionY = 0.0;
-                MovementUtils.strafe(0.3f);
-                mc.timer.timerSpeed = 0.3f;
                 break;
         }
        
@@ -96,11 +99,14 @@ public final class FlightModule extends Module {
                 if (mc.thePlayer == null || mc.theWorld == null) {
                     return;
                 }
-                Packet<?> packet = event.getPacket();
-                if (packet instanceof C0FPacketConfirmTransaction) {
-                    mc.getNetHandler().sendPacket(new C0FPacketConfirmTransaction(((C0FPacketConfirmTransaction)packet).getWindowId(), (short)Math.abs(((C0FPacketConfirmTransaction)packet).getUid()), false));
-                    event.setCancelled();
-                }
+//                if (event.getPacket() instanceof C0FPacketConfirmTransaction) {
+//                    List<Packet<?>> packetArrayList = new ArrayList<>();
+//                    packetArrayList.add(event.getPacket());
+//                    if (packetArrayList.size() > MathUtils.getRandomNumberUsingNextInt(1300, 2500)) {
+//                        mc.getNetHandler().sendPacket(packetArrayList.get(MathUtils.getRandomNumberUsingNextInt(8, 100)));
+//                    }
+//                    event.setCancelled(true);
+//                }
                 break;
         }
     };
