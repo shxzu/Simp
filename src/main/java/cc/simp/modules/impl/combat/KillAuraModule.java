@@ -42,7 +42,7 @@ public final class KillAuraModule extends Module {
     public static EnumProperty<AutoBlockType> autoBlockTypeProperty = new EnumProperty<>("Auto Block", AutoBlockType.FAKE);
     private final Property<Boolean> legitTimingsProperty = new Property<>("Legit Timings", true);
     private final Property<Boolean> keepSprintProperty = new Property<>("Keep Sprint", false);
-    private final Property<Boolean> sprintRotationFixProperty = new Property<>("Sprint Rotation Fix", false, () -> keepSprintProperty.getValue() == false && !Simp.INSTANCE.getModuleManager().getModule(MovementFixModule.class).isEnabled() && !MovementFixModule.killAuraProperty.getValue());
+    private final Property<Boolean> sprintRotationFixProperty = new Property<>("Sprint Rotation Fix", false, () -> keepSprintProperty.getValue() == false);
 
     public enum TargetType {
         PLAYERS,
@@ -179,7 +179,7 @@ public final class KillAuraModule extends Module {
         }
 
         if (keepSprintProperty.getValue()) {
-            mc.thePlayer.setSprinting(MovementUtils.canSprint(Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).omniProperty.getValue()));
+            mc.thePlayer.setSprinting(MovementUtils.canSprint(true));
         }
 
         this.setRandomDelay();
@@ -198,7 +198,7 @@ public final class KillAuraModule extends Module {
         }
 
         if (keepSprintProperty.getValue()) {
-            mc.thePlayer.setSprinting(MovementUtils.canSprint(Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).omniProperty.getValue()));
+            mc.thePlayer.setSprinting(MovementUtils.canSprint(true));
         }
 
         this.setRandomDelay();

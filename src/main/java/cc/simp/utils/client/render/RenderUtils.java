@@ -5,6 +5,8 @@ import cc.simp.utils.client.misc.MathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
@@ -231,6 +233,61 @@ public class RenderUtils extends Util {
                 ((r & 0xFF) << 16) |
                 ((g & 0xFF) << 8) |
                 (b & 0xFF);
+    }
+
+    public static void start3D() {
+        GL11.glDisable((int)3553);
+        GL11.glDisable((int)2929);
+        GL11.glBlendFunc((int)770, (int)771);
+        GL11.glEnable((int)3042);
+        GL11.glDepthMask((boolean)false);
+        GlStateManager.disableCull();
+    }
+
+    public static void stop3D() {
+        GlStateManager.enableCull();
+        GL11.glEnable((int)3553);
+        GL11.glEnable((int)2929);
+        GL11.glDepthMask((boolean)true);
+        GL11.glDisable((int)3042);
+    }
+
+    public static void renderBoundingBox(AxisAlignedBB aabb, Color color, float alpha) {
+        AxisAlignedBB bb = aabb;
+        GlStateManager.pushMatrix();
+        GLUtils.startBlend();
+        GLUtils.setup2DRendering();
+        GLUtils.enableCaps(GL_BLEND, GL_POINT_SMOOTH, GL_POLYGON_SMOOTH, GL_LINE_SMOOTH);
+
+        glLineWidth(5);
+        float actualAlpha = .3f * alpha;
+        glColor4f(color.getRed(), color.getGreen(), color.getBlue(), actualAlpha);
+        color(color.getRGB(), actualAlpha);
+        RenderGlobal.renderCustomBoundingBox(bb, true, false);
+
+        GLUtils.disableCaps();
+        GLUtils.endBlend();
+        GLUtils.end2DRendering();
+
+        GlStateManager.popMatrix();
+    }
+
+    public static void renderFilledBoundingBox(AxisAlignedBB aabb, Color color, float alpha) {
+        AxisAlignedBB bb = aabb;
+        GlStateManager.pushMatrix();
+        GLUtils.setup2DRendering();
+        GLUtils.enableCaps(GL_BLEND, GL_POINT_SMOOTH, GL_POLYGON_SMOOTH, GL_LINE_SMOOTH);
+
+        glLineWidth(5);
+        float actualAlpha = .3f * alpha;
+        glColor4f(color.getRed(), color.getGreen(), color.getBlue(), actualAlpha);
+        color(color.getRGB(), actualAlpha);
+        RenderGlobal.renderCustomBoundingBox(bb, true, true);
+
+        GLUtils.disableCaps();
+        GLUtils.end2DRendering();
+
+        GlStateManager.popMatrix();
     }
 
 }

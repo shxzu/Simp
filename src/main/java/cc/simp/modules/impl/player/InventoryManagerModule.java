@@ -49,7 +49,7 @@ import static cc.simp.utils.client.Util.mc;
 @ModuleInfo(label = "Inventory Manager", category = ModuleCategory.PLAYER)
 public class InventoryManagerModule extends Module {
 
-    // woah I pasted from xiva again!!
+    // woah I pasted from tenacity again!!
 
     private static final DoubleProperty delay = new DoubleProperty("Delay", 75, 0, 500, 25);
     private static final Property<Boolean> onlyWhileNotMoving = new Property<>("Only Not While Moving", true);
@@ -603,6 +603,7 @@ public class InventoryManagerModule extends Module {
     }
 
     private boolean equipBest(int armorSlot) {
+        if(isReady()) {
         int equipSlot = -1, currProt = -1;
         ItemArmor currItem = null;
         ItemStack slotStack = mc.thePlayer.inventoryContainer.getSlot(armorSlot).getStack();
@@ -628,10 +629,13 @@ public class InventoryManagerModule extends Module {
         if (equipSlot != -1) {
             if (slotStack != null) {
                 InventoryUtils.drop(armorSlot);
+                timer.reset();
             } else {
                 InventoryUtils.click(equipSlot, 0, true);
+                timer.reset();
             }
             return true;
+        }
         }
         return false;
     }

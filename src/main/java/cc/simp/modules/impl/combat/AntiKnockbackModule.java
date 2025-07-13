@@ -100,13 +100,11 @@ public final class AntiKnockbackModule extends Module {
                         mc.thePlayer.motionX *= 0.8;
                         mc.thePlayer.motionZ *= 0.8;
                     }
-                    Logger.chatPrint(String.format("Reduced %.3f %.3f", mc.thePlayer.motionX, mc.thePlayer.motionZ));
                 }
             } else {
                 if (event.target instanceof EntityLivingBase && mc.thePlayer.hurtTime > 0) {
                     mc.thePlayer.motionX *= 0.6;
                     mc.thePlayer.motionZ *= 0.6;
-                    Logger.chatPrint(String.format("Reduced %.3f %.3f", mc.thePlayer.motionX, mc.thePlayer.motionZ));
                 }
             }
         }

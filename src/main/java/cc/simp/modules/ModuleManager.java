@@ -4,6 +4,7 @@ import cc.simp.Simp;
 import cc.simp.event.impl.KeyPressEvent;
 import cc.simp.modules.impl.client.*;
 import cc.simp.modules.impl.combat.AntiKnockbackModule;
+import cc.simp.modules.impl.combat.BackTrackModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.combat.TimerRangeModule;
 import cc.simp.modules.impl.movement.*;
@@ -30,6 +31,7 @@ public final class ModuleManager {
                 // COMBAT
                 new KillAuraModule(),
                 new AntiKnockbackModule(),
+                new BackTrackModule(),
                 new TimerRangeModule(),
 
                 // PLAYER

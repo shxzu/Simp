@@ -2669,6 +2669,97 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
         tessellator.draw();
     }
 
+    public static void renderCustomBoundingBox(AxisAlignedBB bb, boolean outline, boolean filled) {
+        if (outline) {
+            GL11.glBegin(GL11.GL_LINE_STRIP);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
+            GL11.glEnd();
+            GL11.glBegin(GL11.GL_LINE_STRIP);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+            GL11.glEnd();
+            GL11.glBegin(GL11.GL_LINES);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+            GL11.glEnd();
+        }
+        if (filled) {
+            GL11.glBegin(7);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+            GL11.glEnd();
+            GL11.glBegin(7);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+            GL11.glEnd();
+            GL11.glBegin(7);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+            GL11.glEnd();
+            GL11.glBegin(7);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
+            GL11.glEnd();
+            GL11.glBegin(7);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+            GL11.glEnd();
+            GL11.glBegin(7);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.maxZ);
+            GL11.glVertex3d(bb.minX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.minX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.minZ);
+            GL11.glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+            GL11.glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+            GL11.glEnd();
+        }
+    }
+
     private void markBlocksForUpdate(int x1, int y1, int z1, int x2, int y2, int z2)
     {
         this.viewFrustum.markBlocksForUpdate(x1, y1, z1, x2, y2, z2);

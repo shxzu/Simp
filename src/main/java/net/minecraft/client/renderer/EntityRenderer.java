@@ -1,5 +1,7 @@
 package net.minecraft.client.renderer;
 
+import cc.simp.Simp;
+import cc.simp.event.impl.render.Render3DEvent;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.gson.JsonSyntaxException;
@@ -1805,6 +1807,8 @@ public class EntityRenderer implements IResourceManagerReloadListener
             this.mc.mcProfiler.endStartSection("aboveClouds");
             this.renderCloudsCheck(renderglobal, partialTicks, pass);
         }
+
+        Simp.INSTANCE.getEventBus().post(new Render3DEvent(partialTicks));
 
         if (Reflector.ForgeHooksClient_dispatchRenderLast.exists())
         {

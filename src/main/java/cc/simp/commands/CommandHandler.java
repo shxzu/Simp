@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-// pasted from xiva. hell their both my clients anyway.
+// pasted from (my lawyer redacted bc it's a private client). hell their both my clients anyway.
 
 public class CommandHandler {
     public static String CHAT_PREFIX = ".";

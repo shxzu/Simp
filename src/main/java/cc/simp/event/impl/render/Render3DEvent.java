@@ -5,15 +5,10 @@ import cc.simp.event.Event;
 
 public final class Render3DEvent implements Event {
 
-    private final ScaledResolution scaledResolution;
     private final float partialTicks;
-    public Render3DEvent(ScaledResolution scaledResolution, float partialTicks) {
-        this.scaledResolution = scaledResolution;
-        this.partialTicks = partialTicks;
-    }
 
-    public ScaledResolution getScaledResolution() {
-        return scaledResolution;
+    public Render3DEvent(float partialTicks) {
+        this.partialTicks = partialTicks;
     }
 
     public float getPartialTicks() {

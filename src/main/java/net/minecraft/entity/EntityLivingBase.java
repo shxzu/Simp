@@ -112,6 +112,9 @@ public abstract class EntityLivingBase extends Entity
     protected double newPosX;
     protected double newPosY;
     protected double newPosZ;
+    public double realPosX;
+    public double realPosY;
+    public double realPosZ;
     protected double newRotationYaw;
     protected double newRotationPitch;
     private boolean potionsNeedUpdate = true;

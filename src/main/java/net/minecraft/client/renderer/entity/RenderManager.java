@@ -112,9 +112,9 @@ public class RenderManager
     private Map<String, RenderPlayer> skinMap = Maps.<String, RenderPlayer>newHashMap();
     private RenderPlayer playerRenderer;
     private MinecraftFontRenderer textRenderer;
-    private double renderPosX;
-    private double renderPosY;
-    private double renderPosZ;
+    public static double renderPosX;
+    public static double renderPosY;
+    public static double renderPosZ;
     public TextureManager renderEngine;
     public World worldObj;
     public Entity livingPlayer;
