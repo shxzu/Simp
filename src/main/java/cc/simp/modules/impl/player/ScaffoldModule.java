@@ -14,12 +14,13 @@ import cc.simp.property.impl.Representation;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.client.mc.MovementUtils;
 import cc.simp.utils.client.mc.RaytraceUtils;
-import cc.simp.utils.client.mc.RotationUtils;
 import cc.simp.utils.client.mc.ScaffoldUtils;
 import cc.simp.utils.client.misc.MathUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
+import lombok.NonNull;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.MathHelper;
 
 import static cc.simp.utils.client.Util.mc;
 
@@ -27,6 +28,7 @@ import static cc.simp.utils.client.Util.mc;
 public final class ScaffoldModule extends Module {
 
     public static EnumProperty<Rotations> rotationsProperty = new EnumProperty<>("Rotations", Rotations.NORMAL);
+    public static Property<Boolean> tellyStaticPitchProperty = new Property<>("Static Telly Pitch", true, () -> rotationsProperty.getValue() == Rotations.TELLY);
     public DoubleProperty delayProperty = new DoubleProperty("Delay", 25, 0, 100, 5);
     public static Property<Boolean> sprintProperty = new Property<>("Sprint", false);
     public static Property<Boolean> raytraceProperty = new Property<>("Raytrace", true);
@@ -39,10 +41,10 @@ public final class ScaffoldModule extends Module {
     public static Property<Boolean> allowSpeedModuleProperty = new Property<>("Allow Speed", false);
     public static Property<Boolean> autoF5Property = new Property<>("Auto F5", false);
 
-    private enum Rotations {
+    public enum Rotations {
         NORMAL,
         STATIC,
-        HYPIXEL,
+        TELLY,
         VULCAN;
     }
 
@@ -60,6 +62,7 @@ public final class ScaffoldModule extends Module {
     private int blocksPlacedCount;
     private int previousHotbarSlot;
     private boolean isSneakingNow = false;
+    private static boolean canPlaceTellyBlock = true;
 
     public ScaffoldModule() {
         setSuffixListener(rotationsProperty);
@@ -103,7 +106,7 @@ public final class ScaffoldModule extends Module {
 
             // Rotations Setup
             float[] rotations = getRotationsForPlacement();
-            Simp.INSTANCE.getRotationManager().rotateToward(rotations[0], rotations[1], ClientRotationsModule.rotSpeed.getValue().floatValue());
+            Simp.INSTANCE.getRotationManager().rotateToward(rotations[0], rotations[1], ClientRotationsModule.rotationSpeedProperty.getValue().floatValue());
             rotatedThisTick = true;
 
             // Place The Block
@@ -122,8 +125,12 @@ public final class ScaffoldModule extends Module {
     private void handleSprint() {
         if (sprintProperty.getValue()) {
             mc.thePlayer.setSprinting(MovementUtils.canSprint(true));
-        } else {
+        } else if(rotationsProperty.getValue() != Rotations.TELLY) {
+            mc.gameSettings.keyBindSprint.setPressed(false);
             mc.thePlayer.setSprinting(false);
+        } else if (rotationsProperty.getValue() == Rotations.TELLY) {
+            final float yawDiff = Math.abs(MathUtils.getAngleDifference((float)MovementUtils.getDirection(), Simp.INSTANCE.getRotationManager().getClientYaw()));
+            mc.thePlayer.setSprinting(yawDiff < 30.0f);
         }
     }
 
@@ -134,9 +141,9 @@ public final class ScaffoldModule extends Module {
     }
 
     private void handleAutoJump() {
-        if (autoJumpProperty.getValue() && !mc.gameSettings.keyBindJump.isPressed() && mc.thePlayer.onGround
-                && MovementUtils.isMoving()) {
-            mc.thePlayer.jump();
+        if (autoJumpProperty.getValue()) {
+            mc.gameSettings.keyBindJump.setPressed(mc.thePlayer.onGround
+                    && MovementUtils.isMoving());
         }
     }
 
@@ -163,19 +170,6 @@ public final class ScaffoldModule extends Module {
                     }
                 }
                 break;
-            case HYPIXEL:
-                rotations[0] = ScaffoldUtils.getHypixelNCPYaw();
-                rotations[1] = NORMAL_PITCH;
-                if (currentBlockCache != null) {
-                    for (float possiblePitch = 90; possiblePitch > 30; possiblePitch -= possiblePitch > (mc.thePlayer
-                            .isPotionActive(Potion.moveSpeed) ? 60 : 80) ? 1 : 10) {
-                        if (RaytraceUtils.isOnBlock(currentBlockCache.getFacing(), currentBlockCache.getPosition(), true, mc.playerController.getBlockReachDistance(),
-                                rotations[0], possiblePitch)) {
-                            rotations[1] = possiblePitch;
-                        }
-                    }
-                }
-                break;
             case STATIC:
                 rotations[0] = MovementUtils.getDirection() - 180;
                 rotations[1] = NORMAL_PITCH;
@@ -184,12 +178,31 @@ public final class ScaffoldModule extends Module {
                 rotations[0] = MovementUtils.getDirection() - 180;
                 rotations[1] = VULCAN_PITCH;
                 break;
+            case TELLY:
+                if (mc.thePlayer.offGroundTicks >= 7 || mc.thePlayer.onGround) {
+                    rotations[0] = MovementUtils.getDirection() - 180;
+                    rotations[1] = NORMAL_PITCH;
+                    canPlaceTellyBlock = true;
+                    if (currentBlockCache != null) {
+                        for (float possiblePitch = 90; possiblePitch > 30; possiblePitch -= possiblePitch > (mc.thePlayer
+                                .isPotionActive(Potion.moveSpeed) ? 60 : 80) ? 1 : 10) {
+                            if (RaytraceUtils.isOnBlock(currentBlockCache.getFacing(), currentBlockCache.getPosition(), true, mc.playerController.getBlockReachDistance(),
+                                    rotations[0], possiblePitch) && !tellyStaticPitchProperty.getValue()) {
+                                rotations[1] = possiblePitch;
+                            }
+                        }
+                    }
+                } else {
+                    rotations[0] = mc.thePlayer.rotationYaw;
+                    canPlaceTellyBlock = false;
+                }
+                break;
         }
         return rotations;
     }
 
     private void placeBlock() {
-        if (currentBlockCache == null || mc.thePlayer.inventory.currentItem == -1 || !rotatedThisTick) {
+        if (currentBlockCache == null || mc.thePlayer.inventory.currentItem == -1 || !rotatedThisTick || !canPlaceTellyBlock) {
             return;
         }
 
@@ -288,6 +301,11 @@ public final class ScaffoldModule extends Module {
             mc.gameSettings.keyBindSneak.setPressed(false);
             isSneakingNow = false;
         }
+
+        if (autoJumpProperty.getValue() && mc.gameSettings.keyBindJump.isKeyDown()) {
+            mc.gameSettings.keyBindJump.setPressed(false);
+        }
+
         rotatedThisTick = false;
         blocksPlacedCount = 0;
         currentBlockCache = null;

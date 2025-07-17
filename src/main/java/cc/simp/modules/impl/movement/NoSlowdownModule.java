@@ -3,6 +3,7 @@ package cc.simp.modules.impl.movement;
 import cc.simp.event.impl.player.ItemSlowdownEvent;
 import cc.simp.event.impl.player.MotionEvent;
 import cc.simp.event.impl.player.MoveEvent;
+import cc.simp.event.impl.world.WorldLoadEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -35,6 +36,8 @@ public final class NoSlowdownModule extends Module {
         setSuffixListener(noSlowModeProperty);
     }
 
+    public static boolean canNoSlow;
+
     @EventLink
     public final Listener<MotionEvent> motionEventListener = event -> {
         switch (noSlowModeProperty.getValue()) {
@@ -50,11 +53,24 @@ public final class NoSlowdownModule extends Module {
     @EventLink
     public final Listener<ItemSlowdownEvent> itemSlowdownEventListener = event -> {
         if (noSlowModeProperty.getValue() == Mode.INTAVE && mc.thePlayer.isUsingItem() && mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemFood) {
+            canNoSlow = true;
             event.setCancelled();
-        }
+        } else canNoSlow = false;
         if (noSlowModeProperty.getValue() == Mode.VANILLA && mc.thePlayer.isUsingItem() && !(mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBow)) {
+            canNoSlow = true;
             event.setCancelled();
-        }
+        } else canNoSlow = false;
     };
+
+    @EventLink
+    public final Listener<WorldLoadEvent> worldLoadEventListener = event -> {
+        canNoSlow = false;
+    };
+
+    @Override
+    public void onDisable() {
+        canNoSlow = false;
+        super.onDisable();
+    }
 
 }

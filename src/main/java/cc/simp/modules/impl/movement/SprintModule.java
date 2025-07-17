@@ -31,16 +31,16 @@ public final class SprintModule extends Module {
             if (!Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) {
                 float currentYaw = mc.thePlayer.rotationYaw;
                 float yawDifference = Math.abs(MathHelper.wrapAngleTo180_float(currentYaw - Simp.INSTANCE.getRotationManager().getClientYaw()));
-                if(!omniProperty.getValue()) {
+                if (!omniProperty.getValue()) {
                     mc.gameSettings.keyBindSprint.setPressed(!(yawDifference > 30));
+                } else {
+                    if (!(yawDifference > 30)) {
+                        mc.thePlayer.setSprinting(canSprint);
                     } else {
-                        if (!(yawDifference > 30)) {
-                            mc.thePlayer.setSprinting(canSprint);
-                        } else {
-                            mc.thePlayer.setSprinting(false);
-                        }
+                        mc.thePlayer.setSprinting(false);
                     }
-            } else mc.gameSettings.keyBindSprint.setPressed(false);
+                }
+            }
         }
     };
 }

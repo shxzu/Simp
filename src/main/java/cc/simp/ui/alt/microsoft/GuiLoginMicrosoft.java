@@ -27,7 +27,7 @@ import net.minecraft.client.resources.I18n;
 public class GuiLoginMicrosoft extends GuiScreen {
     private GuiTextField username, password;
 
-    public String statusString;
+    public static String statusString;
 
     public static boolean didTheThing = false;
 
@@ -164,7 +164,7 @@ public class GuiLoginMicrosoft extends GuiScreen {
         }
     }
 
-    public Session createMsSession() {
+    public static Session createMsSession() {
         statusString = "Awaiting for response for Microsoft login...";
         CompletableFuture<Session> future = new CompletableFuture<>();
         MicrosoftOAuthTranslation.getRefreshToken(refreshToken -> {
@@ -172,7 +172,6 @@ public class GuiLoginMicrosoft extends GuiScreen {
                 System.out.println("Refresh token: " + refreshToken);
                 MicrosoftOAuthTranslation.LoginData login = MicrosoftOAuthTranslation.login(refreshToken);
                 future.complete(new Session(login.username, login.uuid, login.mcToken, "microsoft"));
-                saveAltToFileOAuth(login.username, login.uuid, login.mcToken);
             }
         });
         return future.join();

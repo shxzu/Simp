@@ -82,7 +82,7 @@ public class AltManagerGui extends GuiScreen {
             String line;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
-                if (!line.isEmpty() && (line.startsWith("cracked|") || line.startsWith("microsoft|"))) {
+                if (!line.isEmpty() && (line.startsWith("cracked|") || line.startsWith("microsoft|") || line.startsWith("microsoftOAuth|"))) {
                     alts.add(line);
                 }
             }
@@ -266,12 +266,14 @@ public class AltManagerGui extends GuiScreen {
             }
         } else if (alt.startsWith("microsoftOAuth|")) {
             String[] parts = alt.split("\\|");
-            CompletableFuture<Session> future = new CompletableFuture<>();
             if (parts.length >= 3) {
                 String username = parts[1];
                 String uuid = parts[2];
                 String token = parts[3];
-                future.complete(new Session(username, uuid, token, "microsoft"));
+                Session auth = GuiLoginMicrosoft.createMsSession();
+                if (auth != null) {
+                    mc.session = auth;
+                }
             }
         }
     }

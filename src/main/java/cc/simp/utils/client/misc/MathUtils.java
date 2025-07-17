@@ -39,4 +39,8 @@ public class MathUtils extends Util {
         return origin + secureRandom.nextInt(difference);
     }
 
+    public static float getAngleDifference(final float a, final float b) {
+        return ((a - b) % 360.0f + 540.0f) % 360.0f - 180.0f;
+    }
+
 }

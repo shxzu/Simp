@@ -151,6 +151,41 @@ public class ScaffoldUtils extends Util {
         return count;
     }
 
+    public static boolean isBlockVeryCloseUnderPlayer() {
+        final double minY = mc.thePlayer.getEntityBoundingBox().minY;
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dz = -1; dz <= 1; ++dz) {
+                final double checkX = mc.thePlayer.posX + dx;
+                final double checkZ = mc.thePlayer.posZ + dz;
+                for (double offsetY = 0.0; offsetY <= 0.2; offsetY += 0.05) {
+                    final BlockPos pos = new BlockPos(Math.floor(checkX), Math.floor(minY - offsetY), Math.floor(checkZ));
+                    final Block block = mc.theWorld.getBlockState(pos).getBlock();
+                    if (block != Blocks.air) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isTellyNearEdge() {
+        final double x = mc.thePlayer.posX;
+        final double z = mc.thePlayer.posZ;
+        final int y = (int)Math.floor(mc.thePlayer.posY) - 2;
+        for (double expand = 0.15, dx = -expand; dx <= expand; dx += expand) {
+            for (double dz = -expand; dz <= expand; dz += expand) {
+                if (dx != 0.0 || dz != 0.0) {
+                    final BlockPos pos = new BlockPos(x + dx, y, z + dz);
+                    if (!mc.theWorld.getBlockState(pos).getBlock().isFullBlock()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public static boolean isBlockValid(final Block block) {
         return (block.isFullBlock() || block == Blocks.glass || block == Blocks.stained_glass) && block != Blocks.sand
                 && block != Blocks.gravel && block != Blocks.dispenser && block != Blocks.command_block

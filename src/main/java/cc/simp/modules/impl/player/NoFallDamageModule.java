@@ -77,7 +77,7 @@ public class NoFallDamageModule extends Module {
                     }
                 } else {
                     mc.thePlayer.inventory.currentItem = item;
-                    Simp.INSTANCE.getRotationManager().rotateToward(mc.thePlayer.rotationYaw, 90.0f, ClientRotationsModule.rotSpeed.getValue().floatValue());
+                    Simp.INSTANCE.getRotationManager().rotateToward(mc.thePlayer.rotationYaw, 90.0f, ClientRotationsModule.rotationSpeedProperty.getValue().floatValue());
                     canWork = true;
                     if (!mc.thePlayer.isInWater() && !mc.thePlayer.isInWeb && !pickup && mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 2.0, mc.thePlayer.posZ)).getBlock() != Blocks.water && mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 2.0, mc.thePlayer.posZ)).getBlock() != Blocks.air) {
                         mc.rightClickMouse();

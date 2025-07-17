@@ -29,6 +29,7 @@ dependencies {
     implementation "com.mojang:icu4j-core-mojang:51.2"
     implementation "org.apache.httpcomponents:httpclient:4.3.3"
     implementation "org.apache.httpcomponents:httpcore:4.3.2"
+    implementation "org.projectlombok:lombok:1.18.38"
     implementation "oshi:oshi-core:1.1"
     implementation "net.java.dev.jna:jna:3.4.0"
     implementation "net.java.dev.jna:platform:3.4.0"

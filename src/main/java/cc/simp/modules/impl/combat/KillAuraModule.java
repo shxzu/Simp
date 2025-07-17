@@ -7,7 +7,6 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.movement.MovementFixModule;
-import cc.simp.modules.impl.movement.SprintModule;
 import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.modules.impl.player.ClientRotationsModule;
 import cc.simp.property.Property;
@@ -21,14 +20,16 @@ import cc.simp.utils.client.mc.RotationUtils;
 import cc.simp.utils.client.misc.MathUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
+import lombok.NonNull;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 
 import java.util.Comparator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static cc.simp.utils.client.Util.mc;
 
@@ -39,15 +40,14 @@ public final class KillAuraModule extends Module {
     private final DoubleProperty maxAttackDelayProperty = new DoubleProperty("Max Attack Delay", 40.0, 0.0, 400.0, 1);
     public static DoubleProperty rangeProperty = new DoubleProperty("Range", 3, 3, 6, 0.1);
     private final EnumProperty<TargetType> targetTypeProperty = new EnumProperty<>("Target", TargetType.PLAYERS);
+    private final Property<Boolean> teamCheckProperty = new Property<>("Team Check", true);
     public static EnumProperty<AutoBlockType> autoBlockTypeProperty = new EnumProperty<>("Auto Block", AutoBlockType.FAKE);
     private final Property<Boolean> legitTimingsProperty = new Property<>("Legit Timings", true);
-    private final Property<Boolean> keepSprintProperty = new Property<>("Keep Sprint", false);
+    public static final Property<Boolean> keepSprintProperty = new Property<>("Keep Sprint", false);
     private final Property<Boolean> sprintRotationFixProperty = new Property<>("Sprint Rotation Fix", false, () -> keepSprintProperty.getValue() == false);
 
     public enum TargetType {
         PLAYERS,
-        MOBS,
-        ANIMALS,
         ALL
     }
 
@@ -82,7 +82,7 @@ public final class KillAuraModule extends Module {
         }
 
         if (event.isPre()) {
-            Simp.INSTANCE.getRotationManager().faceEntity(target, ClientRotationsModule.rotSpeed.getValue().floatValue());
+            Simp.INSTANCE.getRotationManager().faceEntity(target, ClientRotationsModule.rotationSpeedProperty.getValue().floatValue());
             rotated = true;
 
             if(sprintRotationFixProperty.getValue() && !keepSprintProperty.getValue() && !Simp.INSTANCE.getModuleManager().getModule(MovementFixModule.class).isEnabled() && !MovementFixModule.killAuraProperty.getValue()) {
@@ -124,13 +124,11 @@ public final class KillAuraModule extends Module {
                 entity.getDistanceToEntity(mc.thePlayer) > rangeProperty.getValue())
             return false;
 
+        if(teamCheckProperty.getValue() && inTeam(mc.thePlayer, entity)) return false;
+
         switch (targetTypeProperty.getValue()) {
             case PLAYERS:
                 return entity instanceof EntityPlayer;
-            case MOBS:
-                return entity instanceof EntityMob;
-            case ANIMALS:
-                return entity instanceof EntityAnimal;
             case ALL:
                 return true;
             default:
@@ -145,6 +143,18 @@ public final class KillAuraModule extends Module {
 
     private float[] getRotations() {
         return RotationUtils.getClosestRotations(target, 0.03f);
+    }
+
+    public static boolean inTeam(@NonNull ICommandSender entity0, @NonNull ICommandSender entity1) {
+        String s = "\u00a7" + teamColor(entity0);
+
+        return     entity0.getDisplayName().getFormattedText().contains(s)
+                && entity1.getDisplayName().getFormattedText().contains(s);
+    }
+
+    public static @NonNull String teamColor(@NonNull ICommandSender player) {
+        Matcher matcher = Pattern.compile("\u00a7(.).*\u00a7r").matcher(player.getDisplayName().getFormattedText());
+        return matcher.find() ? matcher.group(1) : "f";
     }
 
     private boolean isLookingAtEntity() {

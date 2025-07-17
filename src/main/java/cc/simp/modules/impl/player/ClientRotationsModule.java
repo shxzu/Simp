@@ -20,7 +20,7 @@ public final class ClientRotationsModule extends Module {
     private float prevHeadPitch = 0f;
     private float headPitch = 0f;
 
-    public static DoubleProperty rotSpeed = new DoubleProperty("Rotation Speed", 60.0, 0.0, 180.0, 5.0, Representation.INT);
+    public static DoubleProperty rotationSpeedProperty = new DoubleProperty("Rotation Speed", 60.0, 0.0, 180.0, 5.0, Representation.INT);
 
     public ClientRotationsModule() {
         toggle();
