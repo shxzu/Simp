@@ -28,6 +28,7 @@ import static cc.simp.utils.client.Util.mc;
 public final class ScaffoldModule extends Module {
 
     public static EnumProperty<Rotations> rotationsProperty = new EnumProperty<>("Rotations", Rotations.NORMAL);
+    public static DoubleProperty rotationSpeedProperty = new DoubleProperty("Rotation Speed", 60.0, 0.0, 180.0, 5.0, Representation.INT);
     public static Property<Boolean> tellyStaticPitchProperty = new Property<>("Static Telly Pitch", true, () -> rotationsProperty.getValue() == Rotations.TELLY);
     public DoubleProperty delayProperty = new DoubleProperty("Delay", 25, 0, 100, 5);
     public static Property<Boolean> sprintProperty = new Property<>("Sprint", false);
@@ -106,7 +107,7 @@ public final class ScaffoldModule extends Module {
 
             // Rotations Setup
             float[] rotations = getRotationsForPlacement();
-            Simp.INSTANCE.getRotationManager().rotateToward(rotations[0], rotations[1], ClientRotationsModule.rotationSpeedProperty.getValue().floatValue());
+            Simp.INSTANCE.getRotationManager().rotateToward(rotations[0], rotations[1], rotationSpeedProperty.getValue().floatValue());
             rotatedThisTick = true;
 
             // Place The Block
