@@ -10,47 +10,26 @@ import net.minecraft.item.*;
 
 public class InventoryUtils extends Util {
 
-    public static int getItemSlot(Item item) {
-        for (int i = 0; i < 9; i++) {
-            ItemStack is = mc.thePlayer.inventory.mainInventory[i];
-            if (is != null && is.getItem() == item) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    public static int getSwordSlot() {
-        for (int i = 0; i < 9; i++) {
-            ItemStack is = mc.thePlayer.inventory.mainInventory[i];
-            if (is != null && is.getItem() instanceof ItemSword) {
-                return i;
-            }
-        }
-        return -1;
-    }
     public static int getBucketSlot() {
-        for (int i = 0; i < 9; i++) {
-            ItemStack is = mc.thePlayer.inventory.mainInventory[i];
-            if (is != null && is.getItem() instanceof ItemBucket) {
-                Item item = is.getItem();
-
-                if (item == Items.water_bucket) {
-                    return i;
+        int item = -1;
+        for (int i = 36; i < 45; ++i) {
+            if (InventoryUtils.mc.thePlayer.inventoryContainer.getSlot(i).getStack() != null && InventoryUtils.mc.thePlayer.inventoryContainer.getSlot(i).getStack().getItem() instanceof ItemBucket) {
+                Item itemSlot = (ItemBucket)InventoryUtils.mc.thePlayer.inventoryContainer.getSlot(i).getStack().getItem();
+                if (itemSlot == Items.water_bucket) {
+                    item = i - 36;
                 }
             }
         }
-        return mc.thePlayer.inventory.currentItem;
+        return item;
     }
 
     public static int getCobwebSlot() {
         int item = -1;
-        int stacksize = 0;
         for (int i = 36; i < 45; ++i) {
             if (InventoryUtils.mc.thePlayer.inventoryContainer.getSlot(i).getStack() != null && InventoryUtils.mc.thePlayer.inventoryContainer.getSlot(i).getStack().getItem() instanceof ItemBlock) {
                 final ItemBlock block = (ItemBlock)InventoryUtils.mc.thePlayer.inventoryContainer.getSlot(i).getStack().getItem();
                 if (block.getBlock() == Blocks.web) {
                     item = i - 36;
-                    stacksize = InventoryUtils.mc.thePlayer.inventoryContainer.getSlot(i).getStack().stackSize;
                 }
             }
         }

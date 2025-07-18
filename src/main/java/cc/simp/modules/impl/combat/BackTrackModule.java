@@ -72,7 +72,7 @@ public class BackTrackModule extends Module {
     private final Listener<PacketReceiveEvent> packetReceiveEventListener = e -> {
         EntityLivingBase entityLivingBase;
         Entity entity;
-        Packet<INetHandlerPlayClient> packet;
+        S14PacketEntity packet;
         if (mc.thePlayer == null || mc.theWorld == null || !Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() || mc.getNetHandler().getNetworkManager().getNetHandler() == null) {
             incomingPackets.clear();
             return;
@@ -91,12 +91,12 @@ public class BackTrackModule extends Module {
 
         if (e.getPacket() instanceof S14PacketEntity) {
             packet = (S14PacketEntity) e.getPacket();
-            entity = mc.theWorld.getEntityByID(((S14PacketEntity) packet).entityId);
+            entity = mc.theWorld.getEntityByID(packet.entityId);
             if (entity instanceof EntityLivingBase) {
                 entityLivingBase = (EntityLivingBase) entity;
-                entityLivingBase.realPosX += ((S14PacketEntity) packet).func_149062_c();
-                entityLivingBase.realPosY += ((S14PacketEntity) packet).func_149061_d();
-                entityLivingBase.realPosZ += ((S14PacketEntity) packet).func_149064_e();
+                entityLivingBase.realPosX += packet.func_149062_c();
+                entityLivingBase.realPosY += packet.func_149061_d();
+                entityLivingBase.realPosZ += packet.func_149064_e();
             }
         }
         if (e.getPacket() instanceof S18PacketEntityTeleport) {
@@ -212,7 +212,7 @@ public class BackTrackModule extends Module {
             double z = d3 - RenderManager.renderPosZ;
             GlStateManager.pushMatrix();
             RenderUtils.start3D();
-            RenderUtils.renderFilledBoundingBox(new AxisAlignedBB(x - (double) (entity.width / 2.0f), y, z - (double) (entity.width / 2.0f), x + (double) (entity.width / 2.0f), y + (double) entity.height, z + (double) (entity.width / 2.0f)), color, 0.7f);
+            RenderUtils.renderBoundingBox(new AxisAlignedBB(x - (double) (entity.width / 2.0f), y, z - (double) (entity.width / 2.0f), x + (double) (entity.width / 2.0f), y + (double) entity.height, z + (double) (entity.width / 2.0f)), color, 145);
             RenderUtils.stop3D();
             GlStateManager.popMatrix();
         }

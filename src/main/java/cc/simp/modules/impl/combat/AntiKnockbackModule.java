@@ -71,13 +71,9 @@ public final class AntiKnockbackModule extends Module {
             if (mc.thePlayer.hurtTime >= 8) {
                 mc.gameSettings.keyBindJump.setPressed(true);
             }
-            if (mc.thePlayer.hurtTime >= 7) {
-                mc.gameSettings.keyBindForward.setPressed(true);
-            } else if (mc.thePlayer.hurtTime >= 4) {
+            if (mc.thePlayer.hurtTime >= 4) {
                 mc.gameSettings.keyBindJump.setPressed(false);
-                mc.gameSettings.keyBindForward.setPressed(false);
             } else if (mc.thePlayer.hurtTime > 1) {
-                mc.gameSettings.keyBindForward.setPressed(GameSettings.isKeyDown(mc.gameSettings.keyBindForward));
                 mc.gameSettings.keyBindJump.setPressed(GameSettings.isKeyDown(mc.gameSettings.keyBindJump));
             }
         }

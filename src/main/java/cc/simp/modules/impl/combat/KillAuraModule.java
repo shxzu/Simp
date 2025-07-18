@@ -21,12 +21,15 @@ import cc.simp.utils.misc.MathUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import lombok.NonNull;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MovingObjectPosition;
 
 import java.util.Comparator;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,18 +40,23 @@ public final class KillAuraModule extends Module {
 
     private final DoubleProperty minAttackDelayProperty = new DoubleProperty("Min Attack Delay", 40.0, 0.0, 400.0, 1);
     private final DoubleProperty maxAttackDelayProperty = new DoubleProperty("Max Attack Delay", 40.0, 0.0, 400.0, 1);
-    public static DoubleProperty rotationSpeedProperty = new DoubleProperty("Rotation Speed", 60.0, 0.0, 180.0, 5.0, Representation.INT);
     public static DoubleProperty attackRangeProperty = new DoubleProperty("Attack Range", 3, 3, 6, 0.1);
-    private final EnumProperty<TargetType> targetTypeProperty = new EnumProperty<>("Target", TargetType.PLAYERS);
+    public static DoubleProperty rotationSpeedProperty = new DoubleProperty("Rotation Speed", 60.0, 0.0, 180.0, 5.0);
+    private final EnumProperty<TargetType> targetTypeProperty = new EnumProperty<>("Targets Type", TargetType.ADAPTIVE);
     private final Property<Boolean> teamCheckProperty = new Property<>("Team Check", true);
     public static EnumProperty<AutoBlockType> autoBlockTypeProperty = new EnumProperty<>("Auto Block", AutoBlockType.FAKE);
     private final Property<Boolean> legitTimingsProperty = new Property<>("Legit Timings", true);
     public static final Property<Boolean> keepSprintProperty = new Property<>("Keep Sprint", false);
     public static final Property<Boolean> advancedSettingsProperty = new Property<>("Advanced Settings", false);
+    public static final Property<Boolean> sprintResetProperty = new Property<>("Reset Sprint", false, advancedSettingsProperty::getValue);
+    public static DoubleProperty succeededHitsRateProperty = new DoubleProperty("Succeeded Hits Rate", 100, advancedSettingsProperty::getValue, 0, 100, 1);
     public static final Property<Boolean> noiseProperty = new Property<>("Noise", false, advancedSettingsProperty::getValue);
     public static DoubleProperty noiseValueProperty = new DoubleProperty("Noise Value", 2, () -> advancedSettingsProperty.getValue() && noiseProperty.getValue(), 0, 5, 0.5);
+    public static final Property<Boolean> hitSelectProperty = new Property<>("Hit Select", false, advancedSettingsProperty::getValue);
+    public static DoubleProperty hitSelectHurtTicksProperty = new DoubleProperty("Hit Select Hurt Ticks", 5, () -> advancedSettingsProperty.getValue() && hitSelectProperty.getValue(), 0, 10, 1);
 
     public enum TargetType {
+        ADAPTIVE,
         PLAYERS,
         ALL
     }
@@ -68,9 +76,16 @@ public final class KillAuraModule extends Module {
     private boolean rotated = false;
     private Timer hitTimeHelper = new Timer();
     public static boolean autoBlocking = false;
+    private static boolean canAttack;
+    private static boolean activated = false;
 
     @EventLink
     public final Listener<MotionEvent> motionEventListener = event -> {
+
+        if (target == null) {
+            if(canAttack) canAttack = false;
+            if(activated) activated = false;
+        }
 
         if (target == null && autoBlocking) {
             autoBlocking = false;
@@ -84,7 +99,7 @@ public final class KillAuraModule extends Module {
         }
 
         if (event.isPre()) {
-            if(!noiseProperty.getValue() && !advancedSettingsProperty.getValue()) {
+            if (!noiseProperty.getValue() && !advancedSettingsProperty.getValue()) {
                 Simp.INSTANCE.getRotationManager().faceEntity(target, rotationSpeedProperty.getValue().floatValue());
             } else {
                 Simp.INSTANCE.getRotationManager().faceEntity(target, rotationSpeedProperty.getValue().floatValue(), noiseValueProperty.getValue().floatValue());
@@ -94,6 +109,16 @@ public final class KillAuraModule extends Module {
             if (!legitTimingsProperty.getValue() && target != null) {
                 this.autoBlock();
                 this.attack();
+            }
+
+            if (sprintResetProperty.getValue()) {
+                if (mc.thePlayer.hurtTime >= 7) {
+                    mc.gameSettings.keyBindForward.setPressed(true);
+                } else if (mc.thePlayer.hurtTime >= 4) {
+                    mc.gameSettings.keyBindForward.setPressed(false);
+                } else if (mc.thePlayer.hurtTime > 1) {
+                    mc.gameSettings.keyBindForward.setPressed(GameSettings.isKeyDown(mc.gameSettings.keyBindForward));
+                }
             }
         }
     };
@@ -113,11 +138,12 @@ public final class KillAuraModule extends Module {
 
     @EventLink
     public final Listener<AttackSlowdownEvent> attackSlowdownEventListener = event -> {
-        if(keepSprintProperty.getValue()) {
+        if (keepSprintProperty.getValue()) {
             event.setSprint(true);
             event.setSlowDown(1.0);
         }
     };
+
 
     private void updateTarget() {
         target = mc.theWorld.loadedEntityList.stream()
@@ -134,9 +160,11 @@ public final class KillAuraModule extends Module {
                 entity.getDistanceToEntity(mc.thePlayer) > attackRangeProperty.getValue())
             return false;
 
-        if(teamCheckProperty.getValue() && inTeam(mc.thePlayer, entity)) return false;
+        if (teamCheckProperty.getValue() && inTeam(mc.thePlayer, entity)) return false;
 
         switch (targetTypeProperty.getValue()) {
+            case ADAPTIVE:
+                return entity instanceof EntityPlayer || entity instanceof EntityMob;
             case PLAYERS:
                 return entity instanceof EntityPlayer;
             case ALL:
@@ -151,14 +179,10 @@ public final class KillAuraModule extends Module {
                 target.getDistanceToEntity(mc.thePlayer) <= attackRangeProperty.getValue();
     }
 
-    private float[] getRotations() {
-        return RotationUtils.getClosestRotations(target, 0.03f);
-    }
-
     public static boolean inTeam(@NonNull ICommandSender entity0, @NonNull ICommandSender entity1) {
         String s = "\u00a7" + teamColor(entity0);
 
-        return     entity0.getDisplayName().getFormattedText().contains(s)
+        return entity0.getDisplayName().getFormattedText().contains(s)
                 && entity1.getDisplayName().getFormattedText().contains(s);
     }
 
@@ -167,18 +191,9 @@ public final class KillAuraModule extends Module {
         return matcher.find() ? matcher.group(1) : "f";
     }
 
-    private boolean isLookingAtEntity() {
-        boolean notOnEntity;
-        if (target == null)
-            return false;
-        MovingObjectPosition hitResult = RaytraceUtils.getMouseOver(getRotations(), attackRangeProperty.getValue());
-        if (hitResult == null) return false;
-        notOnEntity = hitResult.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY
-                || hitResult.entityHit != target;
-        if (hitResult.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && hitResult.entityHit == target) {
-            mc.objectMouseOver = hitResult;
-        }
-        return !notOnEntity;
+    private boolean hitChance(final int hitChance) {
+        final int randomNumber = ThreadLocalRandom.current().nextInt(0, 99);
+        return randomNumber <= hitChance;
     }
 
     private void setRandomDelay() {
@@ -193,13 +208,11 @@ public final class KillAuraModule extends Module {
 
     private void attack() {
         if (legitTimingsProperty.getValue()) return;
+        if (!this.hitChance(succeededHitsRateProperty.getValue().intValue()) && advancedSettingsProperty.getValue()) return;
+        if (hitSelectProperty.getValue() && !hasTargetAttacked()) return;
         if (this.hitTimeHelper.hasTimeElapsed(this.randomDelay)) {
             mc.thePlayer.swingItem();
             mc.playerController.attackEntity(mc.thePlayer, target);
-        }
-
-        if (keepSprintProperty.getValue()) {
-            mc.thePlayer.setSprinting(MovementUtils.canSprint(true));
         }
 
         this.setRandomDelay();
@@ -208,13 +221,11 @@ public final class KillAuraModule extends Module {
 
     private void legitAttack() {
         if (!legitTimingsProperty.getValue()) return;
+        if (!this.hitChance(succeededHitsRateProperty.getValue().intValue()) && advancedSettingsProperty.getValue()) return;
+        if (hitSelectProperty.getValue() && !hasTargetAttacked()) return;
 
         if (this.hitTimeHelper.hasTimeElapsed(this.randomDelay)) {
             mc.clickMouse();
-        }
-
-        if (keepSprintProperty.getValue()) {
-            mc.thePlayer.setSprinting(MovementUtils.canSprint(true));
         }
 
         this.setRandomDelay();
@@ -240,8 +251,28 @@ public final class KillAuraModule extends Module {
 
     }
 
+    private static boolean hasTargetAttacked() {
+        if (target instanceof EntityPlayer) {
+            if (mc.thePlayer.hurtTime == hitSelectHurtTicksProperty.getValue().intValue() && !activated) {
+                canAttack = true;
+                activated = true;
+            } else {
+                canAttack = false;
+            }
+        } else {
+            activated = false;
+            canAttack = true;
+        }
+
+        if (activated && mc.thePlayer.hurtTime != hitSelectHurtTicksProperty.getValue().intValue()) {
+            canAttack = true;
+        }
+        return canAttack;
+    }
+
     @Override
     public void onDisable() {
+        canAttack = true;
         hitTimeHelper.reset();
         if (autoBlocking) {
             autoBlocking = false;

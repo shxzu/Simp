@@ -251,27 +251,7 @@ public class RenderUtils extends Util {
         GL11.glDisable((int)3042);
     }
 
-    public static void renderBoundingBox(AxisAlignedBB aabb, Color color, float alpha) {
-        AxisAlignedBB bb = aabb;
-        GlStateManager.pushMatrix();
-        GLUtils.startBlend();
-        GLUtils.setup2DRendering();
-        GLUtils.enableCaps(GL_BLEND, GL_POINT_SMOOTH, GL_POLYGON_SMOOTH, GL_LINE_SMOOTH);
-
-        glLineWidth(5);
-        float actualAlpha = .3f * alpha;
-        glColor4f(color.getRed(), color.getGreen(), color.getBlue(), actualAlpha);
-        color(color.getRGB(), actualAlpha);
-        RenderGlobal.renderCustomBoundingBox(bb, true, false);
-
-        GLUtils.disableCaps();
-        GLUtils.endBlend();
-        GLUtils.end2DRendering();
-
-        GlStateManager.popMatrix();
-    }
-
-    public static void renderFilledBoundingBox(AxisAlignedBB aabb, Color color, float alpha) {
+    public static void renderBoundingBox(AxisAlignedBB aabb, Color color, int alpha) {
         AxisAlignedBB bb = aabb;
         GlStateManager.pushMatrix();
         GLUtils.setup2DRendering();
@@ -281,7 +261,7 @@ public class RenderUtils extends Util {
         float actualAlpha = .3f * alpha;
         glColor4f(color.getRed(), color.getGreen(), color.getBlue(), actualAlpha);
         color(color.getRGB(), actualAlpha);
-        RenderGlobal.renderCustomBoundingBox(bb, true, true);
+        RenderGlobal.drawOutlinedBoundingBox(bb, color.getRed(), color.getGreen(), color.getBlue(), alpha);
 
         GLUtils.disableCaps();
         GLUtils.end2DRendering();
