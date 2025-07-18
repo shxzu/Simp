@@ -2,23 +2,16 @@ package cc.simp.modules.impl.render;
 
 import cc.simp.event.impl.packet.PacketReceiveEvent;
 import cc.simp.event.impl.player.MotionEvent;
-import cc.simp.event.impl.player.MoveEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.property.Property;
-import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.utils.client.mc.MovementUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.network.play.server.S03PacketTimeUpdate;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
-import net.minecraft.world.storage.WorldInfo;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Ambience", category = ModuleCategory.RENDER)
 public final class AmbienceModule extends Module {

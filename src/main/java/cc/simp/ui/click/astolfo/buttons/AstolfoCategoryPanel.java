@@ -3,8 +3,8 @@ package cc.simp.ui.click.astolfo.buttons;
 import cc.simp.Simp;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
-import cc.simp.utils.client.font.FontManager;
-import cc.simp.utils.client.render.RenderUtils;
+import cc.simp.utils.font.FontManager;
+import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.gui.Gui;
 
 import java.awt.*;

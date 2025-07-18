@@ -1,6 +1,6 @@
-package cc.simp.utils.client.misc;
+package cc.simp.utils.misc;
 
-import cc.simp.utils.client.Util;
+import cc.simp.utils.Util;
 
 public class StringUtils extends Util {
     public static String upperSnakeCaseToPascal(String s) {

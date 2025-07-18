@@ -1,6 +1,5 @@
 package cc.simp.modules.impl.player;
 
-import cc.simp.Simp;
 import cc.simp.event.impl.player.MotionEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
@@ -8,8 +7,8 @@ import cc.simp.modules.ModuleInfo;
 import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.utils.client.Timer;
-import cc.simp.utils.client.misc.MathUtils;
+import cc.simp.utils.Timer;
+import cc.simp.utils.misc.MathUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.gui.inventory.GuiChest;
@@ -20,10 +19,9 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.init.Items;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Chest Stealer", category = ModuleCategory.PLAYER)
 public final class ChestStealerModule extends Module {

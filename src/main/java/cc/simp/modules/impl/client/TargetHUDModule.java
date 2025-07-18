@@ -20,7 +20,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 import static net.minecraft.client.gui.Gui.drawRect;
 
 @ModuleInfo(label = "Target HUD", category = ModuleCategory.CLIENT, description = "Displays information about the current target of KillAura")

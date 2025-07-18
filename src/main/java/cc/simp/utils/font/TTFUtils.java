@@ -1,6 +1,6 @@
-package cc.simp.utils.client.font;
+package cc.simp.utils.font;
 
-import cc.simp.utils.client.Util;
+import cc.simp.utils.Util;
 import net.minecraft.util.ResourceLocation;
 
 import java.awt.*;

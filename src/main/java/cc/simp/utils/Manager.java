@@ -1,4 +1,4 @@
-package cc.simp.utils.client;
+package cc.simp.utils;
 
 import java.util.ArrayList;
 import java.util.List;

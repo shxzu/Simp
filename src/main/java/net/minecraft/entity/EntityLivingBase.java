@@ -1,14 +1,12 @@
 package net.minecraft.entity;
 
 import cc.simp.Simp;
-import cc.simp.event.impl.player.JumpEvent;
 import cc.simp.event.impl.player.PreUpdateEvent;
 import cc.simp.managers.RotationManager;
-import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.movement.MovementFixModule;
 import cc.simp.modules.impl.movement.SprintModule;
 import cc.simp.modules.impl.player.ClientRotationsModule;
-import cc.simp.utils.client.mc.MovementUtils;
+import cc.simp.utils.mc.MovementUtils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
@@ -61,7 +59,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 public abstract class EntityLivingBase extends Entity
 {

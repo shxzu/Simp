@@ -3,30 +3,23 @@ package cc.simp.modules.impl.movement;
 import cc.simp.event.impl.packet.PacketSendEvent;
 import cc.simp.event.impl.player.BlockCollideEvent;
 import cc.simp.event.impl.player.MotionEvent;
-import cc.simp.event.impl.player.StrafeEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.utils.client.mc.MovementUtils;
-import cc.simp.utils.client.misc.MathUtils;
+import cc.simp.utils.mc.MovementUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.*;
-import net.minecraft.potion.Potion;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Flight", category = ModuleCategory.MOVEMENT)
 public final class FlightModule extends Module {

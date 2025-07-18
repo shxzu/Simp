@@ -3,7 +3,7 @@ package cc.simp.event.impl.render;
 import cc.simp.event.Event;
 import net.minecraft.client.gui.ScaledResolution;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 public final class Render2DEvent implements Event {
 

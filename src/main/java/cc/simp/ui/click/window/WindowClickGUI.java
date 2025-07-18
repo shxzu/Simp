@@ -6,17 +6,14 @@ import cc.simp.modules.ModuleCategory;
 import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.utils.client.Logger;
-import cc.simp.utils.client.render.RenderUtils;
+import cc.simp.utils.Logger;
+import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11; // Required for more advanced rendering like rounded rects
 
 import java.awt.*;
 import java.io.IOException;

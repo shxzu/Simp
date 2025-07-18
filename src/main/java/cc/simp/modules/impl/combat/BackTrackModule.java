@@ -2,7 +2,6 @@ package cc.simp.modules.impl.combat;
 
 import cc.simp.Simp;
 import cc.simp.event.CancellableEvent;
-import cc.simp.event.Event;
 import cc.simp.event.impl.packet.PacketReceiveEvent;
 import cc.simp.event.impl.packet.PacketSendEvent;
 import cc.simp.event.impl.player.PreUpdateEvent;
@@ -13,8 +12,8 @@ import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
-import cc.simp.utils.client.Timer;
-import cc.simp.utils.client.render.RenderUtils;
+import cc.simp.utils.Timer;
+import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -36,7 +35,7 @@ import net.minecraft.util.Vec3;
 import java.awt.*;
 import java.util.*;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Back Track", category = ModuleCategory.COMBAT)
 public class BackTrackModule extends Module {

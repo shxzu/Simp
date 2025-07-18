@@ -1,11 +1,9 @@
-package cc.simp.utils.client.mc;
+package cc.simp.utils.mc;
 
 import cc.simp.Simp;
 import cc.simp.event.impl.player.MotionEvent;
 import cc.simp.event.impl.player.StrafeEvent;
-import cc.simp.modules.impl.player.ScaffoldModule;
-import cc.simp.utils.client.Util;
-import net.minecraft.client.Minecraft;
+import cc.simp.utils.Util;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;

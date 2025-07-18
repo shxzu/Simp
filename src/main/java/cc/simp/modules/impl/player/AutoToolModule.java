@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.util.BlockPos;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Auto Tool", category = ModuleCategory.PLAYER)
 public class AutoToolModule extends Module {

@@ -1,20 +1,17 @@
-package cc.simp.utils.client.mc;
+package cc.simp.utils.mc;
 
 import cc.simp.Simp;
 import cc.simp.modules.impl.player.ScaffoldModule;
-import cc.simp.utils.client.Logger;
-import cc.simp.utils.client.Util;
+import cc.simp.utils.Logger;
+import cc.simp.utils.Util;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
-import net.minecraft.block.BlockSlab;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
-import org.apache.commons.lang3.RandomUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.util.Random;

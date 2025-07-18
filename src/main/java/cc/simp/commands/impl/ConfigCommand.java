@@ -3,8 +3,7 @@ package cc.simp.commands.impl;
 import cc.simp.Simp;
 import cc.simp.commands.Command;
 import cc.simp.config.Config;
-import cc.simp.utils.client.Logger;
-import net.optifine.Log;
+import cc.simp.utils.Logger;
 
 public class ConfigCommand extends Command {
 

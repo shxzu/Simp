@@ -1,6 +1,6 @@
-package cc.simp.utils.client.mc;
+package cc.simp.utils.mc;
 
-import cc.simp.utils.client.Util;
+import cc.simp.utils.Util;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;

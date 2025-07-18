@@ -3,24 +3,19 @@ package cc.simp.modules.impl.combat;
 import cc.simp.event.impl.packet.PacketReceiveEvent;
 import cc.simp.event.impl.player.AttackEvent;
 import cc.simp.event.impl.player.MotionEvent;
-import cc.simp.event.impl.player.MoveEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.modules.impl.client.FontManagerModule;
-import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
 import cc.simp.property.impl.Representation;
-import cc.simp.utils.client.Logger;
-import cc.simp.utils.client.mc.MovementUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Anti Knockback", category = ModuleCategory.COMBAT)
 public final class AntiKnockbackModule extends Module {

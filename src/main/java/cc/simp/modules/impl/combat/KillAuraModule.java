@@ -12,12 +12,12 @@ import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
 import cc.simp.property.impl.Representation;
-import cc.simp.utils.client.Timer;
-import cc.simp.utils.client.mc.MovementUtils;
-import cc.simp.utils.client.mc.PlayerUtils;
-import cc.simp.utils.client.mc.RaytraceUtils;
-import cc.simp.utils.client.mc.RotationUtils;
-import cc.simp.utils.client.misc.MathUtils;
+import cc.simp.utils.Timer;
+import cc.simp.utils.mc.MovementUtils;
+import cc.simp.utils.mc.PlayerUtils;
+import cc.simp.utils.mc.RaytraceUtils;
+import cc.simp.utils.mc.RotationUtils;
+import cc.simp.utils.misc.MathUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import lombok.NonNull;
@@ -30,7 +30,7 @@ import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Kill Aura", category = ModuleCategory.COMBAT)
 public final class KillAuraModule extends Module {

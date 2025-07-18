@@ -7,12 +7,10 @@ import cc.simp.managers.RotationManager;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.property.impl.DoubleProperty;
-import cc.simp.property.impl.Representation;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Client Rotations", category = ModuleCategory.PLAYER)
 public final class ClientRotationsModule extends Module {

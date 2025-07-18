@@ -2,25 +2,21 @@ package cc.simp.modules.impl.movement;
 
 import cc.simp.event.impl.player.ItemSlowdownEvent;
 import cc.simp.event.impl.player.MotionEvent;
-import cc.simp.event.impl.player.MoveEvent;
 import cc.simp.event.impl.world.WorldLoadEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.modules.impl.render.BlockAnimationsModule;
-import cc.simp.property.Property;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.utils.client.mc.MovementUtils;
+import cc.simp.utils.mc.MovementUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemFood;
-import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "No Slowdown", category = ModuleCategory.MOVEMENT)
 public final class NoSlowdownModule extends Module {

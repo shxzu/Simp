@@ -4,7 +4,7 @@ import cc.simp.modules.Module;
 import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.utils.client.font.FontManager;
+import cc.simp.utils.font.FontManager;
 import net.minecraft.client.gui.Gui;
 
 import java.awt.*;

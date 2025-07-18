@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 
 import cc.simp.ui.alt.AltManagerGui;
 import cc.simp.ui.alt.SessionChanger;
-import cc.simp.utils.client.font.FontManager;
+import cc.simp.utils.font.FontManager;
 import net.minecraft.util.Session;
 import org.lwjgl.input.Keyboard;
 

@@ -1,4 +1,4 @@
-package cc.simp.utils.client;
+package cc.simp.utils;
 
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;

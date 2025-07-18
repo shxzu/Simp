@@ -3,7 +3,7 @@ package net.minecraft.client.renderer;
 import cc.simp.Simp;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.render.BlockAnimationsModule;
-import cc.simp.utils.client.mc.PlayerUtils;
+import cc.simp.utils.mc.PlayerUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;

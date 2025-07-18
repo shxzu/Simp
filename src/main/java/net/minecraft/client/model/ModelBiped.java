@@ -3,7 +3,7 @@ package net.minecraft.client.model;
 import cc.simp.Simp;
 import cc.simp.managers.RotationManager;
 import cc.simp.modules.impl.player.ClientRotationsModule;
-import cc.simp.utils.client.misc.MathUtils;
+import cc.simp.utils.misc.MathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;

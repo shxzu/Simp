@@ -1,4 +1,4 @@
-package cc.simp.utils.client.font;
+package cc.simp.utils.font;
 
 public interface FontRenderer {
 

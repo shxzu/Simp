@@ -1,6 +1,5 @@
-package cc.simp.utils.client.font;
+package cc.simp.utils.font;
 
-import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;

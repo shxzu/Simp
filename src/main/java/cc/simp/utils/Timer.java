@@ -1,4 +1,4 @@
-package cc.simp.utils.client;
+package cc.simp.utils;
 
 public class Timer extends Util {
 

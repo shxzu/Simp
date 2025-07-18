@@ -1,7 +1,7 @@
-package cc.simp.utils.client.render;
+package cc.simp.utils.render;
 
-import cc.simp.utils.client.Util;
-import cc.simp.utils.client.misc.MathUtils;
+import cc.simp.utils.Util;
+import cc.simp.utils.misc.MathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -12,7 +12,6 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
-import static cc.simp.utils.client.render.GLUtils.color;
 import static org.lwjgl.opengl.GL11.*;
 
 public class RenderUtils extends Util {

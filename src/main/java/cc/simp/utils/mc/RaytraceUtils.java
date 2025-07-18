@@ -1,12 +1,10 @@
-package cc.simp.utils.client.mc;
+package cc.simp.utils.mc;
 
-import cc.simp.modules.impl.combat.KillAuraModule;
-import cc.simp.utils.client.Util;
+import cc.simp.utils.Util;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.*;
 import net.optifine.reflect.Reflector;
 

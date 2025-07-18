@@ -1,6 +1,6 @@
 package cc.simp.commands;
 
-import cc.simp.utils.client.Logger;
+import cc.simp.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;

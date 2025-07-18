@@ -4,9 +4,9 @@ import cc.simp.event.impl.render.Render2DEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.utils.client.font.FontManager;
-import cc.simp.utils.client.font.TrueTypeFontRenderer;
-import cc.simp.utils.client.mc.MovementUtils;
+import cc.simp.utils.font.FontManager;
+import cc.simp.utils.font.TrueTypeFontRenderer;
+import cc.simp.utils.mc.MovementUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.Minecraft;
@@ -14,7 +14,7 @@ import net.minecraft.client.gui.MinecraftFontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.EnumChatFormatting;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Player Info", category = ModuleCategory.CLIENT)
 public final class PlayerInfoModule extends Module {

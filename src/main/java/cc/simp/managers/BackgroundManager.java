@@ -2,17 +2,15 @@ package cc.simp.managers;
 
 import cc.simp.Simp;
 import cc.simp.event.impl.packet.PacketReceiveEvent;
-import cc.simp.event.impl.player.MotionEvent;
 import cc.simp.event.impl.player.PreUpdateEvent;
 import cc.simp.event.impl.world.WorldLoadEvent;
-import cc.simp.utils.client.Timer;
+import cc.simp.utils.Timer;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 public class BackgroundManager {
 

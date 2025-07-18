@@ -1,8 +1,6 @@
 package cc.simp.modules.impl.movement;
 
 import cc.simp.Simp;
-import cc.simp.event.impl.player.PlayerInputEvent;
-import cc.simp.event.impl.player.SilentMotionEvent;
 import cc.simp.event.impl.player.StrafeEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
@@ -10,12 +8,11 @@ import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.property.Property;
-import cc.simp.utils.client.mc.MovementUtils;
-import cc.simp.utils.client.mc.RotationUtils;
+import cc.simp.utils.mc.MovementUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Movement Fix", category = ModuleCategory.MOVEMENT)
 public final class MovementFixModule extends Module {

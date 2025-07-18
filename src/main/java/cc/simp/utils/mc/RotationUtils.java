@@ -1,14 +1,11 @@
-package cc.simp.utils.client.mc;
+package cc.simp.utils.mc;
 
-import cc.simp.Simp;
-import cc.simp.modules.impl.player.ClientRotationsModule;
-import cc.simp.utils.client.Util;
+import cc.simp.utils.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
-import net.optifine.util.MathUtils;
 
 public class RotationUtils extends Util {
     public static float currentYaw = mc.thePlayer.rotationYaw;

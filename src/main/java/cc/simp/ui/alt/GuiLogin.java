@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.SecureRandom;
 
-import cc.simp.utils.client.font.FontManager;
+import cc.simp.utils.font.FontManager;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.Minecraft;

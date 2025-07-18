@@ -1,7 +1,7 @@
 package cc.simp.ui.click.astolfo.buttons;
 
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.utils.client.font.FontManager;
+import cc.simp.utils.font.FontManager;
 import net.minecraft.client.gui.Gui;
 
 import java.awt.*;

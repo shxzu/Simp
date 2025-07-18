@@ -1,4 +1,4 @@
-package cc.simp.utils.client.render;
+package cc.simp.utils.render;
 
 public final class Translate {
 

@@ -7,8 +7,8 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.utils.client.Timer;
-import cc.simp.utils.client.mc.InventoryUtils;
+import cc.simp.utils.Timer;
+import cc.simp.utils.mc.InventoryUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.init.Blocks;
@@ -16,7 +16,7 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "No Fall Damage", category = ModuleCategory.PLAYER)
 public class NoFallDamageModule extends Module {

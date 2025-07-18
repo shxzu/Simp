@@ -1,8 +1,7 @@
 package net.minecraft.client.renderer.entity;
 
-import cc.simp.event.impl.player.MotionEvent;
 import cc.simp.modules.impl.render.ChamsModule;
-import cc.simp.utils.client.render.RenderUtils;
+import cc.simp.utils.render.RenderUtils;
 import com.google.common.collect.Lists;
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -34,8 +33,6 @@ import net.optifine.shaders.Shaders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
-
-import static org.lwjgl.opengl.GL11.*;
 
 public abstract class RendererLivingEntity<T extends EntityLivingBase> extends Render<T>
 {

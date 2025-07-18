@@ -1,9 +1,9 @@
 package net.minecraft.client.gui;
 
-import cc.simp.utils.client.font.FontRenderer;
-import cc.simp.utils.client.render.ColorUtils;
-import cc.simp.utils.client.render.GLUtils;
-import cc.simp.utils.client.render.RenderUtils;
+import cc.simp.utils.font.FontRenderer;
+import cc.simp.utils.render.ColorUtils;
+import cc.simp.utils.render.GLUtils;
+import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;

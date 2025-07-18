@@ -6,8 +6,8 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.property.Property;
-import cc.simp.utils.client.font.FontManager;
-import cc.simp.utils.client.font.TrueTypeFontRenderer;
+import cc.simp.utils.font.FontManager;
+import cc.simp.utils.font.TrueTypeFontRenderer;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.gui.MinecraftFontRenderer;
@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Arraylist", category = ModuleCategory.CLIENT)
 public final class ArraylistModule extends Module {

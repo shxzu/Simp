@@ -10,10 +10,10 @@ import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
-import cc.simp.utils.client.Timer;
-import cc.simp.utils.client.mc.InventoryUtils;
-import cc.simp.utils.client.mc.MovementUtils;
-import cc.simp.utils.client.mc.ScaffoldUtils;
+import cc.simp.utils.Timer;
+import cc.simp.utils.mc.InventoryUtils;
+import cc.simp.utils.mc.MovementUtils;
+import cc.simp.utils.mc.ScaffoldUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.gui.GuiChat;
@@ -44,7 +44,7 @@ import net.minecraft.network.play.client.C16PacketClientStatus;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Inventory Manager", category = ModuleCategory.PLAYER)
 public class InventoryManagerModule extends Module {

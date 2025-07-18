@@ -1,19 +1,17 @@
 package cc.simp.modules.impl.movement;
 
 import cc.simp.event.impl.player.MotionEvent;
-import cc.simp.event.impl.player.MoveEvent;
 import cc.simp.event.impl.player.StrafeEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.property.Property;
-import cc.simp.property.impl.BooleanProperty;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.utils.client.mc.MovementUtils;
+import cc.simp.utils.mc.MovementUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 
-import static cc.simp.utils.client.Util.mc;
+import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Speed", category = ModuleCategory.MOVEMENT)
 public final class SpeedModule extends Module {

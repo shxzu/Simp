@@ -3,7 +3,7 @@ package cc.simp.ui.alt.mojang;
 import java.io.IOException;
 
 import cc.simp.ui.alt.SessionChanger;
-import cc.simp.utils.client.font.FontManager;
+import cc.simp.utils.font.FontManager;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.gui.Gui;

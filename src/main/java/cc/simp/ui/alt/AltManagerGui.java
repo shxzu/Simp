@@ -9,10 +9,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
 
 import cc.simp.ui.alt.microsoft.GuiLoginMicrosoft;
-import cc.simp.utils.client.font.FontManager;
+import cc.simp.utils.font.FontManager;
 import net.minecraft.util.Session;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
