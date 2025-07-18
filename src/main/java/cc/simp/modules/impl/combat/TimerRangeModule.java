@@ -84,7 +84,7 @@ public class TimerRangeModule extends Module {
             }
 
             // Target out of KillAura's range (if option enabled)
-            if (resetOutOfKASRProperty.getValue() && distanceToTarget > KillAuraModule.rangeProperty.getValue()) {
+            if (resetOutOfKASRProperty.getValue() && distanceToTarget > KillAuraModule.attackRangeProperty.getValue()) {
                 shouldResetTimer = true;
             }
 
@@ -110,7 +110,7 @@ public class TimerRangeModule extends Module {
                 boolean canActivateTimer = true;
 
                 // Within KillAura's horizontal range
-                if (distanceToTarget > KillAuraModule.rangeProperty.getValue()) {
+                if (distanceToTarget > KillAuraModule.attackRangeProperty.getValue()) {
                     canActivateTimer = false;
                 }
 
@@ -122,7 +122,7 @@ public class TimerRangeModule extends Module {
                 // Only when KillAura is trying to attack
                 if (onlyWhenAttackingProperty.getValue()) {
                     // This assumes currentTarget is within KA range property and not dead
-                    if (currentTarget == null || distanceToTarget > KillAuraModule.rangeProperty.getValue() || currentTarget.isDead) {
+                    if (currentTarget == null || distanceToTarget > KillAuraModule.attackRangeProperty.getValue() || currentTarget.isDead) {
                         canActivateTimer = false;
                     }
                 }
@@ -147,12 +147,12 @@ public class TimerRangeModule extends Module {
                         double clampedDistance = MathHelper.clamp_double(
                                 distanceToTarget,
                                 rangeToResetTimerProperty.getValue(),
-                                KillAuraModule.rangeProperty.getValue()
+                                KillAuraModule.attackRangeProperty.getValue()
                         );
 
                         // Normalize distance to a 0-1 scale within the active range
                         double normalizedDistance = (clampedDistance - rangeToResetTimerProperty.getValue()) /
-                                (KillAuraModule.rangeProperty.getValue() - rangeToResetTimerProperty.getValue());
+                                (KillAuraModule.attackRangeProperty.getValue() - rangeToResetTimerProperty.getValue());
 
                         // Interpolate between slowed and sped-up speeds
                         // If normalizedDistance is 0 (very close), use spedUp. If 1 (farther), use slowed.
@@ -170,7 +170,7 @@ public class TimerRangeModule extends Module {
                                 spedUpTimerSpeedProperty.getValue().floatValue());
 
                         // If rangeToResetTimerProperty and KillAura.rangeProperty are too close, avoid division by zero
-                        if (KillAuraModule.rangeProperty.getValue() - rangeToResetTimerProperty.getValue() < 0.01) {
+                        if (KillAuraModule.attackRangeProperty.getValue() - rangeToResetTimerProperty.getValue() < 0.01) {
                             targetTimerSpeed = spedUpTimerSpeedProperty.getValue().floatValue(); // Default to fast if range is negligible
                         }
                     }
