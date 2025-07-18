@@ -1,6 +1,5 @@
 # Get The Client At:
-https://github.com/shxzu/Simp/releases/tag/Release
-
+https://github.com/shxzu/Simp/releases
 # Simp Client
 Introducing Simp Client, your cutting-edge, free, and open-source Minecraft client, meticulously engineered to provide an unparalleled gameplay experience. Designed with a focus on seamless performance and a truly clean interface, Simp Client redefines what you can expect from Minecraft.
 
