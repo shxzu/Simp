@@ -32,7 +32,6 @@ public class RotationManager {
         this.clientPitch = 114514.0f;
         this.prevClientYaw = 114514.0f;
         this.prevClientPitch = 114514.0f;
-        System.out.println("Rotation Manager Started! Pasted from Aspw's Dew Client.. :p");
     }
 
     public void rotateToward(final float targetYaw, final float targetPitch, float rotationSpeed) {
@@ -82,8 +81,7 @@ public class RotationManager {
                 this.clientPitch = targetPitch;
                 this.isReturning = false;
             }
-        }
-        else if (this.mc.thePlayer != null) {
+        } else if (this.mc.thePlayer != null) {
             this.prevClientYaw = this.clientYaw;
             this.prevClientPitch = this.clientPitch;
             this.clientYaw = this.mc.thePlayer.rotationYaw;
@@ -118,7 +116,7 @@ public class RotationManager {
     private float getGCDValue() {
         final double sensitivity = this.mc.gameSettings.mouseSensitivity;
         final double f = sensitivity * 0.6000000238418579 + 0.20000000298023224;
-        return (float)(f * f * f * 8.0);
+        return (float) (f * f * f * 8.0);
     }
 
     private float applyGCDFix(final float delta) {
@@ -132,8 +130,8 @@ public class RotationManager {
     }
 
     private Vec3 getLookVecFromRotations(final float yaw, final float pitch) {
-        final float yawRad = (float)Math.toRadians(yaw);
-        final float pitchRad = (float)Math.toRadians(pitch);
+        final float yawRad = (float) Math.toRadians(yaw);
+        final float pitchRad = (float) Math.toRadians(pitch);
         final float x = -MathHelper.cos(pitchRad) * MathHelper.sin(yawRad);
         final float y = -MathHelper.sin(pitchRad);
         final float z = MathHelper.cos(pitchRad) * MathHelper.cos(yawRad);
@@ -146,19 +144,27 @@ public class RotationManager {
         final double diffY = y - eyePos.yCoord;
         final double diffZ = z - eyePos.zCoord;
         final double distXZ = MathHelper.sqrt_double(diffX * diffX + diffZ * diffZ);
-        float yaw = (float)(Math.atan2(diffZ, diffX) * 57.29577951308232) - 90.0f;
-        float pitch = (float)(-(Math.atan2(diffY, distXZ) * 57.29577951308232));
+        float yaw = (float) (Math.atan2(diffZ, diffX) * 57.29577951308232) - 90.0f;
+        float pitch = (float) (-(Math.atan2(diffY, distXZ) * 57.29577951308232));
         yaw = this.mc.thePlayer.rotationYaw + MathHelper.wrapAngleTo180_float(yaw - this.mc.thePlayer.rotationYaw);
         pitch = this.mc.thePlayer.rotationPitch + MathHelper.wrapAngleTo180_float(pitch - this.mc.thePlayer.rotationPitch);
-        return new float[] { yaw, pitch };
+        return new float[]{yaw, pitch};
     }
 
-    public float getInterpolatedYaw(final float partialTicks) {
-        return this.prevClientYaw + (this.clientYaw - this.prevClientYaw) * partialTicks;
-    }
-
-    public float getInterpolatedPitch(final float partialTicks) {
-        return this.prevClientPitch + (this.clientPitch - this.prevClientPitch) * partialTicks;
+    public boolean faceEntity(final Entity entity, final float rotationSpeed, float noiseValue) {
+        final float[] rotations = this.getRotationsTo(entity.posX, entity.posY + entity.getEyeHeight() / 2.0, entity.posZ);
+        float targetYaw = rotations[0];
+        float targetPitch = rotations[1];
+        final float currentPitch = this.getClientPitch();
+        targetYaw += (float) ((Math.random() - 0.5) * 2 * noiseValue);
+        targetPitch += (float) ((Math.random() - 0.5) * 2 * noiseValue);
+        targetPitch = Math.max(-90F, Math.min(90F, targetPitch));
+        this.rotateToward(targetYaw, currentPitch, rotationSpeed);
+        if (this.canHitEntityAtRotation(entity, this.getClientYaw(), this.getClientPitch())) {
+            return true;
+        }
+        this.rotateToward(targetYaw, targetPitch, rotationSpeed);
+        return this.canHitEntityAtRotation(entity, this.getClientYaw(), this.getClientPitch());
     }
 
     public boolean faceEntity(final Entity entity, final float rotationSpeed) {
