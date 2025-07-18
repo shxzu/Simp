@@ -7,6 +7,7 @@ import cc.simp.event.impl.game.PreClientStartupEvent;
 import cc.simp.event.impl.player.ClickEvent;
 import cc.simp.event.impl.world.TickEvent;
 import cc.simp.event.impl.world.WorldLoadEvent;
+import cc.simp.modules.impl.render.MotionBlurModule;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -176,6 +177,7 @@ import net.minecraft.world.chunk.storage.AnvilSaveConverter;
 import net.minecraft.world.storage.ISaveFormat;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
+import net.optifine.shaders.Shaders;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
@@ -1752,6 +1754,26 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
         this.mcProfiler.endSection();
         this.systemTime = getSystemTime();
+
+        try {
+            if (Minecraft.getMinecraft().thePlayer != null && Shaders.configAntialiasingLevel == 0) {
+                MotionBlurModule motionBlur = Simp.INSTANCE.getModuleManager().getModule(MotionBlurModule.class);
+                if (motionBlur.isEnabled()) {
+                    if (Minecraft.getMinecraft().entityRenderer.getShaderGroup() == null) {
+                        Minecraft.getMinecraft().entityRenderer.loadShader(new ResourceLocation("minecraft", "shaders/post/motion_blur.json"));
+                    }
+                    float uniform = 1.0f - Math.min(motionBlur.blurAmountProperty.getValue().floatValue() / 10.0f, 0.9f);
+                    if (Minecraft.getMinecraft().entityRenderer.getShaderGroup() != null) {
+                        Minecraft.getMinecraft().entityRenderer.getShaderGroup().listShaders.get(0).getShaderManager().getShaderUniform("Phosphor").set(uniform, 0.0f, 0.0f);
+                    }
+                } else if (Minecraft.getMinecraft().entityRenderer.isShaderActive()) {
+                    Minecraft.getMinecraft().entityRenderer.stopUseShader();
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void launchIntegratedServer(String folderName, String worldName, WorldSettings worldSettingsIn) {

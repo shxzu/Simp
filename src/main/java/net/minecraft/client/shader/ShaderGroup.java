@@ -29,7 +29,7 @@ public class ShaderGroup
     private Framebuffer mainFramebuffer;
     private IResourceManager resourceManager;
     private String shaderGroupName;
-    private final List<Shader> listShaders = Lists.<Shader>newArrayList();
+    public final List<Shader> listShaders = Lists.<Shader>newArrayList();
     private final Map<String, Framebuffer> mapFramebuffers = Maps.<String, Framebuffer>newHashMap();
     private final List<Framebuffer> listFramebuffers = Lists.<Framebuffer>newArrayList();
     private Matrix4f projectionMatrix;

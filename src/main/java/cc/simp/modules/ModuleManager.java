@@ -12,6 +12,7 @@ import cc.simp.modules.impl.player.*;
 import cc.simp.modules.impl.render.AmbienceModule;
 import cc.simp.modules.impl.render.BlockAnimationsModule;
 import cc.simp.modules.impl.render.ChamsModule;
+import cc.simp.modules.impl.render.MotionBlurModule;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -55,6 +56,7 @@ public final class ModuleManager {
                 new BlockAnimationsModule(),
                 new AmbienceModule(),
                 new ChamsModule(),
+                new MotionBlurModule(),
 
                 // CLIENT
                 new WatermarkModule(),
