@@ -87,3 +87,5 @@ Licensed under the [MIT License](LICENSE).
 
 ![Last Commit](https://img.shields.io/github/last-commit/shxzu/Simp)
 ![Contributors](https://img.shields.io/github/contributors/shxzu/Simp)
+
+![Alt](https://repobeats.axiom.co/api/embed/b2ed272e1429e6f0f6fe07b3047e737f32073590.svg "Repobeats analytics image")
