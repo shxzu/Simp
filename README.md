@@ -1,48 +1,89 @@
-# Get The Client At:
-https://github.com/shxzu/Simp/releases
 # Simp Client
-Introducing Simp Client, your cutting-edge, free, and open-source Minecraft client, meticulously engineered to provide an unparalleled gameplay experience. Designed with a focus on seamless performance and a truly clean interface, Simp Client redefines what you can expect from Minecraft.
 
-Unrivaled Anti-Cheat Bypass
+[![Download](https://img.shields.io/github/v/release/shxzu/Simp?style=for-the-badge)](https://github.com/shxzu/Simp/releases)
+[![License](https://img.shields.io/github/license/shxzu/Simp?style=for-the-badge)](LICENSE)
+[![Build](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)](https://github.com/shxzu/Simp)
 
-Tired of limitations? Simp Client boasts advanced bypass capabilities for prominent anti-cheat systems, including:
+**Simp Client** is a free, open-source Minecraft client built for prediction predicting.
 
-    Intave
+---
 
-    Hypixel's Watchdog
+## Features
 
-    Verus
+| Category                | Details                                                                 |
+|------------------------|-------------------------------------------------------------------------|
+| Anti-Cheat Bypass      | Does intave, watchdawg, uh like more probably                           |
+| Interface              | Minimal, clean ui with easy customization                               |
+| Open Source            | This means no bigrat.monster                                            |
 
-    And many more!
+---
 
-This allows for a smoother, less restricted experience on a wide array of servers, letting you play how you want to play without constant interruptions.
+## Download
 
-Modernized Exhibition Visuals
+Get the latest release at [Releases Page](https://github.com/shxzu/Simp/releases).
 
-Prepare to be immersed in Minecraft like never before. Simp Client integrates modernized exhibition visuals that enhance the game's aesthetics while maintaining its iconic charm. Experience:
+---
 
-    Enhanced Lighting & Shadows: See your worlds come to life with dynamic lighting and realistic shadows.
+## How to Build
 
-    Vibrant Textures & Effects: Enjoy a visually richer environment with improved textures and subtle, yet impactful, visual effects.
+**Requirements**
 
-    Optimized Rendering: Revel in stunning graphics without compromising on performance, ensuring a fluid and enjoyable visual journey.
+- Java JDK 8 or higher
+- IntelliJ IDEA (recommended)
+- Git
 
-A Clean and Intuitive Experience
+**Steps**
 
-We believe in simplicity and functionality. Simp Client is built with a user-centric design, offering:
+```bash
+git clone https://github.com/shxzu/Simp.git
+cd Simp
+```
 
-    Minimalist UI: A sleek, uncluttered interface that puts the focus on your gameplay.
+1. Open the project in IntelliJ IDEA.
+2. Create a new Run Configuration:
+   - Type: Application
+   - Main Class: (refer to screenshot below)
+   - Use classpath of module: `simp.main`
+3. Run the client.
 
-    Easy Customization: Effortlessly tailor your experience with intuitive settings and options.
-
-    Stable & Reliable: Built on a robust open-source foundation, ensuring stability and consistent performance.
-
-Whether you're looking for freedom on servers or simply a more visually appealing and polished Minecraft, Simp Client delivers a superior, open-source solution that truly stands apart.
-
-# How to setup
-Clone the repository into whatever folder you want (Mine is in my coding folder), open the project in Intellij IDEA then make a new run configuration (Application)
-and copy everything from the image below.
-
-Now you can start Minecraft!
+**Example Run Configuration(outdated)**
 
 ![run_config](https://github.com/AbyssClient/GradleMCPBase/assets/170053471/c52c81f5-d339-434b-9220-290cf5a5e019)
+
+---
+
+## Contributing
+
+please do this im lazy -puhfy
+
+| Step | Action |
+|------|--------|
+| 1    | Fork the repository |
+| 2    | Create a new branch: `git checkout -b feature/my-feature` |
+| 3    | Make your changes |
+| 4    | Commit: `git commit -m "Add my feature"` |
+| 5    | Push: `git push origin feature/my-feature` |
+| 6    | Open a pull request |
+
+---
+
+## Contact
+
+<p align="center">
+  <a href="https://discord.gg/YjU9Za5WVv">
+    <img src="https://img.shields.io/discord/123456789012345678?color=5865F2&label=Join%20Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Join our Discord" />
+  </a>
+</p>
+
+Need help, want to contribute, or just say hi? Join our Discord community or open a GitHub issue.
+
+---
+
+## License
+
+Licensed under the [MIT License](LICENSE).
+
+---
+
+![Last Commit](https://img.shields.io/github/last-commit/shxzu/Simp)
+![Contributors](https://img.shields.io/github/contributors/shxzu/Simp)
