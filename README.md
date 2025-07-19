@@ -71,7 +71,7 @@ please do this im lazy -puhfy
 
 <p align="center">
   <a href="https://discord.gg/YjU9Za5WVv">
-    <img src="https://img.shields.io/discord/123456789012345678?color=5865F2&label=Join%20Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Join our Discord" />
+    <img src="https://img.shields.io/discord/1393759278833078413?color=5865F2&label=Join%20Discord&logo=discord&logoColor=white&style=for-the-badge" />
   </a>
 </p>
 
