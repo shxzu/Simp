@@ -46,9 +46,9 @@ cd Simp
    - Use classpath of module: `simp.main`
 3. Run the client.
 
-**Example Run Configuration(outdated)**
+**Example Run Configuration**
 
-![run_config](https://github.com/AbyssClient/GradleMCPBase/assets/170053471/c52c81f5-d339-434b-9220-290cf5a5e019)
+![run_config](https://github.com/shxzu/Simp/blob/main/assets/setup.png)
 
 ---
 
