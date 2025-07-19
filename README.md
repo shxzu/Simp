@@ -40,11 +40,12 @@ cd Simp
 ```
 
 1. Open the project in IntelliJ IDEA.
-2. Create a new Run Configuration:
+2. Make a run directory
+3. Create a new Run Configuration:
    - Type: Application
    - Main Class: (refer to screenshot below)
    - Use classpath of module: `simp.main`
-3. Run the client.
+4. Run the client.
 
 **Example Run Configuration**
 
