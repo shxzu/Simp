@@ -184,10 +184,6 @@ public class RotationManager {
         return Simp.INSTANCE.getBackgroundManager().canRotation() && (this.isRotating || this.isReturning);
     }
 
-    public boolean isReturning() {
-        return Simp.INSTANCE.getBackgroundManager().canRotation() && !this.isRotating && this.isReturning;
-    }
-
     public float getClientYaw() {
         return this.clientYaw;
     }

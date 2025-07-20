@@ -3,7 +3,9 @@ package cc.simp.modules.impl.combat;
 import cc.simp.Simp;
 import cc.simp.event.impl.player.AttackSlowdownEvent;
 import cc.simp.event.impl.player.ClickEvent;
+import cc.simp.event.impl.player.ItemSlowdownEvent;
 import cc.simp.event.impl.player.MotionEvent;
+import cc.simp.event.impl.world.WorldLoadEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -13,10 +15,7 @@ import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
 import cc.simp.property.impl.Representation;
 import cc.simp.utils.Timer;
-import cc.simp.utils.mc.MovementUtils;
-import cc.simp.utils.mc.PlayerUtils;
-import cc.simp.utils.mc.RaytraceUtils;
-import cc.simp.utils.mc.RotationUtils;
+import cc.simp.utils.mc.*;
 import cc.simp.utils.misc.MathUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -26,6 +25,11 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
+import net.minecraft.network.play.client.C09PacketHeldItemChange;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 
 import java.util.Comparator;
@@ -38,11 +42,11 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Kill Aura", category = ModuleCategory.COMBAT)
 public final class KillAuraModule extends Module {
 
+    private final EnumProperty<TargetType> targetTypeProperty = new EnumProperty<>("Targets Type", TargetType.ADAPTIVE);
+    public static DoubleProperty attackRangeProperty = new DoubleProperty("Attack Range", 3, 3, 6, 0.1);
     private final DoubleProperty minAttackDelayProperty = new DoubleProperty("Min Attack Delay", 40.0, 0.0, 400.0, 1);
     private final DoubleProperty maxAttackDelayProperty = new DoubleProperty("Max Attack Delay", 40.0, 0.0, 400.0, 1);
-    public static DoubleProperty attackRangeProperty = new DoubleProperty("Attack Range", 3, 3, 6, 0.1);
     public static DoubleProperty rotationSpeedProperty = new DoubleProperty("Rotation Speed", 60.0, 0.0, 180.0, 5.0);
-    private final EnumProperty<TargetType> targetTypeProperty = new EnumProperty<>("Targets Type", TargetType.ADAPTIVE);
     private final Property<Boolean> teamCheckProperty = new Property<>("Team Check", true);
     public static EnumProperty<AutoBlockType> autoBlockTypeProperty = new EnumProperty<>("Auto Block", AutoBlockType.FAKE);
     private final Property<Boolean> legitTimingsProperty = new Property<>("Legit Timings", true);
@@ -64,6 +68,9 @@ public final class KillAuraModule extends Module {
     public enum AutoBlockType {
         NONE,
         FAKE,
+        HYPIXEL,
+        BLINK,
+        LEGIT,
         VANILLA
     }
 
@@ -74,17 +81,21 @@ public final class KillAuraModule extends Module {
     public static EntityLivingBase target;
     private long randomDelay = 100L;
     private boolean rotated = false;
-    private Timer hitTimeHelper = new Timer();
+    private final Timer hitTimeHelper = new Timer();
     public static boolean autoBlocking = false;
     private static boolean canAttack;
     private static boolean activated = false;
+    public static boolean blink = false;
+    private static boolean blinkAB = false;
+    private static boolean swapped = false;
+    private static int serverSlot = -1;
 
     @EventLink
     public final Listener<MotionEvent> motionEventListener = event -> {
 
         if (target == null) {
-            if(canAttack) canAttack = false;
-            if(activated) activated = false;
+            if (canAttack) canAttack = false;
+            if (activated) activated = false;
         }
 
         if (target == null && autoBlocking) {
@@ -99,7 +110,7 @@ public final class KillAuraModule extends Module {
         }
 
         if (event.isPre()) {
-            if (!noiseProperty.getValue() && !advancedSettingsProperty.getValue()) {
+            if (!noiseProperty.getValue() || !advancedSettingsProperty.getValue()) {
                 Simp.INSTANCE.getRotationManager().faceEntity(target, rotationSpeedProperty.getValue().floatValue());
             } else {
                 Simp.INSTANCE.getRotationManager().faceEntity(target, rotationSpeedProperty.getValue().floatValue(), noiseValueProperty.getValue().floatValue());
@@ -144,6 +155,10 @@ public final class KillAuraModule extends Module {
         }
     };
 
+    @EventLink
+    public final Listener<WorldLoadEvent> worldLoadEventListener = event -> {
+        onDisable();
+    };
 
     private void updateTarget() {
         target = mc.theWorld.loadedEntityList.stream()
@@ -208,7 +223,8 @@ public final class KillAuraModule extends Module {
 
     private void attack() {
         if (legitTimingsProperty.getValue()) return;
-        if (!this.hitChance(succeededHitsRateProperty.getValue().intValue()) && advancedSettingsProperty.getValue()) return;
+        if (!this.hitChance(succeededHitsRateProperty.getValue().intValue()) && advancedSettingsProperty.getValue())
+            return;
         if (hitSelectProperty.getValue() && !hasTargetAttacked()) return;
         if (this.hitTimeHelper.hasTimeElapsed(this.randomDelay)) {
             mc.thePlayer.swingItem();
@@ -221,7 +237,8 @@ public final class KillAuraModule extends Module {
 
     private void legitAttack() {
         if (!legitTimingsProperty.getValue()) return;
-        if (!this.hitChance(succeededHitsRateProperty.getValue().intValue()) && advancedSettingsProperty.getValue()) return;
+        if (!this.hitChance(succeededHitsRateProperty.getValue().intValue()) && advancedSettingsProperty.getValue())
+            return;
         if (hitSelectProperty.getValue() && !hasTargetAttacked()) return;
 
         if (this.hitTimeHelper.hasTimeElapsed(this.randomDelay)) {
@@ -239,12 +256,56 @@ public final class KillAuraModule extends Module {
             return;
         }
 
+        final int currentSlot = mc.thePlayer.inventory.currentItem;
+
         switch (autoBlockTypeProperty.getValue()) {
             case FAKE:
                 autoBlocking = true;
                 break;
+            case HYPIXEL:
+                if (serverSlot != currentSlot) {
+                    mc.getNetHandler().sendPacket(new C09PacketHeldItemChange(serverSlot = currentSlot));
+                    swapped = false;
+                }
+                mc.getNetHandler().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                autoBlocking = true;
+                break;
+            case BLINK:
+                if (blinkAB) {
+                    BlinkUtils.doBlink();
+                    blink = true;
+                    final int newSlot = mc.thePlayer.inventory.currentItem % 8 + 1;
+                    if (serverSlot != newSlot) {
+                        mc.getNetHandler().sendPacket(new C09PacketHeldItemChange(serverSlot = newSlot));
+                        swapped = true;
+                        autoBlocking = false;
+                    }
+                    canAttack = false;
+                    blinkAB = false;
+                    break;
+                }
+                if (serverSlot != currentSlot) {
+                    mc.getNetHandler().sendPacket(new C09PacketHeldItemChange(serverSlot = currentSlot));
+                    swapped = false;
+                }
+                mc.getNetHandler().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                BlinkUtils.sync(autoBlocking = true, true);
+                BlinkUtils.stopBlink();
+                blink = false;
+                blinkAB = true;
+                break;
+            case LEGIT:
+                if (mc.thePlayer.ticksExisted % 4 == 0) {
+                    mc.gameSettings.keyBindUseItem.setPressed(true);
+                    autoBlocking = true;
+                } else {
+                    mc.gameSettings.keyBindUseItem.setPressed(false);
+                    autoBlocking = false;
+                }
+                canAttack = !mc.gameSettings.keyBindUseItem.isKeyDown();
+                break;
             case VANILLA:
-                mc.thePlayer.setItemInUse(mc.thePlayer.inventory.getCurrentItem(), 32678);
+                mc.getNetHandler().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                 autoBlocking = true;
                 break;
         }
@@ -276,8 +337,15 @@ public final class KillAuraModule extends Module {
         hitTimeHelper.reset();
         if (autoBlocking) {
             autoBlocking = false;
-            mc.thePlayer.clearItemInUse();
+            if (autoBlockTypeProperty.getValue() == AutoBlockType.LEGIT) {
+                mc.gameSettings.keyBindUseItem.setPressed(false);
+            } else if (PlayerUtils.isHoldingSword()) {
+                mc.getNetHandler().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+            }
         }
+        blinkAB = true;
+        swapped = false;
+        serverSlot = -1;
         rotated = false;
         target = null;
     }

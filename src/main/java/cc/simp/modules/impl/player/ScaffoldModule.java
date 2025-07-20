@@ -2,6 +2,7 @@ package cc.simp.modules.impl.player;
 
 import cc.simp.Simp;
 import cc.simp.event.impl.player.MotionEvent;
+import cc.simp.event.impl.player.PreUpdateEvent;
 import cc.simp.event.impl.player.SafeWalkEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
@@ -13,12 +14,14 @@ import cc.simp.property.impl.EnumProperty;
 import cc.simp.property.impl.Representation;
 import cc.simp.utils.Timer;
 import cc.simp.utils.mc.MovementUtils;
+import cc.simp.utils.mc.PlayerUtils;
 import cc.simp.utils.mc.RaytraceUtils;
 import cc.simp.utils.mc.ScaffoldUtils;
 import cc.simp.utils.misc.MathUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.potion.Potion;
+import org.lwjgl.input.Keyboard;
 
 import static cc.simp.utils.Util.mc;
 
@@ -26,14 +29,16 @@ import static cc.simp.utils.Util.mc;
 public final class ScaffoldModule extends Module {
 
     public static EnumProperty<Rotations> rotationsProperty = new EnumProperty<>("Rotations", Rotations.NORMAL);
+    public static Property<Boolean> tellyBridgeProperty = new Property<>("Telly Bridge", false);
+    public static EnumProperty<Rotations> rotationsProperty = new EnumProperty<>("Rotations", Rotations.NORMAL, () -> !tellyBridgeProperty.getValue());
     public static DoubleProperty rotationSpeedProperty = new DoubleProperty("Rotation Speed", 60.0, 0.0, 180.0, 5.0, Representation.INT);
-    public static Property<Boolean> tellyStaticPitchProperty = new Property<>("Static Telly Pitch", true, () -> rotationsProperty.getValue() == Rotations.TELLY);
+    public static Property<Boolean> tellyStaticPitchProperty = new Property<>("Static Telly Pitch", true, tellyBridgeProperty::getValue);
     public DoubleProperty delayProperty = new DoubleProperty("Delay", 25, 0, 100, 5);
-    public static Property<Boolean> sprintProperty = new Property<>("Sprint", false);
+    public static Property<Boolean> sprintProperty = new Property<>("Sprint All Directions", false);
     public static Property<Boolean> raytraceProperty = new Property<>("Raytrace", true);
-    public static Property<Boolean> raytraceStrictProperty = new Property<>("Strict", false, raytraceProperty::getValue);
+    public static Property<Boolean> raytraceStrictProperty = new Property<>("Raytrace Strict", false, raytraceProperty::getValue);
     public static Property<Boolean> safewalkProperty = new Property<>("Safe Walk", false);
-    public static Property<Boolean> autoJumpProperty = new Property<>("Auto Jump", false);
+    public static Property<Boolean> autoJumpProperty = new Property<>("Auto Jump", false, () -> !tellyBridgeProperty.getValue());
     public static Property<Boolean> sneakProperty = new Property<>("Sneak", false);
     public DoubleProperty sneakIntervalProperty = new DoubleProperty("Sneak Every Blocks", 5, sneakProperty::getValue, 1, 10, 1, Representation.INT);
     public static Property<Boolean> keepYProperty = new Property<>("Keep Y", false);
@@ -43,8 +48,6 @@ public final class ScaffoldModule extends Module {
     public enum Rotations {
         NORMAL,
         STATIC,
-        TELLY,
-        VULCAN;
     }
 
     private static final float NORMAL_PITCH = 82.5f;
@@ -62,6 +65,8 @@ public final class ScaffoldModule extends Module {
     private int previousHotbarSlot;
     private boolean isSneakingNow = false;
     private static boolean canPlaceTellyBlock = true;
+    private static int jumpTicks = 0;
+    private static int tellyWaitTicks = 0;
 
     public ScaffoldModule() {
         setSuffixListener(rotationsProperty);
@@ -70,6 +75,9 @@ public final class ScaffoldModule extends Module {
     @EventLink
     public final Listener<MotionEvent> motionEventListener = event -> {
         if (event.isPre()) {
+
+            jumpTicks = (mc.thePlayer.onGround ? 0 : (jumpTicks + 1));
+
             handleSprint();
 
             // Cache current slot
@@ -90,7 +98,7 @@ public final class ScaffoldModule extends Module {
             mc.thePlayer.inventory.currentItem = blockSlot;
 
             handleKeepY();
-            handleAutoJump();
+            if (!tellyBridgeProperty.getValue()) handleAutoJump();
             handleSpeedModuleInteraction();
 
             // Block Cache Setup
@@ -104,9 +112,17 @@ public final class ScaffoldModule extends Module {
             }
 
             // Rotations Setup
-            float[] rotations = getRotationsForPlacement();
-            Simp.INSTANCE.getRotationManager().rotateToward(rotations[0], rotations[1], rotationSpeedProperty.getValue().floatValue());
-            rotatedThisTick = true;
+            if (!tellyBridgeProperty.getValue()) {
+                float[] rotations = getRotationsForPlacement();
+                Simp.INSTANCE.getRotationManager().rotateToward(rotations[0], rotations[1], rotationSpeedProperty.getValue().floatValue());
+                rotatedThisTick = true;
+            }
+
+            handleTellyBridging();
+
+            if (tellyBridgeProperty.getValue() && jumpTicks <= 3) {
+                return;
+            }
 
             // Place The Block
             placeBlock();
@@ -124,11 +140,10 @@ public final class ScaffoldModule extends Module {
     private void handleSprint() {
         if (sprintProperty.getValue()) {
             mc.thePlayer.setSprinting(MovementUtils.canSprint(true));
-        } else if(rotationsProperty.getValue() != Rotations.TELLY) {
+        } else if (!tellyBridgeProperty.getValue()) {
             mc.gameSettings.keyBindSprint.setPressed(false);
-            mc.thePlayer.setSprinting(false);
-        } else if (rotationsProperty.getValue() == Rotations.TELLY) {
-            final float yawDiff = Math.abs(MathUtils.getAngleDifference((float)MovementUtils.getDirection(), Simp.INSTANCE.getRotationManager().getClientYaw()));
+        } else {
+            final float yawDiff = Math.abs(MathUtils.getAngleDifference(MovementUtils.getDirection(), Simp.INSTANCE.getRotationManager().getClientYaw()));
             mc.thePlayer.setSprinting(yawDiff < 30.0f);
         }
     }
@@ -143,6 +158,19 @@ public final class ScaffoldModule extends Module {
         if (autoJumpProperty.getValue()) {
             mc.gameSettings.keyBindJump.setPressed(mc.thePlayer.onGround
                     && MovementUtils.isMoving());
+        }
+    }
+
+    private void handleTellyBridging() {
+        if (tellyBridgeProperty.getValue() && !mc.thePlayer.isPotionActive(Potion.moveSpeed) && !Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode()) && Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()) && !PlayerUtils.isBlockAbovePlayer(mc.thePlayer, 1) && (jumpTicks <= 3 || ScaffoldUtils.isBlockVeryCloseUnderPlayer())) {
+            if (jumpTicks == 0 || ScaffoldUtils.isBlockVeryCloseUnderPlayer()) {
+                Simp.INSTANCE.getRotationManager().rotateToward(MovementUtils.getDirection(), 60.0f, 180.0f);
+            } else {
+                Simp.INSTANCE.getRotationManager().rotateToward((MovementUtils.getDirection() - 180.0f), 90.0f, rotationSpeedProperty.getValue().floatValue());
+            }
+            if (mc.thePlayer.posY > 0.0 && (mc.thePlayer.isSprinting()) && jumpTicks == 0) {
+                mc.thePlayer.jump();
+            }
         }
     }
 
@@ -172,29 +200,6 @@ public final class ScaffoldModule extends Module {
             case STATIC:
                 rotations[0] = MovementUtils.getDirection() - 180;
                 rotations[1] = NORMAL_PITCH;
-                break;
-            case VULCAN:
-                rotations[0] = MovementUtils.getDirection() - 180;
-                rotations[1] = VULCAN_PITCH;
-                break;
-            case TELLY:
-                if (mc.thePlayer.offGroundTicks >= 7 || mc.thePlayer.onGround) {
-                    rotations[0] = MovementUtils.getDirection() - 180;
-                    rotations[1] = NORMAL_PITCH;
-                    canPlaceTellyBlock = true;
-                    if (currentBlockCache != null) {
-                        for (float possiblePitch = 90; possiblePitch > 30; possiblePitch -= possiblePitch > (mc.thePlayer
-                                .isPotionActive(Potion.moveSpeed) ? 60 : 80) ? 1 : 10) {
-                            if (RaytraceUtils.isOnBlock(currentBlockCache.getFacing(), currentBlockCache.getPosition(), true, mc.playerController.getBlockReachDistance(),
-                                    rotations[0], possiblePitch) && !tellyStaticPitchProperty.getValue()) {
-                                rotations[1] = possiblePitch;
-                            }
-                        }
-                    }
-                } else {
-                    rotations[0] = mc.thePlayer.rotationYaw;
-                    canPlaceTellyBlock = false;
-                }
                 break;
         }
         return rotations;
@@ -275,6 +280,7 @@ public final class ScaffoldModule extends Module {
     @Override
     public void onEnable() {
         super.onEnable();
+        if (mc.thePlayer == null) return;
         lastBlockCache = null;
         currentBlockCache = null;
         previousHotbarSlot = mc.thePlayer.inventory.currentItem;
@@ -307,6 +313,8 @@ public final class ScaffoldModule extends Module {
 
         rotatedThisTick = false;
         blocksPlacedCount = 0;
+        jumpTicks = 0;
+        tellyWaitTicks = 0;
         currentBlockCache = null;
         lastBlockCache = null;
     }

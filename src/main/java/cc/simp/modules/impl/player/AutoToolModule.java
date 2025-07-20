@@ -58,7 +58,7 @@ public class AutoToolModule extends Module {
         float bestStr = 1.0F;
         int itemTouse = -1;
 
-        for(int i = 0; i < 9; i++) {
+        for (int i = 0; i < 9; i++) {
             ItemStack itemStack = mc.thePlayer.inventory.mainInventory[i];
             if (itemStack == null) continue;
 

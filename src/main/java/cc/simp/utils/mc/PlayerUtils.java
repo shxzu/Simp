@@ -15,7 +15,8 @@ public class PlayerUtils extends Util {
         return (stack = mc.thePlayer.getCurrentEquippedItem()) != null && stack.getItem() instanceof ItemSword;
     }
 
-    public static boolean isBlockAbovePlayer(final EntityPlayer player, final int distance, final double horizontal) {
+    public static boolean isBlockAbovePlayer(final EntityPlayer player, final int distance) {
+        double horizontal = 0.6;
         final World world = player.worldObj;
         final AxisAlignedBB bb = player.getEntityBoundingBox();
         final double centerX = (bb.minX + bb.maxX) / 2.0;
