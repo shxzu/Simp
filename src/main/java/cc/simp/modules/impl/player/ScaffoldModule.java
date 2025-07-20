@@ -28,7 +28,6 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Scaffold", category = ModuleCategory.PLAYER)
 public final class ScaffoldModule extends Module {
 
-    public static EnumProperty<Rotations> rotationsProperty = new EnumProperty<>("Rotations", Rotations.NORMAL);
     public static Property<Boolean> tellyBridgeProperty = new Property<>("Telly Bridge", false);
     public static EnumProperty<Rotations> rotationsProperty = new EnumProperty<>("Rotations", Rotations.NORMAL, () -> !tellyBridgeProperty.getValue());
     public static DoubleProperty rotationSpeedProperty = new DoubleProperty("Rotation Speed", 60.0, 0.0, 180.0, 5.0, Representation.INT);
