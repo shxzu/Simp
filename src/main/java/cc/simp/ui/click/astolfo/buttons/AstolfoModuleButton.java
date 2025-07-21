@@ -1,10 +1,10 @@
 package cc.simp.ui.click.astolfo.buttons;
 
+import cc.simp.font.FontManager;
 import cc.simp.modules.Module;
 import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.utils.font.FontManager;
 import net.minecraft.client.gui.Gui;
 
 import java.awt.*;
@@ -49,7 +49,7 @@ public class AstolfoModuleButton extends AstolfoButton {
         else
             Gui.drawRect2(x + 1, y, width - 2, height, 0xff181A17);
 
-        FontManager.ARIAL.drawStringWithShadow(module.getLabel().toLowerCase(), (x + width) - FontManager.ARIAL.getWidth(module.getLabel().toLowerCase()) - 3, y + height/2, extended ? module.isEnabled() ? color.getRGB() : 0xffffffff : 0xffffffff);
+        FontManager.getCurrentFont().drawStringWithShadow(module.getLabel().toLowerCase(), (x + width) - FontManager.getCurrentFont().getStringWidth(module.getLabel().toLowerCase()) - 3, y + height/2, extended ? module.isEnabled() ? color.getRGB() : 0xffffffff : 0xffffffff);
 
         int count = 0;
 

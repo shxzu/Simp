@@ -1,9 +1,9 @@
 package cc.simp.ui.click.astolfo.buttons;
 
 import cc.simp.Simp;
+import cc.simp.font.FontManager;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
-import cc.simp.utils.font.FontManager;
 import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.gui.Gui;
 
@@ -47,7 +47,7 @@ public class AstolfoCategoryPanel extends AstolfoButton {
 
 
         Gui.drawRect2(x, y, width, height, 0xff181A17);
-        FontManager.ARIAL.drawStringWithShadow(String.valueOf(category).toLowerCase(), x + 4, y + height / 2, 0xffffffff);
+        FontManager.getCurrentFont().drawStringWithShadow(String.valueOf(category).toLowerCase(), x + 4, y + height / 2, 0xffffffff);
 
         count = 0;
 

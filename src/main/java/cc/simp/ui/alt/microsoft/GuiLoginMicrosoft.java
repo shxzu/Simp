@@ -9,7 +9,6 @@ import java.util.concurrent.CompletableFuture;
 
 import cc.simp.ui.alt.AltManagerGui;
 import cc.simp.ui.alt.SessionChanger;
-import cc.simp.utils.font.FontManager;
 import net.minecraft.util.Session;
 import org.lwjgl.input.Keyboard;
 
@@ -70,7 +69,7 @@ public class GuiLoginMicrosoft extends GuiScreen {
         this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
         this.username.drawTextBox();
         this.password.drawTextBox();
-        GuiLoginMicrosoft.drawCustomCenteredString(FontManager.TAHOMA, statusString, (int) (this.width / 2), (int) (sr.getScaledHeight() / 2 - 65), -1);
+        GuiLoginMicrosoft.drawCenteredString(mc.minecraftFontRendererObj, statusString, (int) (this.width / 2), (int) (sr.getScaledHeight() / 2 - 65), -1);
         if (!didTheThing) {
             statusString = "Email & Password";
         } else {

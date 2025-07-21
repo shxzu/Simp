@@ -12,7 +12,6 @@ import cc.simp.modules.ModuleManager;
 import cc.simp.modules.impl.client.ClickGUIModule;
 import cc.simp.ui.click.astolfo.AstolfoClickGUI;
 import cc.simp.ui.click.window.WindowClickGUI;
-import cc.simp.utils.font.FontManager;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import io.github.nevalackin.homoBus.bus.impl.EventBus;
@@ -53,7 +52,6 @@ public class Simp {
     public final Listener<ClientStartupEvent> onClientStart = e -> {
 
         // Font Manager
-        FontManager.initTextures();
 
         // Module Manager
         moduleManager = new ModuleManager();

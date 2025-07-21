@@ -3,14 +3,13 @@ package cc.simp.modules.impl.client;
 import cc.simp.Simp;
 import cc.simp.event.impl.KeyPressEvent;
 import cc.simp.event.impl.render.Render2DEvent;
+import cc.simp.font.FontManager;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.utils.font.FontManager;
-import cc.simp.utils.font.TrueTypeFontRenderer;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.gui.MinecraftFontRenderer;
@@ -30,7 +29,6 @@ public final class TabGUIModule extends Module {
     private final Property<Boolean> rainbowProperty = new Property<>("Rainbow", true);
     private final EnumProperty<Position> position = new EnumProperty<>("Position", Position.LEFT);
 
-    TrueTypeFontRenderer CFont = FontManager.TAHOMA;
     private boolean inModules = false;
     private boolean inSettings = false;
     private int currentCategory = 0;
@@ -97,8 +95,8 @@ public final class TabGUIModule extends Module {
                         new Color(255, 255, 255, 40).getRGB());
             }
 
-            if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
-                CFont.drawStringWithShadow(category.name(), startX + 4, y, color.getRGB());
+            if (FontManagerModule.fontTypeProperty.getValue() != FontManagerModule.FontType.MC) {
+                FontManager.getCurrentFont().drawStringWithShadow(category.name(), startX + 4, y, color.getRGB());
             } else {
                 fr.drawStringWithShadow(category.name(), startX + 4, y, color.getRGB());
             }
@@ -239,8 +237,8 @@ public final class TabGUIModule extends Module {
             // Module text
             String text = module.getLabel() + (module.getSuffix() != null ? " §7" + module.getSuffix() : "");
             Color rainbow = Color.getHSBColor(hue, 0.55f, 0.9f);
-            if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
-                CFont.drawStringWithShadow(text, x + 4, currentY,
+            if (FontManagerModule.fontTypeProperty.getValue() != FontManagerModule.FontType.MC) {
+                FontManager.getCurrentFont().drawStringWithShadow(text, x + 4, currentY,
                         rainbowProperty.getValue() ? rainbow.getRGB() :
                                 module.isEnabled() ? -1 : Color.GRAY.getRGB());
             } else {
@@ -251,8 +249,8 @@ public final class TabGUIModule extends Module {
 
             // Settings indicator
             if (!module.getElements().isEmpty()) {
-                if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
-                    CFont.drawStringWithShadow("...", x + width - 10, currentY, Color.GRAY.getRGB());
+                if (FontManagerModule.fontTypeProperty.getValue() != FontManagerModule.FontType.MC) {
+                    FontManager.getCurrentFont().drawStringWithShadow("...", x + width - 10, currentY, Color.GRAY.getRGB());
                 } else {
                     fr.drawStringWithShadow("...", x + width - 10, currentY, Color.GRAY.getRGB());
                 }
@@ -293,8 +291,8 @@ public final class TabGUIModule extends Module {
             String value = getPropertyValue(property);
             String text = name + ": §7" + value;
 
-            if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
-                CFont.drawStringWithShadow(text, x + 4, currentY,
+            if (FontManagerModule.fontTypeProperty.getValue() != FontManagerModule.FontType.MC) {
+                FontManager.getCurrentFont().drawStringWithShadow(text, x + 4, currentY,
                         rainbowProperty.getValue() ? rainbow.getRGB() : -1);
             } else {
                 fr.drawStringWithShadow(text, x + 4, currentY,

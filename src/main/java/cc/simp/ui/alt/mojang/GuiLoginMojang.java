@@ -3,7 +3,6 @@ package cc.simp.ui.alt.mojang;
 import java.io.IOException;
 
 import cc.simp.ui.alt.SessionChanger;
-import cc.simp.utils.font.FontManager;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.gui.Gui;
@@ -33,7 +32,7 @@ public class GuiLoginMojang extends GuiScreen {
         final ScaledResolution sr = new ScaledResolution(this.mc);
         this.username.drawTextBox();
         this.password.drawTextBox();
-        Gui.drawCustomCenteredString(FontManager.TAHOMA, "Email & Password", (int)(this.width / 2), (int)(sr.getScaledHeight() / 2 - 65), -1);
+        Gui.drawCenteredString(mc.minecraftFontRendererObj, "Email & Password", (int)(this.width / 2), (int)(sr.getScaledHeight() / 2 - 65), -1);
         super.drawScreen(x2, y2, z2);
     }
 

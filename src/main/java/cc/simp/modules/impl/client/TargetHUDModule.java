@@ -145,7 +145,7 @@ public final class TargetHUDModule extends Module {
 
             GL11.glPushMatrix();
             GL11.glScaled(2,2,2);
-            mc.minecraftFontRendererObj.drawStringWithShadow((Math.round(target.getHealth() * 10f) / 10f + "❤").replace(".0", ""), 19,
+            mc.minecraftFontRendererObj.drawStringWithShadow((Math.round(target.getHealth() * 10f) / 10f + "").replace(".0", ""), 19,
                     5, color.getRGB());
             GL11.glPopMatrix();
 

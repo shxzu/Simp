@@ -2,12 +2,11 @@ package cc.simp.modules.impl.client;
 
 import cc.simp.Simp;
 import cc.simp.event.impl.render.Render2DEvent;
+import cc.simp.font.FontManager;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.property.Property;
-import cc.simp.utils.font.FontManager;
-import cc.simp.utils.font.TrueTypeFontRenderer;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.gui.MinecraftFontRenderer;
@@ -35,7 +34,6 @@ public final class ArraylistModule extends Module {
         if (mc.gameSettings.showDebugInfo) return;
 
         MinecraftFontRenderer minecraftFontRenderer = mc.minecraftFontRendererObj;
-        TrueTypeFontRenderer CFont = FontManager.TAHOMA;
         ScaledResolution sr = new ScaledResolution(mc);
 
         float hue = (System.currentTimeMillis() % 3000) / 3000f;
@@ -55,7 +53,7 @@ public final class ArraylistModule extends Module {
         // Sort modules by width
         if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
             modules.sort(Comparator.comparingDouble(m ->
-                    -CFont.getWidth(m.getUpdatedSuffix() != null ?
+                    -FontManager.getCurrentFont().getStringWidth(m.getUpdatedSuffix() != null ?
                             m.getLabel() + " " + m.getUpdatedSuffix() :
                             m.getLabel())
             ));
@@ -74,11 +72,11 @@ public final class ArraylistModule extends Module {
             String text = module.getLabel() + (module.getUpdatedSuffix() != null ? " §7" + module.getUpdatedSuffix() : "");
             float x = left ? 2.0f : sr.getScaledWidth() - minecraftFontRenderer.getStringWidth(text) - 1.0f;
             if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA)
-                x = left ? 2.0f : sr.getScaledWidth() - CFont.getWidth(text) - 1.0f;
+                x = left ? 2.0f : sr.getScaledWidth() - FontManager.getCurrentFont().getStringWidth(text) - 1.0f;
 
             Color rainbow = Color.getHSBColor(hue, 0.55f, 0.9f);
-            if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
-                CFont.drawStringWithShadow(text, x, y, rainbow.getRGB());
+            if (FontManagerModule.fontTypeProperty.getValue() != FontManagerModule.FontType.MC) {
+                FontManager.getCurrentFont().drawStringWithShadow(text, x, y, rainbow.getRGB());
             } else {
                 minecraftFontRenderer.drawStringWithShadow(text, x, y, rainbow.getRGB());
             }
