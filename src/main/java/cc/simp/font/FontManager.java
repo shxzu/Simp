@@ -9,10 +9,11 @@ import java.util.Map;
 public class FontManager {
     private static final Map<String, CFontRenderer> fontRegistry = new HashMap<>();
     private static final Map<String, CFontRenderer> scaledFontCache = new HashMap<>();
-    private static String currentFont = "default";
+    private static String currentFont = "tahoma";
     
     static {
-        registerFont("default", createFont("tahoma", 20));
+        registerFont("tahoma", createFont("tahoma", 20));
+        registerFont("nunito", createFont("nunito", 20));
     }
 
     public static void registerFont(String name, CFontRenderer font) {

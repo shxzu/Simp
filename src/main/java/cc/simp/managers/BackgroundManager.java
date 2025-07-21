@@ -3,7 +3,10 @@ package cc.simp.managers;
 import cc.simp.Simp;
 import cc.simp.event.impl.packet.PacketReceiveEvent;
 import cc.simp.event.impl.player.PreUpdateEvent;
+import cc.simp.event.impl.render.Render2DEvent;
 import cc.simp.event.impl.world.WorldLoadEvent;
+import cc.simp.font.FontManager;
+import cc.simp.modules.impl.client.FontManagerModule;
 import cc.simp.utils.Timer;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -66,6 +69,17 @@ public class BackgroundManager {
             Simp.INSTANCE.getRotationManager().resetRotationsInstantly();
             this.rotLockTick = 3;
         }
+    };
+
+    @EventLink
+    public final Listener<Render2DEvent> r2d = event -> {
+        String currentFont = FontManager.getCurrentFont().getNameFontTTF().toLowerCase();
+        String desiredFont = FontManagerModule.fontTypeProperty.getValue().toString().toLowerCase();
+
+        if (!currentFont.equals(desiredFont)) {
+            FontManager.setCurrentFont(desiredFont);
+        }
+
     };
 
 }

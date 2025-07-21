@@ -12,6 +12,7 @@ public final class FontManagerModule extends Module {
 
     public enum FontType {
         TAHOMA,
+        NUNITO,
         MC
     }
 
