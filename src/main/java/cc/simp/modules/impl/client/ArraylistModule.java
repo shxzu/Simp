@@ -51,7 +51,7 @@ public final class ArraylistModule extends Module {
         }
 
         // Sort modules by width
-        if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA) {
+        if (FontManager.getCurrentFont() != null) {
             modules.sort(Comparator.comparingDouble(m ->
                     -FontManager.getCurrentFont().getStringWidth(m.getUpdatedSuffix() != null ?
                             m.getLabel() + " " + m.getUpdatedSuffix() :
@@ -71,7 +71,7 @@ public final class ArraylistModule extends Module {
 
             String text = module.getLabel() + (module.getUpdatedSuffix() != null ? " §7" + module.getUpdatedSuffix() : "");
             float x = left ? 2.0f : sr.getScaledWidth() - minecraftFontRenderer.getStringWidth(text) - 1.0f;
-            if (FontManagerModule.fontTypeProperty.getValue() == FontManagerModule.FontType.TAHOMA)
+            if (FontManager.getCurrentFont() != null)
                 x = left ? 2.0f : sr.getScaledWidth() - FontManager.getCurrentFont().getStringWidth(text) - 1.0f;
 
             Color rainbow = Color.getHSBColor(hue, 0.55f, 0.9f);

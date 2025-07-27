@@ -25,7 +25,6 @@ public class NoFallDamageModule extends Module {
 
     private enum Mode {
         VANILLA,
-        WATCHDOG,
         CLUTCH,
         EDIT
     }
@@ -45,20 +44,6 @@ public class NoFallDamageModule extends Module {
         if (modeProperty.getValue() == Mode.VANILLA) {
             if (mc.thePlayer.fallDistance >= 3) {
                 mc.getNetHandler().sendPacket(new C03PacketPlayer(true));
-            }
-        }
-
-        if (modeProperty.getValue() == Mode.WATCHDOG) {
-            if (isOverVoid())
-                return;
-            if (timered) {
-                timered = false;
-                mc.timer.timerSpeed = 1;
-            }
-            if (mc.thePlayer.fallDistance > 2.9) {
-                mc.getNetHandler().sendPacket(new C03PacketPlayer(true));
-                mc.timer.timerSpeed = 0.5f;
-                timered = true;
             }
         }
 

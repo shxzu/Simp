@@ -32,12 +32,9 @@ public final class SprintModule extends Module {
                 float yawDifference = Math.abs(MathHelper.wrapAngleTo180_float(currentYaw - Simp.INSTANCE.getRotationManager().getClientYaw()));
                 if (!omniProperty.getValue()) {
                     mc.gameSettings.keyBindSprint.setPressed(!(yawDifference > 30));
+                    if (yawDifference > 30) mc.thePlayer.setSprinting(false);
                 } else {
-                    if (!(yawDifference > 30)) {
                         mc.thePlayer.setSprinting(canSprint);
-                    } else {
-                        mc.thePlayer.setSprinting(false);
-                    }
                 }
             }
         }

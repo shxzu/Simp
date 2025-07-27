@@ -137,4 +137,14 @@ public class RotationUtils extends Util {
         return MathHelper.wrapAngleTo180_float(yawDiff);
     }
 
+    public static Vec3 getBestHitVec(final Entity entity) {
+        final Vec3 positionEyes = RotationUtils.mc.thePlayer.getPositionEyes(1.0f);
+        final float f11 = entity.getCollisionBorderSize();
+        final AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox().expand(f11, f11, f11);
+        final double ex = MathHelper.clamp_double(positionEyes.xCoord, entityBoundingBox.minX, entityBoundingBox.maxX);
+        final double ey = MathHelper.clamp_double(positionEyes.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
+        final double ez = MathHelper.clamp_double(positionEyes.zCoord, entityBoundingBox.minZ, entityBoundingBox.maxZ);
+        return new Vec3(ex, ey - 0.4, ez);
+    }
+
 }

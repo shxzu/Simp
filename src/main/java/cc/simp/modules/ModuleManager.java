@@ -7,6 +7,9 @@ import cc.simp.modules.impl.combat.AntiKnockbackModule;
 import cc.simp.modules.impl.combat.BackTrackModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.combat.TimerRangeModule;
+import cc.simp.modules.impl.exploit.AntiCheatDisablerModule;
+import cc.simp.modules.impl.exploit.BedDestroyerModule;
+import cc.simp.modules.impl.exploit.InventoryMovementModule;
 import cc.simp.modules.impl.movement.*;
 import cc.simp.modules.impl.player.*;
 import cc.simp.modules.impl.render.AmbienceModule;
@@ -51,6 +54,9 @@ public final class ModuleManager {
                 new MovementFixModule(),
 
                 // EXPLOIT
+                new AntiCheatDisablerModule(),
+                new BedDestroyerModule(),
+                new InventoryMovementModule(),
 
                 // RENDER
                 new BlockAnimationsModule(),

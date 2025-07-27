@@ -3,8 +3,10 @@ package net.minecraft.client;
 import cc.simp.Simp;
 import cc.simp.event.impl.KeyPressEvent;
 import cc.simp.event.impl.game.ClientStartupEvent;
+import cc.simp.event.impl.game.GameLoopEvent;
 import cc.simp.event.impl.game.PreClientStartupEvent;
 import cc.simp.event.impl.player.ClickEvent;
+import cc.simp.event.impl.world.TickDelayEvent;
 import cc.simp.event.impl.world.TickEvent;
 import cc.simp.event.impl.world.WorldLoadEvent;
 import cc.simp.modules.impl.render.MotionBlurModule;
@@ -217,6 +219,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     public int displayHeight;
     private boolean connectedToRealms = false;
     public Timer timer = new Timer(20.0F);
+    public Timer fakeTimer = new Timer(20.0F);
     private PlayerUsageSnooper usageSnooper = new PlayerUsageSnooper("client", this, MinecraftServer.getCurrentTimeMillis());
     public WorldClient theWorld;
     public RenderGlobal renderGlobal;
@@ -343,6 +346,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         while (true) {
             try {
                 while (this.running) {
+                    final GameLoopEvent event = new GameLoopEvent();
+                    Simp.INSTANCE.getEventBus().post(event);
                     if (!this.hasCrashed || this.crashReporter == null) {
                         try {
                             this.runGameLoop();
@@ -858,11 +863,16 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         }
 
         if (this.isGamePaused && this.theWorld != null) {
-            float f = this.timer.renderPartialTicks;
+            final float f = this.timer.renderPartialTicks;
             this.timer.updateTimer();
             this.timer.renderPartialTicks = f;
-        } else {
+            final float f2 = this.fakeTimer.renderPartialTicks;
+            this.fakeTimer.updateTimer();
+            this.fakeTimer.renderPartialTicks = f2;
+        }
+        else {
             this.timer.updateTimer();
+            this.fakeTimer.updateTimer();
         }
 
         this.mcProfiler.startSection("scheduledExecutables");
@@ -876,8 +886,13 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         this.mcProfiler.endSection();
         long l = System.nanoTime();
         this.mcProfiler.startSection("tick");
-
+        for (int j = 0; j < this.fakeTimer.elapsedTicks; ++j) {
+            final TickDelayEvent event = new TickDelayEvent();
+            Simp.INSTANCE.getEventBus().post(event);
+        }
         for (int j = 0; j < this.timer.elapsedTicks; ++j) {
+            final TickEvent event2 = new TickEvent();
+            Simp.INSTANCE.getEventBus().post(event2);
             this.runTick();
         }
 

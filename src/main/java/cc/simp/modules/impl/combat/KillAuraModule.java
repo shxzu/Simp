@@ -1,6 +1,7 @@
 package cc.simp.modules.impl.combat;
 
 import cc.simp.Simp;
+import cc.simp.event.impl.packet.PacketReceiveEvent;
 import cc.simp.event.impl.player.AttackSlowdownEvent;
 import cc.simp.event.impl.player.ClickEvent;
 import cc.simp.event.impl.player.ItemSlowdownEvent;
@@ -28,6 +29,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
+import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
@@ -81,9 +83,9 @@ public final class KillAuraModule extends Module {
     public static EntityLivingBase target;
     private long randomDelay = 100L;
     private boolean rotated = false;
-    private final Timer hitTimeHelper = new Timer();
+    public final Timer hitTimeHelper = new Timer();
     public static boolean autoBlocking = false;
-    private static boolean canAttack;
+    public static boolean canAttack;
     private static boolean activated = false;
     public static boolean blink = false;
     private static boolean blinkAB = false;
@@ -99,6 +101,11 @@ public final class KillAuraModule extends Module {
         }
 
         if (target == null && autoBlocking) {
+            if (autoBlockTypeProperty.getValue() == AutoBlockType.LEGIT) {
+                mc.gameSettings.keyBindUseItem.setPressed(false);
+            } else if (PlayerUtils.isHoldingSword()) {
+                mc.getNetHandler().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+            }
             autoBlocking = false;
         }
 
@@ -152,6 +159,14 @@ public final class KillAuraModule extends Module {
         if (keepSprintProperty.getValue()) {
             event.setSprint(true);
             event.setSlowDown(1.0);
+        }
+    };
+
+    @EventLink
+    public final Listener<PacketReceiveEvent> packetReceiveEventListener = event -> {
+        if (event.getPacket() instanceof S12PacketEntityVelocity && mc.theWorld.getEntityByID(((S12PacketEntityVelocity) event.getPacket()).getEntityID()) == mc.thePlayer && autoBlockTypeProperty.getValue() == AutoBlockType.HYPIXEL && autoBlocking) {
+            BlinkUtils.sync(true, true);
+            BlinkUtils.stopBlink();
         }
     };
 
@@ -263,6 +278,7 @@ public final class KillAuraModule extends Module {
                 autoBlocking = true;
                 break;
             case HYPIXEL:
+                serverSlot = mc.thePlayer.inventory.currentItem % 8 + 1;
                 if (serverSlot != currentSlot) {
                     mc.getNetHandler().sendPacket(new C09PacketHeldItemChange(serverSlot = currentSlot));
                     swapped = false;

@@ -13,7 +13,7 @@ import java.util.List;
 public class RaytraceUtils extends Util {
 
     public static boolean isOnBlock(EnumFacing facing, BlockPos position, boolean strict, float reach, float yaw, float pitch) {
-        MovingObjectPosition blockHitResult = rayTraceBlocks(yaw, pitch);
+        MovingObjectPosition blockHitResult = rayTraceBlocks(yaw, pitch, reach);
         if (blockHitResult == null) {
             return false;
         }
@@ -31,11 +31,10 @@ public class RaytraceUtils extends Util {
         }
     }
 
-    private static MovingObjectPosition rayTraceBlocks(float yaw, float pitch) {
-        double blockReachDistance = mc.playerController.getBlockReachDistance();
+    private static MovingObjectPosition rayTraceBlocks(float yaw, float pitch, float reach) {
         final Vec3 vec3 = mc.thePlayer.getPositionEyes(1.0F);
         final Vec3 vec31 = Entity.getVectorForRotation(pitch, yaw);
-        final Vec3 vec32 = vec3.addVector(vec31.xCoord * blockReachDistance, vec31.yCoord * blockReachDistance, vec31.zCoord * blockReachDistance);
+        final Vec3 vec32 = vec3.addVector(vec31.xCoord * (double) reach, vec31.yCoord * (double) reach, vec31.zCoord * (double) reach);
         return mc.theWorld.rayTraceBlocks(vec3, vec32, false, false, false);
     }
 

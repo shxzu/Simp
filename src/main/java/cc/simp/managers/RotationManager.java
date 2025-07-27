@@ -1,17 +1,15 @@
 package cc.simp.managers;
 
 import cc.simp.Simp;
+import cc.simp.utils.mc.MovementUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 
 import java.util.Random;
 
 public class RotationManager {
-    private final Minecraft mc;
+    private static final Minecraft mc = Minecraft.getMinecraft();
     private float clientYaw;
     private float clientPitch;
     private float prevClientYaw;
@@ -23,7 +21,6 @@ public class RotationManager {
     private Random random;
 
     public RotationManager() {
-        this.mc = Minecraft.getMinecraft();
         this.lastRotationUpdate = 0L;
         this.isRotating = false;
         this.isReturning = false;
@@ -51,6 +48,30 @@ public class RotationManager {
         final AxisAlignedBB box = target.getEntityBoundingBox().expand(0.1, 0.1, 0.1);
         final MovingObjectPosition hit = box.calculateIntercept(eyePos, reachVec);
         return hit != null;
+    }
+
+    public void faceBlockHypixelSafe(final float rotationSpeed, final boolean slowdown) {
+        this.rotateToward(this.snapToHypYaw(MovementUtils.getDirection(), slowdown), 80.0f, rotationSpeed);
+    }
+
+    private float snapToHypYaw(final float yaw, final boolean slowdown) {
+        final float snappedBase = Math.round(yaw / 45.0f) * 45.0f;
+        float lowerOffset;
+        float upperOffset;
+        if (Math.abs(snappedBase % 90.0f) < 0.001f) {
+            lowerOffset = 111.0f;
+            upperOffset = 111.0f;
+        }
+        else {
+            lowerOffset = 137.0f;
+            upperOffset = 137.0f;
+            if (slowdown) {
+                MovementUtils.strafe(0.009999999776482582);
+            }
+        }
+        final float lowerCandidate = snappedBase - lowerOffset;
+        final float upperCandidate = snappedBase + upperOffset;
+        return (Math.abs(yaw - lowerCandidate) <= Math.abs(upperCandidate - yaw)) ? lowerCandidate : upperCandidate;
     }
 
     public void tick() {
@@ -136,6 +157,18 @@ public class RotationManager {
         final float y = -MathHelper.sin(pitchRad);
         final float z = MathHelper.cos(pitchRad) * MathHelper.cos(yawRad);
         return new Vec3(x, y, z);
+    }
+
+    public float[] getRotationsToBlock(BlockPos blockPos, EnumFacing enumFacing) {
+        double d = (double) blockPos.getX() + 0.5 - mc.thePlayer.posX + (double) enumFacing.getFrontOffsetX() * 0.25;
+        double d2 = (double) blockPos.getZ() + 0.5 - mc.thePlayer.posZ + (double) enumFacing.getFrontOffsetZ() * 0.25;
+        double d3 = mc.thePlayer.posY + (double) mc.thePlayer.getEyeHeight() - blockPos.getY() - (double) enumFacing.getFrontOffsetY() * 0.25;
+        double d4 = MathHelper.sqrt_double(d * d + d2 * d2);
+        float f = (float) (Math.atan2(d2, d) * 180.0 / Math.PI) - 90.0f;
+        float f2 = (float) (Math.atan2(d3, d4) * 180.0 / Math.PI);
+        f = mc.thePlayer.rotationYaw + MathHelper.wrapAngleTo180_float(f - mc.thePlayer.rotationYaw);
+        f2 = mc.thePlayer.rotationPitch + MathHelper.wrapAngleTo180_float(f2 - mc.thePlayer.rotationPitch);
+        return new float[]{f, f2};
     }
 
     public float[] getRotationsTo(final double x, final double y, final double z) {

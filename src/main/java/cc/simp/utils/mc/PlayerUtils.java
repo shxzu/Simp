@@ -1,11 +1,16 @@
 package cc.simp.utils.mc;
 
+import cc.simp.Simp;
+import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.utils.Util;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 public class PlayerUtils extends Util {
@@ -42,4 +47,12 @@ public class PlayerUtils extends Util {
         return false;
     }
 
+    public static double getDistanceToEntityBox(final Entity entity) {
+        final Vec3 eyes = mc.thePlayer.getPositionEyes(1.0f);
+        final Vec3 pos = RotationUtils.getBestHitVec(entity);
+        final double xDist = Math.abs(pos.xCoord - eyes.xCoord);
+        final double yDist = Math.abs(pos.yCoord - eyes.yCoord);
+        final double zDist = Math.abs(pos.zCoord - eyes.zCoord);
+        return Math.sqrt(Math.pow(xDist, 2.0) + Math.pow(yDist, 2.0) + Math.pow(zDist, 2.0));
+    }
 }

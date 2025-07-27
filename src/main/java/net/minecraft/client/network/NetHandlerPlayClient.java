@@ -10,11 +10,7 @@ import com.mojang.authlib.GameProfile;
 import io.netty.buffer.Unpooled;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.Map.Entry;
 import net.minecraft.block.Block;
 import net.minecraft.client.ClientBrandRetriever;
@@ -215,6 +211,8 @@ import net.minecraft.world.storage.MapData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static cc.simp.utils.Util.mc;
+
 public class NetHandlerPlayClient implements INetHandlerPlayClient
 {
     private static final Logger logger = LogManager.getLogger();
@@ -228,6 +226,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
     public int currentServerMaxPlayers = 20;
     private boolean field_147308_k = false;
     private final Random avRandomizer = new Random();
+    public static ArrayList<Packet<?>> silentPackets = new ArrayList<Packet<?>>();
 
     public NetHandlerPlayClient(Minecraft mcIn, GuiScreen p_i46300_2_, NetworkManager p_i46300_3_, GameProfile p_i46300_4_)
     {
@@ -251,6 +250,11 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         }
 
         this.netManager.sendPacket(p);
+    }
+
+    public void sendSilentPacket(final Packet<?> packet) {
+        silentPackets.add(packet);
+        mc.getNetHandler().addToSendQueue(packet);
     }
 
     public void handleJoinGame(S01PacketJoinGame packetIn)
