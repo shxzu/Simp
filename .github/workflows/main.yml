@@ -1,37 +1,36 @@
-name: Auto-Build Simp Client
+name: build
 
 on:
-  push:
+  - push
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 8
-      uses: actions/setup-java@v4
-      with:
-        java-version: '8'
-        distribution: 'corretto'
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
-    - name: Change wrapper permissions
-      run: chmod +x ./gradlew
-    - name: Build with Gradle Wrapper
-      run: ./gradlew build
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-  dependecy-submissions:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 8
-      uses: actions/setup-java@v4
-      with:
-        java-version: '8'
-        distribution: 'corretto'
-    - name: Generate and submit dependency graph
-      uses: gradle/actions/dependency-submission@v4
+      - name: Java setup
+        uses: actions/setup-java@v4
+        with:
+          distribution: "corretto"
+          java-version: 8
+          cache: "gradle"
+
+      - name: Set outputs
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Gradle build
+        run: chmod +x ./gradlew && ./gradlew build
+
+      - name: Rename build artifacts
+        run: mv build/libs/Simp-*.jar build/libs/Simp.jar
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Simp
+          path: build/libs/Simp.jar
