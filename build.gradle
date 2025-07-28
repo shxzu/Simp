@@ -52,3 +52,9 @@ dependencies {
     implementation "com.paulscode.sound:librarylwjglopenal:20100824"
     implementation "com.mojang:authlib:1.5.21"
 }
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'StartBuilt'
+    }
+}
