@@ -2,9 +2,7 @@ package cc.simp.modules.impl.combat;
 
 import cc.simp.Simp;
 import cc.simp.event.impl.packet.PacketReceiveEvent;
-import cc.simp.event.impl.player.AttackSlowdownEvent;
 import cc.simp.event.impl.player.ClickEvent;
-import cc.simp.event.impl.player.ItemSlowdownEvent;
 import cc.simp.event.impl.player.MotionEvent;
 import cc.simp.event.impl.world.WorldLoadEvent;
 import cc.simp.modules.Module;
@@ -14,14 +12,12 @@ import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.property.Property;
 import cc.simp.property.impl.DoubleProperty;
 import cc.simp.property.impl.EnumProperty;
-import cc.simp.property.impl.Representation;
 import cc.simp.utils.Timer;
 import cc.simp.utils.mc.*;
 import cc.simp.utils.misc.MathUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import lombok.NonNull;
-import net.minecraft.client.settings.GameSettings;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
@@ -32,7 +28,6 @@ import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
 
 import java.util.Comparator;
 import java.util.concurrent.ThreadLocalRandom;
@@ -70,7 +65,6 @@ public final class KillAuraModule extends Module {
     public enum AutoBlockType {
         NONE,
         FAKE,
-        HYPIXEL,
         BLINK,
         LEGIT,
         VANILLA
@@ -129,13 +123,11 @@ public final class KillAuraModule extends Module {
                 this.attack();
             }
 
-            if (sprintResetProperty.getValue()) {
-                if (mc.thePlayer.hurtTime >= 7) {
-                    mc.gameSettings.keyBindForward.setPressed(true);
-                } else if (mc.thePlayer.hurtTime >= 4) {
+            if (sprintResetProperty.getValue() && advancedSettingsProperty.getValue()) {
+                if (target.hurtTime == 3 || target.hurtTime == 4) {
                     mc.gameSettings.keyBindForward.setPressed(false);
-                } else if (mc.thePlayer.hurtTime > 1) {
-                    mc.gameSettings.keyBindForward.setPressed(GameSettings.isKeyDown(mc.gameSettings.keyBindForward));
+                } else if (target.hurtTime >= 5) {
+                    mc.gameSettings.keyBindForward.setPressed(true);
                 }
             }
         }
@@ -155,16 +147,8 @@ public final class KillAuraModule extends Module {
     };
 
     @EventLink
-    public final Listener<AttackSlowdownEvent> attackSlowdownEventListener = event -> {
-        if (keepSprintProperty.getValue()) {
-            event.setSprint(true);
-            event.setSlowDown(1.0);
-        }
-    };
-
-    @EventLink
     public final Listener<PacketReceiveEvent> packetReceiveEventListener = event -> {
-        if (event.getPacket() instanceof S12PacketEntityVelocity && mc.theWorld.getEntityByID(((S12PacketEntityVelocity) event.getPacket()).getEntityID()) == mc.thePlayer && autoBlockTypeProperty.getValue() == AutoBlockType.HYPIXEL && autoBlocking) {
+        if (event.getPacket() instanceof S12PacketEntityVelocity && mc.theWorld.getEntityByID(((S12PacketEntityVelocity) event.getPacket()).getEntityID()) == mc.thePlayer && autoBlockTypeProperty.getValue() == AutoBlockType.BLINK && autoBlocking) {
             BlinkUtils.sync(true, true);
             BlinkUtils.stopBlink();
         }
@@ -275,15 +259,6 @@ public final class KillAuraModule extends Module {
 
         switch (autoBlockTypeProperty.getValue()) {
             case FAKE:
-                autoBlocking = true;
-                break;
-            case HYPIXEL:
-                serverSlot = mc.thePlayer.inventory.currentItem % 8 + 1;
-                if (serverSlot != currentSlot) {
-                    mc.getNetHandler().sendPacket(new C09PacketHeldItemChange(serverSlot = currentSlot));
-                    swapped = false;
-                }
-                mc.getNetHandler().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                 autoBlocking = true;
                 break;
             case BLINK:

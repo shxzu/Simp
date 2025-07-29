@@ -25,6 +25,11 @@ public class MathUtils extends Util {
                     .doubleValue();
     }
 
+    public static float getRandomInRange(float min, float max) {
+        SecureRandom random = new SecureRandom();
+        return random.nextFloat() * (max - min) + min;
+    }
+
     public static int getRandomNumberUsingNextInt(int min, int max) {
         java.util.Random random = new java.util.Random();
         return random.nextInt(max - min) + min;

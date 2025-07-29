@@ -31,6 +31,8 @@ public final class ScaffoldModule extends Module {
     public static DoubleProperty rotationSpeedProperty = new DoubleProperty("Rotation Speed", 60.0, 0.0, 180.0, 5.0, Representation.INT);
     public DoubleProperty delayProperty = new DoubleProperty("Delay", 25, 0, 100, 5);
     public static EnumProperty<Rotations> rotationsProperty = new EnumProperty<>("Rotations", Rotations.NORMAL);
+    public DoubleProperty pitchUpdateFrequencyProperty = new DoubleProperty("Pitch Update Frequency", 50, () -> rotationsProperty.getValue() == Rotations.ADVANCED, 0, 200, 5);
+    public DoubleProperty advancedPitchRangeProperty = new DoubleProperty("Advanced Pitch Range", 2.0, () -> rotationsProperty.getValue() == Rotations.ADVANCED, 0.0, 5.0, 0.1);
     public static Property<Boolean> sprintProperty = new Property<>("Sprint All Directions", false);
     public static Property<Boolean> raytraceProperty = new Property<>("Raytrace", true);
     public static Property<Boolean> raytraceStrictProperty = new Property<>("Raytrace Strict", false, raytraceProperty::getValue);
@@ -42,9 +44,12 @@ public final class ScaffoldModule extends Module {
     public static Property<Boolean> allowSpeedModuleProperty = new Property<>("Allow Speed", false);
     public static Property<Boolean> autoF5Property = new Property<>("Auto F5", false);
 
+
     public enum Rotations {
         NORMAL,
         STATIC,
+        TELLY,
+        ADVANCED
     }
 
     private static final float NORMAL_PITCH = 82.5f;
@@ -61,6 +66,9 @@ public final class ScaffoldModule extends Module {
     private int previousHotbarSlot;
     private boolean isSneakingNow = false;
     private static int jumpTicks = 0;
+
+    private final Timer advancedPitchUpdateTimer = new Timer();
+    private float currentPitch = NORMAL_PITCH;
 
     public ScaffoldModule() {
         setSuffixListener(rotationsProperty);
@@ -126,8 +134,6 @@ public final class ScaffoldModule extends Module {
     private void handleSprint() {
         if (sprintProperty.getValue()) {
             mc.thePlayer.setSprinting(MovementUtils.canSprint(true));
-        } else {
-            mc.gameSettings.keyBindSprint.setPressed(false);
         }
     }
 
@@ -138,9 +144,9 @@ public final class ScaffoldModule extends Module {
     }
 
     private void handleAutoJump() {
-        if (autoJumpProperty.getValue()) {
-            mc.gameSettings.keyBindJump.setPressed(mc.thePlayer.onGround
-                    && MovementUtils.isMoving());
+        if (autoJumpProperty.getValue() && mc.thePlayer.onGround
+                && MovementUtils.isMoving() && !mc.gameSettings.keyBindJump.isPressed()) {
+            mc.thePlayer.jump();
         }
     }
 
@@ -150,7 +156,7 @@ public final class ScaffoldModule extends Module {
         }
     }
 
-    public static float[] getRotationsForPlacement() {
+    public float[] getRotationsForPlacement() {
         float[] rotations = new float[2];
 
         switch (rotationsProperty.getValue()) {
@@ -170,6 +176,38 @@ public final class ScaffoldModule extends Module {
             case STATIC:
                 rotations[0] = MovementUtils.getDirection() - 180;
                 rotations[1] = NORMAL_PITCH;
+                break;
+            case TELLY:
+                if (mc.thePlayer.offGroundTicks >= 5) {
+                    rotations[0] = MovementUtils.getDirection();
+                    rotations[1] = 60;
+                } else {
+                    rotations[0] = MovementUtils.getDirection() - 180;
+                    rotations[1] = NORMAL_PITCH;
+                    if (currentBlockCache != null && raytraceProperty.getValue()) {
+                        for (float possiblePitch = 90; possiblePitch > 30; possiblePitch -= possiblePitch > (mc.thePlayer
+                                .isPotionActive(Potion.moveSpeed) ? 60 : 80) ? 1 : 10) {
+                            if (RaytraceUtils.isOnBlock(currentBlockCache.getFacing(), currentBlockCache.getPosition(), true, mc.playerController.getBlockReachDistance(),
+                                    rotations[0], possiblePitch)) {
+                                rotations[1] = possiblePitch;
+                            }
+                        }
+                    }
+                }
+                break;
+            case ADVANCED:
+                rotations[0] = MovementUtils.getDirection() - 180; // Yaw remains fixed
+
+                if (advancedPitchUpdateTimer.hasTimeElapsed(pitchUpdateFrequencyProperty.getValue().longValue())) {
+                    float randomOffset = MathUtils.getRandomInRange(-advancedPitchRangeProperty.getValue().floatValue(), advancedPitchRangeProperty.getValue().floatValue());
+                    float targetPitch = NORMAL_PITCH + randomOffset;
+
+                    targetPitch = Math.max(78.0f, Math.min(85.0f, targetPitch));
+
+                    currentPitch = targetPitch;
+                    advancedPitchUpdateTimer.reset();
+                }
+                rotations[1] = currentPitch;
                 break;
         }
         return rotations;
@@ -257,6 +295,9 @@ public final class ScaffoldModule extends Module {
         rotatedThisTick = false;
         blocksPlacedCount = 0;
         isSneakingNow = false;
+        currentPitch = NORMAL_PITCH; // Reset pitch on enable
+        advancedPitchUpdateTimer.reset(); // Reset timer on enable
+
         if ((mc.thePlayer.isSprinting() || mc.gameSettings.keyBindSprint.isPressed()) && !sprintProperty.getValue()) {
             mc.thePlayer.setSprinting(false);
             mc.gameSettings.keyBindSprint.setPressed(false);
@@ -278,10 +319,6 @@ public final class ScaffoldModule extends Module {
         if (isSneakingNow) {
             mc.gameSettings.keyBindSneak.setPressed(false);
             isSneakingNow = false;
-        }
-
-        if (autoJumpProperty.getValue() && mc.gameSettings.keyBindJump.isKeyDown()) {
-            mc.gameSettings.keyBindJump.setPressed(false);
         }
 
         rotatedThisTick = false;

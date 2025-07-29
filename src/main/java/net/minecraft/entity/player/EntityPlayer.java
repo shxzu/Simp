@@ -1,7 +1,7 @@
 package net.minecraft.entity.player;
 
 import cc.simp.Simp;
-import cc.simp.event.impl.player.AttackSlowdownEvent;
+import cc.simp.modules.impl.combat.KillAuraModule;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
@@ -1190,12 +1190,15 @@ public abstract class EntityPlayer extends EntityLivingBase
                     {
                         if (i > 0)
                         {
-                            targetEntity.addVelocity(-MathHelper.sin(this.rotationYaw * 3.1415927f / 180.0f) * i * 0.5f, 0.1, MathHelper.cos(this.rotationYaw * 3.1415927f / 180.0f) * i * 0.5f);
-                            final AttackSlowdownEvent attackSlowdownEvent = new AttackSlowdownEvent(false, 0.6);
-                            Simp.INSTANCE.getEventBus().post(attackSlowdownEvent);
-                            this.motionX *= attackSlowdownEvent.getSlowDown();
-                            this.motionZ *= attackSlowdownEvent.getSlowDown();
-                            this.setSprinting(attackSlowdownEvent.isSprint());
+                            targetEntity.addVelocity((double)(-MathHelper.sin(this.rotationYaw * (float)Math.PI / 180.0F) * (float)i * 0.5F), 0.1D, (double)(MathHelper.cos(this.rotationYaw * (float)Math.PI / 180.0F) * (float)i * 0.5F));
+                                this.motionX *= 0.6D;
+                                this.motionZ *= 0.6D;
+                                this.setSprinting(false);
+                                if(Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && !KillAuraModule.keepSprintProperty.getValue()) {
+                                    this.motionX *= 1.0D;
+                                    this.motionZ *= 1.0D;
+                                    this.setSprinting(true);
+                                }
                         }
 
                         if (targetEntity instanceof EntityPlayerMP && targetEntity.velocityChanged)

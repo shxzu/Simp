@@ -233,7 +233,7 @@ public class BackTrackModule extends Module {
                             mc.getNetHandler().sendSilentPacket(incomingPackets.get(0));
                         }
                     } else {
-                        mc.getNetHandler().sendSilentPacket(incomingPackets.get(0));
+                        packet.processPacket(netHandler);
                     }
                 } catch (ThreadQuickExitException ignored) {
                     // Ignored exception
@@ -260,7 +260,7 @@ public class BackTrackModule extends Module {
             while (!outgoingPackets.isEmpty()) {
                 final Packet packet = outgoingPackets.get(0);
                 try {
-                    mc.getNetHandler().sendSilentPacket(outgoingPackets.get(0));
+                    packet.processPacket(netHandler);
                 } catch (ThreadQuickExitException ignored) {
                     // Ignored exception
                 }

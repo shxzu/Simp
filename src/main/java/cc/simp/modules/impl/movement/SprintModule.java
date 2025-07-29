@@ -27,15 +27,13 @@ public final class SprintModule extends Module {
     public final Listener<MoveEvent> moveEventListener = event -> {
         final boolean canSprint = MovementUtils.canSprint(omniProperty.getValue());
         if (MovementUtils.isMoving()) {
-            if (!Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) {
-                float currentYaw = mc.thePlayer.rotationYaw;
-                float yawDifference = Math.abs(MathHelper.wrapAngleTo180_float(currentYaw - Simp.INSTANCE.getRotationManager().getClientYaw()));
-                if (!omniProperty.getValue()) {
-                    mc.gameSettings.keyBindSprint.setPressed(!(yawDifference > 30));
-                    if (yawDifference > 30) mc.thePlayer.setSprinting(false);
-                } else {
-                        mc.thePlayer.setSprinting(canSprint);
-                }
+            float currentYaw = mc.thePlayer.rotationYaw;
+            float yawDifference = Math.abs(MathHelper.wrapAngleTo180_float(currentYaw - Simp.INSTANCE.getRotationManager().getClientYaw()));
+            if (!omniProperty.getValue()) {
+                mc.gameSettings.keyBindSprint.setPressed(!(yawDifference > 30));
+                if (yawDifference > 30) mc.thePlayer.setSprinting(false);
+            } else {
+                mc.thePlayer.setSprinting(canSprint);
             }
         }
     };
