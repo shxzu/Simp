@@ -27,7 +27,7 @@ public class Simp {
     //Simp Client Info
     public static final Simp INSTANCE = new Simp();
     public static final String NAME = "Simp";
-    public static final String BUILD = "072825";
+    public static final String BUILD = "b1";
 
     //Client Background Stuff
     private ModuleManager moduleManager;
