@@ -5,6 +5,7 @@
 [![Build](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)](https://github.com/shxzu/Simp)
 
 **Simp Client** is a free, open-source Minecraft client built for prediction predicting.
+<img width="800" src="https://raw.githubusercontent.com/shxzu/Simp/master/image.png">
 
 ---
 
