@@ -118,7 +118,6 @@ public class Module extends Manager<Property<?>> implements Toggleable, Serializ
     public void setEnabled(boolean enabled) {
         if (this.enabled != enabled) {
             this.enabled = enabled;
-
             if (enabled) {
                 onEnable();
                 Simp.INSTANCE.getEventBus().subscribe(this);

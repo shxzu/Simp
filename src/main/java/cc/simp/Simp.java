@@ -12,6 +12,7 @@ import cc.simp.modules.ModuleManager;
 import cc.simp.modules.impl.client.ClickGUIModule;
 import cc.simp.ui.click.astolfo.AstolfoClickGUI;
 import cc.simp.ui.click.window.WindowClickGUI;
+import de.florianmichael.viamcp.ViaMCP;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import io.github.nevalackin.homoBus.bus.impl.EventBus;
@@ -45,19 +46,16 @@ public class Simp {
     private Simp() {
         // Subscribe Main Class To The Event Bus To Process Events.
         getEventBus().subscribe(this);
-
     }
 
     @EventLink
     public final Listener<ClientStartupEvent> onClientStart = e -> {
 
-        // Font Manager
-
         // Module Manager
         moduleManager = new ModuleManager();
         moduleManager.postInit();
 
-        //Command Handler
+        // Command Handler
         commandHandler = new CommandHandler();
         commandHandler.commands.addAll(Arrays.asList(
                 new BindCommand(),
@@ -70,6 +68,14 @@ public class Simp {
 
         // Config Manager
         configManager = new ConfigManager();
+
+        // ViaMCP Start-Up
+        try {
+            ViaMCP.create();
+            ViaMCP.INSTANCE.initAsyncSlider();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
 
         // Rotation Handler
         rotationManager = new RotationManager();

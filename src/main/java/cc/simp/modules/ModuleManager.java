@@ -51,7 +51,7 @@ public final class ModuleManager {
                 new SpeedModule(),
                 new FlightModule(),
                 new NoSlowdownModule(),
-                new MovementFixModule(),
+                new MovementCorrectionModule(),
 
                 // EXPLOIT
                 new AntiCheatDisablerModule(),

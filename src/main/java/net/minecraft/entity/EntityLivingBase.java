@@ -3,7 +3,7 @@ package net.minecraft.entity;
 import cc.simp.Simp;
 import cc.simp.event.impl.player.PreUpdateEvent;
 import cc.simp.managers.RotationManager;
-import cc.simp.modules.impl.movement.MovementFixModule;
+import cc.simp.modules.impl.movement.MovementCorrectionModule;
 import cc.simp.modules.impl.movement.SprintModule;
 import cc.simp.modules.impl.player.ClientRotationsModule;
 import cc.simp.utils.mc.MovementUtils;
@@ -1355,7 +1355,7 @@ public abstract class EntityLivingBase extends Entity
             if (mc.gameSettings.keyBindLeft.isKeyDown()) {
                 ++strafe;
             }
-            final float yaw = (Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).isEnabled() && SprintModule.omniProperty.getValue() && this instanceof EntityPlayerSP) ? ((float) MovementUtils.getDirection()) : ((Simp.INSTANCE.getModuleManager().getModule(MovementFixModule.class).isEnabled() && Simp.INSTANCE.getRotationManager().isRotating() && this instanceof EntityPlayerSP) ? Simp.INSTANCE.getRotationManager().getClientYaw() : this.rotationYaw);
+            final float yaw = (Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).isEnabled() && SprintModule.omniProperty.getValue() && this instanceof EntityPlayerSP) ? ((float) MovementUtils.getDirection()) : ((Simp.INSTANCE.getModuleManager().getModule(MovementCorrectionModule.class).isEnabled() && Simp.INSTANCE.getRotationManager().isRotating() && this instanceof EntityPlayerSP) ? Simp.INSTANCE.getRotationManager().getClientYaw() : this.rotationYaw);
             final float f = yaw * 0.017453292f;
             this.motionX -= MathHelper.sin(f) * 0.2f;
             this.motionZ += MathHelper.cos(f) * 0.2f;

@@ -185,16 +185,6 @@ public class MovementUtils extends Util {
 
     public static void silentRotationStrafe(final StrafeEvent event, final float yaw) {
         float currentFriction = event.getFriction();
-        boolean sprintWasBrokenThisTick = false;
-
-        float currentYaw = mc.thePlayer.rotationYaw;
-        float yawDifference = Math.abs(MathHelper.wrapAngleTo180_float(currentYaw - yaw));
-
-        if (mc.thePlayer.isSprinting() && mc.gameSettings.keyBindSprint.isPressed() && yawDifference > 30) {
-            mc.thePlayer.setSprinting(false);
-            mc.gameSettings.keyBindSprint.setPressed(false);
-            sprintWasBrokenThisTick = true;
-        }
 
         final int dif = (int)((MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw - yaw - 23.5f - 135.0f) + 180.0f) / 45.0f);
         final float strafe = event.getStrafe();
@@ -225,13 +215,6 @@ public class MovementUtils extends Util {
         if (f >= 1.0E-4f) {
             if ((f = MathHelper.sqrt_float(f)) < 1.0f) {
                 f = 1.0f;
-            }
-
-            if (sprintWasBrokenThisTick) {
-                final double sprintingSpeedBPS = 5.61;
-                final double nonSprintingSpeedBPS = 4.32;
-                final double speedRatio = nonSprintingSpeedBPS / sprintingSpeedBPS;
-                currentFriction = (float)(currentFriction * speedRatio);
             }
 
             f = currentFriction / f;

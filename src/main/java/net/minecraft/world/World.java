@@ -11,6 +11,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+
+import de.florianmichael.viamcp.fixes.FixedSoundEngine;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHopper;
 import net.minecraft.block.BlockLiquid;
@@ -325,24 +327,7 @@ public abstract class World implements IBlockAccess
 
     public boolean destroyBlock(BlockPos pos, boolean dropBlock)
     {
-        IBlockState iblockstate = this.getBlockState(pos);
-        Block block = iblockstate.getBlock();
-
-        if (block.getMaterial() == Material.air)
-        {
-            return false;
-        }
-        else
-        {
-            this.playAuxSFX(2001, pos, Block.getStateId(iblockstate));
-
-            if (dropBlock)
-            {
-                block.dropBlockAsItem(this, pos, iblockstate, 0);
-            }
-
-            return this.setBlockState(pos, Blocks.air.getDefaultState(), 3);
-        }
+        return FixedSoundEngine.destroyBlock(this, pos, dropBlock);
     }
 
     public boolean setBlockState(BlockPos pos, IBlockState state)

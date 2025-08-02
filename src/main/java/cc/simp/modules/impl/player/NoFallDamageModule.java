@@ -18,7 +18,7 @@ import net.minecraft.util.Vec3;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "No Fall Damage", category = ModuleCategory.PLAYER)
+@ModuleInfo(label = "No-Fall Damage", category = ModuleCategory.PLAYER)
 public class NoFallDamageModule extends Module {
 
     public EnumProperty<Mode> modeProperty = new EnumProperty<>("Mode", Mode.CLUTCH);

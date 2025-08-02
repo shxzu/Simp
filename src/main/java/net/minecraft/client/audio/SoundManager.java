@@ -130,6 +130,14 @@ public class SoundManager
         }
     }
 
+    public void playSoundFromFile(String fileName, double x, double y , double z) {
+        SoundSystemConfig.setSoundFilesPackage("assets/minecraft/Xiva/sounds/");
+        sndSystem.loadSound(fileName);
+        sndSystem.newSource(false, "hitmarker", fileName, false, (float) x, (float) y, (float) z, SoundSystemConfig.ATTENUATION_NONE, SoundSystemConfig.getDefaultRolloff());
+        sndSystem.setVolume("hitmarker", (float) (1));
+        sndSystem.play("hitmarker");
+    }
+
     private float getSoundCategoryVolume(SoundCategory category)
     {
         return category != null && category != SoundCategory.MASTER ? this.options.getSoundLevel(category) : 1.0F;

@@ -49,7 +49,8 @@ public final class ScaffoldModule extends Module {
         NORMAL,
         STATIC,
         TELLY,
-        ADVANCED
+        ADVANCED,
+        HYPIXEL
     }
 
     private static final float NORMAL_PITCH = 82.5f;
@@ -178,7 +179,7 @@ public final class ScaffoldModule extends Module {
                 rotations[1] = NORMAL_PITCH;
                 break;
             case TELLY:
-                if (mc.thePlayer.offGroundTicks >= 5) {
+                if (mc.thePlayer.offGroundTicks >= 7) {
                     rotations[0] = MovementUtils.getDirection();
                     rotations[1] = 60;
                 } else {
@@ -209,6 +210,15 @@ public final class ScaffoldModule extends Module {
                 }
                 rotations[1] = currentPitch;
                 break;
+            case HYPIXEL:
+                if (mc.thePlayer.offGroundTicks >= 9) {
+                    rotations[0] = MovementUtils.getDirection();
+                    rotations[1] = 60;
+                } else {
+                    rotations[0] = Simp.INSTANCE.getRotationManager().snapToHypYaw(MovementUtils.getDirection(), false);
+                    rotations[1] = NORMAL_PITCH;
+                }
+                break;
         }
         return rotations;
     }
@@ -230,9 +240,7 @@ public final class ScaffoldModule extends Module {
                         performedAction = attemptPlaceBlock(currentBlockCache);
                     }
                 } else {
-                    if (RaytraceUtils.isOnBlock(currentBlockCache.getFacing(), currentBlockCache.getPosition(), false,
-                            RAYTRACE_DISTANCE, Simp.INSTANCE.getRotationManager().getClientYaw(),
-                            Simp.INSTANCE.getRotationManager().getClientPitch())) {
+                    if (currentBlockCache.getFacing() == mc.thePlayer.getHorizontalFacing()) {
                         performedAction = attemptPlaceBlock(currentBlockCache);
                     }
                 }

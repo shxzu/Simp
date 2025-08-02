@@ -1,6 +1,8 @@
 package net.minecraft.item;
 
 import java.util.List;
+
+import de.florianmichael.viamcp.fixes.FixedSoundEngine;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -31,47 +33,7 @@ public class ItemBlock extends Item
 
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        IBlockState iblockstate = worldIn.getBlockState(pos);
-        Block block = iblockstate.getBlock();
-
-        if (!block.isReplaceable(worldIn, pos))
-        {
-            pos = pos.offset(side);
-        }
-
-        if (stack.stackSize == 0)
-        {
-            return false;
-        }
-        else if (!playerIn.canPlayerEdit(pos, side, stack))
-        {
-            return false;
-        }
-        else if (worldIn.canBlockBePlaced(this.block, pos, false, side, (Entity)null, stack))
-        {
-            int i = this.getMetadata(stack.getMetadata());
-            IBlockState iblockstate1 = this.block.onBlockPlaced(worldIn, pos, side, hitX, hitY, hitZ, i, playerIn);
-
-            if (worldIn.setBlockState(pos, iblockstate1, 3))
-            {
-                iblockstate1 = worldIn.getBlockState(pos);
-
-                if (iblockstate1.getBlock() == this.block)
-                {
-                    setTileEntityNBT(worldIn, playerIn, pos, stack);
-                    this.block.onBlockPlacedBy(worldIn, pos, iblockstate1, playerIn, stack);
-                }
-
-                worldIn.playSoundEffect((double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), this.block.stepSound.getPlaceSound(), (this.block.stepSound.getVolume() + 1.0F) / 2.0F, this.block.stepSound.getFrequency() * 0.8F);
-                --stack.stackSize;
-            }
-
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return FixedSoundEngine.onItemUse(this, stack, playerIn, worldIn, pos, side, hitX, hitY, hitZ);
     }
 
     public static boolean setTileEntityNBT(World worldIn, EntityPlayer pos, BlockPos stack, ItemStack p_179224_3_)

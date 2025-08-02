@@ -54,7 +54,7 @@ public class RotationManager {
         this.rotateToward(this.snapToHypYaw(MovementUtils.getDirection(), slowdown), 80.0f, rotationSpeed);
     }
 
-    private float snapToHypYaw(final float yaw, final boolean slowdown) {
+    public float snapToHypYaw(final float yaw, final boolean slowdown) {
         final float snappedBase = Math.round(yaw / 45.0f) * 45.0f;
         float lowerOffset;
         float upperOffset;

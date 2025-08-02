@@ -195,6 +195,10 @@ public class SoundHandler implements IResourceManagerReloadListener, ITickable
         this.sndManager.playSound(sound);
     }
 
+    public void playSoundFromFile(String fileName, double x, double y , double z) {
+        sndManager.playSoundFromFile(fileName, x, y ,z);
+    }
+
     public void playDelayedSound(ISound sound, int delay)
     {
         this.sndManager.playDelayedSound(sound, delay);
