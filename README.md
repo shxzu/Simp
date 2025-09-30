@@ -59,6 +59,7 @@ cd Simp
 ## Contributing
 
 please do this im lazy -puhfy
+
 i haven't touched ts in like 2 months so i agree. -shxzu
 
 | Step | Action |
