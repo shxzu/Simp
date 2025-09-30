@@ -13,15 +13,16 @@
 
 | Category                | Details                                                                 |
 |------------------------|-------------------------------------------------------------------------|
-| Anti-Cheat Bypass      | Does intave, watchdawg, uh like more probably                           |
-| Interface              | Minimal, clean ui with easy customization                               |
-| Open Source            | This means no bigrat.monster                                            |
+| Anti-Cheat Bypass      | Bypasses Intave, Watchdog, Verus and more!                              |
+| Interface              | Minimal, and clean UI with easy customization!                          |
+| Open Source            | This means no bigrat.monster!                                           |
 
 ---
 
 ## Download
 
 Get the latest release at [Releases Page](https://github.com/shxzu/Simp/releases).
+... or get a unstable nightly build at the [Actions Page](https://github.com/shxzu/Simp/actions)
 
 ---
 
@@ -30,7 +31,7 @@ Get the latest release at [Releases Page](https://github.com/shxzu/Simp/releases
 **Requirements**
 
 - Java JDK 8 or higher
-- IntelliJ IDEA (recommended)
+- IDE of your preference (IntelliJ IDEA recommended)
 - Git
 
 **Steps**
@@ -40,12 +41,12 @@ git clone https://github.com/shxzu/Simp.git
 cd Simp
 ```
 
-1. Open the project in IntelliJ IDEA.
+1. Open the project in your IDE.
 2. Make a run directory
 3. Create a new Run Configuration:
    - Type: Application
    - Main Class: (refer to screenshot below)
-   - Use classpath of module: `simp.main`
+   - Use classpath of module: `Simp.main`
 4. Run the client.
 
 **Example Run Configuration**
@@ -57,6 +58,7 @@ cd Simp
 ## Contributing
 
 please do this im lazy -puhfy
+i haven't touched ts in like 2 months so i agree. -shxzu
 
 | Step | Action |
 |------|--------|
