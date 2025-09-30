@@ -22,6 +22,7 @@
 ## Download
 
 Get the latest release at [Releases Page](https://github.com/shxzu/Simp/releases).
+
 ... or get a unstable nightly build at the [Actions Page](https://github.com/shxzu/Simp/actions)
 
 ---
