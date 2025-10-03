@@ -52,6 +52,7 @@
 # Clone the repo
 ```bash
 git clone https://github.com/shxzu/Simp.git
+```
 
 # Open in IDE and build the Maven project
 (Intellij IDEA Instructions)
