@@ -56,7 +56,9 @@ git clone https://github.com/shxzu/Simp.git
 
 # Open in IDE and build the Maven project
 (Intellij IDEA Instructions)
+
 Click the import Maven project button when opening the project folder in your IDE.
+
 (Anything other IDE isn't supported but if you find a way to import it using Eclipse, NetBeans, e.g. go ahead.)
 
 # Make a run configuration
