@@ -1,7 +1,6 @@
 # Simp — compact, sleek Minecraft client (Recode)
 
 <p align="center">
-  <a href="https://github.com/shxzu/Simp/actions"><img alt="build" src="https://img.shields.io/github/actions/workflow/status/shxzu/Simp/ci.yml?label=build&logo=github&style=for-the-badge"></a>
   <a href="https://github.com/shxzu/Simp/releases"><img alt="releases" src="https://img.shields.io/github/v/release/shxzu/Simp?style=for-the-badge"></a>
   <a href="https://img.shields.io/github/stars/shxzu/Simp?style=for-the-badge"><img alt="stars" src="https://img.shields.io/github/stars/shxzu/Simp?style=for-the-badge"></a>
   <a href="https://img.shields.io/github/forks/shxzu/Simp?style=for-the-badge"><img alt="forks" src="https://img.shields.io/github/forks/shxzu/Simp?style=for-the-badge"></a>
