@@ -1,5 +1,8 @@
 package net.minecraft.client.entity;
 
+import cc.simp.Simp;
+import cc.simp.api.events.impl.player.MotionEvent;
+import cc.simp.api.events.impl.player.SprintEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MovingSoundMinecartRiding;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -127,90 +130,101 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
     public void onUpdateWalkingPlayer()
     {
-        boolean flag = this.isSprinting();
+        final SprintEvent sprintEvent = new SprintEvent(isSprinting());
+        Simp.INSTANCE.getEventBus().post(sprintEvent);
+        final boolean clientSprintState = sprintEvent.isSprinting();
 
-        if (flag != this.serverSprintState)
-        {
-            if (flag)
-            {
-                this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SPRINTING));
-            }
-            else
-            {
-                this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.STOP_SPRINTING));
+        if (clientSprintState != this.serverSprintState) {
+            if (clientSprintState) {
+                this.sendQueue.sendPacket(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SPRINTING));
+            } else {
+                this.sendQueue.sendPacket(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.STOP_SPRINTING));
             }
 
-            this.serverSprintState = flag;
+            this.serverSprintState = clientSprintState;
         }
 
-        boolean flag1 = this.isSneaking();
+        final boolean clientSneakState = isSneaking();
 
-        if (flag1 != this.serverSneakState)
-        {
-            if (flag1)
-            {
-                this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SNEAKING));
-            }
-            else
-            {
-                this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.STOP_SNEAKING));
+        if (clientSneakState != this.serverSneakState) {
+            if (clientSneakState) {
+                this.sendQueue.sendPacket(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SNEAKING));
+            } else {
+                this.sendQueue.sendPacket(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.STOP_SNEAKING));
             }
 
-            this.serverSneakState = flag1;
+            this.serverSneakState = clientSneakState;
         }
 
-        if (this.isCurrentViewEntity())
-        {
-            double d0 = this.posX - this.lastReportedPosX;
-            double d1 = this.getEntityBoundingBox().minY - this.lastReportedPosY;
-            double d2 = this.posZ - this.lastReportedPosZ;
-            double d3 = this.rotationYaw - this.lastReportedYaw;
-            double d4 = this.rotationPitch - this.lastReportedPitch;
-            boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
-            boolean flag3 = d3 != 0.0D || d4 != 0.0D;
+        if (this.isCurrentViewEntity()) {
+            final MotionEvent motionEvent = new MotionEvent(
+                    lastReportedYaw, lastReportedPitch,
+                    posX, getEntityBoundingBox().minY, posZ,
+                    lastTickPosX, lastTickPosY, lastTickPosZ,
+                    rotationYaw, rotationPitch,
+                    onGround);
+            Simp.INSTANCE.getEventBus().post(motionEvent);
+            final double eventX = motionEvent.getPosX();
+            final double eventY = motionEvent.getPosY();
+            final double eventZ = motionEvent.getPosZ();
+            final float eventYaw = motionEvent.getYaw();
+            final float eventPitch = motionEvent.getPitch();
+            final boolean eventOnGround = motionEvent.isOnGround();
 
-            if (this.ridingEntity == null)
-            {
-                if (flag2 && flag3)
-                {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround));
-                }
-                else if (flag2)
-                {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.onGround));
-                }
-                else if (flag3)
-                {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(this.rotationYaw, this.rotationPitch, this.onGround));
-                }
-                else
-                {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer(this.onGround));
-                }
-            }
-            else
-            {
-                this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
-                flag2 = false;
-            }
+            final double xDif = eventX - this.lastReportedPosX;
+            double yDif = eventY - this.lastReportedPosY;
+            double zDif = eventZ - this.lastReportedPosZ;
+            float yawDif = eventYaw - this.lastReportedYaw;
+            float pitchDif = eventPitch - this.lastReportedPitch;
+            boolean updateXYZ = xDif * xDif + yDif * yDif + zDif * zDif > 9.0E-4D || this.positionUpdateTicks >= 20;
+            boolean updateYawPitch = yawDif != 0.0D || pitchDif != 0.0D;
+            boolean cancelled = motionEvent.isCancelled();
 
-            ++this.positionUpdateTicks;
+            if (isRiding()) {
+                if (!cancelled) {
+                    this.sendQueue.sendPacket(new C03PacketPlayer.C05PacketPlayerLook(
+                            eventYaw, eventPitch, eventOnGround));
+                    this.sendQueue.sendPacket(new C0CPacketInput(
+                            this.moveStrafing, this.moveForward,
+                            this.movementInput.jump, this.movementInput.sneak));
+                }
+            } else {
+                if (!cancelled) {
+                    if (updateXYZ && updateYawPitch) {
+                        this.sendQueue.sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(
+                                eventX, eventY, eventZ, eventYaw, eventPitch, eventOnGround));
+                    } else if (updateXYZ) {
+                        this.sendQueue.sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(
+                                eventX, eventY, eventZ, eventOnGround));
+                    } else if (updateYawPitch) {
+                        this.sendQueue.sendPacket(new C03PacketPlayer.C05PacketPlayerLook(
+                                eventYaw, eventPitch, eventOnGround));
+                    } else {
+                        this.sendQueue.sendPacket(new C03PacketPlayer(eventOnGround));
+                    }
+                }
 
-            if (flag2)
-            {
-                this.lastReportedPosX = this.posX;
-                this.lastReportedPosY = this.getEntityBoundingBox().minY;
-                this.lastReportedPosZ = this.posZ;
-                this.positionUpdateTicks = 0;
-            }
 
-            if (flag3)
-            {
-                this.lastReportedYaw = this.rotationYaw;
-                this.lastReportedPitch = this.rotationPitch;
+                ++this.positionUpdateTicks;
+
+                if (updateXYZ) {
+                    this.lastReportedPosX = eventX;
+                    this.lastReportedPosY = eventY;
+                    this.lastReportedPosZ = eventZ;
+                    this.positionUpdateTicks = 0;
+                }
+
+                if (updateYawPitch) {
+                    this.lastReportedYaw = eventYaw;
+                    this.lastReportedPitch = eventPitch;
+                }
+
+                motionEvent.setPost();
+                Simp.INSTANCE.getEventBus().post(motionEvent);
             }
         }
     }
+
 
     public EntityItem dropOneItem(boolean dropAll)
     {

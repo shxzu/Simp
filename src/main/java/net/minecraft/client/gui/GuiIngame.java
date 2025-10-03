@@ -1,5 +1,7 @@
 package net.minecraft.client.gui;
 
+import cc.simp.Simp;
+import cc.simp.api.events.impl.render.Render2DEvent;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -101,6 +103,7 @@ public class GuiIngame extends Gui
         int i = scaledresolution.getScaledWidth();
         int j = scaledresolution.getScaledHeight();
         this.mc.entityRenderer.setupOverlayRendering();
+        Simp.INSTANCE.getEventBus().post(new Render2DEvent(partialTicks));
         GlStateManager.enableBlend();
 
         if (Config.isVignetteEnabled())

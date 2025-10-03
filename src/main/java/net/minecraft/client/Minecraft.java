@@ -1,5 +1,7 @@
 package net.minecraft.client;
 
+import cc.simp.Simp;
+import cc.simp.api.events.impl.game.ClientStartupEvent;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -322,6 +324,7 @@ public class Minecraft implements IThreadListener
         try
         {
             this.startGame();
+            Simp.INSTANCE.getEventBus().post(new ClientStartupEvent());
         }
         catch (Throwable throwable)
         {
@@ -541,7 +544,7 @@ public class Minecraft implements IThreadListener
     private void createDisplay() throws LWJGLException
     {
         Display.setResizable(true);
-        Display.setTitle("Minecraft 1.8.9 (LWJGL+" + Version.getVersion() + ")");
+        Display.setTitle(Simp.FULL + " | LWJGL " + Version.getVersion());
 
         Display.create((new PixelFormat()).withDepthBits(24));
     }

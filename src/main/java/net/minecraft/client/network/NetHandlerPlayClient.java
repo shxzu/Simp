@@ -1,5 +1,7 @@
 package net.minecraft.client.network;
 
+import cc.simp.Simp;
+import cc.simp.api.events.impl.packet.PacketSendEvent;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -1904,5 +1906,15 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
     public GameProfile getGameProfile()
     {
         return this.profile;
+    }
+
+    public void sendPacket(Packet<?> p) {
+        PacketSendEvent sendEvent = new PacketSendEvent(p);
+        Simp.INSTANCE.getEventBus().post(sendEvent);
+        if (sendEvent.isCancelled()) {
+            return;
+        }
+
+        this.netManager.sendPacket(p);
     }
 }
