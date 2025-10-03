@@ -35,7 +35,7 @@ public class CommandMessageRaw extends CommandBase
     {
         if (args.length < 2)
         {
-            throw new WrongUsageException("commands.tellraw.usage", new Object[0]);
+            throw new WrongUsageException("commands.tellraw.usage");
         }
         else
         {
@@ -50,7 +50,7 @@ public class CommandMessageRaw extends CommandBase
             catch (JsonParseException jsonparseexception)
             {
                 Throwable throwable = ExceptionUtils.getRootCause(jsonparseexception);
-                throw new SyntaxErrorException("commands.tellraw.jsonException", new Object[] {throwable == null ? "" : throwable.getMessage()});
+                throw new SyntaxErrorException("commands.tellraw.jsonException", throwable == null ? "" : throwable.getMessage());
             }
         }
     }

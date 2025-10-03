@@ -20,7 +20,7 @@ public class Metadata
 
     public Metadata(String p_i1030_1_)
     {
-        this(p_i1030_1_, (String)null);
+        this(p_i1030_1_, null);
     }
 
     public void func_152807_a(String p_152807_1_)
@@ -37,7 +37,7 @@ public class Metadata
     {
         if (this.payload == null)
         {
-            this.payload = Maps.<String, String>newHashMap();
+            this.payload = Maps.newHashMap();
         }
 
         if (this.payload.size() > 50)
@@ -68,7 +68,7 @@ public class Metadata
 
     public String func_152806_b()
     {
-        return this.payload != null && !this.payload.isEmpty() ? field_152811_a.toJson((Object)this.payload) : null;
+        return this.payload != null && !this.payload.isEmpty() ? field_152811_a.toJson(this.payload) : null;
     }
 
     public String func_152810_c()

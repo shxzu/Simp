@@ -20,7 +20,7 @@ public class PlayerItemModel
     private ResourceLocation textureLocation = null;
     private BufferedImage textureImage = null;
     private DynamicTexture texture = null;
-    private ResourceLocation locationMissing = new ResourceLocation("textures/blocks/wool_colored_red.png");
+    private final ResourceLocation locationMissing = new ResourceLocation("textures/blocks/wool_colored_red.png");
     public static final int ATTACH_BODY = 0;
     public static final int ATTACH_HEAD = 1;
     public static final int ATTACH_LEFT_ARM = 2;

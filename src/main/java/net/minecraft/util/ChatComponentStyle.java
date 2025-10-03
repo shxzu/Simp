@@ -8,7 +8,7 @@ import java.util.List;
 
 public abstract class ChatComponentStyle implements IChatComponent
 {
-    protected List<IChatComponent> siblings = Lists.<IChatComponent>newArrayList();
+    protected List<IChatComponent> siblings = Lists.newArrayList();
     private ChatStyle style;
 
     public IChatComponent appendSibling(IChatComponent component)
@@ -57,7 +57,7 @@ public abstract class ChatComponentStyle implements IChatComponent
 
     public Iterator<IChatComponent> iterator()
     {
-        return Iterators.<IChatComponent>concat(Iterators.<IChatComponent>forArray(new ChatComponentStyle[] {this}), createDeepCopyIterator(this.siblings));
+        return Iterators.concat(Iterators.<IChatComponent>forArray(new ChatComponentStyle[] {this}), createDeepCopyIterator(this.siblings));
     }
 
     public final String getUnformattedText()
@@ -80,7 +80,7 @@ public abstract class ChatComponentStyle implements IChatComponent
         {
             stringbuilder.append(ichatcomponent.getChatStyle().getFormattingCode());
             stringbuilder.append(ichatcomponent.getUnformattedTextForChat());
-            stringbuilder.append((Object)EnumChatFormatting.RESET);
+            stringbuilder.append(EnumChatFormatting.RESET);
         }
 
         return stringbuilder.toString();
@@ -113,13 +113,12 @@ public abstract class ChatComponentStyle implements IChatComponent
         {
             return true;
         }
-        else if (!(p_equals_1_ instanceof ChatComponentStyle))
+        else if (!(p_equals_1_ instanceof ChatComponentStyle chatcomponentstyle))
         {
             return false;
         }
         else
         {
-            ChatComponentStyle chatcomponentstyle = (ChatComponentStyle)p_equals_1_;
             return this.siblings.equals(chatcomponentstyle.siblings) && this.getChatStyle().equals(chatcomponentstyle.getChatStyle());
         }
     }

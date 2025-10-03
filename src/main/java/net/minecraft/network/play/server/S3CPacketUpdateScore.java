@@ -45,7 +45,7 @@ public class S3CPacketUpdateScore implements Packet<INetHandlerPlayClient>
     public void readPacketData(PacketBuffer buf) throws IOException
     {
         this.name = buf.readStringFromBuffer(40);
-        this.action = (S3CPacketUpdateScore.Action)buf.readEnumValue(S3CPacketUpdateScore.Action.class);
+        this.action = buf.readEnumValue(Action.class);
         this.objective = buf.readStringFromBuffer(16);
 
         if (this.action != S3CPacketUpdateScore.Action.REMOVE)
@@ -91,9 +91,9 @@ public class S3CPacketUpdateScore implements Packet<INetHandlerPlayClient>
         return this.action;
     }
 
-    public static enum Action
+    public enum Action
     {
         CHANGE,
-        REMOVE;
+        REMOVE
     }
 }

@@ -97,9 +97,8 @@ public class ItemDye extends Item
     {
         IBlockState iblockstate = worldIn.getBlockState(target);
 
-        if (iblockstate.getBlock() instanceof IGrowable)
+        if (iblockstate.getBlock() instanceof IGrowable igrowable)
         {
-            IGrowable igrowable = (IGrowable)iblockstate.getBlock();
 
             if (igrowable.canGrow(worldIn, target, iblockstate, worldIn.isRemote))
             {
@@ -138,16 +137,15 @@ public class ItemDye extends Item
                 double d0 = itemRand.nextGaussian() * 0.02D;
                 double d1 = itemRand.nextGaussian() * 0.02D;
                 double d2 = itemRand.nextGaussian() * 0.02D;
-                worldIn.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, (double)((float)pos.getX() + itemRand.nextFloat()), (double)pos.getY() + (double)itemRand.nextFloat() * block.getBlockBoundsMaxY(), (double)((float)pos.getZ() + itemRand.nextFloat()), d0, d1, d2, new int[0]);
+                worldIn.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, (float)pos.getX() + itemRand.nextFloat(), (double)pos.getY() + (double)itemRand.nextFloat() * block.getBlockBoundsMaxY(), (float)pos.getZ() + itemRand.nextFloat(), d0, d1, d2);
             }
         }
     }
 
     public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer playerIn, EntityLivingBase target)
     {
-        if (target instanceof EntitySheep)
+        if (target instanceof EntitySheep entitysheep)
         {
-            EntitySheep entitysheep = (EntitySheep)target;
             EnumDyeColor enumdyecolor = EnumDyeColor.byDyeDamage(stack.getMetadata());
 
             if (!entitysheep.getSheared() && entitysheep.getFleeceColor() != enumdyecolor)

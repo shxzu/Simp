@@ -65,8 +65,8 @@ public abstract class BiomeGenBase
     protected static final BiomeGenBase.Height height_LowIslands = new BiomeGenBase.Height(0.2F, 0.3F);
     protected static final BiomeGenBase.Height height_PartiallySubmerged = new BiomeGenBase.Height(-0.2F, 0.1F);
     private static final BiomeGenBase[] biomeList = new BiomeGenBase[256];
-    public static final Set<BiomeGenBase> explorationBiomesList = Sets.<BiomeGenBase>newHashSet();
-    public static final Map<String, BiomeGenBase> BIOME_ID_MAP = Maps.<String, BiomeGenBase>newHashMap();
+    public static final Set<BiomeGenBase> explorationBiomesList = Sets.newHashSet();
+    public static final Map<String, BiomeGenBase> BIOME_ID_MAP = Maps.newHashMap();
     public static final BiomeGenBase ocean = (new BiomeGenOcean(0)).setColor(112).setBiomeName("Ocean").setHeight(height_Oceans);
     public static final BiomeGenBase plains = (new BiomeGenPlains(1)).setColor(9286496).setBiomeName("Plains");
     public static final BiomeGenBase desert = (new BiomeGenDesert(2)).setColor(16421912).setBiomeName("Desert").setDisableRain().setTemperatureRainfall(2.0F, 0.0F).setHeight(height_LowPlains);
@@ -141,10 +141,10 @@ public abstract class BiomeGenBase
         this.temperature = 0.5F;
         this.rainfall = 0.5F;
         this.waterColorMultiplier = 16777215;
-        this.spawnableMonsterList = Lists.<BiomeGenBase.SpawnListEntry>newArrayList();
-        this.spawnableCreatureList = Lists.<BiomeGenBase.SpawnListEntry>newArrayList();
-        this.spawnableWaterCreatureList = Lists.<BiomeGenBase.SpawnListEntry>newArrayList();
-        this.spawnableCaveCreatureList = Lists.<BiomeGenBase.SpawnListEntry>newArrayList();
+        this.spawnableMonsterList = Lists.newArrayList();
+        this.spawnableCreatureList = Lists.newArrayList();
+        this.spawnableWaterCreatureList = Lists.newArrayList();
+        this.spawnableCaveCreatureList = Lists.newArrayList();
         this.enableRain = true;
         this.worldGeneratorTrees = new WorldGenTrees(false);
         this.worldGeneratorBigTree = new WorldGenBigTree(false);
@@ -202,7 +202,7 @@ public abstract class BiomeGenBase
 
     public WorldGenAbstractTree genBigTreeChance(Random rand)
     {
-        return (WorldGenAbstractTree)(rand.nextInt(10) == 0 ? this.worldGeneratorBigTree : this.worldGeneratorTrees);
+        return rand.nextInt(10) == 0 ? this.worldGeneratorBigTree : this.worldGeneratorTrees;
     }
 
     public WorldGenerator getRandomWorldGenForGrass(Random rand)
@@ -285,7 +285,7 @@ public abstract class BiomeGenBase
                 return this.spawnableCaveCreatureList;
 
             default:
-                return Collections.<BiomeGenBase.SpawnListEntry>emptyList();
+                return Collections.emptyList();
         }
     }
 
@@ -296,7 +296,7 @@ public abstract class BiomeGenBase
 
     public boolean canRain()
     {
-        return this.isSnowyBiome() ? false : this.enableRain;
+        return !this.isSnowyBiome() && this.enableRain;
     }
 
     public boolean isHighHumidity()
@@ -323,7 +323,7 @@ public abstract class BiomeGenBase
     {
         if (pos.getY() > 64)
         {
-            float f = (float)(temperatureNoise.func_151601_a((double)pos.getX() * 1.0D / 8.0D, (double)pos.getZ() * 1.0D / 8.0D) * 4.0D);
+            float f = (float)(temperatureNoise.func_151601_a((double) pos.getX() / 8.0D, (double) pos.getZ() / 8.0D) * 4.0D);
             return this.temperature - (f + (float)pos.getY() - 64.0F) * 0.05F / 30.0F;
         }
         else
@@ -339,15 +339,15 @@ public abstract class BiomeGenBase
 
     public int getGrassColorAtPos(BlockPos pos)
     {
-        double d0 = (double)MathHelper.clamp_float(this.getFloatTemperature(pos), 0.0F, 1.0F);
-        double d1 = (double)MathHelper.clamp_float(this.getFloatRainfall(), 0.0F, 1.0F);
+        double d0 = MathHelper.clamp_float(this.getFloatTemperature(pos), 0.0F, 1.0F);
+        double d1 = MathHelper.clamp_float(this.getFloatRainfall(), 0.0F, 1.0F);
         return ColorizerGrass.getGrassColor(d0, d1);
     }
 
     public int getFoliageColorAtPos(BlockPos pos)
     {
-        double d0 = (double)MathHelper.clamp_float(this.getFloatTemperature(pos), 0.0F, 1.0F);
-        double d1 = (double)MathHelper.clamp_float(this.getFloatRainfall(), 0.0F, 1.0F);
+        double d0 = MathHelper.clamp_float(this.getFloatTemperature(pos), 0.0F, 1.0F);
+        double d1 = MathHelper.clamp_float(this.getFloatRainfall(), 0.0F, 1.0F);
         return ColorizerFoliage.getFoliageColor(d0, d1);
     }
 
@@ -463,7 +463,7 @@ public abstract class BiomeGenBase
 
     public boolean isEqualTo(BiomeGenBase biome)
     {
-        return biome == this ? true : (biome == null ? false : this.getBiomeClass() == biome.getBiomeClass());
+        return biome == this || (biome != null && this.getBiomeClass() == biome.getBiomeClass());
     }
 
     public BiomeGenBase.TempCategory getTempCategory()
@@ -478,7 +478,7 @@ public abstract class BiomeGenBase
 
     public static BiomeGenBase getBiome(int id)
     {
-        return getBiomeFromBiomeList(id, (BiomeGenBase)null);
+        return getBiomeFromBiomeList(id, null);
     }
 
     public static BiomeGenBase getBiomeFromBiomeList(int biomeId, BiomeGenBase biome)
@@ -525,7 +525,7 @@ public abstract class BiomeGenBase
             {
                 if (BIOME_ID_MAP.containsKey(biomegenbase.biomeName))
                 {
-                    throw new Error("Biome \"" + biomegenbase.biomeName + "\" is defined as both ID " + ((BiomeGenBase)BIOME_ID_MAP.get(biomegenbase.biomeName)).biomeID + " and " + biomegenbase.biomeID);
+                    throw new Error("Biome \"" + biomegenbase.biomeName + "\" is defined as both ID " + BIOME_ID_MAP.get(biomegenbase.biomeName).biomeID + " and " + biomegenbase.biomeID);
                 }
 
                 BIOME_ID_MAP.put(biomegenbase.biomeName, biomegenbase);
@@ -583,11 +583,11 @@ public abstract class BiomeGenBase
         }
     }
 
-    public static enum TempCategory
+    public enum TempCategory
     {
         OCEAN,
         COLD,
         MEDIUM,
-        WARM;
+        WARM
     }
 }

@@ -5,10 +5,10 @@ import net.optifine.entity.model.anim.ModelUpdater;
 
 public class CustomModelRenderer
 {
-    private String modelPart;
-    private boolean attach;
-    private ModelRenderer modelRenderer;
-    private ModelUpdater modelUpdater;
+    private final String modelPart;
+    private final boolean attach;
+    private final ModelRenderer modelRenderer;
+    private final ModelUpdater modelUpdater;
 
     public CustomModelRenderer(String modelPart, boolean attach, ModelRenderer modelRenderer, ModelUpdater modelUpdater)
     {

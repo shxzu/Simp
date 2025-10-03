@@ -24,13 +24,12 @@ public class ModelAdapterLeadKnot extends ModelAdapter
 
     public ModelRenderer getModelRenderer(ModelBase model, String modelPart)
     {
-        if (!(model instanceof ModelLeashKnot))
+        if (!(model instanceof ModelLeashKnot modelleashknot))
         {
             return null;
         }
         else
         {
-            ModelLeashKnot modelleashknot = (ModelLeashKnot)model;
             return modelPart.equals("knot") ? modelleashknot.field_110723_a : null;
         }
     }

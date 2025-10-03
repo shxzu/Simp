@@ -7,7 +7,7 @@ import net.minecraft.util.EnumFacing;
 
 public abstract class BlockRotatedPillar extends Block
 {
-    public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis", EnumFacing.Axis.class);
+    public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class);
 
     protected BlockRotatedPillar(Material materialIn)
     {

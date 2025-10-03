@@ -15,8 +15,8 @@ import net.minecraft.item.ItemStack;
 public class FurnaceRecipes
 {
     private static final FurnaceRecipes smeltingBase = new FurnaceRecipes();
-    private Map<ItemStack, ItemStack> smeltingList = Maps.<ItemStack, ItemStack>newHashMap();
-    private Map<ItemStack, Float> experienceList = Maps.<ItemStack, Float>newHashMap();
+    private final Map<ItemStack, ItemStack> smeltingList = Maps.newHashMap();
+    private final Map<ItemStack, Float> experienceList = Maps.newHashMap();
 
     public static FurnaceRecipes instance()
     {
@@ -80,9 +80,9 @@ public class FurnaceRecipes
     {
         for (Entry<ItemStack, ItemStack> entry : this.smeltingList.entrySet())
         {
-            if (this.compareItemStacks(stack, (ItemStack)entry.getKey()))
+            if (this.compareItemStacks(stack, entry.getKey()))
             {
-                return (ItemStack)entry.getValue();
+                return entry.getValue();
             }
         }
 
@@ -103,9 +103,9 @@ public class FurnaceRecipes
     {
         for (Entry<ItemStack, Float> entry : this.experienceList.entrySet())
         {
-            if (this.compareItemStacks(stack, (ItemStack)entry.getKey()))
+            if (this.compareItemStacks(stack, entry.getKey()))
             {
-                return ((Float)entry.getValue()).floatValue();
+                return entry.getValue().floatValue();
             }
         }
 

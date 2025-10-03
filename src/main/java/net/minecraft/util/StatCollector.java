@@ -2,8 +2,8 @@ package net.minecraft.util;
 
 public class StatCollector
 {
-    private static StringTranslate localizedName = StringTranslate.getInstance();
-    private static StringTranslate fallbackTranslator = new StringTranslate();
+    private static final StringTranslate localizedName = StringTranslate.getInstance();
+    private static final StringTranslate fallbackTranslator = new StringTranslate();
 
     public static String translateToLocal(String key)
     {

@@ -111,7 +111,7 @@ public class ServerData
         this.lanServer = serverDataIn.lanServer;
     }
 
-    public static enum ServerResourceMode
+    public enum ServerResourceMode
     {
         ENABLED("enabled"),
         DISABLED("disabled"),
@@ -119,9 +119,9 @@ public class ServerData
 
         private final IChatComponent motd;
 
-        private ServerResourceMode(String name)
+        ServerResourceMode(String name)
         {
-            this.motd = new ChatComponentTranslation("addServer.resourcePack." + name, new Object[0]);
+            this.motd = new ChatComponentTranslation("addServer.resourcePack." + name);
         }
 
         public IChatComponent getMotd()

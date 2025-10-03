@@ -24,7 +24,6 @@ public class RenderWitherSkull extends Render<EntityWitherSkull>
 
         for (f = p_82400_2_ - p_82400_1_; f < -180.0F; f += 360.0F)
         {
-            ;
         }
 
         while (f >= 180.0F)

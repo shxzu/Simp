@@ -23,9 +23,9 @@ public class EntityTNTPrimed extends Entity
         this(worldIn);
         this.setPosition(x, y, z);
         float f = (float)(Math.random() * Math.PI * 2.0D);
-        this.motionX = (double)(-((float)Math.sin((double)f)) * 0.02F);
+        this.motionX = -((float)Math.sin(f)) * 0.02F;
         this.motionY = 0.20000000298023224D;
-        this.motionZ = (double)(-((float)Math.cos((double)f)) * 0.02F);
+        this.motionZ = -((float)Math.cos(f)) * 0.02F;
         this.fuse = 80;
         this.prevPosX = x;
         this.prevPosY = y;
@@ -77,7 +77,7 @@ public class EntityTNTPrimed extends Entity
         else
         {
             this.handleWaterMovement();
-            this.worldObj.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D, new int[0]);
+            this.worldObj.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D);
         }
     }
 

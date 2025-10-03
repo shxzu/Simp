@@ -35,7 +35,7 @@ public class NBTTagLong extends NBTBase.NBTPrimitive
 
     public String toString()
     {
-        return "" + this.data + "L";
+        return this.data + "L";
     }
 
     public NBTBase copy()

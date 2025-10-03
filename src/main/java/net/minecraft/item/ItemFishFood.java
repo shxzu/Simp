@@ -68,14 +68,14 @@ public class ItemFishFood extends ItemFood
         return this.getUnlocalizedName() + "." + itemfishfood$fishtype.getUnlocalizedName() + "." + (this.cooked && itemfishfood$fishtype.canCook() ? "cooked" : "raw");
     }
 
-    public static enum FishType
+    public enum FishType
     {
         COD(0, "cod", 2, 0.1F, 5, 0.6F),
         SALMON(1, "salmon", 2, 0.1F, 6, 0.8F),
         CLOWNFISH(2, "clownfish", 1, 0.1F),
         PUFFERFISH(3, "pufferfish", 1, 0.1F);
 
-        private static final Map<Integer, ItemFishFood.FishType> META_LOOKUP = Maps.<Integer, ItemFishFood.FishType>newHashMap();
+        private static final Map<Integer, ItemFishFood.FishType> META_LOOKUP = Maps.newHashMap();
         private final int meta;
         private final String unlocalizedName;
         private final int uncookedHealAmount;
@@ -84,7 +84,7 @@ public class ItemFishFood extends ItemFood
         private final float cookedSaturationModifier;
         private boolean cookable = false;
 
-        private FishType(int meta, String unlocalizedName, int uncookedHeal, float uncookedSaturation, int cookedHeal, float cookedSaturation)
+        FishType(int meta, String unlocalizedName, int uncookedHeal, float uncookedSaturation, int cookedHeal, float cookedSaturation)
         {
             this.meta = meta;
             this.unlocalizedName = unlocalizedName;
@@ -95,7 +95,7 @@ public class ItemFishFood extends ItemFood
             this.cookable = true;
         }
 
-        private FishType(int meta, String unlocalizedName, int uncookedHeal, float uncookedSaturation)
+        FishType(int meta, String unlocalizedName, int uncookedHeal, float uncookedSaturation)
         {
             this.meta = meta;
             this.unlocalizedName = unlocalizedName;
@@ -143,7 +143,7 @@ public class ItemFishFood extends ItemFood
 
         public static ItemFishFood.FishType byMetadata(int meta)
         {
-            ItemFishFood.FishType itemfishfood$fishtype = (ItemFishFood.FishType)META_LOOKUP.get(Integer.valueOf(meta));
+            ItemFishFood.FishType itemfishfood$fishtype = META_LOOKUP.get(Integer.valueOf(meta));
             return itemfishfood$fishtype == null ? COD : itemfishfood$fishtype;
         }
 

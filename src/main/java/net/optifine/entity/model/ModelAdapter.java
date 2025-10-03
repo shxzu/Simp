@@ -7,9 +7,9 @@ import net.minecraft.client.model.ModelRenderer;
 
 public abstract class ModelAdapter
 {
-    private Class entityClass;
-    private String name;
-    private float shadowSize;
+    private final Class entityClass;
+    private final String name;
+    private final float shadowSize;
     private String[] aliases;
 
     public ModelAdapter(Class entityClass, String name, float shadowSize)
@@ -71,7 +71,7 @@ public abstract class ModelAdapter
             }
         }
 
-        ModelRenderer[] amodelrenderer = (ModelRenderer[])((ModelRenderer[])list.toArray(new ModelRenderer[list.size()]));
+        ModelRenderer[] amodelrenderer = list.toArray(new ModelRenderer[list.size()]);
         return amodelrenderer;
     }
 }

@@ -8,12 +8,12 @@ import net.minecraft.world.World;
 
 public class EntityAIFleeSun extends EntityAIBase
 {
-    private EntityCreature theCreature;
+    private final EntityCreature theCreature;
     private double shelterX;
     private double shelterY;
     private double shelterZ;
-    private double movementSpeed;
-    private World theWorld;
+    private final double movementSpeed;
+    private final World theWorld;
 
     public EntityAIFleeSun(EntityCreature theCreatureIn, double movementSpeedIn)
     {
@@ -76,7 +76,7 @@ public class EntityAIFleeSun extends EntityAIBase
 
             if (!this.theWorld.canSeeSky(blockpos1) && this.theCreature.getBlockPathWeight(blockpos1) < 0.0F)
             {
-                return new Vec3((double)blockpos1.getX(), (double)blockpos1.getY(), (double)blockpos1.getZ());
+                return new Vec3(blockpos1.getX(), blockpos1.getY(), blockpos1.getZ());
             }
         }
 

@@ -58,7 +58,7 @@ public class PathEntity
     public Vec3 getVectorFromIndex(Entity entityIn, int index)
     {
         double d0 = (double)this.points[index].xCoord + (double)((int)(entityIn.width + 1.0F)) * 0.5D;
-        double d1 = (double)this.points[index].yCoord;
+        double d1 = this.points[index].yCoord;
         double d2 = (double)this.points[index].zCoord + (double)((int)(entityIn.width + 1.0F)) * 0.5D;
         return new Vec3(d0, d1, d2);
     }
@@ -95,6 +95,6 @@ public class PathEntity
     public boolean isDestinationSame(Vec3 vec)
     {
         PathPoint pathpoint = this.getFinalPathPoint();
-        return pathpoint == null ? false : pathpoint.xCoord == (int)vec.xCoord && pathpoint.zCoord == (int)vec.zCoord;
+        return pathpoint != null && pathpoint.xCoord == (int) vec.xCoord && pathpoint.zCoord == (int) vec.zCoord;
     }
 }

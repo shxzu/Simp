@@ -10,10 +10,10 @@ import net.minecraft.util.ResourceLocation;
 
 public class CustomLoadingScreen
 {
-    private ResourceLocation locationTexture;
+    private final ResourceLocation locationTexture;
     private int scaleMode = 0;
     private int scale = 2;
-    private boolean center;
+    private final boolean center;
     private static final int SCALE_DEFAULT = 2;
     private static final int SCALE_MODE_FIXED = 0;
     private static final int SCALE_MODE_FULL = 1;
@@ -121,7 +121,7 @@ public class CustomLoadingScreen
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         Config.getTextureManager().bindTexture(this.locationTexture);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        double d0 = (double)(16 * this.scale);
+        double d0 = 16 * this.scale;
         double d1 = (double)width / d0;
         double d2 = (double)height / d0;
         double d3 = 0.0D;
@@ -136,7 +136,7 @@ public class CustomLoadingScreen
         switch (this.scaleMode)
         {
             case 1:
-                d0 = (double)Math.max(width, height);
+                d0 = Math.max(width, height);
                 d1 = (double)(this.scale * width) / d0;
                 d2 = (double)(this.scale * height) / d0;
 
@@ -149,16 +149,16 @@ public class CustomLoadingScreen
                 break;
 
             case 2:
-                d1 = (double)this.scale;
-                d2 = (double)this.scale;
+                d1 = this.scale;
+                d2 = this.scale;
                 d3 = 0.0D;
                 d4 = 0.0D;
         }
 
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        worldrenderer.pos(0.0D, (double)height, 0.0D).tex(d3, d4 + d2).color(255, 255, 255, 255).endVertex();
-        worldrenderer.pos((double)width, (double)height, 0.0D).tex(d3 + d1, d4 + d2).color(255, 255, 255, 255).endVertex();
-        worldrenderer.pos((double)width, 0.0D, 0.0D).tex(d3 + d1, d4).color(255, 255, 255, 255).endVertex();
+        worldrenderer.pos(0.0D, height, 0.0D).tex(d3, d4 + d2).color(255, 255, 255, 255).endVertex();
+        worldrenderer.pos(width, height, 0.0D).tex(d3 + d1, d4 + d2).color(255, 255, 255, 255).endVertex();
+        worldrenderer.pos(width, 0.0D, 0.0D).tex(d3 + d1, d4).color(255, 255, 255, 255).endVertex();
         worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(d3, d4).color(255, 255, 255, 255).endVertex();
         tessellator.draw();
     }

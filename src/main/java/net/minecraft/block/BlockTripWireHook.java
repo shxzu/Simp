@@ -86,7 +86,7 @@ public class BlockTripWireHook extends Block
 
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
-        this.func_176260_a(worldIn, pos, state, false, false, -1, (IBlockState)null);
+        this.func_176260_a(worldIn, pos, state, false, false, -1, null);
     }
 
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
@@ -95,7 +95,7 @@ public class BlockTripWireHook extends Block
         {
             if (this.checkForDrop(worldIn, pos, state))
             {
-                EnumFacing enumfacing = (EnumFacing)state.getValue(FACING);
+                EnumFacing enumfacing = state.getValue(FACING);
 
                 if (!worldIn.getBlockState(pos.offset(enumfacing.getOpposite())).getBlock().isNormalCube())
                 {
@@ -108,9 +108,9 @@ public class BlockTripWireHook extends Block
 
     public void func_176260_a(World worldIn, BlockPos pos, IBlockState hookState, boolean p_176260_4_, boolean p_176260_5_, int p_176260_6_, IBlockState p_176260_7_)
     {
-        EnumFacing enumfacing = (EnumFacing)hookState.getValue(FACING);
-        boolean flag = ((Boolean)hookState.getValue(ATTACHED)).booleanValue();
-        boolean flag1 = ((Boolean)hookState.getValue(POWERED)).booleanValue();
+        EnumFacing enumfacing = hookState.getValue(FACING);
+        boolean flag = hookState.getValue(ATTACHED).booleanValue();
+        boolean flag1 = hookState.getValue(POWERED).booleanValue();
         boolean flag2 = !World.doesBlockHaveSolidTopSurface(worldIn, pos.down());
         boolean flag3 = !p_176260_4_;
         boolean flag4 = false;
@@ -141,12 +141,12 @@ public class BlockTripWireHook extends Block
             {
                 if (j == p_176260_6_)
                 {
-                    iblockstate = (IBlockState)Objects.firstNonNull(p_176260_7_, iblockstate);
+                    iblockstate = Objects.firstNonNull(p_176260_7_, iblockstate);
                 }
 
-                boolean flag5 = !((Boolean)iblockstate.getValue(BlockTripWire.DISARMED)).booleanValue();
-                boolean flag6 = ((Boolean)iblockstate.getValue(BlockTripWire.POWERED)).booleanValue();
-                boolean flag7 = ((Boolean)iblockstate.getValue(BlockTripWire.SUSPENDED)).booleanValue();
+                boolean flag5 = !iblockstate.getValue(BlockTripWire.DISARMED).booleanValue();
+                boolean flag6 = iblockstate.getValue(BlockTripWire.POWERED).booleanValue();
+                boolean flag7 = iblockstate.getValue(BlockTripWire.SUSPENDED).booleanValue();
                 flag3 &= flag7 == flag2;
                 flag4 |= flag5 && flag6;
                 aiblockstate[j] = iblockstate;
@@ -205,7 +205,7 @@ public class BlockTripWireHook extends Block
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        this.func_176260_a(worldIn, pos, state, false, true, -1, (IBlockState)null);
+        this.func_176260_a(worldIn, pos, state, false, true, -1, null);
     }
 
     private void func_180694_a(World worldIn, BlockPos pos, boolean p_180694_3_, boolean p_180694_4_, boolean p_180694_5_, boolean p_180694_6_)
@@ -253,7 +253,7 @@ public class BlockTripWireHook extends Block
     {
         float f = 0.1875F;
 
-        switch ((EnumFacing)worldIn.getBlockState(pos).getValue(FACING))
+        switch (worldIn.getBlockState(pos).getValue(FACING))
         {
             case EAST:
                 this.setBlockBounds(0.0F, 0.2F, 0.5F - f, f * 2.0F, 0.8F, 0.5F + f);
@@ -274,18 +274,18 @@ public class BlockTripWireHook extends Block
 
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
-        boolean flag = ((Boolean)state.getValue(ATTACHED)).booleanValue();
-        boolean flag1 = ((Boolean)state.getValue(POWERED)).booleanValue();
+        boolean flag = state.getValue(ATTACHED).booleanValue();
+        boolean flag1 = state.getValue(POWERED).booleanValue();
 
         if (flag || flag1)
         {
-            this.func_176260_a(worldIn, pos, state, true, false, -1, (IBlockState)null);
+            this.func_176260_a(worldIn, pos, state, true, false, -1, null);
         }
 
         if (flag1)
         {
             worldIn.notifyNeighborsOfStateChange(pos, this);
-            worldIn.notifyNeighborsOfStateChange(pos.offset(((EnumFacing)state.getValue(FACING)).getOpposite()), this);
+            worldIn.notifyNeighborsOfStateChange(pos.offset(state.getValue(FACING).getOpposite()), this);
         }
 
         super.breakBlock(worldIn, pos, state);
@@ -293,12 +293,12 @@ public class BlockTripWireHook extends Block
 
     public int getWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
-        return ((Boolean)state.getValue(POWERED)).booleanValue() ? 15 : 0;
+        return state.getValue(POWERED).booleanValue() ? 15 : 0;
     }
 
     public int getStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
-        return !((Boolean)state.getValue(POWERED)).booleanValue() ? 0 : (state.getValue(FACING) == side ? 15 : 0);
+        return !state.getValue(POWERED).booleanValue() ? 0 : (state.getValue(FACING) == side ? 15 : 0);
     }
 
     public boolean canProvidePower()
@@ -319,14 +319,14 @@ public class BlockTripWireHook extends Block
     public int getMetaFromState(IBlockState state)
     {
         int i = 0;
-        i = i | ((EnumFacing)state.getValue(FACING)).getHorizontalIndex();
+        i = i | state.getValue(FACING).getHorizontalIndex();
 
-        if (((Boolean)state.getValue(POWERED)).booleanValue())
+        if (state.getValue(POWERED).booleanValue())
         {
             i |= 8;
         }
 
-        if (((Boolean)state.getValue(ATTACHED)).booleanValue())
+        if (state.getValue(ATTACHED).booleanValue())
         {
             i |= 4;
         }
@@ -336,6 +336,6 @@ public class BlockTripWireHook extends Block
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {FACING, POWERED, ATTACHED, SUSPENDED});
+        return new BlockState(this, FACING, POWERED, ATTACHED, SUSPENDED);
     }
 }

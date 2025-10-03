@@ -58,17 +58,17 @@ public class BetterGrass
     {
         if (spritesLoaded)
         {
-            modelCubeGrass = BlockModelUtils.makeModelCube((TextureAtlasSprite)spriteGrass, 0);
+            modelCubeGrass = BlockModelUtils.makeModelCube(spriteGrass, 0);
 
             if (grassMultilayer)
             {
-                IBakedModel ibakedmodel = BlockModelUtils.makeModelCube((TextureAtlasSprite)spriteGrassSide, -1);
+                IBakedModel ibakedmodel = BlockModelUtils.makeModelCube(spriteGrassSide, -1);
                 modelCubeGrass = BlockModelUtils.joinModelsCube(ibakedmodel, modelCubeGrass);
             }
 
-            modelCubeMycelium = BlockModelUtils.makeModelCube((TextureAtlasSprite)spriteMycelium, -1);
-            modelCubePodzol = BlockModelUtils.makeModelCube((TextureAtlasSprite)spritePodzol, 0);
-            modelCubeSnow = BlockModelUtils.makeModelCube((TextureAtlasSprite)spriteSnow, -1);
+            modelCubeMycelium = BlockModelUtils.makeModelCube(spriteMycelium, -1);
+            modelCubePodzol = BlockModelUtils.makeModelCube(spritePodzol, 0);
+            modelCubeSnow = BlockModelUtils.makeModelCube(spriteSnow, -1);
             modelsLoaded = true;
         }
     }

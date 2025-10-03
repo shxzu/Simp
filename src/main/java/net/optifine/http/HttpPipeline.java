@@ -12,7 +12,7 @@ import net.minecraft.src.Config;
 
 public class HttpPipeline
 {
-    private static Map mapConnections = new HashMap();
+    private static final Map mapConnections = new HashMap();
     public static final String HEADER_USER_AGENT = "User-Agent";
     public static final String HEADER_HOST = "Host";
     public static final String HEADER_ACCEPT = "Accept";

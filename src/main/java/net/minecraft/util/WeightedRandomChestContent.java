@@ -11,9 +11,9 @@ import net.minecraft.tileentity.TileEntityDispenser;
 
 public class WeightedRandomChestContent extends WeightedRandom.Item
 {
-    private ItemStack theItemId;
-    private int minStackSize;
-    private int maxStackSize;
+    private final ItemStack theItemId;
+    private final int minStackSize;
+    private final int maxStackSize;
 
     public WeightedRandomChestContent(Item p_i45311_1_, int p_i45311_2_, int minimumChance, int maximumChance, int itemWeightIn)
     {
@@ -35,7 +35,7 @@ public class WeightedRandomChestContent extends WeightedRandom.Item
     {
         for (int i = 0; i < max; ++i)
         {
-            WeightedRandomChestContent weightedrandomchestcontent = (WeightedRandomChestContent)WeightedRandom.getRandomItem(random, listIn);
+            WeightedRandomChestContent weightedrandomchestcontent = WeightedRandom.getRandomItem(random, listIn);
             int j = weightedrandomchestcontent.minStackSize + random.nextInt(weightedrandomchestcontent.maxStackSize - weightedrandomchestcontent.minStackSize + 1);
 
             if (weightedrandomchestcontent.theItemId.getMaxStackSize() >= j)
@@ -60,7 +60,7 @@ public class WeightedRandomChestContent extends WeightedRandom.Item
     {
         for (int i = 0; i < max; ++i)
         {
-            WeightedRandomChestContent weightedrandomchestcontent = (WeightedRandomChestContent)WeightedRandom.getRandomItem(random, listIn);
+            WeightedRandomChestContent weightedrandomchestcontent = WeightedRandom.getRandomItem(random, listIn);
             int j = weightedrandomchestcontent.minStackSize + random.nextInt(weightedrandomchestcontent.maxStackSize - weightedrandomchestcontent.minStackSize + 1);
 
             if (weightedrandomchestcontent.theItemId.getMaxStackSize() >= j)

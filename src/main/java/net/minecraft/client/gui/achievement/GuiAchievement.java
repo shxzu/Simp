@@ -13,14 +13,14 @@ import net.minecraft.util.ResourceLocation;
 public class GuiAchievement extends Gui
 {
     private static final ResourceLocation achievementBg = new ResourceLocation("textures/gui/achievement/achievement_background.png");
-    private Minecraft mc;
+    private final Minecraft mc;
     private int width;
     private int height;
     private String achievementTitle;
     private String achievementDescription;
     private Achievement theAchievement;
     private long notificationTime;
-    private RenderItem renderItem;
+    private final RenderItem renderItem;
     private boolean permanentNotification;
 
     public GuiAchievement(Minecraft mc)
@@ -31,7 +31,7 @@ public class GuiAchievement extends Gui
 
     public void displayAchievement(Achievement ach)
     {
-        this.achievementTitle = I18n.format("achievement.get", new Object[0]);
+        this.achievementTitle = I18n.format("achievement.get");
         this.achievementDescription = ach.getStatName().getUnformattedText();
         this.notificationTime = Minecraft.getSystemTime();
         this.theAchievement = ach;
@@ -62,7 +62,7 @@ public class GuiAchievement extends Gui
         GlStateManager.clear(256);
         GlStateManager.matrixMode(5889);
         GlStateManager.loadIdentity();
-        GlStateManager.ortho(0.0D, (double)this.width, (double)this.height, 0.0D, 1000.0D, 3000.0D);
+        GlStateManager.ortho(0.0D, this.width, this.height, 0.0D, 1000.0D, 3000.0D);
         GlStateManager.matrixMode(5888);
         GlStateManager.loadIdentity();
         GlStateManager.translate(0.0F, 0.0F, -2000.0F);
@@ -108,7 +108,7 @@ public class GuiAchievement extends Gui
             d1 = d1 * d1;
             d1 = d1 * d1;
             int i = this.width - 160;
-            int j = 0 - (int)(d1 * 36.0D);
+            int j = -(int) (d1 * 36.0D);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.enableTexture2D();
             this.mc.getTextureManager().bindTexture(achievementBg);
@@ -117,12 +117,12 @@ public class GuiAchievement extends Gui
 
             if (this.permanentNotification)
             {
-                this.mc.minecraftFontRendererObj.drawSplitString(this.achievementDescription, i + 30, j + 7, 120, -1);
+                this.mc.fontRendererObj.drawSplitString(this.achievementDescription, i + 30, j + 7, 120, -1);
             }
             else
             {
-                this.mc.minecraftFontRendererObj.drawString(this.achievementTitle, i + 30, j + 7, -256);
-                this.mc.minecraftFontRendererObj.drawString(this.achievementDescription, i + 30, j + 18, -1);
+                this.mc.fontRendererObj.drawString(this.achievementTitle, i + 30, j + 7, -256);
+                this.mc.fontRendererObj.drawString(this.achievementDescription, i + 30, j + 18, -1);
             }
 
             RenderHelper.enableGUIStandardItemLighting();

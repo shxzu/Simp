@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 
 public class WorldGenLiquids extends WorldGenerator
 {
-    private Block block;
+    private final Block block;
 
     public WorldGenLiquids(Block p_i45465_1_)
     {

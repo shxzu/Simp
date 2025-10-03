@@ -12,27 +12,27 @@ public class GuiLabel extends Gui
     protected int field_146161_f = 20;
     public int field_146162_g;
     public int field_146174_h;
-    private List<String> field_146173_k;
+    private final List<String> field_146173_k;
     public int field_175204_i;
     private boolean centered;
     public boolean visible = true;
-    private boolean labelBgEnabled;
-    private int field_146168_n;
-    private int field_146169_o;
-    private int field_146166_p;
-    private int field_146165_q;
-    private MinecraftFontRenderer minecraftFontRenderer;
-    private int field_146163_s;
+    private final boolean labelBgEnabled;
+    private final int field_146168_n;
+    private final int field_146169_o;
+    private final int field_146166_p;
+    private final int field_146165_q;
+    private final FontRenderer fontRenderer;
+    private final int field_146163_s;
 
-    public GuiLabel(MinecraftFontRenderer minecraftFontRendererObj, int p_i45540_2_, int p_i45540_3_, int p_i45540_4_, int p_i45540_5_, int p_i45540_6_, int p_i45540_7_)
+    public GuiLabel(FontRenderer fontRendererObj, int p_i45540_2_, int p_i45540_3_, int p_i45540_4_, int p_i45540_5_, int p_i45540_6_, int p_i45540_7_)
     {
-        this.minecraftFontRenderer = minecraftFontRendererObj;
+        this.fontRenderer = fontRendererObj;
         this.field_175204_i = p_i45540_2_;
         this.field_146162_g = p_i45540_3_;
         this.field_146174_h = p_i45540_4_;
         this.field_146167_a = p_i45540_5_;
         this.field_146161_f = p_i45540_6_;
-        this.field_146173_k = Lists.<String>newArrayList();
+        this.field_146173_k = Lists.newArrayList();
         this.centered = false;
         this.labelBgEnabled = false;
         this.field_146168_n = p_i45540_7_;
@@ -44,7 +44,7 @@ public class GuiLabel extends Gui
 
     public void func_175202_a(String p_175202_1_)
     {
-        this.field_146173_k.add(I18n.format(p_175202_1_, new Object[0]));
+        this.field_146173_k.add(I18n.format(p_175202_1_));
     }
 
     public GuiLabel setCentered()
@@ -67,11 +67,11 @@ public class GuiLabel extends Gui
             {
                 if (this.centered)
                 {
-                    this.drawCenteredString(this.minecraftFontRenderer, (String)this.field_146173_k.get(k), this.field_146162_g + this.field_146167_a / 2, j + k * 10, this.field_146168_n);
+                    this.drawCenteredString(this.fontRenderer, this.field_146173_k.get(k), this.field_146162_g + this.field_146167_a / 2, j + k * 10, this.field_146168_n);
                 }
                 else
                 {
-                    this.drawString(this.minecraftFontRenderer, (String)this.field_146173_k.get(k), this.field_146162_g, j + k * 10, this.field_146168_n);
+                    this.drawString(this.fontRenderer, this.field_146173_k.get(k), this.field_146162_g, j + k * 10, this.field_146168_n);
                 }
             }
         }

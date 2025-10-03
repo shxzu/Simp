@@ -22,13 +22,12 @@ public class ModelAdapterCreeper extends ModelAdapter
 
     public ModelRenderer getModelRenderer(ModelBase model, String modelPart)
     {
-        if (!(model instanceof ModelCreeper))
+        if (!(model instanceof ModelCreeper modelcreeper))
         {
             return null;
         }
         else
         {
-            ModelCreeper modelcreeper = (ModelCreeper)model;
             return modelPart.equals("head") ? modelcreeper.head : (modelPart.equals("armor") ? modelcreeper.creeperArmor : (modelPart.equals("body") ? modelcreeper.body : (modelPart.equals("leg1") ? modelcreeper.leg1 : (modelPart.equals("leg2") ? modelcreeper.leg2 : (modelPart.equals("leg3") ? modelcreeper.leg3 : (modelPart.equals("leg4") ? modelcreeper.leg4 : null))))));
         }
     }

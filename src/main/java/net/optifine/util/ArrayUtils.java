@@ -1,10 +1,7 @@
 package net.optifine.util;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class ArrayUtils
 {
@@ -39,10 +36,7 @@ public class ArrayUtils
             int[] aint = new int[j];
             System.arraycopy(intArray, 0, aint, 0, i);
 
-            for (int k = 0; k < copyFrom.length; ++k)
-            {
-                aint[k + i] = copyFrom[k];
-            }
+            System.arraycopy(copyFrom, 0, aint, i, copyFrom.length);
 
             return aint;
         }
@@ -71,7 +65,7 @@ public class ArrayUtils
         {
             int i = arr.length;
             int j = i + objs.length;
-            Object[] aobject = (Object[])((Object[])Array.newInstance(arr.getClass().getComponentType(), j));
+            Object[] aobject = (Object[]) Array.newInstance(arr.getClass().getComponentType(), j);
             System.arraycopy(arr, 0, aobject, 0, i);
             System.arraycopy(objs, 0, aobject, i, objs.length);
             return aobject;
@@ -88,7 +82,7 @@ public class ArrayUtils
         {
             int i = arr.length;
             int j = i + 1;
-            Object[] aobject = (Object[])((Object[])Array.newInstance(arr.getClass().getComponentType(), j));
+            Object[] aobject = (Object[]) Array.newInstance(arr.getClass().getComponentType(), j);
             System.arraycopy(arr, 0, aobject, 0, i);
             aobject[i] = obj;
             return aobject;
@@ -99,7 +93,7 @@ public class ArrayUtils
     {
         List list = new ArrayList(Arrays.asList(arr));
         list.add(index, obj);
-        Object[] aobject = (Object[])((Object[])Array.newInstance(arr.getClass().getComponentType(), list.size()));
+        Object[] aobject = (Object[]) Array.newInstance(arr.getClass().getComponentType(), list.size());
         return list.toArray(aobject);
     }
 
@@ -122,7 +116,7 @@ public class ArrayUtils
                     stringbuffer.append(separator);
                 }
 
-                stringbuffer.append(String.valueOf(flag));
+                stringbuffer.append(flag);
             }
 
             return stringbuffer.toString();
@@ -153,7 +147,7 @@ public class ArrayUtils
                     stringbuffer.append(separator);
                 }
 
-                stringbuffer.append(String.valueOf(f));
+                stringbuffer.append(f);
             }
 
             return stringbuffer.toString();
@@ -179,7 +173,7 @@ public class ArrayUtils
                     stringbuffer.append(separator);
                 }
 
-                stringbuffer.append(String.format(format, new Object[] {Float.valueOf(f)}));
+                stringbuffer.append(String.format(format, Float.valueOf(f)));
             }
 
             return stringbuffer.toString();
@@ -210,7 +204,7 @@ public class ArrayUtils
                     stringbuffer.append(separator);
                 }
 
-                stringbuffer.append(String.valueOf(j));
+                stringbuffer.append(j);
             }
 
             return stringbuffer.toString();
@@ -268,7 +262,7 @@ public class ArrayUtils
                     stringbuffer.append(separator);
                 }
 
-                stringbuffer.append(String.valueOf(object));
+                stringbuffer.append(object);
             }
 
             return stringbuffer.toString();
@@ -291,7 +285,7 @@ public class ArrayUtils
         }
         else
         {
-            Object[] aobject = (Object[])((Object[])Array.newInstance(elementClass, coll.size()));
+            Object[] aobject = (Object[]) Array.newInstance(elementClass, coll.size());
             return coll.toArray(aobject);
         }
     }
@@ -333,7 +327,7 @@ public class ArrayUtils
 
     public static boolean equals(Object o1, Object o2)
     {
-        return o1 == o2 ? true : (o1 == null ? false : o1.equals(o2));
+        return Objects.equals(o1, o2);
     }
 
     public static boolean isSameOne(Object a, Object[] bs)

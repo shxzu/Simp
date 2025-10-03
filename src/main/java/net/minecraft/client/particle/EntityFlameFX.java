@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 
 public class EntityFlameFX extends EntityFX
 {
-    private float flameScale;
+    private final float flameScale;
 
     protected EntityFlameFX(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn)
     {
@@ -15,9 +15,9 @@ public class EntityFlameFX extends EntityFX
         this.motionX = this.motionX * 0.009999999776482582D + xSpeedIn;
         this.motionY = this.motionY * 0.009999999776482582D + ySpeedIn;
         this.motionZ = this.motionZ * 0.009999999776482582D + zSpeedIn;
-        this.posX += (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F);
-        this.posY += (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F);
-        this.posZ += (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F);
+        this.posX += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F;
+        this.posY += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F;
+        this.posZ += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F;
         this.flameScale = this.particleScale;
         this.particleRed = this.particleGreen = this.particleBlue = 1.0F;
         this.particleMaxAge = (int)(8.0D / (Math.random() * 0.8D + 0.2D)) + 4;

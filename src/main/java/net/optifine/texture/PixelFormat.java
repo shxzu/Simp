@@ -15,9 +15,9 @@ public enum PixelFormat
     RGBA_INTEGER(36249),
     BGRA_INTEGER(36251);
 
-    private int id;
+    private final int id;
 
-    private PixelFormat(int id)
+    PixelFormat(int id)
     {
         this.id = id;
     }

@@ -10,7 +10,7 @@ public class ReflectorField implements IResolvable
 
     public ReflectorField(ReflectorClass reflectorClass, String targetFieldName)
     {
-        this((IFieldLocator)(new FieldLocatorName(reflectorClass, targetFieldName)));
+        this(new FieldLocatorName(reflectorClass, targetFieldName));
     }
 
     public ReflectorField(ReflectorClass reflectorClass, Class targetFieldType)
@@ -20,12 +20,12 @@ public class ReflectorField implements IResolvable
 
     public ReflectorField(ReflectorClass reflectorClass, Class targetFieldType, int targetFieldIndex)
     {
-        this((IFieldLocator)(new FieldLocatorType(reflectorClass, targetFieldType, targetFieldIndex)));
+        this(new FieldLocatorType(reflectorClass, targetFieldType, targetFieldIndex));
     }
 
     public ReflectorField(Field field)
     {
-        this((IFieldLocator)(new FieldLocatorFixed(field)));
+        this(new FieldLocatorFixed(field));
     }
 
     public ReflectorField(IFieldLocator fieldLocator)
@@ -59,12 +59,12 @@ public class ReflectorField implements IResolvable
 
     public Object getValue()
     {
-        return Reflector.getFieldValue((Object)null, this);
+        return Reflector.getFieldValue(null, this);
     }
 
     public void setValue(Object value)
     {
-        Reflector.setFieldValue((Object)null, this, value);
+        Reflector.setFieldValue(null, this, value);
     }
 
     public void setValue(Object obj, Object value)

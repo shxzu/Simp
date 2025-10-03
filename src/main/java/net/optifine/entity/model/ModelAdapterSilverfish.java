@@ -24,18 +24,17 @@ public class ModelAdapterSilverfish extends ModelAdapter
 
     public ModelRenderer getModelRenderer(ModelBase model, String modelPart)
     {
-        if (!(model instanceof ModelSilverfish))
+        if (!(model instanceof ModelSilverfish modelsilverfish))
         {
             return null;
         }
         else
         {
-            ModelSilverfish modelsilverfish = (ModelSilverfish)model;
             String s = "body";
 
             if (modelPart.startsWith(s))
             {
-                ModelRenderer[] amodelrenderer1 = (ModelRenderer[])((ModelRenderer[])Reflector.getFieldValue(modelsilverfish, Reflector.ModelSilverfish_bodyParts));
+                ModelRenderer[] amodelrenderer1 = (ModelRenderer[]) Reflector.getFieldValue(modelsilverfish, Reflector.ModelSilverfish_bodyParts);
 
                 if (amodelrenderer1 == null)
                 {
@@ -55,7 +54,7 @@ public class ModelAdapterSilverfish extends ModelAdapter
 
                 if (modelPart.startsWith(s1))
                 {
-                    ModelRenderer[] amodelrenderer = (ModelRenderer[])((ModelRenderer[])Reflector.getFieldValue(modelsilverfish, Reflector.ModelSilverfish_wingParts));
+                    ModelRenderer[] amodelrenderer = (ModelRenderer[]) Reflector.getFieldValue(modelsilverfish, Reflector.ModelSilverfish_wingParts);
 
                     if (amodelrenderer == null)
                     {

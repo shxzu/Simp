@@ -5,10 +5,10 @@ import java.util.Arrays;
 
 public class FlipTextures
 {
-    private IntBuffer textures;
-    private int indexFlipped;
-    private boolean[] flips;
-    private boolean[] changed;
+    private final IntBuffer textures;
+    private final int indexFlipped;
+    private final boolean[] flips;
+    private final boolean[] changed;
 
     public FlipTextures(IntBuffer textures, int indexFlipped)
     {

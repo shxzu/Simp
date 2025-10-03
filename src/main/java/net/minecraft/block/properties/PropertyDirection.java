@@ -16,12 +16,12 @@ public class PropertyDirection extends PropertyEnum<EnumFacing>
 
     public static PropertyDirection create(String name)
     {
-        return create(name, Predicates.<EnumFacing>alwaysTrue());
+        return create(name, Predicates.alwaysTrue());
     }
 
     public static PropertyDirection create(String name, Predicate<EnumFacing> filter)
     {
-        return create(name, Collections2.<EnumFacing>filter(Lists.newArrayList(EnumFacing.values()), filter));
+        return create(name, Collections2.filter(Lists.newArrayList(EnumFacing.values()), filter));
     }
 
     public static PropertyDirection create(String name, Collection<EnumFacing> values)

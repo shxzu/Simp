@@ -26,7 +26,7 @@ public class C07PacketPlayerDigging implements Packet<INetHandlerPlayServer>
 
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.status = (C07PacketPlayerDigging.Action)buf.readEnumValue(C07PacketPlayerDigging.Action.class);
+        this.status = buf.readEnumValue(Action.class);
         this.position = buf.readBlockPos();
         this.facing = EnumFacing.getFront(buf.readUnsignedByte());
     }
@@ -58,13 +58,13 @@ public class C07PacketPlayerDigging implements Packet<INetHandlerPlayServer>
         return this.status;
     }
 
-    public static enum Action
+    public enum Action
     {
         START_DESTROY_BLOCK,
         ABORT_DESTROY_BLOCK,
         STOP_DESTROY_BLOCK,
         DROP_ALL_ITEMS,
         DROP_ITEM,
-        RELEASE_USE_ITEM;
+        RELEASE_USE_ITEM
     }
 }

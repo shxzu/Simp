@@ -20,7 +20,7 @@ public class ScreenChatOptions extends GuiScreen
     public void initGui()
     {
         int i = 0;
-        this.field_146401_i = I18n.format("options.chat.title", new Object[0]);
+        this.field_146401_i = I18n.format("options.chat.title");
 
         for (GameSettings.Options gamesettings$options : field_146399_a)
         {
@@ -36,7 +36,7 @@ public class ScreenChatOptions extends GuiScreen
             ++i;
         }
 
-        this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 120, I18n.format("gui.done", new Object[0])));
+        this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 120, I18n.format("gui.done")));
     }
 
     protected void actionPerformed(GuiButton button) throws IOException
@@ -60,7 +60,7 @@ public class ScreenChatOptions extends GuiScreen
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.minecraftFontRendererObj, this.field_146401_i, this.width / 2, 20, 16777215);
+        this.drawCenteredString(this.fontRendererObj, this.field_146401_i, this.width / 2, 20, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 }

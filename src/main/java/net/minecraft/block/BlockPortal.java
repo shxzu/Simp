@@ -23,7 +23,7 @@ import net.minecraft.world.World;
 
 public class BlockPortal extends BlockBreakable
 {
-    public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis", EnumFacing.Axis.class, new EnumFacing.Axis[] {EnumFacing.Axis.X, EnumFacing.Axis.Z});
+    public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class, EnumFacing.Axis.X, EnumFacing.Axis.Z);
 
     public BlockPortal()
     {
@@ -43,7 +43,6 @@ public class BlockPortal extends BlockBreakable
 
             for (blockpos = pos; !World.doesBlockHaveSolidTopSurface(worldIn, blockpos) && blockpos.getY() > 0; blockpos = blockpos.down())
             {
-                ;
             }
 
             if (i > 0 && !worldIn.getBlockState(blockpos.up()).getBlock().isNormalCube())
@@ -65,7 +64,7 @@ public class BlockPortal extends BlockBreakable
 
     public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
     {
-        EnumFacing.Axis enumfacing$axis = (EnumFacing.Axis)worldIn.getBlockState(pos).getValue(AXIS);
+        EnumFacing.Axis enumfacing$axis = worldIn.getBlockState(pos).getValue(AXIS);
         float f = 0.125F;
         float f1 = 0.125F;
 
@@ -119,7 +118,7 @@ public class BlockPortal extends BlockBreakable
 
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
-        EnumFacing.Axis enumfacing$axis = (EnumFacing.Axis)state.getValue(AXIS);
+        EnumFacing.Axis enumfacing$axis = state.getValue(AXIS);
 
         if (enumfacing$axis == EnumFacing.Axis.X)
         {
@@ -148,7 +147,7 @@ public class BlockPortal extends BlockBreakable
 
         if (worldIn.getBlockState(pos).getBlock() == this)
         {
-            enumfacing$axis = (EnumFacing.Axis)iblockstate.getValue(AXIS);
+            enumfacing$axis = iblockstate.getValue(AXIS);
 
             if (enumfacing$axis == null)
             {
@@ -172,7 +171,7 @@ public class BlockPortal extends BlockBreakable
         boolean flag3 = worldIn.getBlockState(pos.south()).getBlock() == this && worldIn.getBlockState(pos.south(2)).getBlock() != this;
         boolean flag4 = flag || flag1 || enumfacing$axis == EnumFacing.Axis.X;
         boolean flag5 = flag2 || flag3 || enumfacing$axis == EnumFacing.Axis.Z;
-        return flag4 && side == EnumFacing.WEST ? true : (flag4 && side == EnumFacing.EAST ? true : (flag5 && side == EnumFacing.NORTH ? true : flag5 && side == EnumFacing.SOUTH));
+        return flag4 && side == EnumFacing.WEST || (flag4 && side == EnumFacing.EAST || (flag5 && side == EnumFacing.NORTH || flag5 && side == EnumFacing.SOUTH));
     }
 
     public int quantityDropped(Random random)
@@ -202,9 +201,9 @@ public class BlockPortal extends BlockBreakable
 
         for (int i = 0; i < 4; ++i)
         {
-            double d0 = (double)((float)pos.getX() + rand.nextFloat());
-            double d1 = (double)((float)pos.getY() + rand.nextFloat());
-            double d2 = (double)((float)pos.getZ() + rand.nextFloat());
+            double d0 = (float)pos.getX() + rand.nextFloat();
+            double d1 = (float)pos.getY() + rand.nextFloat();
+            double d2 = (float)pos.getZ() + rand.nextFloat();
             double d3 = ((double)rand.nextFloat() - 0.5D) * 0.5D;
             double d4 = ((double)rand.nextFloat() - 0.5D) * 0.5D;
             double d5 = ((double)rand.nextFloat() - 0.5D) * 0.5D;
@@ -213,15 +212,15 @@ public class BlockPortal extends BlockBreakable
             if (worldIn.getBlockState(pos.west()).getBlock() != this && worldIn.getBlockState(pos.east()).getBlock() != this)
             {
                 d0 = (double)pos.getX() + 0.5D + 0.25D * (double)j;
-                d3 = (double)(rand.nextFloat() * 2.0F * (float)j);
+                d3 = rand.nextFloat() * 2.0F * (float)j;
             }
             else
             {
                 d2 = (double)pos.getZ() + 0.5D + 0.25D * (double)j;
-                d5 = (double)(rand.nextFloat() * 2.0F * (float)j);
+                d5 = rand.nextFloat() * 2.0F * (float)j;
             }
 
-            worldIn.spawnParticle(EnumParticleTypes.PORTAL, d0, d1, d2, d3, d4, d5, new int[0]);
+            worldIn.spawnParticle(EnumParticleTypes.PORTAL, d0, d1, d2, d3, d4, d5);
         }
     }
 
@@ -237,12 +236,12 @@ public class BlockPortal extends BlockBreakable
 
     public int getMetaFromState(IBlockState state)
     {
-        return getMetaForAxis((EnumFacing.Axis)state.getValue(AXIS));
+        return getMetaForAxis(state.getValue(AXIS));
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {AXIS});
+        return new BlockState(this, AXIS);
     }
 
     public BlockPattern.PatternHelper func_181089_f(World p_181089_1_, BlockPos p_181089_2_)
@@ -328,7 +327,6 @@ public class BlockPortal extends BlockBreakable
 
             for (BlockPos blockpos = p_i45694_2_; p_i45694_2_.getY() > blockpos.getY() - 21 && p_i45694_2_.getY() > 0 && this.func_150857_a(worldIn.getBlockState(p_i45694_2_.down()).getBlock()); p_i45694_2_ = p_i45694_2_.down())
             {
-                ;
             }
 
             int i = this.func_180120_a(p_i45694_2_, this.field_150863_d) - 1;

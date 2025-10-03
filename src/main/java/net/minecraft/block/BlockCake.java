@@ -31,7 +31,7 @@ public class BlockCake extends Block
     public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
     {
         float f = 0.0625F;
-        float f1 = (float)(1 + ((Integer)worldIn.getBlockState(pos).getValue(BITES)).intValue() * 2) / 16.0F;
+        float f1 = (float)(1 + worldIn.getBlockState(pos).getValue(BITES).intValue() * 2) / 16.0F;
         float f2 = 0.5F;
         this.setBlockBounds(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f);
     }
@@ -46,9 +46,9 @@ public class BlockCake extends Block
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
     {
         float f = 0.0625F;
-        float f1 = (float)(1 + ((Integer)state.getValue(BITES)).intValue() * 2) / 16.0F;
+        float f1 = (float)(1 + state.getValue(BITES).intValue() * 2) / 16.0F;
         float f2 = 0.5F;
-        return new AxisAlignedBB((double)((float)pos.getX() + f1), (double)pos.getY(), (double)((float)pos.getZ() + f), (double)((float)(pos.getX() + 1) - f), (double)((float)pos.getY() + f2), (double)((float)(pos.getZ() + 1) - f));
+        return new AxisAlignedBB((float)pos.getX() + f1, pos.getY(), (float)pos.getZ() + f, (float)(pos.getX() + 1) - f, (float)pos.getY() + f2, (float)(pos.getZ() + 1) - f);
     }
 
     public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos)
@@ -83,7 +83,7 @@ public class BlockCake extends Block
         {
             player.triggerAchievement(StatList.field_181724_H);
             player.getFoodStats().addStats(2, 0.1F);
-            int i = ((Integer)state.getValue(BITES)).intValue();
+            int i = state.getValue(BITES).intValue();
 
             if (i < 6)
             {
@@ -98,7 +98,7 @@ public class BlockCake extends Block
 
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
     {
-        return super.canPlaceBlockAt(worldIn, pos) ? this.canBlockStay(worldIn, pos) : false;
+        return super.canPlaceBlockAt(worldIn, pos) && this.canBlockStay(worldIn, pos);
     }
 
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
@@ -141,17 +141,17 @@ public class BlockCake extends Block
 
     public int getMetaFromState(IBlockState state)
     {
-        return ((Integer)state.getValue(BITES)).intValue();
+        return state.getValue(BITES).intValue();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {BITES});
+        return new BlockState(this, BITES);
     }
 
     public int getComparatorInputOverride(World worldIn, BlockPos pos)
     {
-        return (7 - ((Integer)worldIn.getBlockState(pos).getValue(BITES)).intValue()) * 2;
+        return (7 - worldIn.getBlockState(pos).getValue(BITES).intValue()) * 2;
     }
 
     public boolean hasComparatorInputOverride()

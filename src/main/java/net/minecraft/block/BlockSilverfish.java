@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 
 public class BlockSilverfish extends Block
 {
-    public static final PropertyEnum<BlockSilverfish.EnumType> VARIANT = PropertyEnum.<BlockSilverfish.EnumType>create("variant", BlockSilverfish.EnumType.class);
+    public static final PropertyEnum<BlockSilverfish.EnumType> VARIANT = PropertyEnum.create("variant", BlockSilverfish.EnumType.class);
 
     public BlockSilverfish()
     {
@@ -41,7 +41,7 @@ public class BlockSilverfish extends Block
 
     protected ItemStack createStackedBlock(IBlockState state)
     {
-        switch ((BlockSilverfish.EnumType)state.getValue(VARIANT))
+        switch (state.getValue(VARIANT))
         {
             case COBBLESTONE:
                 return new ItemStack(Blocks.cobblestone);
@@ -68,7 +68,7 @@ public class BlockSilverfish extends Block
         if (!worldIn.isRemote && worldIn.getGameRules().getBoolean("doTileDrops"))
         {
             EntitySilverfish entitysilverfish = new EntitySilverfish(worldIn);
-            entitysilverfish.setLocationAndAngles((double)pos.getX() + 0.5D, (double)pos.getY(), (double)pos.getZ() + 0.5D, 0.0F, 0.0F);
+            entitysilverfish.setLocationAndAngles((double)pos.getX() + 0.5D, pos.getY(), (double)pos.getZ() + 0.5D, 0.0F, 0.0F);
             worldIn.spawnEntityInWorld(entitysilverfish);
             entitysilverfish.spawnExplosionParticle();
         }
@@ -95,15 +95,15 @@ public class BlockSilverfish extends Block
 
     public int getMetaFromState(IBlockState state)
     {
-        return ((BlockSilverfish.EnumType)state.getValue(VARIANT)).getMetadata();
+        return state.getValue(VARIANT).getMetadata();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {VARIANT});
+        return new BlockState(this, VARIANT);
     }
 
-    public static enum EnumType implements IStringSerializable
+    public enum EnumType implements IStringSerializable
     {
         STONE(0, "stone")
         {
@@ -153,12 +153,12 @@ public class BlockSilverfish extends Block
         private final String name;
         private final String unlocalizedName;
 
-        private EnumType(int meta, String name)
+        EnumType(int meta, String name)
         {
             this(meta, name, name);
         }
 
-        private EnumType(int meta, String name, String unlocalizedName)
+        EnumType(int meta, String name, String unlocalizedName)
         {
             this.meta = meta;
             this.name = name;

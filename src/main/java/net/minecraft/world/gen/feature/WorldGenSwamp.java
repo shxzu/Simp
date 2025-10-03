@@ -29,7 +29,6 @@ public class WorldGenSwamp extends WorldGenAbstractTree
 
         for (i = rand.nextInt(4) + 5; worldIn.getBlockState(position.down()).getBlock().getMaterial() == Material.water; position = position.down())
         {
-            ;
         }
 
         boolean flag = true;

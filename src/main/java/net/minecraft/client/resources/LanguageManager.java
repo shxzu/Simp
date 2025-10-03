@@ -19,7 +19,7 @@ public class LanguageManager implements IResourceManagerReloadListener
     private final IMetadataSerializer theMetadataSerializer;
     private String currentLanguage;
     protected static final Locale currentLocale = new Locale();
-    private Map<String, Language> languageMap = Maps.<String, Language>newHashMap();
+    private final Map<String, Language> languageMap = Maps.newHashMap();
 
     public LanguageManager(IMetadataSerializer theMetadataSerializerIn, String currentLanguageIn)
     {
@@ -36,7 +36,7 @@ public class LanguageManager implements IResourceManagerReloadListener
         {
             try
             {
-                LanguageMetadataSection languagemetadatasection = (LanguageMetadataSection)iresourcepack.getPackMetadata(this.theMetadataSerializer, "language");
+                LanguageMetadataSection languagemetadatasection = iresourcepack.getPackMetadata(this.theMetadataSerializer, "language");
 
                 if (languagemetadatasection != null)
                 {
@@ -51,18 +51,18 @@ public class LanguageManager implements IResourceManagerReloadListener
             }
             catch (RuntimeException runtimeexception)
             {
-                logger.warn((String)("Unable to parse metadata section of resourcepack: " + iresourcepack.getPackName()), (Throwable)runtimeexception);
+                logger.warn("Unable to parse metadata section of resourcepack: " + iresourcepack.getPackName(), runtimeexception);
             }
             catch (IOException ioexception)
             {
-                logger.warn((String)("Unable to parse metadata section of resourcepack: " + iresourcepack.getPackName()), (Throwable)ioexception);
+                logger.warn("Unable to parse metadata section of resourcepack: " + iresourcepack.getPackName(), ioexception);
             }
         }
     }
 
     public void onResourceManagerReload(IResourceManager resourceManager)
     {
-        List<String> list = Lists.newArrayList(new String[] {"en_US"});
+        List<String> list = Lists.newArrayList("en_US");
 
         if (!"en_US".equals(this.currentLanguage))
         {
@@ -90,7 +90,7 @@ public class LanguageManager implements IResourceManagerReloadListener
 
     public Language getCurrentLanguage()
     {
-        return this.languageMap.containsKey(this.currentLanguage) ? (Language)this.languageMap.get(this.currentLanguage) : (Language)this.languageMap.get("en_US");
+        return this.languageMap.containsKey(this.currentLanguage) ? this.languageMap.get(this.currentLanguage) : this.languageMap.get("en_US");
     }
 
     public SortedSet<Language> getLanguages()

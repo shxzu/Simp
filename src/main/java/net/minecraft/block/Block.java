@@ -2,9 +2,6 @@ package net.minecraft.block;
 
 import java.util.List;
 import java.util.Random;
-
-import cc.simp.Simp;
-import cc.simp.event.impl.player.BlockCollideEvent;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -133,7 +130,7 @@ public class Block
 
     public static Block getBlockById(int id)
     {
-        return (Block)blockRegistry.getObjectById(id);
+        return blockRegistry.getObjectById(id);
     }
 
     public static IBlockState getStateById(int id)
@@ -154,13 +151,13 @@ public class Block
 
         if (blockRegistry.containsKey(resourcelocation))
         {
-            return (Block)blockRegistry.getObject(resourcelocation);
+            return blockRegistry.getObject(resourcelocation);
         }
         else
         {
             try
             {
-                return (Block)blockRegistry.getObjectById(Integer.parseInt(name));
+                return blockRegistry.getObjectById(Integer.parseInt(name));
             }
             catch (NumberFormatException var3)
             {
@@ -213,7 +210,7 @@ public class Block
     {
         if (state != null && !state.getPropertyNames().isEmpty())
         {
-            throw new IllegalArgumentException("Don\'t know how to convert " + state + " back into data...");
+            throw new IllegalArgumentException("Don't know how to convert " + state + " back into data...");
         }
         else
         {
@@ -347,12 +344,12 @@ public class Block
 
     protected final void setBlockBounds(float minX, float minY, float minZ, float maxX, float maxY, float maxZ)
     {
-        this.minX = (double)minX;
-        this.minY = (double)minY;
-        this.minZ = (double)minZ;
-        this.maxX = (double)maxX;
-        this.maxY = (double)maxY;
-        this.maxZ = (double)maxZ;
+        this.minX = minX;
+        this.minY = minY;
+        this.minZ = minZ;
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.maxZ = maxZ;
     }
 
     public int getMixedBrightnessForBlock(IBlockAccess worldIn, BlockPos pos)
@@ -374,7 +371,7 @@ public class Block
 
     public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side)
     {
-        return side == EnumFacing.DOWN && this.minY > 0.0D ? true : (side == EnumFacing.UP && this.maxY < 1.0D ? true : (side == EnumFacing.NORTH && this.minZ > 0.0D ? true : (side == EnumFacing.SOUTH && this.maxZ < 1.0D ? true : (side == EnumFacing.WEST && this.minX > 0.0D ? true : (side == EnumFacing.EAST && this.maxX < 1.0D ? true : !worldIn.getBlockState(pos).getBlock().isOpaqueCube())))));
+        return side == EnumFacing.DOWN && this.minY > 0.0D || (side == EnumFacing.UP && this.maxY < 1.0D || (side == EnumFacing.NORTH && this.minZ > 0.0D || (side == EnumFacing.SOUTH && this.maxZ < 1.0D || (side == EnumFacing.WEST && this.minX > 0.0D || (side == EnumFacing.EAST && this.maxX < 1.0D || !worldIn.getBlockState(pos).getBlock().isOpaqueCube())))));
     }
 
     public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side)
@@ -389,15 +386,12 @@ public class Block
 
     public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
-        BlockCollideEvent blockCollideEvent = new BlockCollideEvent(this.getCollisionBoundingBox(worldIn, pos, state), state.getBlock(), pos.getX(), pos.getY(), pos.getZ());
-        Simp.INSTANCE.getEventBus().post(blockCollideEvent);
-
-        if (blockCollideEvent.isCancelled()) return;
-
-        final AxisAlignedBB axisalignedbb = blockCollideEvent.getCollisionBoundingBox();
+        AxisAlignedBB axisalignedbb = this.getCollisionBoundingBox(worldIn, pos, state);
 
         if (axisalignedbb != null && mask.intersectsWith(axisalignedbb))
+        {
             list.add(axisalignedbb);
+        }
     }
 
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
@@ -536,8 +530,8 @@ public class Block
     public MovingObjectPosition collisionRayTrace(World worldIn, BlockPos pos, Vec3 start, Vec3 end)
     {
         this.setBlockBoundsBasedOnState(worldIn, pos);
-        start = start.addVector((double)(-pos.getX()), (double)(-pos.getY()), (double)(-pos.getZ()));
-        end = end.addVector((double)(-pos.getX()), (double)(-pos.getY()), (double)(-pos.getZ()));
+        start = start.addVector(-pos.getX(), -pos.getY(), -pos.getZ());
+        end = end.addVector(-pos.getX(), -pos.getY(), -pos.getZ());
         Vec3 vec3 = start.getIntermediateWithXValue(end, this.minX);
         Vec3 vec31 = start.getIntermediateWithXValue(end, this.maxX);
         Vec3 vec32 = start.getIntermediateWithYValue(end, this.minY);
@@ -645,23 +639,23 @@ public class Block
                 enumfacing = EnumFacing.SOUTH;
             }
 
-            return new MovingObjectPosition(vec36.addVector((double)pos.getX(), (double)pos.getY(), (double)pos.getZ()), enumfacing, pos);
+            return new MovingObjectPosition(vec36.addVector(pos.getX(), pos.getY(), pos.getZ()), enumfacing, pos);
         }
     }
 
     private boolean isVecInsideYZBounds(Vec3 point)
     {
-        return point == null ? false : point.yCoord >= this.minY && point.yCoord <= this.maxY && point.zCoord >= this.minZ && point.zCoord <= this.maxZ;
+        return point != null && point.yCoord >= this.minY && point.yCoord <= this.maxY && point.zCoord >= this.minZ && point.zCoord <= this.maxZ;
     }
 
     private boolean isVecInsideXZBounds(Vec3 point)
     {
-        return point == null ? false : point.xCoord >= this.minX && point.xCoord <= this.maxX && point.zCoord >= this.minZ && point.zCoord <= this.maxZ;
+        return point != null && point.xCoord >= this.minX && point.xCoord <= this.maxX && point.zCoord >= this.minZ && point.zCoord <= this.maxZ;
     }
 
     private boolean isVecInsideXYBounds(Vec3 point)
     {
-        return point == null ? false : point.xCoord >= this.minX && point.xCoord <= this.maxX && point.yCoord >= this.minY && point.yCoord <= this.maxY;
+        return point != null && point.xCoord >= this.minX && point.xCoord <= this.maxX && point.yCoord >= this.minY && point.yCoord <= this.maxY;
     }
 
     public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn)
@@ -949,7 +943,7 @@ public class Block
 
     public static boolean isEqualTo(Block blockIn, Block other)
     {
-        return blockIn != null && other != null ? (blockIn == other ? true : blockIn.isAssociatedBlock(other)) : false;
+        return blockIn != null && other != null && (blockIn == other || blockIn.isAssociatedBlock(other));
     }
 
     public boolean hasComparatorInputOverride()
@@ -969,7 +963,7 @@ public class Block
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[0]);
+        return new BlockState(this);
     }
 
     public BlockState getBlockState()
@@ -1256,11 +1250,11 @@ public class Block
         registerBlock(id, new ResourceLocation(textualID), block_);
     }
 
-    public static enum EnumOffsetType
+    public enum EnumOffsetType
     {
         NONE,
         XZ,
-        XYZ;
+        XYZ
     }
 
     public static class SoundType

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.gui.MinecraftFontRenderer;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiSpectator;
 import net.minecraft.client.gui.spectator.ISpectatorMenuObject;
@@ -22,7 +22,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject
 {
-    private final List<ISpectatorMenuObject> field_178672_a = Lists.<ISpectatorMenuObject>newArrayList();
+    private final List<ISpectatorMenuObject> field_178672_a = Lists.newArrayList();
 
     public TeleportToTeam()
     {
@@ -82,7 +82,7 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject
         public TeamSelectionObject(ScorePlayerTeam p_i45492_2_)
         {
             this.field_178676_b = p_i45492_2_;
-            this.field_178675_d = Lists.<NetworkPlayerInfo>newArrayList();
+            this.field_178675_d = Lists.newArrayList();
 
             for (String s : p_i45492_2_.getMembershipCollection())
             {
@@ -96,7 +96,7 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject
 
             if (!this.field_178675_d.isEmpty())
             {
-                String s1 = ((NetworkPlayerInfo)this.field_178675_d.get((new Random()).nextInt(this.field_178675_d.size()))).getGameProfile().getName();
+                String s1 = this.field_178675_d.get((new Random()).nextInt(this.field_178675_d.size())).getGameProfile().getName();
                 this.field_178677_c = AbstractClientPlayer.getLocationSkin(s1);
                 AbstractClientPlayer.getDownloadImageSkin(this.field_178677_c, s1);
             }
@@ -119,11 +119,11 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject
         public void func_178663_a(float p_178663_1_, int alpha)
         {
             int i = -1;
-            String s = MinecraftFontRenderer.getFormatFromString(this.field_178676_b.getColorPrefix());
+            String s = FontRenderer.getFormatFromString(this.field_178676_b.getColorPrefix());
 
             if (s.length() >= 2)
             {
-                i = Minecraft.getMinecraft().minecraftFontRendererObj.getColorCode(s.charAt(1));
+                i = Minecraft.getMinecraft().fontRendererObj.getColorCode(s.charAt(1));
             }
 
             if (i >= 0)

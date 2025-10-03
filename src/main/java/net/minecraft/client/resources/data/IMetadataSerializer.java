@@ -38,23 +38,23 @@ public class IMetadataSerializer
         }
         else if (!json.has(sectionName))
         {
-            return (T)null;
+            return null;
         }
         else if (!json.get(sectionName).isJsonObject())
         {
-            throw new IllegalArgumentException("Invalid metadata for \'" + sectionName + "\' - expected object, found " + json.get(sectionName));
+            throw new IllegalArgumentException("Invalid metadata for '" + sectionName + "' - expected object, found " + json.get(sectionName));
         }
         else
         {
-            IMetadataSerializer.Registration<?> registration = (IMetadataSerializer.Registration)this.metadataSectionSerializerRegistry.getObject(sectionName);
+            IMetadataSerializer.Registration<?> registration = this.metadataSectionSerializerRegistry.getObject(sectionName);
 
             if (registration == null)
             {
-                throw new IllegalArgumentException("Don\'t know how to handle metadata section \'" + sectionName + "\'");
+                throw new IllegalArgumentException("Don't know how to handle metadata section '" + sectionName + "'");
             }
             else
             {
-                return (T)((IMetadataSection)this.getGson().fromJson((JsonElement)json.getAsJsonObject(sectionName), registration.clazz));
+                return (T) this.getGson().fromJson(json.getAsJsonObject(sectionName), registration.clazz);
             }
         }
     }

@@ -1,7 +1,5 @@
 package net.minecraft.client.multiplayer;
 
-import cc.simp.Simp;
-import cc.simp.event.impl.player.AttackEvent;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -362,9 +360,8 @@ public class PlayerControllerMP
                     flag = true;
                 }
 
-                if (!flag && heldStack != null && heldStack.getItem() instanceof ItemBlock)
+                if (!flag && heldStack != null && heldStack.getItem() instanceof ItemBlock itemblock)
                 {
-                    ItemBlock itemblock = (ItemBlock)heldStack.getItem();
 
                     if (!itemblock.canPlaceBlockOnSide(worldIn, hitPos, side, player, heldStack))
                     {
@@ -440,21 +437,12 @@ public class PlayerControllerMP
 
     public void attackEntity(EntityPlayer playerIn, Entity targetEntity)
     {
-        AttackEvent attackEntityEvent = new AttackEvent(targetEntity);
-        Simp.INSTANCE.getEventBus().post(attackEntityEvent);
-
-        if(attackEntityEvent.isCancelled())
-            return;
-
         this.syncCurrentPlayItem();
         this.netClientHandler.addToSendQueue(new C02PacketUseEntity(targetEntity, C02PacketUseEntity.Action.ATTACK));
 
         if (this.currentGameType != WorldSettings.GameType.SPECTATOR)
         {
             playerIn.attackTargetEntityWithCurrentItem(targetEntity);
-            if (playerIn instanceof EntityPlayerSP) {
-                this.mc.thePlayer.resetCooldown();
-            }
         }
     }
 

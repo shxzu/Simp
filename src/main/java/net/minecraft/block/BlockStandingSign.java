@@ -34,11 +34,11 @@ public class BlockStandingSign extends BlockSign
 
     public int getMetaFromState(IBlockState state)
     {
-        return ((Integer)state.getValue(ROTATION)).intValue();
+        return state.getValue(ROTATION).intValue();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {ROTATION});
+        return new BlockState(this, ROTATION);
     }
 }

@@ -22,16 +22,16 @@ public class GuiShaders extends GuiScreenOF
 {
     protected GuiScreen parentGui;
     protected String screenTitle = "Shaders";
-    private TooltipManager tooltipManager = new TooltipManager(this, new TooltipProviderEnumShaderOptions());
+    private final TooltipManager tooltipManager = new TooltipManager(this, new TooltipProviderEnumShaderOptions());
     private int updateTimer = -1;
     private GuiSlotShaders shaderList;
     private boolean saved = false;
-    private static float[] QUALITY_MULTIPLIERS = new float[] {0.5F, 0.6F, 0.6666667F, 0.75F, 0.8333333F, 0.9F, 1.0F, 1.1666666F, 1.3333334F, 1.5F, 1.6666666F, 1.8F, 2.0F};
-    private static String[] QUALITY_MULTIPLIER_NAMES = new String[] {"0.5x", "0.6x", "0.66x", "0.75x", "0.83x", "0.9x", "1x", "1.16x", "1.33x", "1.5x", "1.66x", "1.8x", "2x"};
-    private static float QUALITY_MULTIPLIER_DEFAULT = 1.0F;
-    private static float[] HAND_DEPTH_VALUES = new float[] {0.0625F, 0.125F, 0.25F};
-    private static String[] HAND_DEPTH_NAMES = new String[] {"0.5x", "1x", "2x"};
-    private static float HAND_DEPTH_DEFAULT = 0.125F;
+    private static final float[] QUALITY_MULTIPLIERS = new float[] {0.5F, 0.6F, 0.6666667F, 0.75F, 0.8333333F, 0.9F, 1.0F, 1.1666666F, 1.3333334F, 1.5F, 1.6666666F, 1.8F, 2.0F};
+    private static final String[] QUALITY_MULTIPLIER_NAMES = new String[] {"0.5x", "0.6x", "0.66x", "0.75x", "0.83x", "0.9x", "1x", "1.16x", "1.33x", "1.5x", "1.66x", "1.8x", "2x"};
+    private static final float QUALITY_MULTIPLIER_DEFAULT = 1.0F;
+    private static final float[] HAND_DEPTH_VALUES = new float[] {0.0625F, 0.125F, 0.25F};
+    private static final String[] HAND_DEPTH_NAMES = new String[] {"0.5x", "1x", "2x"};
+    private static final float HAND_DEPTH_DEFAULT = 0.125F;
     public static final int EnumOS_UNKNOWN = 0;
     public static final int EnumOS_WINDOWS = 1;
     public static final int EnumOS_OSX = 2;
@@ -45,7 +45,7 @@ public class GuiShaders extends GuiScreenOF
 
     public void initGui()
     {
-        this.screenTitle = I18n.format("of.options.shadersTitle", new Object[0]);
+        this.screenTitle = I18n.format("of.options.shadersTitle");
 
         if (Shaders.shadersConfig == null)
         {
@@ -60,8 +60,8 @@ public class GuiShaders extends GuiScreenOF
         int j1 = this.width - i - 20;
         this.shaderList = new GuiSlotShaders(this, j1, this.height, l, this.height - 50, 16);
         this.shaderList.registerScrollButtons(7, 8);
-        this.buttonList.add(new GuiButtonEnumShaderOption(EnumShaderOption.ANTIALIASING, k, 0 * i1 + l, i, j));
-        this.buttonList.add(new GuiButtonEnumShaderOption(EnumShaderOption.NORMAL_MAP, k, 1 * i1 + l, i, j));
+        this.buttonList.add(new GuiButtonEnumShaderOption(EnumShaderOption.ANTIALIASING, k, l, i, j));
+        this.buttonList.add(new GuiButtonEnumShaderOption(EnumShaderOption.NORMAL_MAP, k, i1 + l, i, j));
         this.buttonList.add(new GuiButtonEnumShaderOption(EnumShaderOption.SPECULAR_MAP, k, 2 * i1 + l, i, j));
         this.buttonList.add(new GuiButtonEnumShaderOption(EnumShaderOption.RENDER_RES_MUL, k, 3 * i1 + l, i, j));
         this.buttonList.add(new GuiButtonEnumShaderOption(EnumShaderOption.SHADOW_RES_MUL, k, 4 * i1 + l, i, j));
@@ -73,7 +73,7 @@ public class GuiShaders extends GuiScreenOF
         int i2 = this.height - 25;
         this.buttonList.add(new GuiButton(201, l1, i2, k1 - 22 + 1, j, Lang.get("of.options.shaders.shadersFolder")));
         this.buttonList.add(new GuiButtonDownloadShaders(210, l1 + k1 - 22 - 1, i2));
-        this.buttonList.add(new GuiButton(202, j1 / 4 * 3 - k1 / 2, this.height - 25, k1, j, I18n.format("gui.done", new Object[0])));
+        this.buttonList.add(new GuiButton(202, j1 / 4 * 3 - k1 / 2, this.height - 25, k1, j, I18n.format("gui.done")));
         this.buttonList.add(new GuiButton(203, k, this.height - 25, i, j, Lang.get("of.options.shaders.shaderOptions")));
         this.updateButtons();
     }
@@ -111,7 +111,7 @@ public class GuiShaders extends GuiScreenOF
     {
         if (button.enabled)
         {
-            if (!(button instanceof GuiButtonEnumShaderOption))
+            if (!(button instanceof GuiButtonEnumShaderOption guibuttonenumshaderoption))
             {
                 if (!rightClick)
                 {
@@ -121,7 +121,7 @@ public class GuiShaders extends GuiScreenOF
                             switch (getOSType())
                             {
                                 case 1:
-                                    String s = String.format("cmd.exe /C start \"Open file\" \"%s\"", new Object[] {Shaders.shaderPacksDir.getAbsolutePath()});
+                                    String s = String.format("cmd.exe /C start \"Open file\" \"%s\"", Shaders.shaderPacksDir.getAbsolutePath());
 
                                     try
                                     {
@@ -151,8 +151,8 @@ public class GuiShaders extends GuiScreenOF
                             try
                             {
                                 Class oclass1 = Class.forName("java.awt.Desktop");
-                                Object object1 = oclass1.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
-                                oclass1.getMethod("browse", new Class[] {URI.class}).invoke(object1, new Object[] {(new File(this.mc.mcDataDir, "shaderpacks")).toURI()});
+                                Object object1 = oclass1.getMethod("getDesktop").invoke(null);
+                                oclass1.getMethod("browse", URI.class).invoke(object1, (new File(this.mc.mcDataDir, "shaderpacks")).toURI());
                             }
                             catch (Throwable throwable1)
                             {
@@ -183,8 +183,8 @@ public class GuiShaders extends GuiScreenOF
                             try
                             {
                                 Class<?> oclass = Class.forName("java.awt.Desktop");
-                                Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
-                                oclass.getMethod("browse", new Class[] {URI.class}).invoke(object, new Object[] {new URI("http://optifine.net/shaderPacks")});
+                                Object object = oclass.getMethod("getDesktop").invoke(null);
+                                oclass.getMethod("browse", URI.class).invoke(object, new URI("http://optifine.net/shaderPacks"));
                             }
                             catch (Throwable throwable)
                             {
@@ -204,7 +204,6 @@ public class GuiShaders extends GuiScreenOF
             }
             else
             {
-                GuiButtonEnumShaderOption guibuttonenumshaderoption = (GuiButtonEnumShaderOption)button;
 
                 switch (guibuttonenumshaderoption.getEnumShaderOption())
                 {
@@ -343,17 +342,17 @@ public class GuiShaders extends GuiScreenOF
             this.updateTimer += 20;
         }
 
-        this.drawCenteredString(this.minecraftFontRendererObj, this.screenTitle + " ", this.width / 2, 15, 16777215);
+        this.drawCenteredString(this.fontRendererObj, this.screenTitle + " ", this.width / 2, 15, 16777215);
         String s = "OpenGL: " + Shaders.glVersionString + ", " + Shaders.glVendorString + ", " + Shaders.glRendererString;
-        int i = this.minecraftFontRendererObj.getStringWidth(s);
+        int i = this.fontRendererObj.getStringWidth(s);
 
         if (i < this.width - 5)
         {
-            this.drawCenteredString(this.minecraftFontRendererObj, s, this.width / 2, this.height - 40, 8421504);
+            this.drawCenteredString(this.fontRendererObj, s, this.width / 2, this.height - 40, 8421504);
         }
         else
         {
-            this.drawString(this.minecraftFontRendererObj, s, 5, this.height - 40, 8421504);
+            this.drawString(this.fontRendererObj, s, 5, this.height - 40, 8421504);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
@@ -373,7 +372,7 @@ public class GuiShaders extends GuiScreenOF
 
     public void drawCenteredString(String text, int x, int y, int color)
     {
-        this.drawCenteredString(this.minecraftFontRendererObj, text, x, y, color);
+        this.drawCenteredString(this.fontRendererObj, text, x, y, color);
     }
 
     public static String toStringOnOff(boolean value)

@@ -37,7 +37,7 @@ public class BlockEndPortal extends BlockContainer
 
     public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side)
     {
-        return side == EnumFacing.DOWN ? super.shouldSideBeRendered(worldIn, pos, side) : false;
+        return side == EnumFacing.DOWN && super.shouldSideBeRendered(worldIn, pos, side);
     }
 
     public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
@@ -69,13 +69,13 @@ public class BlockEndPortal extends BlockContainer
 
     public void randomDisplayTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        double d0 = (double)((float)pos.getX() + rand.nextFloat());
-        double d1 = (double)((float)pos.getY() + 0.8F);
-        double d2 = (double)((float)pos.getZ() + rand.nextFloat());
+        double d0 = (float)pos.getX() + rand.nextFloat();
+        double d1 = (float)pos.getY() + 0.8F;
+        double d2 = (float)pos.getZ() + rand.nextFloat();
         double d3 = 0.0D;
         double d4 = 0.0D;
         double d5 = 0.0D;
-        worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, d3, d4, d5, new int[0]);
+        worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, d3, d4, d5);
     }
 
     public Item getItem(World worldIn, BlockPos pos)

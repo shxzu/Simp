@@ -10,7 +10,7 @@ public class GuiBrewingStand extends GuiContainer
 {
     private static final ResourceLocation brewingStandGuiTextures = new ResourceLocation("textures/gui/container/brewing_stand.png");
     private final InventoryPlayer playerInventory;
-    private IInventory tileBrewingStand;
+    private final IInventory tileBrewingStand;
 
     public GuiBrewingStand(InventoryPlayer playerInv, IInventory p_i45506_2_)
     {
@@ -22,8 +22,8 @@ public class GuiBrewingStand extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         String s = this.tileBrewingStand.getDisplayName().getUnformattedText();
-        this.minecraftFontRendererObj.drawString(s, this.xSize / 2 - this.minecraftFontRendererObj.getStringWidth(s) / 2, 6, 4210752);
-        this.minecraftFontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
+        this.fontRendererObj.drawString(s, this.xSize / 2 - this.fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
+        this.fontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)

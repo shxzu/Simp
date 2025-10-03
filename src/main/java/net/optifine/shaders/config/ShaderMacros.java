@@ -6,7 +6,7 @@ import net.optifine.shaders.Shaders;
 
 public class ShaderMacros
 {
-    private static String PREFIX_MACRO = "MC_";
+    private static final String PREFIX_MACRO = "MC_";
     public static final String MC_VERSION = "MC_VERSION";
     public static final String MC_GL_VERSION = "MC_GL_VERSION";
     public static final String MC_GLSL_VERSION = "MC_GLSL_VERSION";

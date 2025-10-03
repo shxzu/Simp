@@ -67,7 +67,7 @@ public class SetVisibility
                 else
                 {
                     boolean flag = this.isVisible(enumfacing2, enumfacing1);
-                    stringbuilder.append(' ').append((char)(flag ? 'Y' : 'n'));
+                    stringbuilder.append(' ').append(flag ? 'Y' : 'n');
                 }
             }
 
@@ -79,7 +79,7 @@ public class SetVisibility
 
     private boolean getBit(int p_getBit_1_)
     {
-        return (this.bits & (long)(1 << p_getBit_1_)) != 0L;
+        return (this.bits & (1L << p_getBit_1_)) != 0L;
     }
 
     private void setBit(int p_setBit_1_, boolean p_setBit_2_)
@@ -96,11 +96,11 @@ public class SetVisibility
 
     private void setBit(int p_setBit_1_)
     {
-        this.bits |= (long)(1 << p_setBit_1_);
+        this.bits |= 1L << p_setBit_1_;
     }
 
     private void clearBit(int p_clearBit_1_)
     {
-        this.bits &= (long)(~(1 << p_clearBit_1_));
+        this.bits &= ~(1L << p_clearBit_1_);
     }
 }

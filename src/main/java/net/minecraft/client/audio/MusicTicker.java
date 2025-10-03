@@ -60,7 +60,7 @@ public class MusicTicker implements ITickable
         }
     }
 
-    public static enum MusicType
+    public enum MusicType
     {
         MENU(new ResourceLocation("minecraft:music.menu"), 20, 600),
         GAME(new ResourceLocation("minecraft:music.game"), 12000, 24000),
@@ -74,7 +74,7 @@ public class MusicTicker implements ITickable
         private final int minDelay;
         private final int maxDelay;
 
-        private MusicType(ResourceLocation location, int minDelayIn, int maxDelayIn)
+        MusicType(ResourceLocation location, int minDelayIn, int maxDelayIn)
         {
             this.musicLocation = location;
             this.minDelay = minDelayIn;

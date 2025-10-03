@@ -58,9 +58,8 @@ public class ModelArmorStand extends ModelArmorStandArmor
     {
         super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
 
-        if (entityIn instanceof EntityArmorStand)
+        if (entityIn instanceof EntityArmorStand entityarmorstand)
         {
-            EntityArmorStand entityarmorstand = (EntityArmorStand)entityIn;
             this.bipedLeftArm.showModel = entityarmorstand.getShowArms();
             this.bipedRightArm.showModel = entityarmorstand.getShowArms();
             this.standBase.showModel = !entityarmorstand.hasNoBasePlate();

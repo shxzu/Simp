@@ -4,15 +4,15 @@ import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.MinecraftFontRenderer;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 
 public class TooltipManager
 {
-    private GuiScreen guiScreen;
-    private TooltipProvider tooltipProvider;
+    private final GuiScreen guiScreen;
+    private final TooltipProvider tooltipProvider;
     private int lastMouseX = 0;
     private int lastMouseY = 0;
     private long mouseStillTime = 0L;
@@ -42,7 +42,7 @@ public class TooltipManager
                     {
                         if (astring.length > 8)
                         {
-                            astring = (String[])Arrays.copyOf(astring, 8);
+                            astring = Arrays.copyOf(astring, 8);
                             astring[astring.length - 1] = astring[astring.length - 1] + " ...";
                         }
 
@@ -64,7 +64,7 @@ public class TooltipManager
                                 k = 16719904;
                             }
 
-                            MinecraftFontRenderer fontrenderer = Minecraft.getMinecraft().minecraftFontRendererObj;
+                            FontRenderer fontrenderer = Minecraft.getMinecraft().fontRendererObj;
                             fontrenderer.drawStringWithShadow(s, (float)(rectangle.x + 5), (float)(rectangle.y + 5 + l * 11), k);
                         }
                     }

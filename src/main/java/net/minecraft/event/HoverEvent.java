@@ -43,17 +43,9 @@ public class HoverEvent
             {
                 if (this.value != null)
                 {
-                    if (!this.value.equals(hoverevent.value))
-                    {
-                        return false;
-                    }
+                    return this.value.equals(hoverevent.value);
                 }
-                else if (hoverevent.value != null)
-                {
-                    return false;
-                }
-
-                return true;
+                else return hoverevent.value == null;
             }
         }
         else
@@ -64,7 +56,7 @@ public class HoverEvent
 
     public String toString()
     {
-        return "HoverEvent{action=" + this.action + ", value=\'" + this.value + '\'' + '}';
+        return "HoverEvent{action=" + this.action + ", value='" + this.value + '\'' + '}';
     }
 
     public int hashCode()
@@ -74,18 +66,18 @@ public class HoverEvent
         return i;
     }
 
-    public static enum Action
+    public enum Action
     {
         SHOW_TEXT("show_text", true),
         SHOW_ACHIEVEMENT("show_achievement", true),
         SHOW_ITEM("show_item", true),
         SHOW_ENTITY("show_entity", true);
 
-        private static final Map<String, HoverEvent.Action> nameMapping = Maps.<String, HoverEvent.Action>newHashMap();
+        private static final Map<String, HoverEvent.Action> nameMapping = Maps.newHashMap();
         private final boolean allowedInChat;
         private final String canonicalName;
 
-        private Action(String canonicalNameIn, boolean allowedInChatIn)
+        Action(String canonicalNameIn, boolean allowedInChatIn)
         {
             this.canonicalName = canonicalNameIn;
             this.allowedInChat = allowedInChatIn;
@@ -103,7 +95,7 @@ public class HoverEvent
 
         public static HoverEvent.Action getValueByCanonicalName(String canonicalNameIn)
         {
-            return (HoverEvent.Action)nameMapping.get(canonicalNameIn);
+            return nameMapping.get(canonicalNameIn);
         }
 
         static {

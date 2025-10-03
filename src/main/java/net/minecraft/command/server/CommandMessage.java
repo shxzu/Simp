@@ -18,7 +18,7 @@ public class CommandMessage extends CommandBase
 {
     public List<String> getCommandAliases()
     {
-        return Arrays.<String>asList(new String[] {"w", "msg"});
+        return Arrays.asList("w", "msg");
     }
 
     public String getCommandName()
@@ -40,7 +40,7 @@ public class CommandMessage extends CommandBase
     {
         if (args.length < 2)
         {
-            throw new WrongUsageException("commands.message.usage", new Object[0]);
+            throw new WrongUsageException("commands.message.usage");
         }
         else
         {
@@ -48,13 +48,13 @@ public class CommandMessage extends CommandBase
 
             if (entityplayer == sender)
             {
-                throw new PlayerNotFoundException("commands.message.sameTarget", new Object[0]);
+                throw new PlayerNotFoundException("commands.message.sameTarget");
             }
             else
             {
                 IChatComponent ichatcomponent = getChatComponentFromNthArg(sender, args, 1, !(sender instanceof EntityPlayer));
-                ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("commands.message.display.incoming", new Object[] {sender.getDisplayName(), ichatcomponent.createCopy()});
-                ChatComponentTranslation chatcomponenttranslation1 = new ChatComponentTranslation("commands.message.display.outgoing", new Object[] {entityplayer.getDisplayName(), ichatcomponent.createCopy()});
+                ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("commands.message.display.incoming", sender.getDisplayName(), ichatcomponent.createCopy());
+                ChatComponentTranslation chatcomponenttranslation1 = new ChatComponentTranslation("commands.message.display.outgoing", entityplayer.getDisplayName(), ichatcomponent.createCopy());
                 chatcomponenttranslation.getChatStyle().setColor(EnumChatFormatting.GRAY).setItalic(Boolean.valueOf(true));
                 chatcomponenttranslation1.getChatStyle().setColor(EnumChatFormatting.GRAY).setItalic(Boolean.valueOf(true));
                 entityplayer.addChatMessage(chatcomponenttranslation);

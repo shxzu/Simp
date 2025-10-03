@@ -10,7 +10,7 @@ import net.minecraft.world.World;
 
 public class WorldGenSpikes extends WorldGenerator
 {
-    private Block baseBlockRequired;
+    private final Block baseBlockRequired;
 
     public WorldGenSpikes(Block p_i45464_1_)
     {
@@ -57,7 +57,7 @@ public class WorldGenSpikes extends WorldGenerator
             }
 
             Entity entity = new EntityEnderCrystal(worldIn);
-            entity.setLocationAndAngles((double)((float)position.getX() + 0.5F), (double)(position.getY() + i), (double)((float)position.getZ() + 0.5F), rand.nextFloat() * 360.0F, 0.0F);
+            entity.setLocationAndAngles((float)position.getX() + 0.5F, position.getY() + i, (float)position.getZ() + 0.5F, rand.nextFloat() * 360.0F, 0.0F);
             worldIn.spawnEntityInWorld(entity);
             worldIn.setBlockState(position.up(i), Blocks.bedrock.getDefaultState(), 2);
             return true;

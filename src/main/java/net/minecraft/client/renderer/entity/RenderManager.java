@@ -7,7 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.gui.MinecraftFontRenderer;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelChicken;
 import net.minecraft.client.model.ModelCow;
 import net.minecraft.client.model.ModelHorse;
@@ -109,12 +109,12 @@ import net.optifine.shaders.Shaders;
 public class RenderManager
 {
     private Map<Class, Render> entityRenderMap = Maps.newHashMap();
-    private Map<String, RenderPlayer> skinMap = Maps.<String, RenderPlayer>newHashMap();
-    private RenderPlayer playerRenderer;
-    private MinecraftFontRenderer textRenderer;
-    public static double renderPosX;
-    public static double renderPosY;
-    public static double renderPosZ;
+    private final Map<String, RenderPlayer> skinMap = Maps.newHashMap();
+    private final RenderPlayer playerRenderer;
+    private FontRenderer textRenderer;
+    private double renderPosX;
+    private double renderPosY;
+    private double renderPosZ;
     public TextureManager renderEngine;
     public World worldObj;
     public Entity livingPlayer;
@@ -196,11 +196,6 @@ public class RenderManager
         this.skinMap.put("default", this.playerRenderer);
         this.skinMap.put("slim", new RenderPlayer(this, true));
         PlayerItemsLayer.register(this.skinMap);
-
-        if (Reflector.RenderingRegistry_loadEntityRenderers.exists())
-        {
-            Reflector.call(Reflector.RenderingRegistry_loadEntityRenderers, new Object[] {this, this.entityRenderMap});
-        }
     }
 
     public void setRenderPosition(double renderPosXIn, double renderPosYIn, double renderPosZIn)
@@ -216,7 +211,7 @@ public class RenderManager
 
         if (render == null && entityClass != Entity.class)
         {
-            render = this.<Entity>getEntityClassRenderObject((Class <? extends Entity >)entityClass.getSuperclass());
+            render = this.getEntityClassRenderObject((Class <? extends Entity >)entityClass.getSuperclass());
             this.entityRenderMap.put(entityClass, render);
         }
 
@@ -228,16 +223,16 @@ public class RenderManager
         if (entityIn instanceof AbstractClientPlayer)
         {
             String s = ((AbstractClientPlayer)entityIn).getSkinType();
-            RenderPlayer renderplayer = (RenderPlayer)this.skinMap.get(s);
+            RenderPlayer renderplayer = this.skinMap.get(s);
             return (Render<T>)(renderplayer != null ? renderplayer : this.playerRenderer);
         }
         else
         {
-            return this.<T>getEntityClassRenderObject(entityIn.getClass());
+            return this.getEntityClassRenderObject(entityIn.getClass());
         }
     }
 
-    public void cacheActiveRenderInfo(World worldIn, MinecraftFontRenderer textRendererIn, Entity livingPlayerIn, Entity pointedEntityIn, GameSettings optionsIn, float partialTicks)
+    public void cacheActiveRenderInfo(World worldIn, FontRenderer textRendererIn, Entity livingPlayerIn, Entity pointedEntityIn, GameSettings optionsIn, float partialTicks)
     {
         this.worldObj = worldIn;
         this.options = optionsIn;
@@ -250,16 +245,9 @@ public class RenderManager
             IBlockState iblockstate = worldIn.getBlockState(new BlockPos(livingPlayerIn));
             Block block = iblockstate.getBlock();
 
-            if (Reflector.callBoolean(block, Reflector.ForgeBlock_isBed, new Object[] {iblockstate, worldIn, new BlockPos(livingPlayerIn), (EntityLivingBase)livingPlayerIn}))
+            if (block == Blocks.bed)
             {
-                EnumFacing enumfacing = (EnumFacing)Reflector.call(block, Reflector.ForgeBlock_getBedDirection, new Object[] {iblockstate, worldIn, new BlockPos(livingPlayerIn)});
-                int i = enumfacing.getHorizontalIndex();
-                this.playerViewY = (float)(i * 90 + 180);
-                this.playerViewX = 0.0F;
-            }
-            else if (block == Blocks.bed)
-            {
-                int j = ((EnumFacing)iblockstate.getValue(BlockBed.FACING)).getHorizontalIndex();
+                int j = iblockstate.getValue(BlockBed.FACING).getHorizontalIndex();
                 this.playerViewY = (float)(j * 90 + 180);
                 this.playerViewX = 0.0F;
             }
@@ -312,7 +300,7 @@ public class RenderManager
 
     public boolean shouldRender(Entity entityIn, ICamera camera, double camX, double camY, double camZ)
     {
-        Render<Entity> render = this.<Entity>getEntityRenderObject(entityIn);
+        Render<Entity> render = this.getEntityRenderObject(entityIn);
         return render != null && render.shouldRender(entityIn, camera, camX, camY, camZ);
     }
 
@@ -338,7 +326,7 @@ public class RenderManager
 
         int j = i % 65536;
         int k = i / 65536;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j / 1.0F, (float)k / 1.0F);
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j, (float) k);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         return this.doRenderEntity(entity, d0 - this.renderPosX, d1 - this.renderPosY, d2 - this.renderPosZ, f, partialTicks, hideDebugBox);
     }
@@ -348,14 +336,14 @@ public class RenderManager
         double d0 = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double)partialTicks;
         double d1 = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double)partialTicks;
         double d2 = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double)partialTicks;
-        Render<Entity> render = this.<Entity>getEntityRenderObject(entityIn);
+        Render<Entity> render = this.getEntityRenderObject(entityIn);
 
         if (render != null && this.renderEngine != null)
         {
             int i = entityIn.getBrightnessForRender(partialTicks);
             int j = i % 65536;
             int k = i / 65536;
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j / 1.0F, (float)k / 1.0F);
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j, (float) k);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             render.renderName(entityIn, d0 - this.renderPosX, d1 - this.renderPosY, d2 - this.renderPosZ);
         }
@@ -372,7 +360,7 @@ public class RenderManager
 
         try
         {
-            render = this.<Entity>getEntityRenderObject(entity);
+            render = this.getEntityRenderObject(entity);
 
             if (render != null && this.renderEngine != null)
             {
@@ -419,10 +407,7 @@ public class RenderManager
                     }
                 }
             }
-            else if (this.renderEngine != null)
-            {
-                return false;
-            }
+            else return this.renderEngine == null;
 
             return true;
         }
@@ -488,7 +473,7 @@ public class RenderManager
         return d0 * d0 + d1 * d1 + d2 * d2;
     }
 
-    public MinecraftFontRenderer getFontRenderer()
+    public FontRenderer getFontRenderer()
     {
         return this.textRenderer;
     }
@@ -510,6 +495,6 @@ public class RenderManager
 
     public Map<String, RenderPlayer> getSkinMap()
     {
-        return Collections.<String, RenderPlayer>unmodifiableMap(this.skinMap);
+        return Collections.unmodifiableMap(this.skinMap);
     }
 }

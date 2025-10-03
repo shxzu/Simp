@@ -2,7 +2,7 @@ package net.optifine.expr;
 
 public class ExpressionFloatArrayCached implements IExpressionFloatArray, IExpressionCached
 {
-    private IExpressionFloatArray expression;
+    private final IExpressionFloatArray expression;
     private boolean cached;
     private float[] value;
 

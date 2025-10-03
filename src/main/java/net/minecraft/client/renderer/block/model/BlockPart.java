@@ -37,8 +37,8 @@ public class BlockPart
     {
         for (Entry<EnumFacing, BlockPartFace> entry : this.mapFaces.entrySet())
         {
-            float[] afloat = this.getFaceUvs((EnumFacing)entry.getKey());
-            ((BlockPartFace)entry.getValue()).blockFaceUV.setUvs(afloat);
+            float[] afloat = this.getFaceUvs(entry.getKey());
+            entry.getValue().blockFaceUV.setUvs(afloat);
         }
     }
 
@@ -156,8 +156,8 @@ public class BlockPart
 
             for (Entry<String, JsonElement> entry : jsonobject.entrySet())
             {
-                EnumFacing enumfacing = this.parseEnumFacing((String)entry.getKey());
-                map.put(enumfacing, (BlockPartFace)p_178253_1_.deserialize((JsonElement)entry.getValue(), BlockPartFace.class));
+                EnumFacing enumfacing = this.parseEnumFacing(entry.getKey());
+                map.put(enumfacing, p_178253_1_.deserialize(entry.getValue(), BlockPartFace.class));
             }
 
             return map;
@@ -187,7 +187,7 @@ public class BlockPart
             }
             else
             {
-                throw new JsonParseException("\'to\' specifier exceeds the allowed boundaries: " + vector3f);
+                throw new JsonParseException("'to' specifier exceeds the allowed boundaries: " + vector3f);
             }
         }
 
@@ -201,7 +201,7 @@ public class BlockPart
             }
             else
             {
-                throw new JsonParseException("\'from\' specifier exceeds the allowed boundaries: " + vector3f);
+                throw new JsonParseException("'from' specifier exceeds the allowed boundaries: " + vector3f);
             }
         }
 

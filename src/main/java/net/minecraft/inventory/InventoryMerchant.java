@@ -12,7 +12,7 @@ import net.minecraft.village.MerchantRecipeList;
 public class InventoryMerchant implements IInventory
 {
     private final IMerchant theMerchant;
-    private ItemStack[] theInventory = new ItemStack[3];
+    private final ItemStack[] theInventory = new ItemStack[3];
     private final EntityPlayer thePlayer;
     private MerchantRecipe currentRecipe;
     private int currentRecipeIndex;
@@ -124,7 +124,7 @@ public class InventoryMerchant implements IInventory
 
     public IChatComponent getDisplayName()
     {
-        return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
+        return this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName());
     }
 
     public int getInventoryStackLimit()
@@ -169,7 +169,7 @@ public class InventoryMerchant implements IInventory
 
         if (itemstack == null)
         {
-            this.setInventorySlotContents(2, (ItemStack)null);
+            this.setInventorySlotContents(2, null);
         }
         else
         {
@@ -195,12 +195,12 @@ public class InventoryMerchant implements IInventory
                     }
                     else
                     {
-                        this.setInventorySlotContents(2, (ItemStack)null);
+                        this.setInventorySlotContents(2, null);
                     }
                 }
                 else
                 {
-                    this.setInventorySlotContents(2, (ItemStack)null);
+                    this.setInventorySlotContents(2, null);
                 }
             }
         }

@@ -12,7 +12,7 @@ public enum EnumRarity
     public final EnumChatFormatting rarityColor;
     public final String rarityName;
 
-    private EnumRarity(EnumChatFormatting color, String name)
+    EnumRarity(EnumChatFormatting color, String name)
     {
         this.rarityColor = color;
         this.rarityName = name;

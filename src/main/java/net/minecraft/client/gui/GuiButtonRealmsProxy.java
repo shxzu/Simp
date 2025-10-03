@@ -5,7 +5,7 @@ import net.minecraft.realms.RealmsButton;
 
 public class GuiButtonRealmsProxy extends GuiButton
 {
-    private RealmsButton realmsButton;
+    private final RealmsButton realmsButton;
 
     public GuiButtonRealmsProxy(RealmsButton realmsButtonIn, int buttonId, int x, int y, String text)
     {

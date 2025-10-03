@@ -15,7 +15,7 @@ public class RecipesArmorDyes implements IRecipe
     public boolean matches(InventoryCrafting inv, World worldIn)
     {
         ItemStack itemstack = null;
-        List<ItemStack> list = Lists.<ItemStack>newArrayList();
+        List<ItemStack> list = Lists.newArrayList();
 
         for (int i = 0; i < inv.getSizeInventory(); ++i)
         {
@@ -23,9 +23,8 @@ public class RecipesArmorDyes implements IRecipe
 
             if (itemstack1 != null)
             {
-                if (itemstack1.getItem() instanceof ItemArmor)
+                if (itemstack1.getItem() instanceof ItemArmor itemarmor)
                 {
-                    ItemArmor itemarmor = (ItemArmor)itemstack1.getItem();
 
                     if (itemarmor.getArmorMaterial() != ItemArmor.ArmorMaterial.LEATHER || itemstack != null)
                     {

@@ -36,11 +36,11 @@ public class EffectRenderer
 {
     private static final ResourceLocation particleTextures = new ResourceLocation("textures/particle/particles.png");
     protected World worldObj;
-    private List<EntityFX>[][] fxLayers = new List[4][];
-    private List<EntityParticleEmitter> particleEmitters = Lists.<EntityParticleEmitter>newArrayList();
-    private TextureManager renderer;
-    private Random rand = new Random();
-    private Map<Integer, IParticleFactory> particleTypes = Maps.<Integer, IParticleFactory>newHashMap();
+    private final List<EntityFX>[][] fxLayers = new List[4][];
+    private final List<EntityParticleEmitter> particleEmitters = Lists.newArrayList();
+    private final TextureManager renderer;
+    private final Random rand = new Random();
+    private final Map<Integer, IParticleFactory> particleTypes = Maps.newHashMap();
 
     public EffectRenderer(World worldIn, TextureManager rendererIn)
     {
@@ -117,7 +117,7 @@ public class EffectRenderer
 
     public EntityFX spawnEffectParticle(int particleId, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed, double zSpeed, int... parameters)
     {
-        IParticleFactory iparticlefactory = (IParticleFactory)this.particleTypes.get(Integer.valueOf(particleId));
+        IParticleFactory iparticlefactory = this.particleTypes.get(Integer.valueOf(particleId));
 
         if (iparticlefactory != null)
         {
@@ -159,7 +159,7 @@ public class EffectRenderer
             this.updateEffectLayer(i);
         }
 
-        List<EntityParticleEmitter> list = Lists.<EntityParticleEmitter>newArrayList();
+        List<EntityParticleEmitter> list = Lists.newArrayList();
 
         for (EntityParticleEmitter entityparticleemitter : this.particleEmitters)
         {
@@ -302,7 +302,7 @@ public class EffectRenderer
 
                     for (int k = 0; k < this.fxLayers[i][j].size(); ++k)
                     {
-                        final EntityFX entityfx = (EntityFX)this.fxLayers[i][j].get(k);
+                        final EntityFX entityfx = this.fxLayers[i][j].get(k);
 
                         try
                         {
@@ -363,7 +363,7 @@ public class EffectRenderer
 
                 for (int j = 0; j < list.size(); ++j)
                 {
-                    EntityFX entityfx = (EntityFX)list.get(j);
+                    EntityFX entityfx = list.get(j);
                     entityfx.renderParticle(worldrenderer, entityIn, partialTick, f1, f5, f2, f3, f4);
                 }
             }
@@ -387,17 +387,7 @@ public class EffectRenderer
 
     public void addBlockDestroyEffects(BlockPos pos, IBlockState state)
     {
-        boolean flag;
-
-        if (Reflector.ForgeBlock_addDestroyEffects.exists() && Reflector.ForgeBlock_isAir.exists())
-        {
-            Block block = state.getBlock();
-            flag = !Reflector.callBoolean(block, Reflector.ForgeBlock_isAir, new Object[] {this.worldObj, pos}) && !Reflector.callBoolean(block, Reflector.ForgeBlock_addDestroyEffects, new Object[] {this.worldObj, pos, this});
-        }
-        else
-        {
-            flag = state.getBlock().getMaterial() != Material.air;
-        }
+        boolean flag = state.getBlock().getMaterial() != Material.air;
 
         if (flag)
         {
@@ -512,9 +502,9 @@ public class EffectRenderer
 
         if (iblockstate != null)
         {
-            boolean flag = Reflector.callBoolean(iblockstate.getBlock(), Reflector.ForgeBlock_addHitEffects, new Object[] {this.worldObj, p_addBlockHitEffects_2_, this});
+            boolean flag = false;
 
-            if (iblockstate != null && !flag)
+            if (!flag)
             {
                 this.addBlockHitEffects(p_addBlockHitEffects_1_, p_addBlockHitEffects_2_.sideHit);
             }

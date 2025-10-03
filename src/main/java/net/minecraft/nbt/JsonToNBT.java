@@ -19,7 +19,7 @@ public class JsonToNBT
 
         if (!jsonString.startsWith("{"))
         {
-            throw new NBTException("Invalid tag encountered, expected \'{\' as first char.");
+            throw new NBTException("Invalid tag encountered, expected '{' as first char.");
         }
         else if (func_150310_b(jsonString) != 1)
         {
@@ -59,12 +59,12 @@ public class JsonToNBT
             {
                 if (c0 != 123 && c0 != 91)
                 {
-                    if (c0 == 125 && (stack.isEmpty() || ((Character)stack.pop()).charValue() != 123))
+                    if (c0 == 125 && (stack.isEmpty() || stack.pop().charValue() != 123))
                     {
                         throw new NBTException("Unbalanced curly brackets {}: " + p_150310_0_);
                     }
 
-                    if (c0 == 93 && (stack.isEmpty() || ((Character)stack.pop()).charValue() != 91))
+                    if (c0 == 93 && (stack.isEmpty() || stack.pop().charValue() != 91))
                     {
                         throw new NBTException("Unbalanced square brackets []: " + p_150310_0_);
                     }
@@ -134,7 +134,7 @@ public class JsonToNBT
 
                 if (c1 != 44 && c1 != 123 && c1 != 125 && c1 != 91 && c1 != 93)
                 {
-                    throw new NBTException("Unexpected token \'" + c1 + "\' at: " + p_150316_1_.substring(s1.length()));
+                    throw new NBTException("Unexpected token '" + c1 + "' at: " + p_150316_1_.substring(s1.length()));
                 }
             }
 
@@ -165,7 +165,7 @@ public class JsonToNBT
 
                 if (c0 != 44 && c0 != 123 && c0 != 125 && c0 != 91 && c0 != 93)
                 {
-                    throw new NBTException("Unexpected token \'" + c0 + "\' at: " + p_150316_1_.substring(s.length()));
+                    throw new NBTException("Unexpected token '" + c0 + "' at: " + p_150316_1_.substring(s.length()));
                 }
             }
 
@@ -181,7 +181,7 @@ public class JsonToNBT
     {
         String s = func_150313_b(p_179270_0_, p_179270_1_);
         String s1 = func_150311_c(p_179270_0_, p_179270_1_);
-        return func_179272_a(new String[] {s, s1});
+        return func_179272_a(s, s1);
     }
 
     private static String func_150314_a(String p_150314_0_, boolean p_150314_1_) throws NBTException
@@ -249,12 +249,12 @@ public class JsonToNBT
             {
                 if (c0 != 123 && c0 != 91)
                 {
-                    if (c0 == 125 && (stack.isEmpty() || ((Character)stack.pop()).charValue() != 123))
+                    if (c0 == 125 && (stack.isEmpty() || stack.pop().charValue() != 123))
                     {
                         throw new NBTException("Unbalanced curly brackets {}: " + p_179269_0_);
                     }
 
-                    if (c0 == 93 && (stack.isEmpty() || ((Character)stack.pop()).charValue() != 91))
+                    if (c0 == 93 && (stack.isEmpty() || stack.pop().charValue() != 91))
                     {
                         throw new NBTException("Unbalanced square brackets []: " + p_179269_0_);
                     }
@@ -392,7 +392,7 @@ public class JsonToNBT
 
     static class Compound extends JsonToNBT.Any
     {
-        protected java.util.List<JsonToNBT.Any> field_150491_b = Lists.<JsonToNBT.Any>newArrayList();
+        protected java.util.List<JsonToNBT.Any> field_150491_b = Lists.newArrayList();
 
         public Compound(String p_i45137_1_)
         {
@@ -414,7 +414,7 @@ public class JsonToNBT
 
     static class List extends JsonToNBT.Any
     {
-        protected java.util.List<JsonToNBT.Any> field_150492_b = Lists.<JsonToNBT.Any>newArrayList();
+        protected java.util.List<JsonToNBT.Any> field_150492_b = Lists.newArrayList();
 
         public List(String json)
         {
@@ -505,7 +505,7 @@ public class JsonToNBT
             if (this.jsonValue.startsWith("[") && this.jsonValue.endsWith("]"))
             {
                 String s = this.jsonValue.substring(1, this.jsonValue.length() - 1);
-                String[] astring = (String[])Iterables.toArray(SPLITTER.split(s), String.class);
+                String[] astring = Iterables.toArray(SPLITTER.split(s), String.class);
 
                 try
                 {

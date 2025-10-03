@@ -14,8 +14,8 @@ import net.minecraft.world.World;
 public class EntityAIEatGrass extends EntityAIBase
 {
     private static final Predicate<IBlockState> field_179505_b = BlockStateHelper.forBlock(Blocks.tallgrass).where(BlockTallGrass.TYPE, Predicates.equalTo(BlockTallGrass.EnumType.GRASS));
-    private EntityLiving grassEaterEntity;
-    private World entityWorld;
+    private final EntityLiving grassEaterEntity;
+    private final World entityWorld;
     int eatingGrassTimer;
 
     public EntityAIEatGrass(EntityLiving grassEaterEntityIn)
@@ -34,7 +34,7 @@ public class EntityAIEatGrass extends EntityAIBase
         else
         {
             BlockPos blockpos = new BlockPos(this.grassEaterEntity.posX, this.grassEaterEntity.posY, this.grassEaterEntity.posZ);
-            return field_179505_b.apply(this.entityWorld.getBlockState(blockpos)) ? true : this.entityWorld.getBlockState(blockpos.down()).getBlock() == Blocks.grass;
+            return field_179505_b.apply(this.entityWorld.getBlockState(blockpos)) || this.entityWorld.getBlockState(blockpos.down()).getBlock() == Blocks.grass;
         }
     }
 

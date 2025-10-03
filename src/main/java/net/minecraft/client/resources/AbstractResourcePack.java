@@ -31,7 +31,7 @@ public abstract class AbstractResourcePack implements IResourcePack
 
     private static String locationToName(ResourceLocation location)
     {
-        return String.format("%s/%s/%s", new Object[] {"assets", location.getResourceDomain(), location.getResourcePath()});
+        return String.format("%s/%s/%s", "assets", location.getResourceDomain(), location.getResourcePath());
     }
 
     protected static String getRelativeName(File p_110595_0_, File p_110595_1_)
@@ -71,7 +71,7 @@ public abstract class AbstractResourcePack implements IResourcePack
         try
         {
             bufferedreader = new BufferedReader(new InputStreamReader(p_110596_1_, Charsets.UTF_8));
-            jsonobject = (new JsonParser()).parse((Reader)bufferedreader).getAsJsonObject();
+            jsonobject = (new JsonParser()).parse(bufferedreader).getAsJsonObject();
         }
         catch (RuntimeException runtimeexception)
         {
@@ -79,7 +79,7 @@ public abstract class AbstractResourcePack implements IResourcePack
         }
         finally
         {
-            IOUtils.closeQuietly((Reader)bufferedreader);
+            IOUtils.closeQuietly(bufferedreader);
         }
 
         return p_110596_0_.parseMetadataSection(p_110596_2_, jsonobject);

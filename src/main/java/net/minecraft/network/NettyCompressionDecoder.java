@@ -20,7 +20,7 @@ public class NettyCompressionDecoder extends ByteToMessageDecoder
         this.inflater = new Inflater();
     }
 
-    protected void decode(ChannelHandlerContext p_decode_1_, ByteBuf p_decode_2_, List<Object> p_decode_3_) throws DataFormatException, Exception
+    protected void decode(ChannelHandlerContext p_decode_1_, ByteBuf p_decode_2_, List<Object> p_decode_3_) throws Exception
     {
         if (p_decode_2_.readableBytes() != 0)
         {

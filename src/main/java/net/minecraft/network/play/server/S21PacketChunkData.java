@@ -70,7 +70,7 @@ public class S21PacketChunkData implements Packet<INetHandlerPlayClient>
     {
         ExtendedBlockStorage[] aextendedblockstorage = p_179756_0_.getBlockStorageArray();
         S21PacketChunkData.Extracted s21packetchunkdata$extracted = new S21PacketChunkData.Extracted();
-        List<ExtendedBlockStorage> list = Lists.<ExtendedBlockStorage>newArrayList();
+        List<ExtendedBlockStorage> list = Lists.newArrayList();
 
         for (int i = 0; i < aextendedblockstorage.length; ++i)
         {

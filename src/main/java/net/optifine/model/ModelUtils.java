@@ -52,7 +52,7 @@ public class ModelUtils
         for (int j = 0; j < 4; ++j)
         {
             int k = j * i;
-            float f = Float.intBitsToFloat(vd[k + 0]);
+            float f = Float.intBitsToFloat(vd[k]);
             float f1 = Float.intBitsToFloat(vd[k + 1]);
             float f2 = Float.intBitsToFloat(vd[k + 2]);
             int l = vd[k + 3];
@@ -96,7 +96,7 @@ public class ModelUtils
 
     public static BakedQuad duplicateQuad(BakedQuad quad)
     {
-        BakedQuad bakedquad = new BakedQuad((int[])quad.getVertexData().clone(), quad.getTintIndex(), quad.getFace(), quad.getSprite());
+        BakedQuad bakedquad = new BakedQuad(quad.getVertexData().clone(), quad.getTintIndex(), quad.getFace(), quad.getSprite());
         return bakedquad;
     }
 }

@@ -10,7 +10,7 @@ import net.minecraft.util.MathHelper;
 
 public class SlotFurnaceOutput extends Slot
 {
-    private EntityPlayer thePlayer;
+    private final EntityPlayer thePlayer;
     private int field_75228_b;
 
     public SlotFurnaceOutput(EntityPlayer player, IInventory inventoryIn, int slotIndex, int xPosition, int yPosition)

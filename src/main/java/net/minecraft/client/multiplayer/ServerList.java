@@ -14,7 +14,7 @@ public class ServerList
 {
     private static final Logger logger = LogManager.getLogger();
     private final Minecraft mc;
-    private final List<ServerData> servers = Lists.<ServerData>newArrayList();
+    private final List<ServerData> servers = Lists.newArrayList();
 
     public ServerList(Minecraft mcIn)
     {
@@ -43,7 +43,7 @@ public class ServerList
         }
         catch (Exception exception)
         {
-            logger.error((String)"Couldn\'t load server list", (Throwable)exception);
+            logger.error("Couldn't load server list", exception);
         }
     }
 
@@ -64,13 +64,13 @@ public class ServerList
         }
         catch (Exception exception)
         {
-            logger.error((String)"Couldn\'t save server list", (Throwable)exception);
+            logger.error("Couldn't save server list", exception);
         }
     }
 
     public ServerData getServerData(int index)
     {
-        return (ServerData)this.servers.get(index);
+        return this.servers.get(index);
     }
 
     public void removeServerData(int index)

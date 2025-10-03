@@ -138,8 +138,8 @@ public class TileEntityBanner extends TileEntity
             }
             else
             {
-                this.patternList = Lists.<TileEntityBanner.EnumBannerPattern>newArrayList();
-                this.colorList = Lists.<EnumDyeColor>newArrayList();
+                this.patternList = Lists.newArrayList();
+                this.colorList = Lists.newArrayList();
                 this.patternList.add(TileEntityBanner.EnumBannerPattern.BASE);
                 this.colorList.add(EnumDyeColor.byDyeDamage(this.baseColor));
                 this.patternResourceLocation = "b" + this.baseColor;
@@ -182,14 +182,14 @@ public class TileEntityBanner extends TileEntity
 
                     if (stack.getTagCompound().hasNoTags())
                     {
-                        stack.setTagCompound((NBTTagCompound)null);
+                        stack.setTagCompound(null);
                     }
                 }
             }
         }
     }
 
-    public static enum EnumBannerPattern
+    public enum EnumBannerPattern
     {
         BASE("base", "b"),
         SQUARE_BOTTOM_LEFT("square_bottom_left", "bl", "   ", "   ", "#  "),
@@ -231,25 +231,25 @@ public class TileEntityBanner extends TileEntity
         FLOWER("flower", "flo", new ItemStack(Blocks.red_flower, 1, BlockFlower.EnumFlowerType.OXEYE_DAISY.getMeta())),
         MOJANG("mojang", "moj", new ItemStack(Items.golden_apple, 1, 1));
 
-        private String patternName;
-        private String patternID;
-        private String[] craftingLayers;
+        private final String patternName;
+        private final String patternID;
+        private final String[] craftingLayers;
         private ItemStack patternCraftingStack;
 
-        private EnumBannerPattern(String name, String id)
+        EnumBannerPattern(String name, String id)
         {
             this.craftingLayers = new String[3];
             this.patternName = name;
             this.patternID = id;
         }
 
-        private EnumBannerPattern(String name, String id, ItemStack craftingItem)
+        EnumBannerPattern(String name, String id, ItemStack craftingItem)
         {
             this(name, id);
             this.patternCraftingStack = craftingItem;
         }
 
-        private EnumBannerPattern(String name, String id, String craftingTop, String craftingMid, String craftingBot)
+        EnumBannerPattern(String name, String id, String craftingTop, String craftingMid, String craftingBot)
         {
             this(name, id);
             this.craftingLayers[0] = craftingTop;

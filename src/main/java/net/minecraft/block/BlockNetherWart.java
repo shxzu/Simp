@@ -26,7 +26,7 @@ public class BlockNetherWart extends BlockBush
         this.setTickRandomly(true);
         float f = 0.5F;
         this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, 0.25F, 0.5F + f);
-        this.setCreativeTab((CreativeTabs)null);
+        this.setCreativeTab(null);
     }
 
     protected boolean canPlaceBlockOn(Block ground)
@@ -41,7 +41,7 @@ public class BlockNetherWart extends BlockBush
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        int i = ((Integer)state.getValue(AGE)).intValue();
+        int i = state.getValue(AGE).intValue();
 
         if (i < 3 && rand.nextInt(10) == 0)
         {
@@ -58,7 +58,7 @@ public class BlockNetherWart extends BlockBush
         {
             int i = 1;
 
-            if (((Integer)state.getValue(AGE)).intValue() >= 3)
+            if (state.getValue(AGE).intValue() >= 3)
             {
                 i = 2 + worldIn.rand.nextInt(3);
 
@@ -97,11 +97,11 @@ public class BlockNetherWart extends BlockBush
 
     public int getMetaFromState(IBlockState state)
     {
-        return ((Integer)state.getValue(AGE)).intValue();
+        return state.getValue(AGE).intValue();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {AGE});
+        return new BlockState(this, AGE);
     }
 }

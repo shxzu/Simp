@@ -6,12 +6,12 @@ import net.minecraft.util.MathHelper;
 
 public class ModelBat extends ModelBase
 {
-    private ModelRenderer batHead;
-    private ModelRenderer batBody;
-    private ModelRenderer batRightWing;
-    private ModelRenderer batLeftWing;
-    private ModelRenderer batOuterRightWing;
-    private ModelRenderer batOuterLeftWing;
+    private final ModelRenderer batHead;
+    private final ModelRenderer batBody;
+    private final ModelRenderer batRightWing;
+    private final ModelRenderer batLeftWing;
+    private final ModelRenderer batOuterRightWing;
+    private final ModelRenderer batOuterLeftWing;
 
     public ModelBat()
     {

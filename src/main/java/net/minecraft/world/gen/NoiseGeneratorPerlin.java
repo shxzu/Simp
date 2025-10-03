@@ -4,8 +4,8 @@ import java.util.Random;
 
 public class NoiseGeneratorPerlin extends NoiseGenerator
 {
-    private NoiseGeneratorSimplex[] field_151603_a;
-    private int field_151602_b;
+    private final NoiseGeneratorSimplex[] field_151603_a;
+    private final int field_151602_b;
 
     public NoiseGeneratorPerlin(Random p_i45470_1_, int p_i45470_2_)
     {

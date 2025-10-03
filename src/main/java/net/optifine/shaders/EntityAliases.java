@@ -9,7 +9,7 @@ import net.minecraft.src.Config;
 import net.minecraft.util.ResourceLocation;
 import net.optifine.config.ConnectedParser;
 import net.optifine.reflect.Reflector;
-import net.optifine.reflect.ReflectorForge;
+
 import net.optifine.shaders.config.MacroProcessor;
 import net.optifine.util.PropertiesOrdered;
 import net.optifine.util.StrUtils;
@@ -51,35 +51,27 @@ public class EntityAliases
 
         if (shaderPack != null)
         {
-            if (Reflector.Loader_getActiveModList.exists() && Config.getResourceManager() == null)
+            List<Integer> list = new ArrayList();
+            String s = "/shaders/entity.properties";
+            InputStream inputstream = shaderPack.getResourceAsStream(s);
+
+            if (inputstream != null)
             {
-                Config.dbg("[Shaders] Delayed loading of entity mappings after resources are loaded");
-                updateOnResourcesReloaded = true;
+                loadEntityAliases(inputstream, s, list);
             }
-            else
+
+            loadModEntityAliases(list);
+
+            if (list.size() > 0)
             {
-                List<Integer> list = new ArrayList();
-                String s = "/shaders/entity.properties";
-                InputStream inputstream = shaderPack.getResourceAsStream(s);
-
-                if (inputstream != null)
-                {
-                    loadEntityAliases(inputstream, s, list);
-                }
-
-                loadModEntityAliases(list);
-
-                if (((List)list).size() > 0)
-                {
-                    entityAliases = toArray(list);
-                }
+                entityAliases = toArray(list);
             }
         }
     }
 
     private static void loadModEntityAliases(List<Integer> listEntityAliases)
     {
-        String[] astring = ReflectorForge.getForgeModIds();
+        String[] astring = new String[0];
 
         for (int i = 0; i < astring.length; ++i)
         {
@@ -93,7 +85,6 @@ public class EntityAliases
             }
             catch (IOException var6)
             {
-                ;
             }
         }
     }
@@ -173,7 +164,7 @@ public class EntityAliases
 
         for (int i = 0; i < aint.length; ++i)
         {
-            aint[i] = ((Integer)list.get(i)).intValue();
+            aint[i] = list.get(i).intValue();
         }
 
         return aint;

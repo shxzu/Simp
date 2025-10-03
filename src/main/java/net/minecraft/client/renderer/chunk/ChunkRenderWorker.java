@@ -23,7 +23,7 @@ public class ChunkRenderWorker implements Runnable
 
     public ChunkRenderWorker(ChunkRenderDispatcher p_i46201_1_)
     {
-        this(p_i46201_1_, (RegionRenderCacheBuilder)null);
+        this(p_i46201_1_, null);
     }
 
     public ChunkRenderWorker(ChunkRenderDispatcher chunkRenderDispatcherIn, RegionRenderCacheBuilder regionRenderCacheBuilderIn)

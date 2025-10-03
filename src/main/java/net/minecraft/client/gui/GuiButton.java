@@ -24,11 +24,30 @@ public class GuiButton extends Gui
         this(buttonId, x, y, 200, 20, buttonText);
     }
 
+    public GuiButton(int buttonId, int x, int y, String buttonText, boolean enabled)
+    {
+        this(buttonId, x, y, 200, 20, buttonText, enabled);
+    }
+
     public GuiButton(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText)
     {
         this.width = 200;
         this.height = 20;
         this.enabled = true;
+        this.visible = true;
+        this.id = buttonId;
+        this.xPosition = x;
+        this.yPosition = y;
+        this.width = widthIn;
+        this.height = heightIn;
+        this.displayString = buttonText;
+    }
+
+    public GuiButton(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, boolean enabled)
+    {
+        this.width = 200;
+        this.height = 20;
+        this.enabled = enabled;
         this.visible = true;
         this.id = buttonId;
         this.xPosition = x;
@@ -58,7 +77,7 @@ public class GuiButton extends Gui
     {
         if (this.visible)
         {
-            MinecraftFontRenderer fontrenderer = mc.minecraftFontRendererObj;
+            FontRenderer fontrenderer = mc.fontRendererObj;
             mc.getTextureManager().bindTexture(buttonTextures);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;

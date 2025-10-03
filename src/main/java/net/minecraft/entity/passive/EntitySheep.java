@@ -44,11 +44,11 @@ public class EntitySheep extends EntityAnimal
     }, 2, 1);
     private static final Map<EnumDyeColor, float[]> DYE_TO_RGB = Maps.newEnumMap(EnumDyeColor.class);
     private int sheepTimer;
-    private EntityAIEatGrass entityAIEatGrass = new EntityAIEatGrass(this);
+    private final EntityAIEatGrass entityAIEatGrass = new EntityAIEatGrass(this);
 
     public static float[] getDyeRgb(EnumDyeColor dyeColor)
     {
-        return (float[])DYE_TO_RGB.get(dyeColor);
+        return DYE_TO_RGB.get(dyeColor);
     }
 
     public EntitySheep(World worldIn)
@@ -95,7 +95,7 @@ public class EntitySheep extends EntityAnimal
     protected void entityInit()
     {
         super.entityInit();
-        this.dataWatcher.addObject(16, new Byte((byte)0));
+        this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
     }
 
     protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier)
@@ -169,9 +169,9 @@ public class EntitySheep extends EntityAnimal
                 for (int j = 0; j < i; ++j)
                 {
                     EntityItem entityitem = this.entityDropItem(new ItemStack(Item.getItemFromBlock(Blocks.wool), 1, this.getFleeceColor().getMetadata()), 1.0F);
-                    entityitem.motionY += (double)(this.rand.nextFloat() * 0.05F);
-                    entityitem.motionX += (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F);
-                    entityitem.motionZ += (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F);
+                    entityitem.motionY += this.rand.nextFloat() * 0.05F;
+                    entityitem.motionX += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F;
+                    entityitem.motionZ += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F;
                 }
             }
 
@@ -283,7 +283,7 @@ public class EntitySheep extends EntityAnimal
         int j = ((EntitySheep)mother).getFleeceColor().getDyeDamage();
         this.inventoryCrafting.getStackInSlot(0).setItemDamage(i);
         this.inventoryCrafting.getStackInSlot(1).setItemDamage(j);
-        ItemStack itemstack = CraftingManager.getInstance().findMatchingRecipe(this.inventoryCrafting, ((EntitySheep)father).worldObj);
+        ItemStack itemstack = CraftingManager.getInstance().findMatchingRecipe(this.inventoryCrafting, father.worldObj);
         int k;
 
         if (itemstack != null && itemstack.getItem() == Items.dye)

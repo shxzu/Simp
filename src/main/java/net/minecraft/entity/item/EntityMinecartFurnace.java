@@ -38,7 +38,7 @@ public class EntityMinecartFurnace extends EntityMinecart
     protected void entityInit()
     {
         super.entityInit();
-        this.dataWatcher.addObject(16, new Byte((byte)0));
+        this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
     }
 
     public void onUpdate()
@@ -59,7 +59,7 @@ public class EntityMinecartFurnace extends EntityMinecart
 
         if (this.isMinecartPowered() && this.rand.nextInt(4) == 0)
         {
-            this.worldObj.spawnParticle(EnumParticleTypes.SMOKE_LARGE, this.posX, this.posY + 0.8D, this.posZ, 0.0D, 0.0D, 0.0D, new int[0]);
+            this.worldObj.spawnParticle(EnumParticleTypes.SMOKE_LARGE, this.posX, this.posY + 0.8D, this.posZ, 0.0D, 0.0D, 0.0D);
         }
     }
 
@@ -85,7 +85,7 @@ public class EntityMinecartFurnace extends EntityMinecart
 
         if (d0 > 1.0E-4D && this.motionX * this.motionX + this.motionZ * this.motionZ > 0.001D)
         {
-            d0 = (double)MathHelper.sqrt_double(d0);
+            d0 = MathHelper.sqrt_double(d0);
             this.pushX /= d0;
             this.pushZ /= d0;
 
@@ -109,7 +109,7 @@ public class EntityMinecartFurnace extends EntityMinecart
 
         if (d0 > 1.0E-4D)
         {
-            d0 = (double)MathHelper.sqrt_double(d0);
+            d0 = MathHelper.sqrt_double(d0);
             this.pushX /= d0;
             this.pushZ /= d0;
             double d1 = 1.0D;
@@ -137,7 +137,7 @@ public class EntityMinecartFurnace extends EntityMinecart
         {
             if (!playerIn.capabilities.isCreativeMode && --itemstack.stackSize == 0)
             {
-                playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, (ItemStack)null);
+                playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, null);
             }
 
             this.fuel += 3600;

@@ -228,7 +228,6 @@ public class ShaderUniform
     {
         if (!this.dirty)
         {
-            ;
         }
 
         this.dirty = false;

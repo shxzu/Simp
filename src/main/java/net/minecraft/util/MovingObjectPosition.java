@@ -50,10 +50,10 @@ public class MovingObjectPosition
         return "HitResult{type=" + this.typeOfHit + ", blockpos=" + this.blockPos + ", f=" + this.sideHit + ", pos=" + this.hitVec + ", entity=" + this.entityHit + '}';
     }
 
-    public static enum MovingObjectType
+    public enum MovingObjectType
     {
         MISS,
         BLOCK,
-        ENTITY;
+        ENTITY
     }
 }

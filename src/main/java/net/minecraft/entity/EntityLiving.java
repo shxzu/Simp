@@ -38,22 +38,21 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.optifine.reflect.Reflector;
 
 public abstract class EntityLiving extends EntityLivingBase
 {
     public int livingSoundTime;
     protected int experienceValue;
-    private EntityLookHelper lookHelper;
+    private final EntityLookHelper lookHelper;
     protected EntityMoveHelper moveHelper;
     protected EntityJumpHelper jumpHelper;
-    private EntityBodyHelper bodyHelper;
+    private final EntityBodyHelper bodyHelper;
     protected PathNavigate navigator;
     protected final EntityAITasks tasks;
     protected final EntityAITasks targetTasks;
     private EntityLivingBase attackTarget;
-    private EntitySenses senses;
-    private ItemStack[] equipment = new ItemStack[5];
+    private final EntitySenses senses;
+    private final ItemStack[] equipment = new ItemStack[5];
     protected float[] equipmentDropChances = new float[5];
     private boolean canPickUpLoot;
     private boolean persistenceRequired;
@@ -66,8 +65,8 @@ public abstract class EntityLiving extends EntityLivingBase
     public EntityLiving(World worldIn)
     {
         super(worldIn);
-        this.tasks = new EntityAITasks(worldIn != null && worldIn.theProfiler != null ? worldIn.theProfiler : null);
-        this.targetTasks = new EntityAITasks(worldIn != null && worldIn.theProfiler != null ? worldIn.theProfiler : null);
+        this.tasks = new EntityAITasks();
+        this.targetTasks = new EntityAITasks();
         this.lookHelper = new EntityLookHelper(this);
         this.moveHelper = new EntityMoveHelper(this);
         this.jumpHelper = new EntityJumpHelper(this);
@@ -125,7 +124,6 @@ public abstract class EntityLiving extends EntityLivingBase
     public void setAttackTarget(EntityLivingBase entitylivingbaseIn)
     {
         this.attackTarget = entitylivingbaseIn;
-        Reflector.callVoid(Reflector.ForgeHooks_onLivingSetAttackTarget, new Object[] {this, entitylivingbaseIn});
     }
 
     public boolean canAttackClass(Class <? extends EntityLivingBase > cls)
@@ -161,15 +159,12 @@ public abstract class EntityLiving extends EntityLivingBase
     public void onEntityUpdate()
     {
         super.onEntityUpdate();
-        this.worldObj.theProfiler.startSection("mobBaseTick");
 
         if (this.isEntityAlive() && this.rand.nextInt(1000) < this.livingSoundTime++)
         {
             this.livingSoundTime = -this.getTalkInterval();
             this.playLivingSound();
         }
-
-        this.worldObj.theProfiler.endSection();
     }
 
     protected int getExperiencePoints(EntityPlayer player)
@@ -205,7 +200,7 @@ public abstract class EntityLiving extends EntityLivingBase
                 double d1 = this.rand.nextGaussian() * 0.02D;
                 double d2 = this.rand.nextGaussian() * 0.02D;
                 double d3 = 10.0D;
-                this.worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width - d0 * d3, this.posY + (double)(this.rand.nextFloat() * this.height) - d1 * d3, this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width - d2 * d3, d0, d1, d2, new int[0]);
+                this.worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width - d0 * d3, this.posY + (double)(this.rand.nextFloat() * this.height) - d1 * d3, this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width - d2 * d3, d0, d1, d2);
             }
         }
         else
@@ -390,7 +385,6 @@ public abstract class EntityLiving extends EntityLivingBase
     public void onLivingUpdate()
     {
         super.onLivingUpdate();
-        this.worldObj.theProfiler.startSection("looting");
 
         if (!this.worldObj.isRemote && this.canPickUpLoot() && !this.dead && this.worldObj.getGameRules().getBoolean("mobGriefing"))
         {
@@ -402,8 +396,6 @@ public abstract class EntityLiving extends EntityLivingBase
                 }
             }
         }
-
-        this.worldObj.theProfiler.endSection();
     }
 
     protected void updateEquipmentIfNeeded(EntityItem itemEntity)
@@ -424,10 +416,8 @@ public abstract class EntityLiving extends EntityLivingBase
                     {
                         flag = true;
                     }
-                    else if (itemstack.getItem() instanceof ItemSword && itemstack1.getItem() instanceof ItemSword)
+                    else if (itemstack.getItem() instanceof ItemSword itemsword && itemstack1.getItem() instanceof ItemSword itemsword1)
                     {
-                        ItemSword itemsword = (ItemSword)itemstack.getItem();
-                        ItemSword itemsword1 = (ItemSword)itemstack1.getItem();
 
                         if (itemsword.getDamageVsEntity() != itemsword1.getDamageVsEntity())
                         {
@@ -451,10 +441,8 @@ public abstract class EntityLiving extends EntityLivingBase
                 {
                     flag = true;
                 }
-                else if (itemstack.getItem() instanceof ItemArmor && itemstack1.getItem() instanceof ItemArmor)
+                else if (itemstack.getItem() instanceof ItemArmor itemarmor && itemstack1.getItem() instanceof ItemArmor itemarmor1)
                 {
-                    ItemArmor itemarmor = (ItemArmor)itemstack.getItem();
-                    ItemArmor itemarmor1 = (ItemArmor)itemstack1.getItem();
 
                     if (itemarmor.damageReduceAmount != itemarmor1.damageReduceAmount)
                     {
@@ -509,24 +497,9 @@ public abstract class EntityLiving extends EntityLivingBase
 
     protected void despawnEntity()
     {
-        Object object = null;
-        Object object1 = Reflector.getFieldValue(Reflector.Event_Result_DEFAULT);
-        Object object2 = Reflector.getFieldValue(Reflector.Event_Result_DENY);
-
         if (this.persistenceRequired)
         {
             this.entityAge = 0;
-        }
-        else if ((this.entityAge & 31) == 31 && (object = Reflector.call(Reflector.ForgeEventFactory_canEntityDespawn, new Object[] {this})) != object1)
-        {
-            if (object == object2)
-            {
-                this.entityAge = 0;
-            }
-            else
-            {
-                this.setDead();
-            }
         }
         else
         {
@@ -559,33 +532,15 @@ public abstract class EntityLiving extends EntityLivingBase
     protected final void updateEntityActionState()
     {
         ++this.entityAge;
-        this.worldObj.theProfiler.startSection("checkDespawn");
         this.despawnEntity();
-        this.worldObj.theProfiler.endSection();
-        this.worldObj.theProfiler.startSection("sensing");
         this.senses.clearSensingCache();
-        this.worldObj.theProfiler.endSection();
-        this.worldObj.theProfiler.startSection("targetSelector");
         this.targetTasks.onUpdateTasks();
-        this.worldObj.theProfiler.endSection();
-        this.worldObj.theProfiler.startSection("goalSelector");
         this.tasks.onUpdateTasks();
-        this.worldObj.theProfiler.endSection();
-        this.worldObj.theProfiler.startSection("navigation");
         this.navigator.onUpdateNavigation();
-        this.worldObj.theProfiler.endSection();
-        this.worldObj.theProfiler.startSection("mob tick");
         this.updateAITasks();
-        this.worldObj.theProfiler.endSection();
-        this.worldObj.theProfiler.startSection("controls");
-        this.worldObj.theProfiler.startSection("move");
         this.moveHelper.onUpdateMoveHelper();
-        this.worldObj.theProfiler.endStartSection("look");
         this.lookHelper.onUpdateLook();
-        this.worldObj.theProfiler.endStartSection("jump");
         this.jumpHelper.doJump();
-        this.worldObj.theProfiler.endSection();
-        this.worldObj.theProfiler.endSection();
     }
 
     protected void updateAITasks()
@@ -603,9 +558,8 @@ public abstract class EntityLiving extends EntityLivingBase
         double d1 = entityIn.posZ - this.posZ;
         double d2;
 
-        if (entityIn instanceof EntityLivingBase)
+        if (entityIn instanceof EntityLivingBase entitylivingbase)
         {
-            EntityLivingBase entitylivingbase = (EntityLivingBase)entityIn;
             d2 = entitylivingbase.posY + (double)entitylivingbase.getEyeHeight() - (this.posY + (double)this.getEyeHeight());
         }
         else
@@ -613,7 +567,7 @@ public abstract class EntityLiving extends EntityLivingBase
             d2 = (entityIn.getEntityBoundingBox().minY + entityIn.getEntityBoundingBox().maxY) / 2.0D - (this.posY + (double)this.getEyeHeight());
         }
 
-        double d3 = (double)MathHelper.sqrt_double(d0 * d0 + d1 * d1);
+        double d3 = MathHelper.sqrt_double(d0 * d0 + d1 * d1);
         float f = (float)(MathHelper.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
         float f1 = (float)(-(MathHelper.atan2(d2, d3) * 180.0D / Math.PI));
         this.rotationPitch = this.updateRotation(this.rotationPitch, f1, p_70625_3_);
@@ -1040,7 +994,7 @@ public abstract class EntityLiving extends EntityLivingBase
 
             if (!this.worldObj.isRemote && sendPacket && this.worldObj instanceof WorldServer)
             {
-                ((WorldServer)this.worldObj).getEntityTracker().sendToAllTrackingEntity(this, new S1BPacketEntityAttach(1, this, (Entity)null));
+                ((WorldServer)this.worldObj).getEntityTracker().sendToAllTrackingEntity(this, new S1BPacketEntityAttach(1, this, null));
             }
         }
     }
@@ -1181,7 +1135,7 @@ public abstract class EntityLiving extends EntityLivingBase
             }
             else
             {
-                Entity entity = (Entity)world.playerEntities.get(0);
+                Entity entity = world.playerEntities.get(0);
                 double d0 = Math.max(Math.abs(this.posX - entity.posX) - 16.0D, 0.0D);
                 double d1 = Math.max(Math.abs(this.posZ - entity.posZ) - 16.0D, 0.0D);
                 double d2 = d0 * d0 + d1 * d1;
@@ -1220,10 +1174,10 @@ public abstract class EntityLiving extends EntityLivingBase
         return this.worldObj.getScoreboard().getPlayersTeam(this.teamUuidString);
     }
 
-    public static enum SpawnPlacementType
+    public enum SpawnPlacementType
     {
         ON_GROUND,
         IN_AIR,
-        IN_WATER;
+        IN_WATER
     }
 }

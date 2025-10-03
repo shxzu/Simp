@@ -324,7 +324,7 @@ public class EntityArmorStand extends EntityLivingBase
         {
             for (int i = 0; i < list.size(); ++i)
             {
-                Entity entity = (Entity)list.get(i);
+                Entity entity = list.get(i);
 
                 if (entity instanceof EntityMinecart && ((EntityMinecart)entity).getMinecartType() == EntityMinecart.EnumMinecartType.RIDEABLE && this.getDistanceSqToEntity(entity) <= 0.2D)
                 {
@@ -346,9 +346,8 @@ public class EntityArmorStand extends EntityLivingBase
             ItemStack itemstack = player.getCurrentEquippedItem();
             boolean flag = itemstack != null;
 
-            if (flag && itemstack.getItem() instanceof ItemArmor)
+            if (flag && itemstack.getItem() instanceof ItemArmor itemarmor)
             {
-                ItemArmor itemarmor = (ItemArmor)itemstack.getItem();
 
                 if (itemarmor.armorType == 3)
                 {
@@ -581,7 +580,7 @@ public class EntityArmorStand extends EntityLivingBase
     {
         if (this.worldObj instanceof WorldServer)
         {
-            ((WorldServer)this.worldObj).spawnParticle(EnumParticleTypes.BLOCK_DUST, this.posX, this.posY + (double)this.height / 1.5D, this.posZ, 10, (double)(this.width / 4.0F), (double)(this.height / 4.0F), (double)(this.width / 4.0F), 0.05D, new int[] {Block.getStateId(Blocks.planks.getDefaultState())});
+            ((WorldServer)this.worldObj).spawnParticle(EnumParticleTypes.BLOCK_DUST, this.posX, this.posY + (double)this.height / 1.5D, this.posZ, 10, this.width / 4.0F, this.height / 4.0F, this.width / 4.0F, 0.05D, Block.getStateId(Blocks.planks.getDefaultState()));
         }
     }
 

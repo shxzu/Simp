@@ -1,12 +1,5 @@
 package net.minecraft.client.entity;
 
-import cc.simp.Simp;
-import cc.simp.commands.CommandHandler;
-import cc.simp.event.impl.player.*;
-import cc.simp.managers.RotationManager;
-import cc.simp.modules.impl.player.ScaffoldModule;
-import cc.simp.utils.mc.MovementUtils;
-import cc.simp.utils.mc.ScaffoldUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MovingSoundMinecartRiding;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -49,7 +42,13 @@ import net.minecraft.potion.Potion;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatFileWriter;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.*;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.MovementInput;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 
@@ -64,7 +63,6 @@ public class EntityPlayerSP extends AbstractClientPlayer
     private float lastReportedPitch;
     private boolean serverSneakState;
     private boolean serverSprintState;
-    public int ticksSinceLastSwing;
     private int positionUpdateTicks;
     private boolean hasValidHealth;
     private String clientBrand;
@@ -80,7 +78,6 @@ public class EntityPlayerSP extends AbstractClientPlayer
     private float horseJumpPower;
     public float timeInPortal;
     public float prevTimeInPortal;
-    public MotionEvent currentEvent;
 
     public EntityPlayerSP(Minecraft mcIn, World worldIn, NetHandlerPlayClient netHandler, StatFileWriter statFile)
     {
@@ -128,90 +125,91 @@ public class EntityPlayerSP extends AbstractClientPlayer
         }
     }
 
-    @Override
-    public void moveEntity(double x, double y, double z) {
-        final MoveEvent eventMoveEntity = new MoveEvent(x, y, z);
-        Simp.INSTANCE.getEventBus().post(eventMoveEntity);
-        x = eventMoveEntity.getX();
-        y = eventMoveEntity.getY();
-        z = eventMoveEntity.getZ();
-        if (eventMoveEntity.isCancelled()) {
-            return;
-        }
-        super.moveEntity(x, y, z);
-    }
+    public void onUpdateWalkingPlayer()
+    {
+        boolean flag = this.isSprinting();
 
-    public void onUpdateWalkingPlayer() {
-        final RotationManager rotationManager = Simp.INSTANCE.getRotationManager();
-        final float baseYaw = rotationManager.isRotating() ? rotationManager.getClientYaw() : this.rotationYaw;
-        final float basePitch = rotationManager.isRotating() ? rotationManager.getClientPitch() : this.rotationPitch;
-        final MotionEvent motionEvent = new MotionEvent(this.posX, this.getEntityBoundingBox().minY, this.posZ, baseYaw, basePitch, this.onGround);
-        Simp.INSTANCE.getEventBus().post(motionEvent);
-        if (motionEvent.isCancelled()) {
-            return;
-        }
-        final float yaw = motionEvent.yaw;
-        final float pitch = motionEvent.pitch;
-        final boolean flag = this.isSprinting();
-        if (flag != this.serverSprintState) {
-            if (flag) {
+        if (flag != this.serverSprintState)
+        {
+            if (flag)
+            {
                 this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SPRINTING));
             }
-            else {
+            else
+            {
                 this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.STOP_SPRINTING));
             }
+
             this.serverSprintState = flag;
         }
-        final boolean flag2 = this.isSneaking();
-        if (flag2 != this.serverSneakState) {
-            if (flag2) {
+
+        boolean flag1 = this.isSneaking();
+
+        if (flag1 != this.serverSneakState)
+        {
+            if (flag1)
+            {
                 this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SNEAKING));
             }
-            else {
+            else
+            {
                 this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.STOP_SNEAKING));
             }
-            this.serverSneakState = flag2;
+
+            this.serverSneakState = flag1;
         }
-        if (this.isCurrentViewEntity()) {
-            final double d0 = motionEvent.posX - this.lastReportedPosX;
-            final double d2 = motionEvent.posY - this.lastReportedPosY;
-            final double d3 = motionEvent.posZ - this.lastReportedPosZ;
-            final double d4 = yaw - this.lastReportedYaw;
-            final double d5 = pitch - this.lastReportedPitch;
-            boolean flag3 = d0 * d0 + d2 * d2 + d3 * d3 > 9.0E-4 || this.positionUpdateTicks >= 20;
-            final boolean flag4 = d4 != 0.0 || d5 != 0.0;
-            if (this.ridingEntity == null) {
-                if (flag3 && flag4) {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(motionEvent.posX, motionEvent.posY, motionEvent.posZ, yaw, pitch, motionEvent.onGround));
+
+        if (this.isCurrentViewEntity())
+        {
+            double d0 = this.posX - this.lastReportedPosX;
+            double d1 = this.getEntityBoundingBox().minY - this.lastReportedPosY;
+            double d2 = this.posZ - this.lastReportedPosZ;
+            double d3 = this.rotationYaw - this.lastReportedYaw;
+            double d4 = this.rotationPitch - this.lastReportedPitch;
+            boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
+            boolean flag3 = d3 != 0.0D || d4 != 0.0D;
+
+            if (this.ridingEntity == null)
+            {
+                if (flag2 && flag3)
+                {
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround));
                 }
-                else if (flag3) {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(motionEvent.posX, motionEvent.posY, motionEvent.posZ, motionEvent.onGround));
+                else if (flag2)
+                {
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.onGround));
                 }
-                else if (flag4) {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(yaw, pitch, motionEvent.onGround));
+                else if (flag3)
+                {
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(this.rotationYaw, this.rotationPitch, this.onGround));
                 }
-                else {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer(motionEvent.onGround));
+                else
+                {
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer(this.onGround));
                 }
             }
-            else {
-                this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(motionEvent.posX, -999.0, motionEvent.posZ, yaw, pitch, motionEvent.onGround));
-                flag3 = false;
+            else
+            {
+                this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
+                flag2 = false;
             }
+
             ++this.positionUpdateTicks;
-            if (flag3) {
-                this.lastReportedPosX = motionEvent.posX;
-                this.lastReportedPosY = motionEvent.posY;
-                this.lastReportedPosZ = motionEvent.posZ;
+
+            if (flag2)
+            {
+                this.lastReportedPosX = this.posX;
+                this.lastReportedPosY = this.getEntityBoundingBox().minY;
+                this.lastReportedPosZ = this.posZ;
                 this.positionUpdateTicks = 0;
             }
-            if (flag4) {
-                this.lastReportedYaw = yaw;
-                this.lastReportedPitch = pitch;
+
+            if (flag3)
+            {
+                this.lastReportedYaw = this.rotationYaw;
+                this.lastReportedPitch = this.rotationPitch;
             }
         }
-        motionEvent.setPost();
-        Simp.INSTANCE.getEventBus().post(motionEvent);
     }
 
     public EntityItem dropOneItem(boolean dropAll)
@@ -225,18 +223,13 @@ public class EntityPlayerSP extends AbstractClientPlayer
     {
     }
 
-    public void sendChatMessage(String message) {
-
-        if (Simp.INSTANCE.getCommandHandler().execute(message) || message.startsWith(CommandHandler.CHAT_PREFIX)) {
-            return;
-        }
-
+    public void sendChatMessage(String message)
+    {
         this.sendQueue.addToSendQueue(new C01PacketChatMessage(message));
     }
 
     public void swingItem()
     {
-        this.mc.thePlayer.resetCooldown();
         super.swingItem();
         this.sendQueue.addToSendQueue(new C0APacketAnimation());
     }
@@ -262,9 +255,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
     public void closeScreenAndDropStack()
     {
-        this.inventory.setItemStack((ItemStack)null);
+        this.inventory.setItemStack(null);
         super.closeScreen();
-        this.mc.displayGuiScreen((GuiScreen)null);
+        this.mc.displayGuiScreen(null);
     }
 
     public void setPlayerSPHealth(float health)
@@ -394,22 +387,22 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
                 if (i == 0)
                 {
-                    this.motionX = (double)(-f);
+                    this.motionX = -f;
                 }
 
                 if (i == 1)
                 {
-                    this.motionX = (double)f;
+                    this.motionX = f;
                 }
 
                 if (i == 4)
                 {
-                    this.motionZ = (double)(-f);
+                    this.motionZ = -f;
                 }
 
                 if (i == 5)
                 {
-                    this.motionZ = (double)f;
+                    this.motionZ = f;
                 }
             }
 
@@ -426,10 +419,6 @@ public class EntityPlayerSP extends AbstractClientPlayer
     {
         super.setSprinting(sprinting);
         this.sprintingTicksLeft = sprinting ? 600 : 0;
-    }
-
-    public void resetCooldown() {
-        this.ticksSinceLastSwing = 0;
     }
 
     public void setXPStats(float currentXP, int maxXP, int level)
@@ -568,7 +557,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
     public boolean isSneaking()
     {
-        boolean flag = this.movementInput != null ? this.movementInput.sneak : false;
+        boolean flag = this.movementInput != null && this.movementInput.sneak;
         return flag && !this.sleeping;
     }
 
@@ -616,7 +605,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
         {
             if (this.mc.currentScreen != null && !this.mc.currentScreen.doesGuiPauseGame())
             {
-                this.mc.displayGuiScreen((GuiScreen)null);
+                this.mc.displayGuiScreen(null);
             }
 
             if (this.timeInPortal == 0.0F)
@@ -660,84 +649,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
             --this.timeUntilPortal;
         }
 
-        boolean flag = movementInput.jump;
-        boolean flag1 = movementInput.sneak;
-        float f = 0.8F; // This 'f' seems unused after original code, verify its purpose
-        boolean flag2 = movementInput.moveForward >= f; // This 'flag2' also seems unused
+        boolean flag = this.movementInput.jump;
+        boolean flag1 = this.movementInput.sneak;
+        float f = 0.8F;
+        boolean flag2 = this.movementInput.moveForward >= f;
+        this.movementInput.updatePlayerMoveState();
 
-        final float originalForward = movementInput.moveForward; // Store original values
-        final float originalStrafe = movementInput.moveStrafe;
-
-        movementInput.updatePlayerMoveState(); // This updates moveForward/moveStrafe based on keys
-
-        // Determine the base yaw for movement correction
-        // If Simp's RotationManager is rotating, use its client yaw. Otherwise, use player's actual yaw.
-        float baseYaw;
-        if (Simp.INSTANCE.getRotationManager().isRotating()) {
-            baseYaw = Simp.INSTANCE.getRotationManager().getClientYaw();
-        } else {
-            baseYaw = rotationYaw; // Use 'this.rotationYaw' as you are inside EntityPlayerSP
-        }
-
-        // Post SilentMotionEvent to allow other modules to provide a specific yaw for movement correction
-        SilentMotionEvent silentMotionEvent = new SilentMotionEvent(baseYaw);
-        // If Scaffold is enabled, override the yaw with Scaffold's fixed yaw
-        if (Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled()) {
-            // ASSUMPTION: ScaffoldUtils.getScaffoldFixedYaw() exists and returns a float yaw
-            silentMotionEvent = new SilentMotionEvent(ScaffoldUtils.getScaffoldFixedYaw());
-        }
-        Simp.INSTANCE.getEventBus().post(silentMotionEvent);
-
-
-        // --- Apply Movement Fix if Silent Movement is Active ---
-        if (silentMotionEvent.isSilent()) {
-            // Calculate adjusted movement inputs using your MovementUtils
-            final float[] adjustedInputs = MovementUtils.handleMovementFix(
-                    movementInput.moveStrafe,
-                    movementInput.moveForward,
-                    silentMotionEvent.getYaw(),
-                    silentMotionEvent.isAdvanced() // Use the isAdvanced flag from the event
-            );
-
-            // The original code had these redundant diffForward/diffStrafe checks.
-            // These might be for a very specific anticheat bypass.
-            // If they are not essential, simplifying this part is possible.
-            // The clamping in handleMovementFix should handle the 1.0f limits.
-            // The original logic here seemed to zero out inputs if differences were large,
-            // which might be an anti-cheat specific "safeguard". I'll keep it as-is.
-
-            final float diffForward = originalForward - adjustedInputs[1];
-            final float diffStrafe = originalStrafe - adjustedInputs[0];
-
-            if (movementInput.sneak) { // Special clamping for sneaking
-                movementInput.moveStrafe = MathHelper.clamp_float(adjustedInputs[0], -0.3f, 0.3f);
-                movementInput.moveForward = MathHelper.clamp_float(adjustedInputs[1], -0.3f, 0.3f);
-            } else {
-                // Apply original safeguarding based on input difference
-                if (diffForward >= 2.0f) {
-                    adjustedInputs[1] = 0.0f; // Zero out if major discrepancy
-                }
-                if (diffForward <= -2.0f) {
-                    adjustedInputs[1] = 0.0f;
-                }
-                if (diffStrafe >= 2.0f) {
-                    adjustedInputs[0] = 0.0f;
-                }
-                if (diffStrafe <= -2.0f) {
-                    adjustedInputs[0] = 0.0f;
-                }
-                // Apply clamped adjusted inputs
-                movementInput.moveStrafe = MathHelper.clamp_float(adjustedInputs[0], -1.0f, 1.0f);
-                movementInput.moveForward = MathHelper.clamp_float(adjustedInputs[1], -1.0f, 1.0f);
-            }
-        }
-
-        final ItemSlowdownEvent slowDownEvent = new ItemSlowdownEvent(0.2F, 0.2F);
-        Simp.INSTANCE.getEventBus().post(slowDownEvent);
-
-        if (!slowDownEvent.isCancelled() && this.isUsingItem() && !this.isRiding()) {
-            this.movementInput.moveStrafe *= slowDownEvent.getStrafeMultiplier();
-            this.movementInput.moveForward *= slowDownEvent.getForwardMultiplier();
+        if (this.isUsingItem() && !this.isRiding())
+        {
+            this.movementInput.moveStrafe *= 0.2F;
+            this.movementInput.moveForward *= 0.2F;
             this.sprintToggleTimer = 0;
         }
 
@@ -798,12 +719,12 @@ public class EntityPlayerSP extends AbstractClientPlayer
         {
             if (this.movementInput.sneak)
             {
-                this.motionY -= (double)(this.capabilities.getFlySpeed() * 3.0F);
+                this.motionY -= this.capabilities.getFlySpeed() * 3.0F;
             }
 
             if (this.movementInput.jump)
             {
-                this.motionY += (double)(this.capabilities.getFlySpeed() * 3.0F);
+                this.motionY += this.capabilities.getFlySpeed() * 3.0F;
             }
         }
 

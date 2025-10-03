@@ -6,7 +6,7 @@ public class IntegerCache
 
     public static Integer getInteger(int value)
     {
-        return value >= 0 && value < CACHE.length ? CACHE[value] : new Integer(value);
+        return value >= 0 && value < CACHE.length ? CACHE[value] : Integer.valueOf(value);
     }
 
     static

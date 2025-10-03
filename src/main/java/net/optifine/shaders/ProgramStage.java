@@ -8,9 +8,9 @@ public enum ProgramStage
     DEFERRED("deferred"),
     COMPOSITE("composite");
 
-    private String name;
+    private final String name;
 
-    private ProgramStage(String name)
+    ProgramStage(String name)
     {
         this.name = name;
     }

@@ -17,7 +17,6 @@ public class FoliageColorReloadListener implements IResourceManagerReloadListene
         }
         catch (IOException var3)
         {
-            ;
         }
     }
 }

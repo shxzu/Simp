@@ -19,13 +19,12 @@ public class ItemFireworkCharge extends Item
         {
             NBTBase nbtbase = getExplosionTag(stack, "Colors");
 
-            if (!(nbtbase instanceof NBTTagIntArray))
+            if (!(nbtbase instanceof NBTTagIntArray nbttagintarray))
             {
                 return 9079434;
             }
             else
             {
-                NBTTagIntArray nbttagintarray = (NBTTagIntArray)nbtbase;
                 int[] aint = nbttagintarray.getIntArray();
 
                 if (aint.length == 1)

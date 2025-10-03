@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 
 public class ContainerBeacon extends Container
 {
-    private IInventory tileBeacon;
+    private final IInventory tileBeacon;
     private final ContainerBeacon.BeaconSlot beaconSlot;
 
     public ContainerBeacon(IInventory playerInventory, IInventory tileBeaconIn)
@@ -69,7 +69,7 @@ public class ContainerBeacon extends Container
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
     {
         ItemStack itemstack = null;
-        Slot slot = (Slot)this.inventorySlots.get(index);
+        Slot slot = this.inventorySlots.get(index);
 
         if (slot != null && slot.getHasStack())
         {
@@ -113,7 +113,7 @@ public class ContainerBeacon extends Container
 
             if (itemstack1.stackSize == 0)
             {
-                slot.putStack((ItemStack)null);
+                slot.putStack(null);
             }
             else
             {
@@ -140,7 +140,7 @@ public class ContainerBeacon extends Container
 
         public boolean isItemValid(ItemStack stack)
         {
-            return stack == null ? false : stack.getItem() == Items.emerald || stack.getItem() == Items.diamond || stack.getItem() == Items.gold_ingot || stack.getItem() == Items.iron_ingot;
+            return stack != null && (stack.getItem() == Items.emerald || stack.getItem() == Items.diamond || stack.getItem() == Items.gold_ingot || stack.getItem() == Items.iron_ingot);
         }
 
         public int getSlotStackLimit()

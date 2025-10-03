@@ -11,14 +11,14 @@ import net.minecraft.util.ResourceLocation;
 import net.optifine.config.ConnectedParser;
 import net.optifine.config.MatchBlock;
 import net.optifine.reflect.Reflector;
-import net.optifine.reflect.ReflectorForge;
+
 import net.optifine.shaders.config.MacroProcessor;
 import net.optifine.util.PropertiesOrdered;
 import net.optifine.util.StrUtils;
 
 public class BlockAliases
 {
-    private static BlockAlias[][] blockAliases = (BlockAlias[][])null;
+    private static BlockAlias[][] blockAliases = null;
     private static PropertiesOrdered blockLayerPropertes = null;
     private static boolean updateOnResourcesReloaded;
 
@@ -72,35 +72,27 @@ public class BlockAliases
 
         if (shaderPack != null)
         {
-            if (Reflector.Loader_getActiveModList.exists() && Minecraft.getMinecraft().getResourcePackRepository() == null)
+            List<List<BlockAlias>> list = new ArrayList();
+            String s = "/shaders/block.properties";
+            InputStream inputstream = shaderPack.getResourceAsStream(s);
+
+            if (inputstream != null)
             {
-                Config.dbg("[Shaders] Delayed loading of block mappings after resources are loaded");
-                updateOnResourcesReloaded = true;
+                loadBlockAliases(inputstream, s, list);
             }
-            else
+
+            loadModBlockAliases(list);
+
+            if (list.size() > 0)
             {
-                List<List<BlockAlias>> list = new ArrayList();
-                String s = "/shaders/block.properties";
-                InputStream inputstream = shaderPack.getResourceAsStream(s);
-
-                if (inputstream != null)
-                {
-                    loadBlockAliases(inputstream, s, list);
-                }
-
-                loadModBlockAliases(list);
-
-                if (((List)list).size() > 0)
-                {
-                    blockAliases = toArrays(list);
-                }
+                blockAliases = toArrays(list);
             }
         }
     }
 
     private static void loadModBlockAliases(List<List<BlockAlias>> listBlockAliases)
     {
-        String[] astring = ReflectorForge.getForgeModIds();
+        String[] astring = new String[0];
 
         for (int i = 0; i < astring.length; ++i)
         {
@@ -114,7 +106,6 @@ public class BlockAliases
             }
             catch (IOException var6)
             {
-                ;
             }
         }
     }
@@ -201,7 +192,7 @@ public class BlockAliases
                 blocksAliases.add(null);
             }
 
-            List<BlockAlias> list = (List)blocksAliases.get(j);
+            List<BlockAlias> list = blocksAliases.get(j);
 
             if (list == null)
             {
@@ -220,11 +211,11 @@ public class BlockAliases
 
         for (int i = 0; i < ablockalias.length; ++i)
         {
-            List<BlockAlias> list = (List)listBlocksAliases.get(i);
+            List<BlockAlias> list = listBlocksAliases.get(i);
 
             if (list != null)
             {
-                ablockalias[i] = (BlockAlias[])((BlockAlias[])list.toArray(new BlockAlias[list.size()]));
+                ablockalias[i] = list.toArray(new BlockAlias[list.size()]);
             }
         }
 
@@ -238,7 +229,7 @@ public class BlockAliases
 
     public static void reset()
     {
-        blockAliases = (BlockAlias[][])null;
+        blockAliases = null;
         blockLayerPropertes = null;
     }
 }

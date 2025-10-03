@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 public class RConConsoleSource implements ICommandSender
 {
     private static final RConConsoleSource instance = new RConConsoleSource();
-    private StringBuffer buffer = new StringBuffer();
+    private final StringBuffer buffer = new StringBuffer();
 
     public String getName()
     {

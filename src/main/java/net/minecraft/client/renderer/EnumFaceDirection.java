@@ -19,7 +19,7 @@ public enum EnumFaceDirection
         return facings[facing.getIndex()];
     }
 
-    private EnumFaceDirection(EnumFaceDirection.VertexInformation[] vertexInfosIn)
+    EnumFaceDirection(EnumFaceDirection.VertexInformation[] vertexInfosIn)
     {
         this.vertexInfos = vertexInfosIn;
     }

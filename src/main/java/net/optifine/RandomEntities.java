@@ -30,12 +30,12 @@ import net.optifine.util.StrUtils;
 
 public class RandomEntities
 {
-    private static Map<String, RandomEntityProperties> mapProperties = new HashMap();
+    private static final Map<String, RandomEntityProperties> mapProperties = new HashMap();
     private static boolean active = false;
     private static RenderGlobal renderGlobal;
-    private static RandomEntity randomEntity = new RandomEntity();
+    private static final RandomEntity randomEntity = new RandomEntity();
     private static TileEntityRendererDispatcher tileEntityRendererDispatcher;
-    private static RandomTileEntity randomTileEntity = new RandomTileEntity();
+    private static final RandomTileEntity randomTileEntity = new RandomTileEntity();
     private static boolean working = false;
     public static final String SUFFIX_PNG = ".png";
     public static final String SUFFIX_PROPERTIES = ".properties";
@@ -46,8 +46,8 @@ public class RandomEntities
     public static final String PREFIX_MCPATCHER_MOB = "mcpatcher/mob/";
     private static final String[] DEPENDANT_SUFFIXES = new String[] {"_armor", "_eyes", "_exploding", "_shooting", "_fur", "_eyes", "_invulnerable", "_angry", "_tame", "_collar"};
     private static final String PREFIX_DYNAMIC_TEXTURE_HORSE = "horse/";
-    private static final String[] HORSE_TEXTURES = (String[])((String[])ReflectorRaw.getFieldValue((Object)null, EntityHorse.class, String[].class, 2));
-    private static final String[] HORSE_TEXTURES_ABBR = (String[])((String[])ReflectorRaw.getFieldValue((Object)null, EntityHorse.class, String[].class, 3));
+    private static final String[] HORSE_TEXTURES = (String[]) ReflectorRaw.getFieldValue(null, EntityHorse.class, String[].class, 2);
+    private static final String[] HORSE_TEXTURES_ABBR = (String[]) ReflectorRaw.getFieldValue(null, EntityHorse.class, String[].class, 3);
 
     public static void entityLoaded(Entity entity, World world)
     {
@@ -73,9 +73,8 @@ public class RandomEntities
     {
         Entity entity = IntegratedServerUtils.getEntity(uuid);
 
-        if (entity instanceof EntityVillager)
+        if (entity instanceof EntityVillager entityvillager)
         {
-            EntityVillager entityvillager = (EntityVillager)entity;
             int i = entityvillager.getProfession();
             ev.setProfession(i);
             int j = Reflector.getFieldValueInt(entityvillager, Reflector.EntityVillager_careerId, 0);
@@ -98,8 +97,8 @@ public class RandomEntities
             }
         }
 
-        randomEntity.setEntity((Entity)null);
-        randomTileEntity.setTileEntity((TileEntity)null);
+        randomEntity.setEntity(null);
+        randomTileEntity.setTileEntity(null);
     }
 
     public static ResourceLocation getTextureLocation(ResourceLocation loc)
@@ -136,7 +135,7 @@ public class RandomEntities
                         return resourcelocation2;
                     }
 
-                    RandomEntityProperties randomentityproperties = (RandomEntityProperties)mapProperties.get(s);
+                    RandomEntityProperties randomentityproperties = mapProperties.get(s);
 
                     if (randomentityproperties == null)
                     {
@@ -378,7 +377,7 @@ public class RandomEntities
         }
         else
         {
-            for (int i = 1; i < ((List)list).size() + 10; ++i)
+            for (int i = 1; i < list.size() + 10; ++i)
             {
                 int j = i + 1;
                 ResourceLocation resourcelocation1 = getLocationIndexed(resourcelocation, j);
@@ -395,7 +394,7 @@ public class RandomEntities
             }
             else
             {
-                ResourceLocation[] aresourcelocation = (ResourceLocation[])((ResourceLocation[])list.toArray(new ResourceLocation[list.size()]));
+                ResourceLocation[] aresourcelocation = (ResourceLocation[]) list.toArray(new ResourceLocation[list.size()]);
                 dbg(loc.getResourcePath() + ", variants: " + aresourcelocation.length);
                 return aresourcelocation;
             }
@@ -437,7 +436,7 @@ public class RandomEntities
 
                 if (Config.hasResource(resourcelocation))
                 {
-                    RandomEntityProperties randomentityproperties = (RandomEntityProperties)mapProperties.get(s1);
+                    RandomEntityProperties randomentityproperties = mapProperties.get(s1);
 
                     if (randomentityproperties == null)
                     {

@@ -9,7 +9,7 @@ import net.minecraft.world.ChunkCoordIntPair;
 
 public class WorldBorder
 {
-    private final List<IBorderListener> listeners = Lists.<IBorderListener>newArrayList();
+    private final List<IBorderListener> listeners = Lists.newArrayList();
     private double centerX = 0.0D;
     private double centerZ = 0.0D;
     private double startDiameter = 6.0E7D;
@@ -74,7 +74,7 @@ public class WorldBorder
 
         if (d0 < (double)(-this.worldSize))
         {
-            d0 = (double)(-this.worldSize);
+            d0 = -this.worldSize;
         }
 
         return d0;
@@ -86,7 +86,7 @@ public class WorldBorder
 
         if (d0 < (double)(-this.worldSize))
         {
-            d0 = (double)(-this.worldSize);
+            d0 = -this.worldSize;
         }
 
         return d0;
@@ -98,7 +98,7 @@ public class WorldBorder
 
         if (d0 > (double)this.worldSize)
         {
-            d0 = (double)this.worldSize;
+            d0 = this.worldSize;
         }
 
         return d0;
@@ -110,7 +110,7 @@ public class WorldBorder
 
         if (d0 > (double)this.worldSize)
         {
-            d0 = (double)this.worldSize;
+            d0 = this.worldSize;
         }
 
         return d0;
@@ -141,7 +141,7 @@ public class WorldBorder
     {
         if (this.getStatus() != EnumBorderStatus.STATIONARY)
         {
-            double d0 = (double)((float)(System.currentTimeMillis() - this.startTime) / (float)(this.endTime - this.startTime));
+            double d0 = (float)(System.currentTimeMillis() - this.startTime) / (float)(this.endTime - this.startTime);
 
             if (d0 < 1.0D)
             {

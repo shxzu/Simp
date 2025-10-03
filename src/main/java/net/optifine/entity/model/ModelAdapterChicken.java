@@ -22,13 +22,12 @@ public class ModelAdapterChicken extends ModelAdapter
 
     public ModelRenderer getModelRenderer(ModelBase model, String modelPart)
     {
-        if (!(model instanceof ModelChicken))
+        if (!(model instanceof ModelChicken modelchicken))
         {
             return null;
         }
         else
         {
-            ModelChicken modelchicken = (ModelChicken)model;
             return modelPart.equals("head") ? modelchicken.head : (modelPart.equals("body") ? modelchicken.body : (modelPart.equals("right_leg") ? modelchicken.rightLeg : (modelPart.equals("left_leg") ? modelchicken.leftLeg : (modelPart.equals("right_wing") ? modelchicken.rightWing : (modelPart.equals("left_wing") ? modelchicken.leftWing : (modelPart.equals("bill") ? modelchicken.bill : (modelPart.equals("chin") ? modelchicken.chin : null)))))));
         }
     }

@@ -59,19 +59,17 @@ public abstract class PathNavigate
         else
         {
             float f = this.getPathSearchRange();
-            this.worldObj.theProfiler.startSection("pathfind");
             BlockPos blockpos = new BlockPos(this.theEntity);
             int i = (int)(f + 8.0F);
             ChunkCache chunkcache = new ChunkCache(this.worldObj, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
             PathEntity pathentity = this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, pos, f);
-            this.worldObj.theProfiler.endSection();
             return pathentity;
         }
     }
 
     public boolean tryMoveToXYZ(double x, double y, double z, double speedIn)
     {
-        PathEntity pathentity = this.getPathToXYZ((double)MathHelper.floor_double(x), (double)((int)y), (double)MathHelper.floor_double(z));
+        PathEntity pathentity = this.getPathToXYZ(MathHelper.floor_double(x), (int)y, MathHelper.floor_double(z));
         return this.setPath(pathentity, speedIn);
     }
 
@@ -89,12 +87,10 @@ public abstract class PathNavigate
         else
         {
             float f = this.getPathSearchRange();
-            this.worldObj.theProfiler.startSection("pathfind");
             BlockPos blockpos = (new BlockPos(this.theEntity)).up();
             int i = (int)(f + 16.0F);
             ChunkCache chunkcache = new ChunkCache(this.worldObj, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
             PathEntity pathentity = this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, entityIn, f);
-            this.worldObj.theProfiler.endSection();
             return pathentity;
         }
     }
@@ -102,7 +98,7 @@ public abstract class PathNavigate
     public boolean tryMoveToEntityLiving(Entity entityIn, double speedIn)
     {
         PathEntity pathentity = this.getPathToEntityLiving(entityIn);
-        return pathentity != null ? this.setPath(pathentity, speedIn) : false;
+        return pathentity != null && this.setPath(pathentity, speedIn);
     }
 
     public boolean setPath(PathEntity pathentityIn, double speedIn)

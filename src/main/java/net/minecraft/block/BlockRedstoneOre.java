@@ -112,9 +112,9 @@ public class BlockRedstoneOre extends Block
 
         for (int i = 0; i < 6; ++i)
         {
-            double d1 = (double)((float)pos.getX() + random.nextFloat());
-            double d2 = (double)((float)pos.getY() + random.nextFloat());
-            double d3 = (double)((float)pos.getZ() + random.nextFloat());
+            double d1 = (float)pos.getX() + random.nextFloat();
+            double d2 = (float)pos.getY() + random.nextFloat();
+            double d3 = (float)pos.getZ() + random.nextFloat();
 
             if (i == 0 && !worldIn.getBlockState(pos.up()).getBlock().isOpaqueCube())
             {
@@ -148,7 +148,7 @@ public class BlockRedstoneOre extends Block
 
             if (d1 < (double)pos.getX() || d1 > (double)(pos.getX() + 1) || d2 < 0.0D || d2 > (double)(pos.getY() + 1) || d3 < (double)pos.getZ() || d3 > (double)(pos.getZ() + 1))
             {
-                worldIn.spawnParticle(EnumParticleTypes.REDSTONE, d1, d2, d3, 0.0D, 0.0D, 0.0D, new int[0]);
+                worldIn.spawnParticle(EnumParticleTypes.REDSTONE, d1, d2, d3, 0.0D, 0.0D, 0.0D);
             }
         }
     }

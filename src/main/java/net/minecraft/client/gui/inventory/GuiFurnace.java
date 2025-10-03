@@ -11,7 +11,7 @@ public class GuiFurnace extends GuiContainer
 {
     private static final ResourceLocation furnaceGuiTextures = new ResourceLocation("textures/gui/container/furnace.png");
     private final InventoryPlayer playerInventory;
-    private IInventory tileFurnace;
+    private final IInventory tileFurnace;
 
     public GuiFurnace(InventoryPlayer playerInv, IInventory furnaceInv)
     {
@@ -23,8 +23,8 @@ public class GuiFurnace extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         String s = this.tileFurnace.getDisplayName().getUnformattedText();
-        this.minecraftFontRendererObj.drawString(s, this.xSize / 2 - this.minecraftFontRendererObj.getStringWidth(s) / 2, 6, 4210752);
-        this.minecraftFontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
+        this.fontRendererObj.drawString(s, this.xSize / 2 - this.fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
+        this.fontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)

@@ -26,9 +26,9 @@ public class MessageSerializer extends MessageToByteEncoder<Packet>
         this.direction = direction;
     }
 
-    protected void encode(ChannelHandlerContext p_encode_1_, Packet p_encode_2_, ByteBuf p_encode_3_) throws IOException, Exception
+    protected void encode(ChannelHandlerContext p_encode_1_, Packet p_encode_2_, ByteBuf p_encode_3_) throws Exception
     {
-        Integer integer = ((EnumConnectionState)p_encode_1_.channel().attr(NetworkManager.attrKeyConnectionState).get()).getPacketId(this.direction, p_encode_2_);
+        Integer integer = p_encode_1_.channel().attr(NetworkManager.attrKeyConnectionState).get().getPacketId(this.direction, p_encode_2_);
 
         if (logger.isDebugEnabled())
         {
@@ -37,7 +37,7 @@ public class MessageSerializer extends MessageToByteEncoder<Packet>
 
         if (integer == null)
         {
-            throw new IOException("Can\'t serialize unregistered packet");
+            throw new IOException("Can't serialize unregistered packet");
         }
         else
         {
@@ -50,7 +50,7 @@ public class MessageSerializer extends MessageToByteEncoder<Packet>
             }
             catch (Throwable throwable)
             {
-                logger.error((Object)throwable);
+                logger.error(throwable);
             }
         }
     }

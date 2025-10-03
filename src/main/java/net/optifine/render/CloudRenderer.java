@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL11;
 
 public class CloudRenderer
 {
-    private Minecraft mc;
+    private final Minecraft mc;
     private boolean updated = false;
     private boolean renderFancy = false;
     int cloudTickCounter;
@@ -96,7 +96,7 @@ public class CloudRenderer
         double d0 = entity.prevPosX + (entity.posX - entity.prevPosX) * (double)this.partialTicks;
         double d1 = entity.prevPosY + (entity.posY - entity.prevPosY) * (double)this.partialTicks;
         double d2 = entity.prevPosZ + (entity.posZ - entity.prevPosZ) * (double)this.partialTicks;
-        double d3 = (double)((float)(this.cloudTickCounter - this.updateCloudTickCounter) + this.partialTicks);
+        double d3 = (float)(this.cloudTickCounter - this.updateCloudTickCounter) + this.partialTicks;
         float f = (float)(d0 - this.updatePlayerX + d3 * 0.03D);
         float f1 = (float)(d1 - this.updatePlayerY);
         float f2 = (float)(d2 - this.updatePlayerZ);

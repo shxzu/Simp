@@ -24,13 +24,12 @@ public class ModelAdapterGuardian extends ModelAdapter
 
     public ModelRenderer getModelRenderer(ModelBase model, String modelPart)
     {
-        if (!(model instanceof ModelGuardian))
+        if (!(model instanceof ModelGuardian modelguardian))
         {
             return null;
         }
         else
         {
-            ModelGuardian modelguardian = (ModelGuardian)model;
 
             if (modelPart.equals("body"))
             {
@@ -46,7 +45,7 @@ public class ModelAdapterGuardian extends ModelAdapter
 
                 if (modelPart.startsWith(s))
                 {
-                    ModelRenderer[] amodelrenderer1 = (ModelRenderer[])((ModelRenderer[])Reflector.getFieldValue(modelguardian, Reflector.ModelGuardian_spines));
+                    ModelRenderer[] amodelrenderer1 = (ModelRenderer[]) Reflector.getFieldValue(modelguardian, Reflector.ModelGuardian_spines);
 
                     if (amodelrenderer1 == null)
                     {
@@ -66,7 +65,7 @@ public class ModelAdapterGuardian extends ModelAdapter
 
                     if (modelPart.startsWith(s1))
                     {
-                        ModelRenderer[] amodelrenderer = (ModelRenderer[])((ModelRenderer[])Reflector.getFieldValue(modelguardian, Reflector.ModelGuardian_tail));
+                        ModelRenderer[] amodelrenderer = (ModelRenderer[]) Reflector.getFieldValue(modelguardian, Reflector.ModelGuardian_tail);
 
                         if (amodelrenderer == null)
                         {

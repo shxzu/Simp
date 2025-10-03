@@ -44,7 +44,7 @@ public class ItemInWorldManager
         this.gameType = type;
         type.configurePlayerCapabilities(this.thisPlayerMP.capabilities);
         this.thisPlayerMP.sendPlayerAbilities();
-        this.thisPlayerMP.mcServer.getConfigurationManager().sendPacketToAllPlayers(new S38PacketPlayerListItem(S38PacketPlayerListItem.Action.UPDATE_GAME_MODE, new EntityPlayerMP[] {this.thisPlayerMP}));
+        this.thisPlayerMP.mcServer.getConfigurationManager().sendPacketToAllPlayers(new S38PacketPlayerListItem(S38PacketPlayerListItem.Action.UPDATE_GAME_MODE, this.thisPlayerMP));
     }
 
     public WorldSettings.GameType getGameType()
@@ -132,7 +132,7 @@ public class ItemInWorldManager
     {
         if (this.isCreative())
         {
-            if (!this.theWorld.extinguishFire((EntityPlayer)null, pos, side))
+            if (!this.theWorld.extinguishFire(null, pos, side))
             {
                 this.tryHarvestBlock(pos);
             }
@@ -164,7 +164,7 @@ public class ItemInWorldManager
                 }
             }
 
-            this.theWorld.extinguishFire((EntityPlayer)null, pos, side);
+            this.theWorld.extinguishFire(null, pos, side);
             this.initialDamage = this.curblockDamage;
             float f = 1.0F;
 
@@ -354,10 +354,9 @@ public class ItemInWorldManager
         {
             TileEntity tileentity = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof ILockableContainer)
+            if (tileentity instanceof ILockableContainer ilockablecontainer)
             {
                 Block block = worldIn.getBlockState(pos).getBlock();
-                ILockableContainer ilockablecontainer = (ILockableContainer)tileentity;
 
                 if (ilockablecontainer instanceof TileEntityChest && block instanceof BlockChest)
                 {

@@ -8,11 +8,11 @@ public class GuiSlider extends GuiButton
 {
     private float sliderPosition = 1.0F;
     public boolean isMouseDown;
-    private String name;
+    private final String name;
     private final float min;
     private final float max;
     private final GuiPageButtonList.GuiResponder responder;
-    private GuiSlider.FormatHelper formatHelper;
+    private final GuiSlider.FormatHelper formatHelper;
 
     public GuiSlider(GuiPageButtonList.GuiResponder guiResponder, int idIn, int x, int y, String name, float min, float max, float defaultValue, GuiSlider.FormatHelper formatter)
     {
@@ -49,7 +49,7 @@ public class GuiSlider extends GuiButton
 
     private String getDisplayString()
     {
-        return this.formatHelper == null ? I18n.format(this.name, new Object[0]) + ": " + this.func_175220_c() : this.formatHelper.getText(this.id, I18n.format(this.name, new Object[0]), this.func_175220_c());
+        return this.formatHelper == null ? I18n.format(this.name) + ": " + this.func_175220_c() : this.formatHelper.getText(this.id, I18n.format(this.name), this.func_175220_c());
     }
 
     protected int getHoverState(boolean mouseOver)

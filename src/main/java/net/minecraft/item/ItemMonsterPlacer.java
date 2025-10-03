@@ -33,7 +33,7 @@ public class ItemMonsterPlacer extends Item
 
     public String getItemStackDisplayName(ItemStack stack)
     {
-        String s = ("" + StatCollector.translateToLocal(this.getUnlocalizedName() + ".name")).trim();
+        String s = (StatCollector.translateToLocal(this.getUnlocalizedName() + ".name")).trim();
         String s1 = EntityList.getStringFromID(stack.getMetadata());
 
         if (s1 != null)
@@ -46,7 +46,7 @@ public class ItemMonsterPlacer extends Item
 
     public int getColorFromItemStack(ItemStack stack, int renderPass)
     {
-        EntityList.EntityEggInfo entitylist$entityegginfo = (EntityList.EntityEggInfo)EntityList.entityEggs.get(Integer.valueOf(stack.getMetadata()));
+        EntityList.EntityEggInfo entitylist$entityegginfo = EntityList.entityEggs.get(Integer.valueOf(stack.getMetadata()));
         return entitylist$entityegginfo != null ? (renderPass == 0 ? entitylist$entityegginfo.primaryColor : entitylist$entityegginfo.secondaryColor) : 16777215;
     }
 
@@ -149,7 +149,7 @@ public class ItemMonsterPlacer extends Item
                         {
                             if (entity instanceof EntityLivingBase && itemStackIn.hasDisplayName())
                             {
-                                ((EntityLiving)entity).setCustomNameTag(itemStackIn.getDisplayName());
+                                entity.setCustomNameTag(itemStackIn.getDisplayName());
                             }
 
                             if (!playerIn.capabilities.isCreativeMode)
@@ -187,7 +187,7 @@ public class ItemMonsterPlacer extends Item
                     entity.setLocationAndAngles(x, y, z, MathHelper.wrapAngleTo180_float(worldIn.rand.nextFloat() * 360.0F), 0.0F);
                     entityliving.rotationYawHead = entityliving.rotationYaw;
                     entityliving.renderYawOffset = entityliving.rotationYaw;
-                    entityliving.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityliving)), (IEntityLivingData)null);
+                    entityliving.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityliving)), null);
                     worldIn.spawnEntityInWorld(entity);
                     entityliving.playLivingSound();
                 }

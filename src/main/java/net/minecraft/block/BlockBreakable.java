@@ -10,7 +10,7 @@ import net.minecraft.world.IBlockAccess;
 
 public class BlockBreakable extends Block
 {
-    private boolean ignoreSimilarity;
+    private final boolean ignoreSimilarity;
 
     protected BlockBreakable(Material materialIn, boolean ignoreSimilarityIn)
     {
@@ -46,6 +46,6 @@ public class BlockBreakable extends Block
             }
         }
 
-        return !this.ignoreSimilarity && block == this ? false : super.shouldSideBeRendered(worldIn, pos, side);
+        return (this.ignoreSimilarity || block != this) && super.shouldSideBeRendered(worldIn, pos, side);
     }
 }

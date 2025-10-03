@@ -196,7 +196,7 @@ public class CustomItemProperties
 
                 if (j >= 0)
                 {
-                    set.add(new Integer(j));
+                    set.add(j);
                 }
                 else
                 {
@@ -222,7 +222,7 @@ public class CustomItemProperties
                                         continue label45;
                                     }
 
-                                    set.add(new Integer(k1));
+                                    set.add(k1);
                                     ++k1;
                                 }
                             }
@@ -245,13 +245,13 @@ public class CustomItemProperties
                         }
                         else
                         {
-                            set.add(new Integer(i2));
+                            set.add(i2);
                         }
                     }
                 }
             }
 
-            Integer[] ainteger = (Integer[])((Integer[])set.toArray(new Integer[set.size()]));
+            Integer[] ainteger = (Integer[]) set.toArray(new Integer[set.size()]);
             int[] aint = new int[ainteger.length];
 
             for (int l1 = 0; l1 < aint.length; ++l1)
@@ -295,7 +295,7 @@ public class CustomItemProperties
         {
             if (mapTexs != null)
             {
-                String s = (String)mapTexs.get("texture.bow_standby");
+                String s = mapTexs.get("texture.bow_standby");
 
                 if (s != null)
                 {
@@ -400,7 +400,7 @@ public class CustomItemProperties
         {
             if (mapModelNames != null)
             {
-                String s = (String)mapModelNames.get("model.bow_standby");
+                String s = mapModelNames.get("model.bow_standby");
 
                 if (s != null)
                 {
@@ -511,7 +511,7 @@ public class CustomItemProperties
 
     private RangeListInt parseRangeListInt(String str)
     {
-        return this.parseRangeListInt(str, (IParserInt)null);
+        return this.parseRangeListInt(str, null);
     }
 
     private RangeListInt parseRangeListInt(String str, IParserInt parser)
@@ -644,7 +644,7 @@ public class CustomItemProperties
                 list.add(nbttagvalue);
             }
 
-            NbtTagValue[] anbttagvalue = (NbtTagValue[])((NbtTagValue[])list.toArray(new NbtTagValue[list.size()]));
+            NbtTagValue[] anbttagvalue = (NbtTagValue[]) list.toArray(new NbtTagValue[list.size()]);
             return anbttagvalue;
         }
     }
@@ -785,7 +785,7 @@ public class CustomItemProperties
 
             for (String s : this.mapTextures.keySet())
             {
-                String s1 = (String)this.mapTextures.get(s);
+                String s1 = this.mapTextures.get(s);
                 ResourceLocation resourcelocation1 = this.getTextureLocation(s1);
                 this.mapTextureLocations.put(s, resourcelocation1);
 
@@ -850,7 +850,7 @@ public class CustomItemProperties
             {
                 for (String s : this.mapTextures.keySet())
                 {
-                    String s1 = (String)this.mapTextures.get(s);
+                    String s1 = this.mapTextures.get(s);
                     String s2 = StrUtils.removePrefix(s, "texture.");
 
                     if (s2.startsWith("bow") || s2.startsWith("fishing_rod") || s2.startsWith("shield"))
@@ -917,9 +917,8 @@ public class CustomItemProperties
                 return new String[] {s5, s6};
             }
 
-            if (item instanceof ItemArmor)
+            if (item instanceof ItemArmor itemarmor)
             {
-                ItemArmor itemarmor = (ItemArmor)item;
 
                 if (itemarmor.getArmorMaterial() == ItemArmor.ArmorMaterial.LEATHER)
                 {
@@ -965,7 +964,7 @@ public class CustomItemProperties
         }
         else
         {
-            String s = (String)map.get(key);
+            String s = map.get(key);
             return s == null ? def : s;
         }
     }
@@ -1005,7 +1004,7 @@ public class CustomItemProperties
         {
             for (EnumFacing enumfacing : blockpart.mapFaces.keySet())
             {
-                BlockPartFace blockpartface = (BlockPartFace)blockpart.mapFaces.get(enumfacing);
+                BlockPartFace blockpartface = blockpart.mapFaces.get(enumfacing);
 
                 if (!useTint)
                 {
@@ -1038,7 +1037,7 @@ public class CustomItemProperties
 
     public String toString()
     {
-        return "" + this.basePath + "/" + this.name + ", type: " + this.type + ", items: [" + Config.arrayToString(this.items) + "], textture: " + this.texture;
+        return this.basePath + "/" + this.name + ", type: " + this.type + ", items: [" + Config.arrayToString(this.items) + "], textture: " + this.texture;
     }
 
     public float getTextureWidth(TextureManager textureManager)
@@ -1106,7 +1105,7 @@ public class CustomItemProperties
         if (modelLocation != null && map != null)
         {
             String s = modelLocation.getResourcePath();
-            IBakedModel ibakedmodel1 = (IBakedModel)map.get(s);
+            IBakedModel ibakedmodel1 = map.get(s);
 
             if (ibakedmodel1 != null)
             {
@@ -1128,7 +1127,7 @@ public class CustomItemProperties
         {
             for (String s : this.mapModels.keySet())
             {
-                String s1 = (String)this.mapModels.get(s);
+                String s1 = this.mapModels.get(s);
                 String s2 = StrUtils.removePrefix(s, "model.");
 
                 if (s2.startsWith("bow") || s2.startsWith("fishing_rod") || s2.startsWith("shield"))
@@ -1161,7 +1160,7 @@ public class CustomItemProperties
         {
             for (String s : this.mapModels.keySet())
             {
-                String s1 = (String)this.mapModels.get(s);
+                String s1 = this.mapModels.get(s);
                 String s2 = StrUtils.removePrefix(s, "model.");
 
                 if (s2.startsWith("bow") || s2.startsWith("fishing_rod") || s2.startsWith("shield"))
@@ -1193,32 +1192,7 @@ public class CustomItemProperties
         ResourceLocation resourcelocation = getModelLocation(model);
         ModelResourceLocation modelresourcelocation = new ModelResourceLocation(resourcelocation, "inventory");
 
-        if (Reflector.ModelLoader.exists())
-        {
-            try
-            {
-                Object object = Reflector.ModelLoader_VanillaLoader_INSTANCE.getValue();
-                checkNull(object, "vanillaLoader is null");
-                Object object1 = Reflector.call(object, Reflector.ModelLoader_VanillaLoader_loadModel, new Object[] {modelresourcelocation});
-                checkNull(object1, "iModel is null");
-                Map map = (Map)Reflector.getFieldValue(modelBakery, Reflector.ModelLoader_stateModels);
-                checkNull(map, "stateModels is null");
-                map.put(modelresourcelocation, object1);
-                Set set = (Set)Reflector.getFieldValue(modelBakery, Reflector.ModelLoader_textures);
-                checkNull(set, "registryTextures is null");
-                Collection collection = (Collection)Reflector.call(object1, Reflector.IModel_getTextures, new Object[0]);
-                checkNull(collection, "modelTextures is null");
-                set.addAll(collection);
-            }
-            catch (Exception exception)
-            {
-                Config.warn("Error registering model with ModelLoader: " + modelresourcelocation + ", " + exception.getClass().getName() + ": " + exception.getMessage());
-            }
-        }
-        else
-        {
-            modelBakery.loadItemModel(resourcelocation.toString(), modelresourcelocation, resourcelocation);
-        }
+        modelBakery.loadItemModel(resourcelocation.toString(), modelresourcelocation, resourcelocation);
     }
 
     private static void checkNull(Object obj, String msg) throws NullPointerException
@@ -1231,6 +1205,6 @@ public class CustomItemProperties
 
     private static ResourceLocation getModelLocation(String modelName)
     {
-        return Reflector.ModelLoader.exists() && !modelName.startsWith("mcpatcher/") && !modelName.startsWith("optifine/") ? new ResourceLocation("models/" + modelName) : new ResourceLocation(modelName);
+        return new ResourceLocation(modelName);
     }
 }

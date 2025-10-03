@@ -6,9 +6,9 @@ import net.optifine.expr.IExpressionFloat;
 
 public class ModelVariableFloat implements IExpressionFloat
 {
-    private String name;
-    private ModelRenderer modelRenderer;
-    private ModelVariableType enumModelVariable;
+    private final String name;
+    private final ModelRenderer modelRenderer;
+    private final ModelVariableType enumModelVariable;
 
     public ModelVariableFloat(String name, ModelRenderer modelRenderer, ModelVariableType enumModelVariable)
     {

@@ -11,9 +11,9 @@ import net.minecraft.src.Config;
 
 public class GuiMessage extends GuiScreen
 {
-    private GuiScreen parentScreen;
-    private String messageLine1;
-    private String messageLine2;
+    private final GuiScreen parentScreen;
+    private final String messageLine1;
+    private final String messageLine2;
     private final List listLines2 = Lists.newArrayList();
     protected String confirmButtonText;
     private int ticksUntilEnable;
@@ -23,14 +23,14 @@ public class GuiMessage extends GuiScreen
         this.parentScreen = parentScreen;
         this.messageLine1 = line1;
         this.messageLine2 = line2;
-        this.confirmButtonText = I18n.format("gui.done", new Object[0]);
+        this.confirmButtonText = I18n.format("gui.done");
     }
 
     public void initGui()
     {
         this.buttonList.add(new GuiOptionButton(0, this.width / 2 - 74, this.height / 6 + 96, this.confirmButtonText));
         this.listLines2.clear();
-        this.listLines2.addAll(this.minecraftFontRendererObj.listFormattedStringToWidth(this.messageLine2, this.width - 50));
+        this.listLines2.addAll(this.fontRendererObj.listFormattedStringToWidth(this.messageLine2, this.width - 50));
     }
 
     protected void actionPerformed(GuiButton button) throws IOException
@@ -41,13 +41,13 @@ public class GuiMessage extends GuiScreen
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.minecraftFontRendererObj, this.messageLine1, this.width / 2, 70, 16777215);
+        this.drawCenteredString(this.fontRendererObj, this.messageLine1, this.width / 2, 70, 16777215);
         int i = 90;
 
         for (Object s : this.listLines2)
         {
-            this.drawCenteredString(this.minecraftFontRendererObj, (String) s, this.width / 2, i, 16777215);
-            i += this.minecraftFontRendererObj.FONT_HEIGHT;
+            this.drawCenteredString(this.fontRendererObj, (String) s, this.width / 2, i, 16777215);
+            i += this.fontRendererObj.FONT_HEIGHT;
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);

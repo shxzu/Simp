@@ -64,12 +64,12 @@ public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry
                     catch (UnknownHostException var2)
                     {
                         ServerListEntryNormal.this.server.pingToServer = -1L;
-                        ServerListEntryNormal.this.server.serverMOTD = EnumChatFormatting.DARK_RED + "Can\'t resolve hostname";
+                        ServerListEntryNormal.this.server.serverMOTD = EnumChatFormatting.DARK_RED + "Can't resolve hostname";
                     }
                     catch (Exception var3)
                     {
                         ServerListEntryNormal.this.server.pingToServer = -1L;
-                        ServerListEntryNormal.this.server.serverMOTD = EnumChatFormatting.DARK_RED + "Can\'t connect to server.";
+                        ServerListEntryNormal.this.server.serverMOTD = EnumChatFormatting.DARK_RED + "Can't connect to server.";
                     }
                 }
             });
@@ -78,17 +78,17 @@ public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry
         boolean flag = this.server.version > 47;
         boolean flag1 = this.server.version < 47;
         boolean flag2 = flag || flag1;
-        this.mc.minecraftFontRendererObj.drawString(this.server.serverName, x + 32 + 3, y + 1, 16777215);
-        List<String> list = this.mc.minecraftFontRendererObj.listFormattedStringToWidth(this.server.serverMOTD, listWidth - 32 - 2);
+        this.mc.fontRendererObj.drawString(this.server.serverName, x + 32 + 3, y + 1, 16777215);
+        List<String> list = this.mc.fontRendererObj.listFormattedStringToWidth(this.server.serverMOTD, listWidth - 32 - 2);
 
         for (int i = 0; i < Math.min(list.size(), 2); ++i)
         {
-            this.mc.minecraftFontRendererObj.drawString((String)list.get(i), x + 32 + 3, y + 12 + this.mc.minecraftFontRendererObj.FONT_HEIGHT * i, 8421504);
+            this.mc.fontRendererObj.drawString(list.get(i), x + 32 + 3, y + 12 + this.mc.fontRendererObj.FONT_HEIGHT * i, 8421504);
         }
 
         String s2 = flag2 ? EnumChatFormatting.DARK_RED + this.server.gameVersion : this.server.populationInfo;
-        int j = this.mc.minecraftFontRendererObj.getStringWidth(s2);
-        this.mc.minecraftFontRendererObj.drawString(s2, x + listWidth - j - 15 - 2, y + 1, 8421504);
+        int j = this.mc.fontRendererObj.getStringWidth(s2);
+        this.mc.fontRendererObj.drawString(s2, x + listWidth - j - 15 - 2, y + 1, 8421504);
         int k = 0;
         String s = null;
         int l;
@@ -140,7 +140,7 @@ public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry
         else
         {
             k = 1;
-            l = (int)(Minecraft.getSystemTime() / 100L + (long)(slotIndex * 2) & 7L);
+            l = (int)(Minecraft.getSystemTime() / 100L + (slotIndex * 2L) & 7L);
 
             if (l > 4)
             {
@@ -250,7 +250,7 @@ public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry
         }
         else
         {
-            ByteBuf bytebuf = Unpooled.copiedBuffer((CharSequence)this.server.getBase64EncodedIconData(), Charsets.UTF_8);
+            ByteBuf bytebuf = Unpooled.copiedBuffer(this.server.getBase64EncodedIconData(), Charsets.UTF_8);
             ByteBuf bytebuf1 = Base64.decode(bytebuf);
             BufferedImage bufferedimage;
             label101:
@@ -258,14 +258,14 @@ public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry
                 try
                 {
                     bufferedimage = TextureUtil.readBufferedImage(new ByteBufInputStream(bytebuf1));
-                    Validate.validState(bufferedimage.getWidth() == 64, "Must be 64 pixels wide", new Object[0]);
-                    Validate.validState(bufferedimage.getHeight() == 64, "Must be 64 pixels high", new Object[0]);
+                    Validate.validState(bufferedimage.getWidth() == 64, "Must be 64 pixels wide");
+                    Validate.validState(bufferedimage.getHeight() == 64, "Must be 64 pixels high");
                     break label101;
                 }
                 catch (Throwable throwable)
                 {
                     logger.error("Invalid icon for server " + this.server.serverName + " (" + this.server.serverIP + ")", throwable);
-                    this.server.setBase64EncodedIconData((String)null);
+                    this.server.setBase64EncodedIconData(null);
                 }
                 finally
                 {

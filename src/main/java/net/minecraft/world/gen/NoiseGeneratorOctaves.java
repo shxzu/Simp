@@ -5,8 +5,8 @@ import net.minecraft.util.MathHelper;
 
 public class NoiseGeneratorOctaves extends NoiseGenerator
 {
-    private NoiseGeneratorImproved[] generatorCollection;
-    private int octaves;
+    private final NoiseGeneratorImproved[] generatorCollection;
+    private final int octaves;
 
     public NoiseGeneratorOctaves(Random seed, int octavesIn)
     {

@@ -56,9 +56,8 @@ public class SVertexBuilder
         int i;
         int j;
 
-        if (blockState instanceof BlockStateBase)
+        if (blockState instanceof BlockStateBase blockstatebase)
         {
-            BlockStateBase blockstatebase = (BlockStateBase)blockState;
             i = blockstatebase.getBlockId();
             j = blockstatebase.getMetadata();
         }
@@ -191,16 +190,16 @@ public class SVertexBuilder
         FloatBuffer floatbuffer = wrr.rawFloatBuffer;
         IntBuffer intbuffer = wrr.rawIntBuffer;
         int i = wrr.getBufferSize();
-        float f = floatbuffer.get(baseIndex + 0 * this.vertexSize);
-        float f1 = floatbuffer.get(baseIndex + 0 * this.vertexSize + 1);
-        float f2 = floatbuffer.get(baseIndex + 0 * this.vertexSize + 2);
-        float f3 = floatbuffer.get(baseIndex + 0 * this.vertexSize + this.offsetUV);
-        float f4 = floatbuffer.get(baseIndex + 0 * this.vertexSize + this.offsetUV + 1);
-        float f5 = floatbuffer.get(baseIndex + 1 * this.vertexSize);
-        float f6 = floatbuffer.get(baseIndex + 1 * this.vertexSize + 1);
-        float f7 = floatbuffer.get(baseIndex + 1 * this.vertexSize + 2);
-        float f8 = floatbuffer.get(baseIndex + 1 * this.vertexSize + this.offsetUV);
-        float f9 = floatbuffer.get(baseIndex + 1 * this.vertexSize + this.offsetUV + 1);
+        float f = floatbuffer.get(baseIndex);
+        float f1 = floatbuffer.get(baseIndex + 1);
+        float f2 = floatbuffer.get(baseIndex + 2);
+        float f3 = floatbuffer.get(baseIndex + this.offsetUV);
+        float f4 = floatbuffer.get(baseIndex + this.offsetUV + 1);
+        float f5 = floatbuffer.get(baseIndex + this.vertexSize);
+        float f6 = floatbuffer.get(baseIndex + this.vertexSize + 1);
+        float f7 = floatbuffer.get(baseIndex + this.vertexSize + 2);
+        float f8 = floatbuffer.get(baseIndex + this.vertexSize + this.offsetUV);
+        float f9 = floatbuffer.get(baseIndex + this.vertexSize + this.offsetUV + 1);
         float f10 = floatbuffer.get(baseIndex + 2 * this.vertexSize);
         float f11 = floatbuffer.get(baseIndex + 2 * this.vertexSize + 1);
         float f12 = floatbuffer.get(baseIndex + 2 * this.vertexSize + 2);
@@ -221,7 +220,7 @@ public class SVertexBuilder
         float f31 = f22 * f23 - f25 * f20;
         float f32 = f20 * f24 - f23 * f21;
         float f33 = f30 * f30 + f31 * f31 + f32 * f32;
-        float f34 = (double)f33 != 0.0D ? (float)(1.0D / Math.sqrt((double)f33)) : 1.0F;
+        float f34 = (double)f33 != 0.0D ? (float)(1.0D / Math.sqrt(f33)) : 1.0F;
         f30 = f30 * f34;
         f31 = f31 * f34;
         f32 = f32 * f34;
@@ -244,12 +243,12 @@ public class SVertexBuilder
         float f41 = (f26 * f24 - f28 * f21) * f36;
         float f42 = (f26 * f25 - f28 * f22) * f36;
         f33 = f37 * f37 + f38 * f38 + f39 * f39;
-        f34 = (double)f33 != 0.0D ? (float)(1.0D / Math.sqrt((double)f33)) : 1.0F;
+        f34 = (double)f33 != 0.0D ? (float)(1.0D / Math.sqrt(f33)) : 1.0F;
         f37 = f37 * f34;
         f38 = f38 * f34;
         f39 = f39 * f34;
         f33 = f40 * f40 + f41 * f41 + f42 * f42;
-        f34 = (double)f33 != 0.0D ? (float)(1.0D / Math.sqrt((double)f33)) : 1.0F;
+        f34 = (double)f33 != 0.0D ? (float)(1.0D / Math.sqrt(f33)) : 1.0F;
         f40 = f40 * f34;
         f41 = f41 * f34;
         f42 = f42 * f34;
@@ -261,26 +260,26 @@ public class SVertexBuilder
         int k = (int)(f31 * 127.0F) & 255;
         int l = (int)(f32 * 127.0F) & 255;
         int i1 = (l << 16) + (k << 8) + j;
-        intbuffer.put(baseIndex + 0 * this.vertexSize + this.offsetNormal, i1);
-        intbuffer.put(baseIndex + 1 * this.vertexSize + this.offsetNormal, i1);
+        intbuffer.put(baseIndex + this.offsetNormal, i1);
+        intbuffer.put(baseIndex + this.vertexSize + this.offsetNormal, i1);
         intbuffer.put(baseIndex + 2 * this.vertexSize + this.offsetNormal, i1);
         intbuffer.put(baseIndex + 3 * this.vertexSize + this.offsetNormal, i1);
         int j1 = ((int)(f37 * 32767.0F) & 65535) + (((int)(f38 * 32767.0F) & 65535) << 16);
         int k1 = ((int)(f39 * 32767.0F) & 65535) + (((int)(f46 * 32767.0F) & 65535) << 16);
-        intbuffer.put(baseIndex + 0 * this.vertexSize + 10, j1);
-        intbuffer.put(baseIndex + 0 * this.vertexSize + 10 + 1, k1);
-        intbuffer.put(baseIndex + 1 * this.vertexSize + 10, j1);
-        intbuffer.put(baseIndex + 1 * this.vertexSize + 10 + 1, k1);
+        intbuffer.put(baseIndex + 10, j1);
+        intbuffer.put(baseIndex + 10 + 1, k1);
+        intbuffer.put(baseIndex + this.vertexSize + 10, j1);
+        intbuffer.put(baseIndex + this.vertexSize + 10 + 1, k1);
         intbuffer.put(baseIndex + 2 * this.vertexSize + 10, j1);
         intbuffer.put(baseIndex + 2 * this.vertexSize + 10 + 1, k1);
         intbuffer.put(baseIndex + 3 * this.vertexSize + 10, j1);
         intbuffer.put(baseIndex + 3 * this.vertexSize + 10 + 1, k1);
         float f47 = (f3 + f8 + f13 + f18) / 4.0F;
         float f48 = (f4 + f9 + f14 + f19) / 4.0F;
-        floatbuffer.put(baseIndex + 0 * this.vertexSize + 8, f47);
-        floatbuffer.put(baseIndex + 0 * this.vertexSize + 8 + 1, f48);
-        floatbuffer.put(baseIndex + 1 * this.vertexSize + 8, f47);
-        floatbuffer.put(baseIndex + 1 * this.vertexSize + 8 + 1, f48);
+        floatbuffer.put(baseIndex + 8, f47);
+        floatbuffer.put(baseIndex + 8 + 1, f48);
+        floatbuffer.put(baseIndex + this.vertexSize + 8, f47);
+        floatbuffer.put(baseIndex + this.vertexSize + 8 + 1, f48);
         floatbuffer.put(baseIndex + 2 * this.vertexSize + 8, f47);
         floatbuffer.put(baseIndex + 2 * this.vertexSize + 8 + 1, f48);
         floatbuffer.put(baseIndex + 3 * this.vertexSize + 8, f47);

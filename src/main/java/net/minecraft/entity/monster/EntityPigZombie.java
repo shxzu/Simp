@@ -234,7 +234,7 @@ public class EntityPigZombie extends EntityZombie
     {
         public AIHurtByAggressor(EntityPigZombie p_i45828_1_)
         {
-            super(p_i45828_1_, true, new Class[0]);
+            super(p_i45828_1_, true);
         }
 
         protected void setEntityAttackTarget(EntityCreature creatureIn, EntityLivingBase entityLivingBaseIn)

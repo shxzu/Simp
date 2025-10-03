@@ -15,7 +15,7 @@ public class WorldGenForest extends WorldGenAbstractTree
 {
     private static final IBlockState field_181629_a = Blocks.log.getDefaultState().withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.BIRCH);
     private static final IBlockState field_181630_b = Blocks.leaves.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.BIRCH).withProperty(BlockOldLeaf.CHECK_DECAY, Boolean.valueOf(false));
-    private boolean useExtraRandomHeight;
+    private final boolean useExtraRandomHeight;
 
     public WorldGenForest(boolean p_i45449_1_, boolean p_i45449_2_)
     {

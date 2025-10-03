@@ -100,7 +100,7 @@ public class TileEntityEndPortalRenderer extends TileEntitySpecialRenderer<TileE
 
                 if (i == 0)
                 {
-                    f11 = f12 = f13 = 1.0F * f6;
+                    f11 = f12 = f13 = f6;
                 }
 
                 worldrenderer.pos(x, y + (double)f3, z).color(f11, f12, f13, 1.0F).endVertex();

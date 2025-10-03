@@ -6,8 +6,8 @@ import net.minecraft.item.ItemStack;
 
 public class RecipesArmor
 {
-    private String[][] recipePatterns = new String[][] {{"XXX", "X X"}, {"X X", "XXX", "XXX"}, {"XXX", "X X", "X X"}, {"X X", "X X"}};
-    private Item[][] recipeItems = new Item[][] {{Items.leather, Items.iron_ingot, Items.diamond, Items.gold_ingot}, {Items.leather_helmet, Items.iron_helmet, Items.diamond_helmet, Items.golden_helmet}, {Items.leather_chestplate, Items.iron_chestplate, Items.diamond_chestplate, Items.golden_chestplate}, {Items.leather_leggings, Items.iron_leggings, Items.diamond_leggings, Items.golden_leggings}, {Items.leather_boots, Items.iron_boots, Items.diamond_boots, Items.golden_boots}};
+    private final String[][] recipePatterns = new String[][] {{"XXX", "X X"}, {"X X", "XXX", "XXX"}, {"XXX", "X X", "X X"}, {"X X", "X X"}};
+    private final Item[][] recipeItems = new Item[][] {{Items.leather, Items.iron_ingot, Items.diamond, Items.gold_ingot}, {Items.leather_helmet, Items.iron_helmet, Items.diamond_helmet, Items.golden_helmet}, {Items.leather_chestplate, Items.iron_chestplate, Items.diamond_chestplate, Items.golden_chestplate}, {Items.leather_leggings, Items.iron_leggings, Items.diamond_leggings, Items.golden_leggings}, {Items.leather_boots, Items.iron_boots, Items.diamond_boots, Items.golden_boots}};
 
     public void addRecipes(CraftingManager craftManager)
     {
@@ -18,7 +18,7 @@ public class RecipesArmor
             for (int j = 0; j < this.recipeItems.length - 1; ++j)
             {
                 Item item1 = this.recipeItems[j + 1][i];
-                craftManager.addRecipe(new ItemStack(item1), new Object[] {this.recipePatterns[j], 'X', item});
+                craftManager.addRecipe(new ItemStack(item1), this.recipePatterns[j], 'X', item);
             }
         }
     }

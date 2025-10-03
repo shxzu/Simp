@@ -12,7 +12,7 @@ public class NaturalProperties
 {
     public int rotation = 1;
     public boolean flip = false;
-    private Map[] quadMaps = new Map[8];
+    private final Map[] quadMaps = new Map[8];
 
     public NaturalProperties(String type)
     {
@@ -46,7 +46,7 @@ public class NaturalProperties
 
     public boolean isValid()
     {
-        return this.rotation != 2 && this.rotation != 4 ? this.flip : true;
+        return this.rotation == 2 || this.rotation == 4 || this.flip;
     }
 
     public synchronized BakedQuad getQuad(BakedQuad quadIn, int rotate, boolean flipU)
@@ -103,7 +103,7 @@ public class NaturalProperties
 
     private int[] transformVertexData(int[] vertexData, int rotate, boolean flipU)
     {
-        int[] aint = (int[])vertexData.clone();
+        int[] aint = vertexData.clone();
         int i = 4 - rotate;
 
         if (flipU)

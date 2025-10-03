@@ -32,7 +32,7 @@ public class BlockFarmland extends Block
 
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
     {
-        return new AxisAlignedBB((double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), (double)(pos.getX() + 1), (double)(pos.getY() + 1), (double)(pos.getZ() + 1));
+        return new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
     }
 
     public boolean isOpaqueCube()
@@ -47,7 +47,7 @@ public class BlockFarmland extends Block
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        int i = ((Integer)state.getValue(MOISTURE)).intValue();
+        int i = state.getValue(MOISTURE).intValue();
 
         if (!this.hasWater(worldIn, pos) && !worldIn.isRainingAt(pos.up()))
         {
@@ -149,11 +149,11 @@ public class BlockFarmland extends Block
 
     public int getMetaFromState(IBlockState state)
     {
-        return ((Integer)state.getValue(MOISTURE)).intValue();
+        return state.getValue(MOISTURE).intValue();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {MOISTURE});
+        return new BlockState(this, MOISTURE);
     }
 }

@@ -35,7 +35,7 @@ public class EntityAIOcelotAttack extends EntityAIBase
 
     public boolean continueExecuting()
     {
-        return !this.theVictim.isEntityAlive() ? false : (this.theEntity.getDistanceSqToEntity(this.theVictim) > 225.0D ? false : !this.theEntity.getNavigator().noPath() || this.shouldExecute());
+        return this.theVictim.isEntityAlive() && (!(this.theEntity.getDistanceSqToEntity(this.theVictim) > 225.0D) && (!this.theEntity.getNavigator().noPath() || this.shouldExecute()));
     }
 
     public void resetTask()
@@ -47,7 +47,7 @@ public class EntityAIOcelotAttack extends EntityAIBase
     public void updateTask()
     {
         this.theEntity.getLookHelper().setLookPositionWithEntity(this.theVictim, 30.0F, 30.0F);
-        double d0 = (double)(this.theEntity.width * 2.0F * this.theEntity.width * 2.0F);
+        double d0 = this.theEntity.width * 2.0F * this.theEntity.width * 2.0F;
         double d1 = this.theEntity.getDistanceSq(this.theVictim.posX, this.theVictim.getEntityBoundingBox().minY, this.theVictim.posZ);
         double d2 = 0.8D;
 

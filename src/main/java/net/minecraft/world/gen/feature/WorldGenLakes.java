@@ -11,7 +11,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 public class WorldGenLakes extends WorldGenerator
 {
-    private Block block;
+    private final Block block;
 
     public WorldGenLakes(Block blockIn)
     {
@@ -22,7 +22,6 @@ public class WorldGenLakes extends WorldGenerator
     {
         for (position = position.add(-8, 0, -8); position.getY() > 5 && worldIn.isAirBlock(position); position = position.down())
         {
-            ;
         }
 
         if (position.getY() <= 4)

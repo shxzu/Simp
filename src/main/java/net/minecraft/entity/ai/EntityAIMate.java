@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 
 public class EntityAIMate extends EntityAIBase
 {
-    private EntityAnimal theAnimal;
+    private final EntityAnimal theAnimal;
     World theWorld;
     private EntityAnimal targetMate;
     int spawnBabyDelay;
@@ -67,7 +67,7 @@ public class EntityAIMate extends EntityAIBase
     private EntityAnimal getNearbyMate()
     {
         float f = 8.0F;
-        List<EntityAnimal> list = this.theWorld.<EntityAnimal>getEntitiesWithinAABB(this.theAnimal.getClass(), this.theAnimal.getEntityBoundingBox().expand((double)f, (double)f, (double)f));
+        List<EntityAnimal> list = this.theWorld.getEntitiesWithinAABB(this.theAnimal.getClass(), this.theAnimal.getEntityBoundingBox().expand(f, f, f));
         double d0 = Double.MAX_VALUE;
         EntityAnimal entityanimal = null;
 
@@ -123,7 +123,7 @@ public class EntityAIMate extends EntityAIBase
                 double d3 = random.nextDouble() * (double)this.theAnimal.width * 2.0D - (double)this.theAnimal.width;
                 double d4 = 0.5D + random.nextDouble() * (double)this.theAnimal.height;
                 double d5 = random.nextDouble() * (double)this.theAnimal.width * 2.0D - (double)this.theAnimal.width;
-                this.theWorld.spawnParticle(EnumParticleTypes.HEART, this.theAnimal.posX + d3, this.theAnimal.posY + d4, this.theAnimal.posZ + d5, d0, d1, d2, new int[0]);
+                this.theWorld.spawnParticle(EnumParticleTypes.HEART, this.theAnimal.posX + d3, this.theAnimal.posY + d4, this.theAnimal.posZ + d5, d0, d1, d2);
             }
 
             if (this.theWorld.getGameRules().getBoolean("doMobLoot"))

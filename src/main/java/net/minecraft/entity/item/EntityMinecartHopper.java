@@ -20,7 +20,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 {
     private boolean isBlocked = true;
     private int transferTicker = -1;
-    private BlockPos field_174900_c = BlockPos.ORIGIN;
+    private final BlockPos field_174900_c = BlockPos.ORIGIN;
 
     public EntityMinecartHopper(World worldIn)
     {
@@ -140,11 +140,11 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
         }
         else
         {
-            List<EntityItem> list = this.worldObj.<EntityItem>getEntitiesWithinAABB(EntityItem.class, this.getEntityBoundingBox().expand(0.25D, 0.0D, 0.25D), EntitySelectors.selectAnything);
+            List<EntityItem> list = this.worldObj.getEntitiesWithinAABB(EntityItem.class, this.getEntityBoundingBox().expand(0.25D, 0.0D, 0.25D), EntitySelectors.selectAnything);
 
             if (list.size() > 0)
             {
-                TileEntityHopper.putDropInInventoryAllSlots(this, (EntityItem)list.get(0));
+                TileEntityHopper.putDropInInventoryAllSlots(this, list.get(0));
             }
 
             return false;

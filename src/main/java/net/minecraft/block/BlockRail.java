@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 
 public class BlockRail extends BlockRailBase
 {
-    public static final PropertyEnum<BlockRailBase.EnumRailDirection> SHAPE = PropertyEnum.<BlockRailBase.EnumRailDirection>create("shape", BlockRailBase.EnumRailDirection.class);
+    public static final PropertyEnum<BlockRailBase.EnumRailDirection> SHAPE = PropertyEnum.create("shape", BlockRailBase.EnumRailDirection.class);
 
     protected BlockRail()
     {
@@ -37,11 +37,11 @@ public class BlockRail extends BlockRailBase
 
     public int getMetaFromState(IBlockState state)
     {
-        return ((BlockRailBase.EnumRailDirection)state.getValue(SHAPE)).getMetadata();
+        return state.getValue(SHAPE).getMetadata();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {SHAPE});
+        return new BlockState(this, SHAPE);
     }
 }

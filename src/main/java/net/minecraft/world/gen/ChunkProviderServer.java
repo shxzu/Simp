@@ -28,14 +28,14 @@ import org.apache.logging.log4j.Logger;
 public class ChunkProviderServer implements IChunkProvider
 {
     private static final Logger logger = LogManager.getLogger();
-    private Set<Long> droppedChunksSet = Collections.<Long>newSetFromMap(new ConcurrentHashMap());
-    private Chunk dummyChunk;
-    private IChunkProvider serverChunkGenerator;
-    private IChunkLoader chunkLoader;
+    private final Set<Long> droppedChunksSet = Collections.<Long>newSetFromMap(new ConcurrentHashMap());
+    private final Chunk dummyChunk;
+    private final IChunkProvider serverChunkGenerator;
+    private final IChunkLoader chunkLoader;
     public boolean chunkLoadOverride = true;
-    private LongHashMap<Chunk> id2ChunkMap = new LongHashMap();
-    private List<Chunk> loadedChunks = Lists.<Chunk>newArrayList();
-    private WorldServer worldObj;
+    private final LongHashMap<Chunk> id2ChunkMap = new LongHashMap();
+    private final List<Chunk> loadedChunks = Lists.newArrayList();
+    private final WorldServer worldObj;
 
     public ChunkProviderServer(WorldServer p_i1520_1_, IChunkLoader p_i1520_2_, IChunkProvider p_i1520_3_)
     {
@@ -82,7 +82,7 @@ public class ChunkProviderServer implements IChunkProvider
     {
         long i = ChunkCoordIntPair.chunkXZ2Int(chunkX, chunkZ);
         this.droppedChunksSet.remove(Long.valueOf(i));
-        Chunk chunk = (Chunk)this.id2ChunkMap.getValueByKey(i);
+        Chunk chunk = this.id2ChunkMap.getValueByKey(i);
 
         if (chunk == null)
         {
@@ -104,7 +104,7 @@ public class ChunkProviderServer implements IChunkProvider
                     {
                         CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Exception generating new chunk");
                         CrashReportCategory crashreportcategory = crashreport.makeCategory("Chunk to be generated");
-                        crashreportcategory.addCrashSection("Location", String.format("%d,%d", new Object[] {Integer.valueOf(chunkX), Integer.valueOf(chunkZ)}));
+                        crashreportcategory.addCrashSection("Location", String.format("%d,%d", Integer.valueOf(chunkX), Integer.valueOf(chunkZ)));
                         crashreportcategory.addCrashSection("Position hash", Long.valueOf(i));
                         crashreportcategory.addCrashSection("Generator", this.serverChunkGenerator.makeString());
                         throw new ReportedException(crashreport);
@@ -123,7 +123,7 @@ public class ChunkProviderServer implements IChunkProvider
 
     public Chunk provideChunk(int x, int z)
     {
-        Chunk chunk = (Chunk)this.id2ChunkMap.getValueByKey(ChunkCoordIntPair.chunkXZ2Int(x, z));
+        Chunk chunk = this.id2ChunkMap.getValueByKey(ChunkCoordIntPair.chunkXZ2Int(x, z));
         return chunk == null ? (!this.worldObj.isFindingSpawnPoint() && !this.chunkLoadOverride ? this.dummyChunk : this.loadChunk(x, z)) : chunk;
     }
 
@@ -153,7 +153,7 @@ public class ChunkProviderServer implements IChunkProvider
             }
             catch (Exception exception)
             {
-                logger.error((String)"Couldn\'t load chunk", (Throwable)exception);
+                logger.error("Couldn't load chunk", exception);
                 return null;
             }
         }
@@ -169,7 +169,7 @@ public class ChunkProviderServer implements IChunkProvider
             }
             catch (Exception exception)
             {
-                logger.error((String)"Couldn\'t save entities", (Throwable)exception);
+                logger.error("Couldn't save entities", exception);
             }
         }
     }
@@ -185,11 +185,11 @@ public class ChunkProviderServer implements IChunkProvider
             }
             catch (IOException ioexception)
             {
-                logger.error((String)"Couldn\'t save chunk", (Throwable)ioexception);
+                logger.error("Couldn't save chunk", ioexception);
             }
             catch (MinecraftException minecraftexception)
             {
-                logger.error((String)"Couldn\'t save chunk; already in use by another instance of Minecraft?", (Throwable)minecraftexception);
+                logger.error("Couldn't save chunk; already in use by another instance of Minecraft?", minecraftexception);
             }
         }
     }
@@ -229,9 +229,9 @@ public class ChunkProviderServer implements IChunkProvider
         int i = 0;
         List<Chunk> list = Lists.newArrayList(this.loadedChunks);
 
-        for (int j = 0; j < ((List)list).size(); ++j)
+        for (int j = 0; j < list.size(); ++j)
         {
-            Chunk chunk = (Chunk)list.get(j);
+            Chunk chunk = list.get(j);
 
             if (saveAllChunks)
             {
@@ -270,8 +270,8 @@ public class ChunkProviderServer implements IChunkProvider
             {
                 if (!this.droppedChunksSet.isEmpty())
                 {
-                    Long olong = (Long)this.droppedChunksSet.iterator().next();
-                    Chunk chunk = (Chunk)this.id2ChunkMap.getValueByKey(olong.longValue());
+                    Long olong = this.droppedChunksSet.iterator().next();
+                    Chunk chunk = this.id2ChunkMap.getValueByKey(olong.longValue());
 
                     if (chunk != null)
                     {

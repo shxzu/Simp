@@ -139,7 +139,7 @@ public class CustomEntityModels
             }
         }
 
-        ResourceLocation[] aresourcelocation = (ResourceLocation[])((ResourceLocation[])list.toArray(new ResourceLocation[list.size()]));
+        ResourceLocation[] aresourcelocation = list.toArray(new ResourceLocation[list.size()]);
         return aresourcelocation;
     }
 
@@ -153,12 +153,12 @@ public class CustomEntityModels
         }
         catch (IOException ioexception)
         {
-            Config.error("" + ioexception.getClass().getName() + ": " + ioexception.getMessage());
+            Config.error(ioexception.getClass().getName() + ": " + ioexception.getMessage());
             return null;
         }
         catch (JsonParseException jsonparseexception)
         {
-            Config.error("" + jsonparseexception.getClass().getName() + ": " + jsonparseexception.getMessage());
+            Config.error(jsonparseexception.getClass().getName() + ": " + jsonparseexception.getMessage());
             return null;
         }
         catch (Exception exception)
@@ -278,7 +278,7 @@ public class CustomEntityModels
                 {
                     ModelRenderer[] amodelrenderer = modelAdapter.getModelRenderers(model);
                     Set<ModelRenderer> set = Collections.<ModelRenderer>newSetFromMap(new IdentityHashMap());
-                    set.addAll(Arrays.<ModelRenderer>asList(amodelrenderer));
+                    set.addAll(Arrays.asList(amodelrenderer));
                     List<ModelRenderer> list = modelrenderer.childModels;
                     Iterator iterator = list.iterator();
 

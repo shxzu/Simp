@@ -34,7 +34,7 @@ public class CommandFill extends CommandBase
     {
         if (args.length < 7)
         {
-            throw new WrongUsageException("commands.fill.usage", new Object[0]);
+            throw new WrongUsageException("commands.fill.usage");
         }
         else
         {
@@ -55,7 +55,7 @@ public class CommandFill extends CommandBase
 
             if (j > 32768)
             {
-                throw new CommandException("commands.fill.tooManyBlocks", new Object[] {Integer.valueOf(j), Integer.valueOf(32768)});
+                throw new CommandException("commands.fill.tooManyBlocks", Integer.valueOf(j), Integer.valueOf(32768));
             }
             else if (blockpos2.getY() >= 0 && blockpos3.getY() < 256)
             {
@@ -67,7 +67,7 @@ public class CommandFill extends CommandBase
                     {
                         if (!world.isBlockLoaded(new BlockPos(l, blockpos3.getY() - blockpos2.getY(), k)))
                         {
-                            throw new CommandException("commands.fill.outOfWorld", new Object[0]);
+                            throw new CommandException("commands.fill.outOfWorld");
                         }
                     }
                 }
@@ -86,11 +86,11 @@ public class CommandFill extends CommandBase
                     }
                     catch (NBTException nbtexception)
                     {
-                        throw new CommandException("commands.fill.tagError", new Object[] {nbtexception.getMessage()});
+                        throw new CommandException("commands.fill.tagError", nbtexception.getMessage());
                     }
                 }
 
-                List<BlockPos> list = Lists.<BlockPos>newArrayList();
+                List<BlockPos> list = Lists.newArrayList();
                 j = 0;
 
                 for (int i1 = blockpos2.getZ(); i1 <= blockpos3.getZ(); ++i1)
@@ -196,23 +196,23 @@ public class CommandFill extends CommandBase
 
                 if (j <= 0)
                 {
-                    throw new CommandException("commands.fill.failed", new Object[0]);
+                    throw new CommandException("commands.fill.failed");
                 }
                 else
                 {
                     sender.setCommandStat(CommandResultStats.Type.AFFECTED_BLOCKS, j);
-                    notifyOperators(sender, this, "commands.fill.success", new Object[] {Integer.valueOf(j)});
+                    notifyOperators(sender, this, "commands.fill.success", Integer.valueOf(j));
                 }
             }
             else
             {
-                throw new CommandException("commands.fill.outOfWorld", new Object[0]);
+                throw new CommandException("commands.fill.outOfWorld");
             }
         }
     }
 
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length > 3 && args.length <= 6 ? func_175771_a(args, 3, pos) : (args.length == 7 ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : (args.length == 9 ? getListOfStringsMatchingLastWord(args, new String[] {"replace", "destroy", "keep", "hollow", "outline"}): (args.length == 10 && "replace".equals(args[8]) ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : null))));
+        return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length > 3 && args.length <= 6 ? func_175771_a(args, 3, pos) : (args.length == 7 ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : (args.length == 9 ? getListOfStringsMatchingLastWord(args, "replace", "destroy", "keep", "hollow", "outline"): (args.length == 10 && "replace".equals(args[8]) ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : null))));
     }
 }

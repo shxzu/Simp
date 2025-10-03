@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 
 public class VillageSiege
 {
-    private World worldObj;
+    private final World worldObj;
     private boolean field_75535_b;
     private int field_75536_c = -1;
     private int field_75533_d;
@@ -171,7 +171,7 @@ public class VillageSiege
             try
             {
                 entityzombie = new EntityZombie(this.worldObj);
-                entityzombie.onInitialSpawn(this.worldObj.getDifficultyForLocation(new BlockPos(entityzombie)), (IEntityLivingData)null);
+                entityzombie.onInitialSpawn(this.worldObj.getDifficultyForLocation(new BlockPos(entityzombie)), null);
                 entityzombie.setVillager(false);
             }
             catch (Exception exception)
@@ -196,7 +196,7 @@ public class VillageSiege
 
             if (this.theVillage.func_179866_a(blockpos) && SpawnerAnimals.canCreatureTypeSpawnAtLocation(EntityLiving.SpawnPlacementType.ON_GROUND, this.worldObj, blockpos))
             {
-                return new Vec3((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ());
+                return new Vec3(blockpos.getX(), blockpos.getY(), blockpos.getZ());
             }
         }
 

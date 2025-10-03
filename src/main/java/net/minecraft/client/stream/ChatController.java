@@ -1,11 +1,9 @@
 package net.minecraft.client.stream;
 
 import com.google.common.collect.Lists;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+
+import java.util.*;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import tv.twitch.AuthToken;
@@ -80,7 +78,7 @@ public class ChatController
                 if (ErrorCode.failed(errorcode))
                 {
                     String s = ErrorCode.getString(errorcode);
-                    ChatController.this.func_152995_h(String.format("Error shutting down the Twitch sdk: %s", new Object[] {s}));
+                    ChatController.this.func_152995_h(String.format("Error shutting down the Twitch sdk: %s", s));
                 }
 
                 ChatController.this.func_175985_a(ChatController.ChatState.Uninitialized);
@@ -88,7 +86,7 @@ public class ChatController
             else
             {
                 ChatController.this.func_175985_a(ChatController.ChatState.Initialized);
-                ChatController.this.func_152995_h(String.format("Error shutting down Twith chat: %s", new Object[] {p_chatShutdownCallback_1_}));
+                ChatController.this.func_152995_h(String.format("Error shutting down Twith chat: %s", p_chatShutdownCallback_1_));
             }
 
             try
@@ -145,7 +143,7 @@ public class ChatController
         }
         else
         {
-            ChatController.ChatChannelListener chatcontroller$chatchannellistener = (ChatController.ChatChannelListener)this.field_175998_i.get(p_175990_1_);
+            ChatController.ChatChannelListener chatcontroller$chatchannellistener = this.field_175998_i.get(p_175990_1_);
             return chatcontroller$chatchannellistener.func_176040_a() == ChatController.EnumChannelState.Connected;
         }
     }
@@ -158,7 +156,7 @@ public class ChatController
         }
         else
         {
-            ChatController.ChatChannelListener chatcontroller$chatchannellistener = (ChatController.ChatChannelListener)this.field_175998_i.get(p_175989_1_);
+            ChatController.ChatChannelListener chatcontroller$chatchannellistener = this.field_175998_i.get(p_175989_1_);
             return chatcontroller$chatchannellistener.func_176040_a();
         }
     }
@@ -184,13 +182,13 @@ public class ChatController
         else
         {
             this.func_175985_a(ChatController.ChatState.Initializing);
-            ErrorCode errorcode = this.field_175992_e.initialize(this.field_153006_d, (String)null);
+            ErrorCode errorcode = this.field_175992_e.initialize(this.field_153006_d, null);
 
             if (ErrorCode.failed(errorcode))
             {
                 this.func_175985_a(ChatController.ChatState.Uninitialized);
                 String s1 = ErrorCode.getString(errorcode);
-                this.func_152995_h(String.format("Error initializing Twitch sdk: %s", new Object[] {s1}));
+                this.func_152995_h(String.format("Error initializing Twitch sdk: %s", s1));
                 return false;
             }
             else
@@ -219,7 +217,7 @@ public class ChatController
                     this.field_175992_e.shutdown();
                     this.func_175985_a(ChatController.ChatState.Uninitialized);
                     String s = ErrorCode.getString(errorcode);
-                    this.func_152995_h(String.format("Error initializing Twitch chat: %s", new Object[] {s}));
+                    this.func_152995_h(String.format("Error initializing Twitch chat: %s", s));
                     return false;
                 }
                 else
@@ -279,7 +277,7 @@ public class ChatController
         }
         else
         {
-            ChatController.ChatChannelListener chatcontroller$chatchannellistener = (ChatController.ChatChannelListener)this.field_175998_i.get(p_175991_1_);
+            ChatController.ChatChannelListener chatcontroller$chatchannellistener = this.field_175998_i.get(p_175991_1_);
             return chatcontroller$chatchannellistener.func_176034_g();
         }
     }
@@ -297,7 +295,7 @@ public class ChatController
             if (ErrorCode.failed(errorcode))
             {
                 String s = ErrorCode.getString(errorcode);
-                this.func_152995_h(String.format("Error shutting down chat: %s", new Object[] {s}));
+                this.func_152995_h(String.format("Error shutting down chat: %s", s));
                 return false;
             }
             else
@@ -326,7 +324,6 @@ public class ChatController
                     }
                     catch (InterruptedException var2)
                     {
-                        ;
                     }
                 }
             }
@@ -342,7 +339,7 @@ public class ChatController
             if (ErrorCode.failed(errorcode))
             {
                 String s = ErrorCode.getString(errorcode);
-                this.func_152995_h(String.format("Error flushing chat events: %s", new Object[] {s}));
+                this.func_152995_h(String.format("Error flushing chat events: %s", s));
             }
         }
     }
@@ -360,7 +357,7 @@ public class ChatController
         }
         else
         {
-            ChatController.ChatChannelListener chatcontroller$chatchannellistener = (ChatController.ChatChannelListener)this.field_175998_i.get(p_175986_1_);
+            ChatController.ChatChannelListener chatcontroller$chatchannellistener = this.field_175998_i.get(p_175986_1_);
             return chatcontroller$chatchannellistener.func_176037_b(p_175986_2_);
         }
     }
@@ -396,7 +393,7 @@ public class ChatController
                 if (ErrorCode.failed(errorcode))
                 {
                     String s = ErrorCode.getString(errorcode);
-                    this.func_152995_h(String.format("Error trying to download emoticon data: %s", new Object[] {s}));
+                    this.func_152995_h(String.format("Error trying to download emoticon data: %s", s));
                 }
             }
         }
@@ -469,7 +466,7 @@ public class ChatController
         protected String field_176048_a = null;
         protected boolean field_176046_b = false;
         protected ChatController.EnumChannelState field_176047_c = ChatController.EnumChannelState.Created;
-        protected List<ChatUserInfo> field_176044_d = Lists.<ChatUserInfo>newArrayList();
+        protected List<ChatUserInfo> field_176044_d = Lists.newArrayList();
         protected LinkedList<ChatRawMessage> field_176045_e = new LinkedList();
         protected LinkedList<ChatTokenizedMessage> field_176042_f = new LinkedList();
         protected ChatBadgeData field_176043_g = null;
@@ -501,7 +498,7 @@ public class ChatController
             if (ErrorCode.failed(errorcode))
             {
                 String s = ErrorCode.getString(errorcode);
-                ChatController.this.func_152995_h(String.format("Error connecting: %s", new Object[] {s}));
+                ChatController.this.func_152995_h(String.format("Error connecting: %s", s));
                 this.func_176036_d(this.field_176048_a);
                 return false;
             }
@@ -524,7 +521,7 @@ public class ChatController
                     if (ErrorCode.failed(errorcode))
                     {
                         String s = ErrorCode.getString(errorcode);
-                        ChatController.this.func_152995_h(String.format("Error disconnecting: %s", new Object[] {s}));
+                        ChatController.this.func_152995_h(String.format("Error disconnecting: %s", s));
                         return false;
                     }
 
@@ -562,7 +559,7 @@ public class ChatController
 
                     while (listiterator.hasNext())
                     {
-                        ChatRawMessage chatrawmessage = (ChatRawMessage)listiterator.next();
+                        ChatRawMessage chatrawmessage = listiterator.next();
 
                         if (chatrawmessage.userName.equals(p_176032_1_))
                         {
@@ -577,7 +574,7 @@ public class ChatController
 
                     while (listiterator1.hasNext())
                     {
-                        ChatTokenizedMessage chattokenizedmessage = (ChatTokenizedMessage)listiterator1.next();
+                        ChatTokenizedMessage chattokenizedmessage = listiterator1.next();
 
                         if (chattokenizedmessage.displayName.equals(p_176032_1_))
                         {
@@ -613,7 +610,7 @@ public class ChatController
                 if (ErrorCode.failed(errorcode))
                 {
                     String s = ErrorCode.getString(errorcode);
-                    ChatController.this.func_152995_h(String.format("Error sending chat message: %s", new Object[] {s}));
+                    ChatController.this.func_152995_h(String.format("Error sending chat message: %s", s));
                     return false;
                 }
                 else
@@ -634,7 +631,7 @@ public class ChatController
                     if (ErrorCode.failed(errorcode))
                     {
                         String s = ErrorCode.getString(errorcode);
-                        ChatController.this.func_152995_h(String.format("Error trying to download badge data: %s", new Object[] {s}));
+                        ChatController.this.func_152995_h(String.format("Error trying to download badge data: %s", s));
                     }
                 }
             }
@@ -784,10 +781,7 @@ public class ChatController
                 this.field_176044_d.add(p_chatChannelUserChangeCallback_4_[k]);
             }
 
-            for (int l = 0; l < p_chatChannelUserChangeCallback_2_.length; ++l)
-            {
-                this.field_176044_d.add(p_chatChannelUserChangeCallback_2_[l]);
-            }
+            Collections.addAll(this.field_176044_d, p_chatChannelUserChangeCallback_2_);
 
             try
             {
@@ -895,27 +889,27 @@ public class ChatController
         void func_176020_d(String p_176020_1_);
     }
 
-    public static enum ChatState
+    public enum ChatState
     {
         Uninitialized,
         Initializing,
         Initialized,
-        ShuttingDown;
+        ShuttingDown
     }
 
-    public static enum EnumChannelState
+    public enum EnumChannelState
     {
         Created,
         Connecting,
         Connected,
         Disconnecting,
-        Disconnected;
+        Disconnected
     }
 
-    public static enum EnumEmoticonMode
+    public enum EnumEmoticonMode
     {
         None,
         Url,
-        TextureAtlas;
+        TextureAtlas
     }
 }

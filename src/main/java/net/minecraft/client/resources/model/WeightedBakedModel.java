@@ -20,7 +20,7 @@ public class WeightedBakedModel implements IBakedModel
     {
         this.models = p_i46073_1_;
         this.totalWeight = WeightedRandom.getTotalWeight(p_i46073_1_);
-        this.baseModel = ((WeightedBakedModel.MyWeighedRandomItem)p_i46073_1_.get(0)).model;
+        this.baseModel = p_i46073_1_.get(0).model;
     }
 
     public List<BakedQuad> getFaceQuads(EnumFacing facing)
@@ -60,12 +60,12 @@ public class WeightedBakedModel implements IBakedModel
 
     public IBakedModel getAlternativeModel(long p_177564_1_)
     {
-        return ((WeightedBakedModel.MyWeighedRandomItem)WeightedRandom.getRandomItem(this.models, Math.abs((int)p_177564_1_ >> 16) % this.totalWeight)).model;
+        return WeightedRandom.getRandomItem(this.models, Math.abs((int)p_177564_1_ >> 16) % this.totalWeight).model;
     }
 
     public static class Builder
     {
-        private List<WeightedBakedModel.MyWeighedRandomItem> listItems = Lists.<WeightedBakedModel.MyWeighedRandomItem>newArrayList();
+        private final List<WeightedBakedModel.MyWeighedRandomItem> listItems = Lists.newArrayList();
 
         public WeightedBakedModel.Builder add(IBakedModel p_177677_1_, int p_177677_2_)
         {
@@ -81,7 +81,7 @@ public class WeightedBakedModel implements IBakedModel
 
         public IBakedModel first()
         {
-            return ((WeightedBakedModel.MyWeighedRandomItem)this.listItems.get(0)).model;
+            return this.listItems.get(0).model;
         }
     }
 

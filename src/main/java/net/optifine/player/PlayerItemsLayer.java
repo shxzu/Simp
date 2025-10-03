@@ -30,9 +30,8 @@ public class PlayerItemsLayer implements LayerRenderer
         {
             if (!entityLiving.isInvisible())
             {
-                if (entityLiving instanceof AbstractClientPlayer)
+                if (entityLiving instanceof AbstractClientPlayer abstractclientplayer)
                 {
-                    AbstractClientPlayer abstractclientplayer = (AbstractClientPlayer)entityLiving;
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     GlStateManager.disableRescaleNormal();
                     GlStateManager.enableCull();
@@ -58,9 +57,8 @@ public class PlayerItemsLayer implements LayerRenderer
         {
             Object object1 = renderPlayerMap.get(object);
 
-            if (object1 instanceof RenderPlayer)
+            if (object1 instanceof RenderPlayer renderplayer)
             {
-                RenderPlayer renderplayer = (RenderPlayer)object1;
                 renderplayer.addLayer(new PlayerItemsLayer(renderplayer));
                 flag = true;
             }

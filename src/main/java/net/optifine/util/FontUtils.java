@@ -39,7 +39,6 @@ public class FontUtils
             }
             catch (FileNotFoundException var7)
             {
-                ;
             }
             catch (IOException ioexception)
             {

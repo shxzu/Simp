@@ -27,7 +27,7 @@ public class S23PacketBlockChange implements Packet<INetHandlerPlayClient>
     public void readPacketData(PacketBuffer buf) throws IOException
     {
         this.blockPosition = buf.readBlockPos();
-        this.blockState = (IBlockState)Block.BLOCK_STATE_IDS.getByValue(buf.readVarIntFromBuffer());
+        this.blockState = Block.BLOCK_STATE_IDS.getByValue(buf.readVarIntFromBuffer());
     }
 
     public void writePacketData(PacketBuffer buf) throws IOException

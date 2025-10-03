@@ -11,7 +11,7 @@ import net.minecraft.util.ResourceLocation;
 public class RenderGiantZombie extends RenderLiving<EntityGiantZombie>
 {
     private static final ResourceLocation zombieTextures = new ResourceLocation("textures/entity/zombie/zombie.png");
-    private float scale;
+    private final float scale;
 
     public RenderGiantZombie(RenderManager renderManagerIn, ModelBase modelBaseIn, float shadowSizeIn, float scaleIn)
     {

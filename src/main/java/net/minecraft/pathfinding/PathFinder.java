@@ -7,9 +7,9 @@ import net.minecraft.world.pathfinder.NodeProcessor;
 
 public class PathFinder
 {
-    private Path path = new Path();
-    private PathPoint[] pathOptions = new PathPoint[32];
-    private NodeProcessor nodeProcessor;
+    private final Path path = new Path();
+    private final PathPoint[] pathOptions = new PathPoint[32];
+    private final NodeProcessor nodeProcessor;
 
     public PathFinder(NodeProcessor nodeProcessorIn)
     {
@@ -23,7 +23,7 @@ public class PathFinder
 
     public PathEntity createEntityPathTo(IBlockAccess blockaccess, Entity entityIn, BlockPos targetPos, float dist)
     {
-        return this.createEntityPathTo(blockaccess, entityIn, (double)((float)targetPos.getX() + 0.5F), (double)((float)targetPos.getY() + 0.5F), (double)((float)targetPos.getZ() + 0.5F), dist);
+        return this.createEntityPathTo(blockaccess, entityIn, (float)targetPos.getX() + 0.5F, (float)targetPos.getY() + 0.5F, (float)targetPos.getZ() + 0.5F, dist);
     }
 
     private PathEntity createEntityPathTo(IBlockAccess blockaccess, Entity entityIn, double x, double y, double z, float distance)

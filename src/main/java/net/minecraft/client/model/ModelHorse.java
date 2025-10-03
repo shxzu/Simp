@@ -8,45 +8,45 @@ import net.minecraft.util.MathHelper;
 
 public class ModelHorse extends ModelBase
 {
-    private ModelRenderer head;
-    private ModelRenderer field_178711_b;
-    private ModelRenderer field_178712_c;
-    private ModelRenderer horseLeftEar;
-    private ModelRenderer horseRightEar;
-    private ModelRenderer muleLeftEar;
-    private ModelRenderer muleRightEar;
-    private ModelRenderer neck;
-    private ModelRenderer horseFaceRopes;
-    private ModelRenderer mane;
-    private ModelRenderer body;
-    private ModelRenderer tailBase;
-    private ModelRenderer tailMiddle;
-    private ModelRenderer tailTip;
-    private ModelRenderer backLeftLeg;
-    private ModelRenderer backLeftShin;
-    private ModelRenderer backLeftHoof;
-    private ModelRenderer backRightLeg;
-    private ModelRenderer backRightShin;
-    private ModelRenderer backRightHoof;
-    private ModelRenderer frontLeftLeg;
-    private ModelRenderer frontLeftShin;
-    private ModelRenderer frontLeftHoof;
-    private ModelRenderer frontRightLeg;
-    private ModelRenderer frontRightShin;
-    private ModelRenderer frontRightHoof;
-    private ModelRenderer muleLeftChest;
-    private ModelRenderer muleRightChest;
-    private ModelRenderer horseSaddleBottom;
-    private ModelRenderer horseSaddleFront;
-    private ModelRenderer horseSaddleBack;
-    private ModelRenderer horseLeftSaddleRope;
-    private ModelRenderer horseLeftSaddleMetal;
-    private ModelRenderer horseRightSaddleRope;
-    private ModelRenderer horseRightSaddleMetal;
-    private ModelRenderer horseLeftFaceMetal;
-    private ModelRenderer horseRightFaceMetal;
-    private ModelRenderer horseLeftRein;
-    private ModelRenderer horseRightRein;
+    private final ModelRenderer head;
+    private final ModelRenderer field_178711_b;
+    private final ModelRenderer field_178712_c;
+    private final ModelRenderer horseLeftEar;
+    private final ModelRenderer horseRightEar;
+    private final ModelRenderer muleLeftEar;
+    private final ModelRenderer muleRightEar;
+    private final ModelRenderer neck;
+    private final ModelRenderer horseFaceRopes;
+    private final ModelRenderer mane;
+    private final ModelRenderer body;
+    private final ModelRenderer tailBase;
+    private final ModelRenderer tailMiddle;
+    private final ModelRenderer tailTip;
+    private final ModelRenderer backLeftLeg;
+    private final ModelRenderer backLeftShin;
+    private final ModelRenderer backLeftHoof;
+    private final ModelRenderer backRightLeg;
+    private final ModelRenderer backRightShin;
+    private final ModelRenderer backRightHoof;
+    private final ModelRenderer frontLeftLeg;
+    private final ModelRenderer frontLeftShin;
+    private final ModelRenderer frontLeftHoof;
+    private final ModelRenderer frontRightLeg;
+    private final ModelRenderer frontRightShin;
+    private final ModelRenderer frontRightHoof;
+    private final ModelRenderer muleLeftChest;
+    private final ModelRenderer muleRightChest;
+    private final ModelRenderer horseSaddleBottom;
+    private final ModelRenderer horseSaddleFront;
+    private final ModelRenderer horseSaddleBack;
+    private final ModelRenderer horseLeftSaddleRope;
+    private final ModelRenderer horseLeftSaddleMetal;
+    private final ModelRenderer horseRightSaddleRope;
+    private final ModelRenderer horseRightSaddleMetal;
+    private final ModelRenderer horseLeftFaceMetal;
+    private final ModelRenderer horseRightFaceMetal;
+    private final ModelRenderer horseLeftRein;
+    private final ModelRenderer horseRightRein;
 
     public ModelHorse()
     {
@@ -312,7 +312,6 @@ public class ModelHorse extends ModelBase
 
         for (f = p_110683_2_ - p_110683_1_; f < -180.0F; f += 360.0F)
         {
-            ;
         }
 
         while (f >= 180.0F)
@@ -389,8 +388,8 @@ public class ModelHorse extends ModelBase
         this.muleLeftEar.rotationPointZ = this.head.rotationPointZ;
         this.muleRightEar.rotationPointZ = this.head.rotationPointZ;
         this.neck.rotationPointZ = this.head.rotationPointZ;
-        this.field_178711_b.rotationPointZ = 0.02F - f8 * 1.0F;
-        this.field_178712_c.rotationPointZ = 0.0F + f8 * 1.0F;
+        this.field_178711_b.rotationPointZ = 0.02F - f8;
+        this.field_178712_c.rotationPointZ = 0.0F + f8;
         this.mane.rotationPointZ = this.head.rotationPointZ;
         this.horseLeftEar.rotateAngleX = this.head.rotateAngleX;
         this.horseRightEar.rotateAngleX = this.head.rotateAngleX;

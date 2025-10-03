@@ -25,7 +25,7 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
     public float bookRotation;
     public float bookRotationPrev;
     public float field_145924_q;
-    private static Random rand = new Random();
+    private static final Random rand = new Random();
     private String customName;
 
     public void writeToNBT(NBTTagCompound compound)
@@ -52,7 +52,7 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
     {
         this.bookSpreadPrev = this.bookSpread;
         this.bookRotationPrev = this.bookRotation;
-        EntityPlayer entityplayer = this.worldObj.getClosestPlayer((double)((float)this.pos.getX() + 0.5F), (double)((float)this.pos.getY() + 0.5F), (double)((float)this.pos.getZ() + 0.5F), 3.0D);
+        EntityPlayer entityplayer = this.worldObj.getClosestPlayer((float)this.pos.getX() + 0.5F, (float)this.pos.getY() + 0.5F, (float)this.pos.getZ() + 0.5F, 3.0D);
 
         if (entityplayer != null)
         {
@@ -106,7 +106,6 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
 
         for (f2 = this.field_145924_q - this.bookRotation; f2 >= (float)Math.PI; f2 -= ((float)Math.PI * 2F))
         {
-            ;
         }
 
         while (f2 < -(float)Math.PI)
@@ -142,7 +141,7 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
 
     public IChatComponent getDisplayName()
     {
-        return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
+        return this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName());
     }
 
     public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn)

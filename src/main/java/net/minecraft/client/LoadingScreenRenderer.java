@@ -17,12 +17,12 @@ import net.optifine.reflect.Reflector;
 public class LoadingScreenRenderer implements IProgressUpdate
 {
     private String message = "";
-    private Minecraft mc;
+    private final Minecraft mc;
     private String currentlyDisplayedText = "";
     private long systemTime = Minecraft.getSystemTime();
     private boolean loadingSuccess;
-    private ScaledResolution scaledResolution;
-    private Framebuffer framebuffer;
+    private final ScaledResolution scaledResolution;
+    private final Framebuffer framebuffer;
 
     public LoadingScreenRenderer(Minecraft mcIn)
     {
@@ -64,7 +64,7 @@ public class LoadingScreenRenderer implements IProgressUpdate
             if (OpenGlHelper.isFramebufferEnabled())
             {
                 int i = this.scaledResolution.getScaleFactor();
-                GlStateManager.ortho(0.0D, (double)(this.scaledResolution.getScaledWidth() * i), (double)(this.scaledResolution.getScaledHeight() * i), 0.0D, 100.0D, 300.0D);
+                GlStateManager.ortho(0.0D, this.scaledResolution.getScaledWidth() * i, this.scaledResolution.getScaledHeight() * i, 0.0D, 100.0D, 300.0D);
             }
             else
             {
@@ -141,16 +141,6 @@ public class LoadingScreenRenderer implements IProgressUpdate
 
                 boolean flag = true;
 
-                if (Reflector.FMLClientHandler_handleLoadingScreen.exists())
-                {
-                    Object object = Reflector.call(Reflector.FMLClientHandler_instance, new Object[0]);
-
-                    if (object != null)
-                    {
-                        flag = !Reflector.callBoolean(object, Reflector.FMLClientHandler_handleLoadingScreen, new Object[] {scaledresolution});
-                    }
-                }
-
                 if (flag)
                 {
                     Tessellator tessellator = Tessellator.getInstance();
@@ -166,9 +156,9 @@ public class LoadingScreenRenderer implements IProgressUpdate
                         this.mc.getTextureManager().bindTexture(Gui.optionsBackground);
                         float f = 32.0F;
                         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-                        worldrenderer.pos(0.0D, (double)l, 0.0D).tex(0.0D, (double)((float)l / f)).color(64, 64, 64, 255).endVertex();
-                        worldrenderer.pos((double)k, (double)l, 0.0D).tex((double)((float)k / f), (double)((float)l / f)).color(64, 64, 64, 255).endVertex();
-                        worldrenderer.pos((double)k, 0.0D, 0.0D).tex((double)((float)k / f), 0.0D).color(64, 64, 64, 255).endVertex();
+                        worldrenderer.pos(0.0D, l, 0.0D).tex(0.0D, (float)l / f).color(64, 64, 64, 255).endVertex();
+                        worldrenderer.pos(k, l, 0.0D).tex((float)k / f, (float)l / f).color(64, 64, 64, 255).endVertex();
+                        worldrenderer.pos(k, 0.0D, 0.0D).tex((float)k / f, 0.0D).color(64, 64, 64, 255).endVertex();
                         worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(0.0D, 0.0D).color(64, 64, 64, 255).endVertex();
                         tessellator.draw();
                     }
@@ -181,22 +171,22 @@ public class LoadingScreenRenderer implements IProgressUpdate
                         int k1 = l / 2 + 16;
                         GlStateManager.disableTexture2D();
                         worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-                        worldrenderer.pos((double)j1, (double)k1, 0.0D).color(128, 128, 128, 255).endVertex();
-                        worldrenderer.pos((double)j1, (double)(k1 + i1), 0.0D).color(128, 128, 128, 255).endVertex();
-                        worldrenderer.pos((double)(j1 + l1), (double)(k1 + i1), 0.0D).color(128, 128, 128, 255).endVertex();
-                        worldrenderer.pos((double)(j1 + l1), (double)k1, 0.0D).color(128, 128, 128, 255).endVertex();
-                        worldrenderer.pos((double)j1, (double)k1, 0.0D).color(128, 255, 128, 255).endVertex();
-                        worldrenderer.pos((double)j1, (double)(k1 + i1), 0.0D).color(128, 255, 128, 255).endVertex();
-                        worldrenderer.pos((double)(j1 + progress), (double)(k1 + i1), 0.0D).color(128, 255, 128, 255).endVertex();
-                        worldrenderer.pos((double)(j1 + progress), (double)k1, 0.0D).color(128, 255, 128, 255).endVertex();
+                        worldrenderer.pos(j1, k1, 0.0D).color(128, 128, 128, 255).endVertex();
+                        worldrenderer.pos(j1, k1 + i1, 0.0D).color(128, 128, 128, 255).endVertex();
+                        worldrenderer.pos(j1 + l1, k1 + i1, 0.0D).color(128, 128, 128, 255).endVertex();
+                        worldrenderer.pos(j1 + l1, k1, 0.0D).color(128, 128, 128, 255).endVertex();
+                        worldrenderer.pos(j1, k1, 0.0D).color(128, 255, 128, 255).endVertex();
+                        worldrenderer.pos(j1, k1 + i1, 0.0D).color(128, 255, 128, 255).endVertex();
+                        worldrenderer.pos(j1 + progress, k1 + i1, 0.0D).color(128, 255, 128, 255).endVertex();
+                        worldrenderer.pos(j1 + progress, k1, 0.0D).color(128, 255, 128, 255).endVertex();
                         tessellator.draw();
                         GlStateManager.enableTexture2D();
                     }
 
                     GlStateManager.enableBlend();
                     GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-                    this.mc.minecraftFontRendererObj.drawStringWithShadow(this.currentlyDisplayedText, (float)((k - this.mc.minecraftFontRendererObj.getStringWidth(this.currentlyDisplayedText)) / 2), (float)(l / 2 - 4 - 16), 16777215);
-                    this.mc.minecraftFontRendererObj.drawStringWithShadow(this.message, (float)((k - this.mc.minecraftFontRendererObj.getStringWidth(this.message)) / 2), (float)(l / 2 - 4 + 8), 16777215);
+                    this.mc.fontRendererObj.drawStringWithShadow(this.currentlyDisplayedText, (float)((k - this.mc.fontRendererObj.getStringWidth(this.currentlyDisplayedText)) / 2), (float)(l / 2 - 4 - 16), 16777215);
+                    this.mc.fontRendererObj.drawStringWithShadow(this.message, (float)((k - this.mc.fontRendererObj.getStringWidth(this.message)) / 2), (float)(l / 2 - 4 + 8), 16777215);
                 }
 
                 this.framebuffer.unbindFramebuffer();
@@ -214,7 +204,6 @@ public class LoadingScreenRenderer implements IProgressUpdate
                 }
                 catch (Exception var16)
                 {
-                    ;
                 }
             }
         }

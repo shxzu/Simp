@@ -37,13 +37,12 @@ public class ChunkCoordIntPair
         {
             return true;
         }
-        else if (!(p_equals_1_ instanceof ChunkCoordIntPair))
+        else if (!(p_equals_1_ instanceof ChunkCoordIntPair chunkcoordintpair))
         {
             return false;
         }
         else
         {
-            ChunkCoordIntPair chunkcoordintpair = (ChunkCoordIntPair)p_equals_1_;
             return this.chunkXPos == chunkcoordintpair.chunkXPos && this.chunkZPos == chunkcoordintpair.chunkZPos;
         }
     }

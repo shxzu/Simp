@@ -12,7 +12,7 @@ import net.minecraft.src.Config;
 
 public class ExpressionParser
 {
-    private IExpressionResolver expressionResolver;
+    private final IExpressionResolver expressionResolver;
 
     public ExpressionParser(IExpressionResolver expressionResolver)
     {
@@ -85,7 +85,7 @@ public class ExpressionParser
 
             while (true)
             {
-                Token token = (Token)deque.poll();
+                Token token = deque.poll();
 
                 if (token == null)
                 {
@@ -127,7 +127,7 @@ public class ExpressionParser
         }
         else if (listExpr.size() == 1)
         {
-            return (IExpression)listExpr.get(0);
+            return listExpr.get(0);
         }
         else
         {
@@ -149,7 +149,7 @@ public class ExpressionParser
 
                 if (listExpr.size() == 1 && listFunc.size() == 0)
                 {
-                    return (IExpression)listExpr.get(0);
+                    return listExpr.get(0);
                 }
                 else
                 {
@@ -167,13 +167,13 @@ public class ExpressionParser
     {
         for (int i = 0; i < listFuncs.size(); ++i)
         {
-            FunctionType functiontype = (FunctionType)listFuncs.get(i);
+            FunctionType functiontype = listFuncs.get(i);
 
             if (functiontype.getPrecedence() == precedence)
             {
                 listFuncs.remove(i);
-                IExpression iexpression = (IExpression)listExpr.remove(i);
-                IExpression iexpression1 = (IExpression)listExpr.remove(i);
+                IExpression iexpression = listExpr.remove(i);
+                IExpression iexpression1 = listExpr.remove(i);
                 IExpression iexpression2 = makeFunction(functiontype, new IExpression[] {iexpression, iexpression1});
                 listExpr.add(i, iexpression2);
                 --i;
@@ -183,7 +183,7 @@ public class ExpressionParser
 
     private IExpression parseExpression(Deque<Token> deque) throws ParseException
     {
-        Token token = (Token)deque.poll();
+        Token token = deque.poll();
         checkNull(token, "Missing expression");
 
         switch (token.getType())
@@ -244,7 +244,7 @@ public class ExpressionParser
 
     private FunctionType getFunctionType(Token token, Deque<Token> deque) throws ParseException
     {
-        Token token1 = (Token)deque.peek();
+        Token token1 = deque.peek();
 
         if (token1 != null && token1.getType() == TokenType.BRACKET_OPEN)
         {
@@ -275,7 +275,7 @@ public class ExpressionParser
     {
         if (type.getParameterCount(new IExpression[0]) == 0)
         {
-            Token token = (Token)deque.peek();
+            Token token = deque.peek();
 
             if (token == null || token.getType() != TokenType.BRACKET_OPEN)
             {
@@ -283,7 +283,7 @@ public class ExpressionParser
             }
         }
 
-        Token token1 = (Token)deque.poll();
+        Token token1 = deque.poll();
         Deque<Token> deque2 = getGroup(deque, TokenType.BRACKET_CLOSE, true);
         IExpression[] aiexpression = this.parseExpressions(deque2);
         return makeFunction(type, aiexpression);
@@ -300,7 +300,7 @@ public class ExpressionParser
 
             if (iexpression == null)
             {
-                IExpression[] aiexpression = (IExpression[])((IExpression[])list.toArray(new IExpression[list.size()]));
+                IExpression[] aiexpression = list.toArray(new IExpression[list.size()]);
                 return aiexpression;
             }
 

@@ -5,7 +5,7 @@ import java.util.Deque;
 
 public class ProgramStack
 {
-    private Deque<Program> stack = new ArrayDeque();
+    private final Deque<Program> stack = new ArrayDeque();
 
     public void push(Program p)
     {
@@ -25,7 +25,7 @@ public class ProgramStack
         }
         else
         {
-            Program program = (Program)this.stack.pollLast();
+            Program program = this.stack.pollLast();
             return program;
         }
     }

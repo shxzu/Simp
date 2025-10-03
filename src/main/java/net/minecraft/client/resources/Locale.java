@@ -17,7 +17,7 @@ public class Locale
 {
     private static final Splitter splitter = Splitter.on('=').limit(2);
     private static final Pattern pattern = Pattern.compile("%(\\d+\\$)?[\\d\\.]*[df]");
-    Map<String, String> properties = Maps.<String, String>newHashMap();
+    Map<String, String> properties = Maps.newHashMap();
     private boolean unicode;
 
     public synchronized void loadLocaleDataFiles(IResourceManager resourceManager, List<String> languageList)
@@ -26,7 +26,7 @@ public class Locale
 
         for (String s : languageList)
         {
-            String s1 = String.format("lang/%s.lang", new Object[] {s});
+            String s1 = String.format("lang/%s.lang", s);
 
             for (String s2 : resourceManager.getResourceDomains())
             {
@@ -36,7 +36,6 @@ public class Locale
                 }
                 catch (IOException var9)
                 {
-                    ;
                 }
             }
         }
@@ -96,7 +95,7 @@ public class Locale
         {
             if (!s.isEmpty() && s.charAt(0) != 35)
             {
-                String[] astring = (String[])Iterables.toArray(splitter.split(s), String.class);
+                String[] astring = Iterables.toArray(splitter.split(s), String.class);
 
                 if (astring != null && astring.length == 2)
                 {
@@ -110,7 +109,7 @@ public class Locale
 
     private String translateKeyPrivate(String translateKey)
     {
-        String s = (String)this.properties.get(translateKey);
+        String s = this.properties.get(translateKey);
         return s == null ? translateKey : s;
     }
 

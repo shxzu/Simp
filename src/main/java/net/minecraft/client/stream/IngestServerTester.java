@@ -103,7 +103,7 @@ public class IngestServerTester
         {
             if (ErrorCode.failed(p_stopCallback_1_))
             {
-                System.out.println("IngestTester.stopCallback failed to stop - " + IngestServerTester.this.field_153059_q.serverName + ": " + p_stopCallback_1_.toString());
+                System.out.println("IngestTester.stopCallback failed to stop - " + IngestServerTester.this.field_153059_q.serverName + ": " + p_stopCallback_1_);
             }
 
             IngestServerTester.this.field_176007_z = false;
@@ -202,7 +202,7 @@ public class IngestServerTester
             this.audioParameters.enableMicCapture = false;
             this.audioParameters.enablePlaybackCapture = false;
             this.audioParameters.enablePassthroughAudio = false;
-            this.field_153055_m = Lists.<FrameBuffer>newArrayList();
+            this.field_153055_m = Lists.newArrayList();
             int i = 3;
 
             for (int j = 0; j < i; ++j)
@@ -341,7 +341,7 @@ public class IngestServerTester
             if (ErrorCode.failed(errorcode))
             {
                 this.field_176005_A.stopCallback(ErrorCode.TTV_EC_SUCCESS);
-                System.out.println("Stop failed: " + errorcode.toString());
+                System.out.println("Stop failed: " + errorcode);
             }
 
             this.field_153045_c.pollStats();
@@ -402,7 +402,7 @@ public class IngestServerTester
         {
             if (!this.field_176008_y && !this.field_176007_z)
             {
-                ErrorCode errorcode = this.field_153045_c.submitVideoFrame((FrameBuffer)this.field_153055_m.get(this.field_153063_u));
+                ErrorCode errorcode = this.field_153045_c.submitVideoFrame(this.field_153055_m.get(this.field_153063_u));
 
                 if (ErrorCode.failed(errorcode))
                 {
@@ -450,7 +450,7 @@ public class IngestServerTester
         {
             for (int i = 0; i < this.field_153055_m.size(); ++i)
             {
-                ((FrameBuffer)this.field_153055_m.get(i)).free();
+                this.field_153055_m.get(i).free();
             }
 
             this.field_153055_m = null;
@@ -487,7 +487,7 @@ public class IngestServerTester
         void func_152907_a(IngestServerTester p_152907_1_, IngestServerTester.IngestTestState p_152907_2_);
     }
 
-    public static enum IngestTestState
+    public enum IngestTestState
     {
         Uninitalized,
         Starting,
@@ -497,6 +497,6 @@ public class IngestServerTester
         Finished,
         Cancelling,
         Cancelled,
-        Failed;
+        Failed
     }
 }

@@ -8,7 +8,7 @@ import net.minecraft.util.ResourceLocation;
 public class CapeImageBuffer extends ImageBufferDownload
 {
     private AbstractClientPlayer player;
-    private ResourceLocation resourceLocation;
+    private final ResourceLocation resourceLocation;
     private boolean elytraOfCape;
 
     public CapeImageBuffer(AbstractClientPlayer player, ResourceLocation resourceLocation)

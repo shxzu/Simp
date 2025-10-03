@@ -5,7 +5,7 @@ import net.minecraft.entity.passive.EntityVillager;
 
 public class EntityAILookAtVillager extends EntityAIBase
 {
-    private EntityIronGolem theGolem;
+    private final EntityIronGolem theGolem;
     private EntityVillager theVillager;
     private int lookTime;
 

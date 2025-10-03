@@ -35,7 +35,7 @@ public class NBTTagShort extends NBTBase.NBTPrimitive
 
     public String toString()
     {
-        return "" + this.data + "s";
+        return this.data + "s";
     }
 
     public NBTBase copy()
@@ -63,7 +63,7 @@ public class NBTTagShort extends NBTBase.NBTPrimitive
 
     public long getLong()
     {
-        return (long)this.data;
+        return this.data;
     }
 
     public int getInt()
@@ -83,11 +83,11 @@ public class NBTTagShort extends NBTBase.NBTPrimitive
 
     public double getDouble()
     {
-        return (double)this.data;
+        return this.data;
     }
 
     public float getFloat()
     {
-        return (float)this.data;
+        return this.data;
     }
 }

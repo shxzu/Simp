@@ -30,7 +30,7 @@ public class ScreenShotHelper
 
     public static IChatComponent saveScreenshot(File gameDirectory, int width, int height, Framebuffer buffer)
     {
-        return saveScreenshot(gameDirectory, (String)null, width, height, buffer);
+        return saveScreenshot(gameDirectory, null, width, height, buffer);
     }
 
     public static IChatComponent saveScreenshot(File gameDirectory, String screenshotName, int width, int height, Framebuffer buffer)
@@ -77,11 +77,11 @@ public class ScreenShotHelper
             if (OpenGlHelper.isFramebufferEnabled())
             {
                 GlStateManager.bindTexture(buffer.framebufferTexture);
-                GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, (IntBuffer)pixelBuffer);
+                GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, pixelBuffer);
             }
             else
             {
-                GL11.glReadPixels(0, 0, width, height, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, (IntBuffer)pixelBuffer);
+                GL11.glReadPixels(0, 0, width, height, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, pixelBuffer);
             }
 
             pixelBuffer.get(pixelValues);
@@ -127,22 +127,22 @@ public class ScreenShotHelper
             }
 
             file2 = file2.getCanonicalFile();
-            ImageIO.write(bufferedimage, "png", (File)file2);
+            ImageIO.write(bufferedimage, "png", file2);
             IChatComponent ichatcomponent = new ChatComponentText(file2.getName());
             ichatcomponent.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file2.getAbsolutePath()));
             ichatcomponent.getChatStyle().setUnderlined(Boolean.valueOf(true));
-            return new ChatComponentTranslation("screenshot.success", new Object[] {ichatcomponent});
+            return new ChatComponentTranslation("screenshot.success", ichatcomponent);
         }
         catch (Exception exception)
         {
-            logger.warn((String)"Couldn\'t save screenshot", (Throwable)exception);
-            return new ChatComponentTranslation("screenshot.failure", new Object[] {exception.getMessage()});
+            logger.warn("Couldn't save screenshot", exception);
+            return new ChatComponentTranslation("screenshot.failure", exception.getMessage());
         }
     }
 
     private static File getTimestampedPNGFileForDirectory(File gameDirectory)
     {
-        String s = dateFormat.format(new Date()).toString();
+        String s = dateFormat.format(new Date());
         int i = 1;
 
         while (true)

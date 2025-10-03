@@ -11,7 +11,7 @@ import net.minecraft.util.MathHelper;
 public class EntityAIVillagerInteract extends EntityAIWatchClosest2
 {
     private int interactionDelay;
-    private EntityVillager villager;
+    private final EntityVillager villager;
 
     public EntityAIVillagerInteract(EntityVillager villagerIn)
     {
@@ -70,7 +70,7 @@ public class EntityAIVillagerInteract extends EntityAIWatchClosest2
 
                         if (itemstack.stackSize <= 0)
                         {
-                            inventorybasic.setInventorySlotContents(i, (ItemStack)null);
+                            inventorybasic.setInventorySlotContents(i, null);
                         }
                     }
 
@@ -81,9 +81,9 @@ public class EntityAIVillagerInteract extends EntityAIWatchClosest2
                         float f = 0.3F;
                         float f1 = this.villager.rotationYawHead;
                         float f2 = this.villager.rotationPitch;
-                        entityitem.motionX = (double)(-MathHelper.sin(f1 / 180.0F * (float)Math.PI) * MathHelper.cos(f2 / 180.0F * (float)Math.PI) * f);
-                        entityitem.motionZ = (double)(MathHelper.cos(f1 / 180.0F * (float)Math.PI) * MathHelper.cos(f2 / 180.0F * (float)Math.PI) * f);
-                        entityitem.motionY = (double)(-MathHelper.sin(f2 / 180.0F * (float)Math.PI) * f + 0.1F);
+                        entityitem.motionX = -MathHelper.sin(f1 / 180.0F * (float)Math.PI) * MathHelper.cos(f2 / 180.0F * (float)Math.PI) * f;
+                        entityitem.motionZ = MathHelper.cos(f1 / 180.0F * (float)Math.PI) * MathHelper.cos(f2 / 180.0F * (float)Math.PI) * f;
+                        entityitem.motionY = -MathHelper.sin(f2 / 180.0F * (float)Math.PI) * f + 0.1F;
                         entityitem.setDefaultPickupDelay();
                         this.villager.worldObj.spawnEntityInWorld(entityitem);
                         break;

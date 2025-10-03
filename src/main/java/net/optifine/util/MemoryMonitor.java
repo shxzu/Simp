@@ -8,7 +8,7 @@ public class MemoryMonitor
     private static long lastMemory = startMemory;
     private static boolean gcEvent = false;
     private static int memBytesSec = 0;
-    private static long MB = 1048576L;
+    private static final long MB = 1048576L;
 
     public static void update()
     {

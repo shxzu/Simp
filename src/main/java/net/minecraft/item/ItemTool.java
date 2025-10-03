@@ -12,16 +12,15 @@ import net.minecraft.world.World;
 
 public class ItemTool extends Item
 {
-    private Set<Block> effectiveBlocks;
+    private final Set<Block> effectiveBlocks;
     protected float efficiencyOnProperMaterial = 4.0F;
-    private float damageVsEntity;
+    private final float damageVsEntity;
     protected Item.ToolMaterial toolMaterial;
 
     protected ItemTool(float attackDamage, Item.ToolMaterial material, Set<Block> effectiveBlocks)
     {
         this.toolMaterial = material;
         this.effectiveBlocks = effectiveBlocks;
-        this.coolDownTicks = 20;
         this.maxStackSize = 1;
         this.setMaxDamage(material.getMaxUses());
         this.efficiencyOnProperMaterial = material.getEfficiencyOnProperMaterial();
@@ -72,13 +71,13 @@ public class ItemTool extends Item
 
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair)
     {
-        return this.toolMaterial.getRepairItem() == repair.getItem() ? true : super.getIsRepairable(toRepair, repair);
+        return this.toolMaterial.getRepairItem() == repair.getItem() || super.getIsRepairable(toRepair, repair);
     }
 
     public Multimap<String, AttributeModifier> getItemAttributeModifiers()
     {
         Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers();
-        multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(itemModifierUUID, "Tool modifier", (double)this.damageVsEntity, 0));
+        multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(itemModifierUUID, "Tool modifier", this.damageVsEntity, 0));
         return multimap;
     }
 }

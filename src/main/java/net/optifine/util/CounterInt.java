@@ -2,7 +2,7 @@ package net.optifine.util;
 
 public class CounterInt
 {
-    private int startValue;
+    private final int startValue;
     private int value;
 
     public CounterInt(int startValue)

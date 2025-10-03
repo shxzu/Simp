@@ -26,8 +26,8 @@ import net.minecraft.world.World;
 
 public class ItemPotion extends Item
 {
-    private Map<Integer, List<PotionEffect>> effectCache = Maps.<Integer, List<PotionEffect>>newHashMap();
-    private static final Map<List<PotionEffect>, Integer> SUB_ITEMS_CACHE = Maps.<List<PotionEffect>, Integer>newLinkedHashMap();
+    private final Map<Integer, List<PotionEffect>> effectCache = Maps.newHashMap();
+    private static final Map<List<PotionEffect>, Integer> SUB_ITEMS_CACHE = Maps.newLinkedHashMap();
 
     public ItemPotion()
     {
@@ -41,7 +41,7 @@ public class ItemPotion extends Item
     {
         if (stack.hasTagCompound() && stack.getTagCompound().hasKey("CustomPotionEffects", 9))
         {
-            List<PotionEffect> list1 = Lists.<PotionEffect>newArrayList();
+            List<PotionEffect> list1 = Lists.newArrayList();
             NBTTagList nbttaglist = stack.getTagCompound().getTagList("CustomPotionEffects", 10);
 
             for (int i = 0; i < nbttaglist.tagCount(); ++i)
@@ -59,7 +59,7 @@ public class ItemPotion extends Item
         }
         else
         {
-            List<PotionEffect> list = (List)this.effectCache.get(Integer.valueOf(stack.getMetadata()));
+            List<PotionEffect> list = this.effectCache.get(Integer.valueOf(stack.getMetadata()));
 
             if (list == null)
             {
@@ -73,7 +73,7 @@ public class ItemPotion extends Item
 
     public List<PotionEffect> getEffects(int meta)
     {
-        List<PotionEffect> list = (List)this.effectCache.get(Integer.valueOf(meta));
+        List<PotionEffect> list = this.effectCache.get(Integer.valueOf(meta));
 
         if (list == null)
         {
@@ -211,7 +211,7 @@ public class ItemPotion extends Item
 
             if (list != null && !list.isEmpty())
             {
-                String s2 = ((PotionEffect)list.get(0)).getEffectName();
+                String s2 = list.get(0).getEffectName();
                 s2 = s2 + ".postfix";
                 return s + StatCollector.translateToLocal(s2).trim();
             }
@@ -228,7 +228,7 @@ public class ItemPotion extends Item
         if (stack.getMetadata() != 0)
         {
             List<PotionEffect> list = Items.potionitem.getEffects(stack);
-            Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
+            Multimap<String, AttributeModifier> multimap = HashMultimap.create();
 
             if (list != null && !list.isEmpty())
             {
@@ -242,9 +242,9 @@ public class ItemPotion extends Item
                     {
                         for (Entry<IAttribute, AttributeModifier> entry : map.entrySet())
                         {
-                            AttributeModifier attributemodifier = (AttributeModifier)entry.getValue();
+                            AttributeModifier attributemodifier = entry.getValue();
                             AttributeModifier attributemodifier1 = new AttributeModifier(attributemodifier.getName(), potion.getAttributeModifierAmount(potioneffect.getAmplifier(), attributemodifier), attributemodifier.getOperation());
-                            multimap.put(((IAttribute)entry.getKey()).getAttributeUnlocalizedName(), attributemodifier1);
+                            multimap.put(entry.getKey().getAttributeUnlocalizedName(), attributemodifier1);
                         }
                     }
 
@@ -281,7 +281,7 @@ public class ItemPotion extends Item
 
                 for (Entry<String, AttributeModifier> entry1 : multimap.entries())
                 {
-                    AttributeModifier attributemodifier2 = (AttributeModifier)entry1.getValue();
+                    AttributeModifier attributemodifier2 = entry1.getValue();
                     double d0 = attributemodifier2.getAmount();
                     double d1;
 
@@ -296,12 +296,12 @@ public class ItemPotion extends Item
 
                     if (d0 > 0.0D)
                     {
-                        tooltip.add(EnumChatFormatting.BLUE + StatCollector.translateToLocalFormatted("attribute.modifier.plus." + attributemodifier2.getOperation(), new Object[] {ItemStack.DECIMALFORMAT.format(d1), StatCollector.translateToLocal("attribute.name." + (String)entry1.getKey())}));
+                        tooltip.add(EnumChatFormatting.BLUE + StatCollector.translateToLocalFormatted("attribute.modifier.plus." + attributemodifier2.getOperation(), new Object[] {ItemStack.DECIMALFORMAT.format(d1), StatCollector.translateToLocal("attribute.name." + entry1.getKey())}));
                     }
                     else if (d0 < 0.0D)
                     {
                         d1 = d1 * -1.0D;
-                        tooltip.add(EnumChatFormatting.RED + StatCollector.translateToLocalFormatted("attribute.modifier.take." + attributemodifier2.getOperation(), new Object[] {ItemStack.DECIMALFORMAT.format(d1), StatCollector.translateToLocal("attribute.name." + (String)entry1.getKey())}));
+                        tooltip.add(EnumChatFormatting.RED + StatCollector.translateToLocalFormatted("attribute.modifier.take." + attributemodifier2.getOperation(), new Object[] {ItemStack.DECIMALFORMAT.format(d1), StatCollector.translateToLocal("attribute.name." + entry1.getKey())}));
                     }
                 }
             }

@@ -1,5 +1,7 @@
 package net.minecraft.util;
 
+import java.util.Objects;
+
 public class LongHashMap<V>
 {
     private transient LongHashMap.Entry<V>[] hashArray = new LongHashMap.Entry[4096];
@@ -47,7 +49,7 @@ public class LongHashMap<V>
             }
         }
 
-        return (V)((Object)null);
+        return null;
     }
 
     public boolean containsItem(long p_76161_1_)
@@ -142,7 +144,7 @@ public class LongHashMap<V>
     public V remove(long p_76159_1_)
     {
         LongHashMap.Entry<V> entry = this.removeKey(p_76159_1_);
-        return (V)(entry == null ? null : entry.value);
+        return entry == null ? null : entry.value;
     }
 
     final LongHashMap.Entry<V> removeKey(long p_76152_1_)
@@ -203,7 +205,7 @@ public class LongHashMap<V>
             }
         }
 
-        return 1.0D * (double)i / (double)this.numHashElements;
+        return (double) i / (double)this.numHashElements;
     }
 
     static class Entry<V>
@@ -243,15 +245,12 @@ public class LongHashMap<V>
                 Object object = Long.valueOf(this.getKey());
                 Object object1 = Long.valueOf(entry.getKey());
 
-                if (object == object1 || object != null && object.equals(object1))
+                if (Objects.equals(object, object1))
                 {
                     Object object2 = this.getValue();
                     Object object3 = entry.getValue();
 
-                    if (object2 == object3 || object2 != null && object2.equals(object3))
-                    {
-                        return true;
-                    }
+                    return Objects.equals(object2, object3);
                 }
 
                 return false;

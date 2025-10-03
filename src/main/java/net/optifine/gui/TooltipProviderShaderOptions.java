@@ -3,7 +3,7 @@ package net.optifine.gui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import net.minecraft.client.gui.MinecraftFontRenderer;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.src.Config;
@@ -16,13 +16,12 @@ public class TooltipProviderShaderOptions extends TooltipProviderOptions
 {
     public String[] getTooltipLines(GuiButton btn, int width)
     {
-        if (!(btn instanceof GuiButtonShaderOption))
+        if (!(btn instanceof GuiButtonShaderOption guibuttonshaderoption))
         {
             return null;
         }
         else
         {
-            GuiButtonShaderOption guibuttonshaderoption = (GuiButtonShaderOption)btn;
             ShaderOption shaderoption = guibuttonshaderoption.getShaderOption();
             String[] astring = this.makeTooltipLines(shaderoption, width);
             return astring;
@@ -46,7 +45,7 @@ public class TooltipProviderShaderOptions extends TooltipProviderOptions
 
         if (so.getPaths() != null && gamesettings.advancedItemTooltips)
         {
-            s3 = "\u00a78" + Lang.get("of.general.from") + ": " + Config.arrayToString((Object[])so.getPaths());
+            s3 = "\u00a78" + Lang.get("of.general.from") + ": " + Config.arrayToString(so.getPaths());
         }
 
         String s4 = null;
@@ -59,7 +58,7 @@ public class TooltipProviderShaderOptions extends TooltipProviderOptions
 
         List<String> list = new ArrayList();
         list.add(s);
-        list.addAll(Arrays.<String>asList(astring));
+        list.addAll(Arrays.asList(astring));
 
         if (s2 != null)
         {
@@ -103,12 +102,12 @@ public class TooltipProviderShaderOptions extends TooltipProviderOptions
 
     private String[] makeTooltipLines(int width, List<String> args)
     {
-        MinecraftFontRenderer fontrenderer = Config.getMinecraft().minecraftFontRendererObj;
+        FontRenderer fontrenderer = Config.getMinecraft().fontRendererObj;
         List<String> list = new ArrayList();
 
         for (int i = 0; i < args.size(); ++i)
         {
-            String s = (String)args.get(i);
+            String s = args.get(i);
 
             if (s != null && s.length() > 0)
             {
@@ -119,7 +118,7 @@ public class TooltipProviderShaderOptions extends TooltipProviderOptions
             }
         }
 
-        String[] astring = (String[])((String[])list.toArray(new String[list.size()]));
+        String[] astring = list.toArray(new String[list.size()]);
         return astring;
     }
 }

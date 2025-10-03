@@ -10,9 +10,9 @@ public class ModelPlayer extends ModelBiped
     public ModelRenderer bipedLeftLegwear;
     public ModelRenderer bipedRightLegwear;
     public ModelRenderer bipedBodyWear;
-    private ModelRenderer bipedCape;
-    private ModelRenderer bipedDeadmau5Head;
-    private boolean smallArms;
+    private final ModelRenderer bipedCape;
+    private final ModelRenderer bipedDeadmau5Head;
+    private final boolean smallArms;
 
     public ModelPlayer(float p_i46304_1_, boolean p_i46304_2_)
     {

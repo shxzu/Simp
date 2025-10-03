@@ -2,8 +2,8 @@ package net.minecraft.util;
 
 public class Tuple<A, B>
 {
-    private A a;
-    private B b;
+    private final A a;
+    private final B b;
 
     public Tuple(A aIn, B bIn)
     {

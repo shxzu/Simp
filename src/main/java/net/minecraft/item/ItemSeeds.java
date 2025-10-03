@@ -9,8 +9,8 @@ import net.minecraft.world.World;
 
 public class ItemSeeds extends Item
 {
-    private Block crops;
-    private Block soilBlockID;
+    private final Block crops;
+    private final Block soilBlockID;
 
     public ItemSeeds(Block crops, Block soil)
     {

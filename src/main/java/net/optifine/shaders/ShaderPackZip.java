@@ -37,7 +37,6 @@ public class ShaderPackZip implements IShaderPack
             }
             catch (Exception var2)
             {
-                ;
             }
 
             this.packZipFile = null;
@@ -113,7 +112,7 @@ public class ShaderPackZip implements IShaderPack
 
             while (enumeration.hasMoreElements())
             {
-                ZipEntry zipentry1 = (ZipEntry)enumeration.nextElement();
+                ZipEntry zipentry1 = enumeration.nextElement();
                 String s = zipentry1.getName();
                 Matcher matcher = pattern.matcher(s);
 

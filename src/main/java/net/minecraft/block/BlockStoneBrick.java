@@ -13,7 +13,7 @@ import net.minecraft.util.IStringSerializable;
 
 public class BlockStoneBrick extends Block
 {
-    public static final PropertyEnum<BlockStoneBrick.EnumType> VARIANT = PropertyEnum.<BlockStoneBrick.EnumType>create("variant", BlockStoneBrick.EnumType.class);
+    public static final PropertyEnum<BlockStoneBrick.EnumType> VARIANT = PropertyEnum.create("variant", BlockStoneBrick.EnumType.class);
     public static final int DEFAULT_META = BlockStoneBrick.EnumType.DEFAULT.getMetadata();
     public static final int MOSSY_META = BlockStoneBrick.EnumType.MOSSY.getMetadata();
     public static final int CRACKED_META = BlockStoneBrick.EnumType.CRACKED.getMetadata();
@@ -28,7 +28,7 @@ public class BlockStoneBrick extends Block
 
     public int damageDropped(IBlockState state)
     {
-        return ((BlockStoneBrick.EnumType)state.getValue(VARIANT)).getMetadata();
+        return state.getValue(VARIANT).getMetadata();
     }
 
     public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
@@ -46,15 +46,15 @@ public class BlockStoneBrick extends Block
 
     public int getMetaFromState(IBlockState state)
     {
-        return ((BlockStoneBrick.EnumType)state.getValue(VARIANT)).getMetadata();
+        return state.getValue(VARIANT).getMetadata();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {VARIANT});
+        return new BlockState(this, VARIANT);
     }
 
-    public static enum EnumType implements IStringSerializable
+    public enum EnumType implements IStringSerializable
     {
         DEFAULT(0, "stonebrick", "default"),
         MOSSY(1, "mossy_stonebrick", "mossy"),
@@ -66,7 +66,7 @@ public class BlockStoneBrick extends Block
         private final String name;
         private final String unlocalizedName;
 
-        private EnumType(int meta, String name, String unlocalizedName)
+        EnumType(int meta, String name, String unlocalizedName)
         {
             this.meta = meta;
             this.name = name;

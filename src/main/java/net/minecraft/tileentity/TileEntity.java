@@ -18,8 +18,8 @@ import org.apache.logging.log4j.Logger;
 public abstract class TileEntity
 {
     private static final Logger logger = LogManager.getLogger();
-    private static Map < String, Class <? extends TileEntity >> nameToClassMap = Maps. < String, Class <? extends TileEntity >> newHashMap();
-    private static Map < Class <? extends TileEntity > , String > classToNameMap = Maps. < Class <? extends TileEntity > , String > newHashMap();
+    private static final Map < String, Class <? extends TileEntity >> nameToClassMap = Maps.newHashMap();
+    private static final Map < Class <? extends TileEntity > , String > classToNameMap = Maps.newHashMap();
     protected World worldObj;
     protected BlockPos pos = BlockPos.ORIGIN;
     protected boolean tileEntityInvalid;
@@ -61,7 +61,7 @@ public abstract class TileEntity
 
     public void writeToNBT(NBTTagCompound compound)
     {
-        String s = (String)classToNameMap.get(this.getClass());
+        String s = classToNameMap.get(this.getClass());
 
         if (s == null)
         {
@@ -82,11 +82,11 @@ public abstract class TileEntity
 
         try
         {
-            Class <? extends TileEntity > oclass = (Class)nameToClassMap.get(nbt.getString("id"));
+            Class <? extends TileEntity > oclass = nameToClassMap.get(nbt.getString("id"));
 
             if (oclass != null)
             {
-                tileentity = (TileEntity)oclass.newInstance();
+                tileentity = oclass.newInstance();
             }
         }
         catch (Exception exception)
@@ -197,7 +197,7 @@ public abstract class TileEntity
         {
             public String call() throws Exception
             {
-                return (String)TileEntity.classToNameMap.get(TileEntity.this.getClass()) + " // " + TileEntity.this.getClass().getCanonicalName();
+                return TileEntity.classToNameMap.get(TileEntity.this.getClass()) + " // " + TileEntity.this.getClass().getCanonicalName();
             }
         });
 
@@ -212,7 +212,7 @@ public abstract class TileEntity
 
                     try
                     {
-                        return String.format("ID #%d (%s // %s)", new Object[] {Integer.valueOf(i), Block.getBlockById(i).getUnlocalizedName(), Block.getBlockById(i).getClass().getCanonicalName()});
+                        return String.format("ID #%d (%s // %s)", Integer.valueOf(i), Block.getBlockById(i).getUnlocalizedName(), Block.getBlockById(i).getClass().getCanonicalName());
                     }
                     catch (Throwable var3)
                     {
@@ -233,8 +233,8 @@ public abstract class TileEntity
                     }
                     else
                     {
-                        String s = String.format("%4s", new Object[] {Integer.toBinaryString(i)}).replace(" ", "0");
-                        return String.format("%1$d / 0x%1$X / 0b%2$s", new Object[] {Integer.valueOf(i), s});
+                        String s = String.format("%4s", Integer.toBinaryString(i)).replace(" ", "0");
+                        return String.format("%1$d / 0x%1$X / 0b%2$s", Integer.valueOf(i), s);
                     }
                 }
             });

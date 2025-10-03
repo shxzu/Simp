@@ -2,8 +2,8 @@ package net.optifine.expr;
 
 public class FunctionFloatArray implements IExpressionFloatArray
 {
-    private FunctionType type;
-    private IExpression[] arguments;
+    private final FunctionType type;
+    private final IExpression[] arguments;
 
     public FunctionFloatArray(FunctionType type, IExpression[] arguments)
     {
@@ -23,6 +23,6 @@ public class FunctionFloatArray implements IExpressionFloatArray
 
     public String toString()
     {
-        return "" + this.type + "()";
+        return this.type + "()";
     }
 }

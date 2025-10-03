@@ -18,10 +18,10 @@ import org.apache.logging.log4j.Logger;
 public class ChunkProviderClient implements IChunkProvider
 {
     private static final Logger logger = LogManager.getLogger();
-    private Chunk blankChunk;
-    private LongHashMap<Chunk> chunkMapping = new LongHashMap();
-    private List<Chunk> chunkListing = Lists.<Chunk>newArrayList();
-    private World worldObj;
+    private final Chunk blankChunk;
+    private final LongHashMap<Chunk> chunkMapping = new LongHashMap();
+    private final List<Chunk> chunkListing = Lists.newArrayList();
+    private final World worldObj;
 
     public ChunkProviderClient(World worldIn)
     {
@@ -58,7 +58,7 @@ public class ChunkProviderClient implements IChunkProvider
 
     public Chunk provideChunk(int x, int z)
     {
-        Chunk chunk = (Chunk)this.chunkMapping.getValueByKey(ChunkCoordIntPair.chunkXZ2Int(x, z));
+        Chunk chunk = this.chunkMapping.getValueByKey(ChunkCoordIntPair.chunkXZ2Int(x, z));
         return chunk == null ? this.blankChunk : chunk;
     }
 

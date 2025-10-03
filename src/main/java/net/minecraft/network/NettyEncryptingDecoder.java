@@ -16,7 +16,7 @@ public class NettyEncryptingDecoder extends MessageToMessageDecoder<ByteBuf>
         this.decryptionCodec = new NettyEncryptionTranslator(cipher);
     }
 
-    protected void decode(ChannelHandlerContext p_decode_1_, ByteBuf p_decode_2_, List<Object> p_decode_3_) throws ShortBufferException, Exception
+    protected void decode(ChannelHandlerContext p_decode_1_, ByteBuf p_decode_2_, List<Object> p_decode_3_) throws Exception
     {
         p_decode_3_.add(this.decryptionCodec.decipher(p_decode_1_, p_decode_2_));
     }

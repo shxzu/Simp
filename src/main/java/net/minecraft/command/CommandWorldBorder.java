@@ -28,7 +28,7 @@ public class CommandWorldBorder extends CommandBase
     {
         if (args.length < 1)
         {
-            throw new WrongUsageException("commands.worldborder.usage", new Object[0]);
+            throw new WrongUsageException("commands.worldborder.usage");
         }
         else
         {
@@ -38,7 +38,7 @@ public class CommandWorldBorder extends CommandBase
             {
                 if (args.length != 2 && args.length != 3)
                 {
-                    throw new WrongUsageException("commands.worldborder.set.usage", new Object[0]);
+                    throw new WrongUsageException("commands.worldborder.set.usage");
                 }
 
                 double d0 = worldborder.getTargetSize();
@@ -51,24 +51,24 @@ public class CommandWorldBorder extends CommandBase
 
                     if (d0 > d2)
                     {
-                        notifyOperators(sender, this, "commands.worldborder.setSlowly.shrink.success", new Object[] {String.format("%.1f", new Object[]{Double.valueOf(d2)}), String.format("%.1f", new Object[]{Double.valueOf(d0)}), Long.toString(i / 1000L)});
+                        notifyOperators(sender, this, "commands.worldborder.setSlowly.shrink.success", String.format("%.1f", Double.valueOf(d2)), String.format("%.1f", Double.valueOf(d0)), Long.toString(i / 1000L));
                     }
                     else
                     {
-                        notifyOperators(sender, this, "commands.worldborder.setSlowly.grow.success", new Object[] {String.format("%.1f", new Object[]{Double.valueOf(d2)}), String.format("%.1f", new Object[]{Double.valueOf(d0)}), Long.toString(i / 1000L)});
+                        notifyOperators(sender, this, "commands.worldborder.setSlowly.grow.success", String.format("%.1f", Double.valueOf(d2)), String.format("%.1f", Double.valueOf(d0)), Long.toString(i / 1000L));
                     }
                 }
                 else
                 {
                     worldborder.setTransition(d2);
-                    notifyOperators(sender, this, "commands.worldborder.set.success", new Object[] {String.format("%.1f", new Object[]{Double.valueOf(d2)}), String.format("%.1f", new Object[]{Double.valueOf(d0)})});
+                    notifyOperators(sender, this, "commands.worldborder.set.success", String.format("%.1f", Double.valueOf(d2)), String.format("%.1f", Double.valueOf(d0)));
                 }
             }
             else if (args[0].equals("add"))
             {
                 if (args.length != 2 && args.length != 3)
                 {
-                    throw new WrongUsageException("commands.worldborder.add.usage", new Object[0]);
+                    throw new WrongUsageException("commands.worldborder.add.usage");
                 }
 
                 double d4 = worldborder.getDiameter();
@@ -81,69 +81,69 @@ public class CommandWorldBorder extends CommandBase
 
                     if (d4 > d8)
                     {
-                        notifyOperators(sender, this, "commands.worldborder.setSlowly.shrink.success", new Object[] {String.format("%.1f", new Object[]{Double.valueOf(d8)}), String.format("%.1f", new Object[]{Double.valueOf(d4)}), Long.toString(i1 / 1000L)});
+                        notifyOperators(sender, this, "commands.worldborder.setSlowly.shrink.success", String.format("%.1f", Double.valueOf(d8)), String.format("%.1f", Double.valueOf(d4)), Long.toString(i1 / 1000L));
                     }
                     else
                     {
-                        notifyOperators(sender, this, "commands.worldborder.setSlowly.grow.success", new Object[] {String.format("%.1f", new Object[]{Double.valueOf(d8)}), String.format("%.1f", new Object[]{Double.valueOf(d4)}), Long.toString(i1 / 1000L)});
+                        notifyOperators(sender, this, "commands.worldborder.setSlowly.grow.success", String.format("%.1f", Double.valueOf(d8)), String.format("%.1f", Double.valueOf(d4)), Long.toString(i1 / 1000L));
                     }
                 }
                 else
                 {
                     worldborder.setTransition(d8);
-                    notifyOperators(sender, this, "commands.worldborder.set.success", new Object[] {String.format("%.1f", new Object[]{Double.valueOf(d8)}), String.format("%.1f", new Object[]{Double.valueOf(d4)})});
+                    notifyOperators(sender, this, "commands.worldborder.set.success", String.format("%.1f", Double.valueOf(d8)), String.format("%.1f", Double.valueOf(d4)));
                 }
             }
             else if (args[0].equals("center"))
             {
                 if (args.length != 3)
                 {
-                    throw new WrongUsageException("commands.worldborder.center.usage", new Object[0]);
+                    throw new WrongUsageException("commands.worldborder.center.usage");
                 }
 
                 BlockPos blockpos = sender.getPosition();
                 double d1 = parseDouble((double)blockpos.getX() + 0.5D, args[1], true);
                 double d3 = parseDouble((double)blockpos.getZ() + 0.5D, args[2], true);
                 worldborder.setCenter(d1, d3);
-                notifyOperators(sender, this, "commands.worldborder.center.success", new Object[] {Double.valueOf(d1), Double.valueOf(d3)});
+                notifyOperators(sender, this, "commands.worldborder.center.success", Double.valueOf(d1), Double.valueOf(d3));
             }
             else if (args[0].equals("damage"))
             {
                 if (args.length < 2)
                 {
-                    throw new WrongUsageException("commands.worldborder.damage.usage", new Object[0]);
+                    throw new WrongUsageException("commands.worldborder.damage.usage");
                 }
 
                 if (args[1].equals("buffer"))
                 {
                     if (args.length != 3)
                     {
-                        throw new WrongUsageException("commands.worldborder.damage.buffer.usage", new Object[0]);
+                        throw new WrongUsageException("commands.worldborder.damage.buffer.usage");
                     }
 
                     double d5 = parseDouble(args[2], 0.0D);
                     double d9 = worldborder.getDamageBuffer();
                     worldborder.setDamageBuffer(d5);
-                    notifyOperators(sender, this, "commands.worldborder.damage.buffer.success", new Object[] {String.format("%.1f", new Object[]{Double.valueOf(d5)}), String.format("%.1f", new Object[]{Double.valueOf(d9)})});
+                    notifyOperators(sender, this, "commands.worldborder.damage.buffer.success", String.format("%.1f", Double.valueOf(d5)), String.format("%.1f", Double.valueOf(d9)));
                 }
                 else if (args[1].equals("amount"))
                 {
                     if (args.length != 3)
                     {
-                        throw new WrongUsageException("commands.worldborder.damage.amount.usage", new Object[0]);
+                        throw new WrongUsageException("commands.worldborder.damage.amount.usage");
                     }
 
                     double d6 = parseDouble(args[2], 0.0D);
                     double d10 = worldborder.getDamageAmount();
                     worldborder.setDamageAmount(d6);
-                    notifyOperators(sender, this, "commands.worldborder.damage.amount.success", new Object[] {String.format("%.2f", new Object[]{Double.valueOf(d6)}), String.format("%.2f", new Object[]{Double.valueOf(d10)})});
+                    notifyOperators(sender, this, "commands.worldborder.damage.amount.success", String.format("%.2f", Double.valueOf(d6)), String.format("%.2f", Double.valueOf(d10)));
                 }
             }
             else if (args[0].equals("warning"))
             {
                 if (args.length < 2)
                 {
-                    throw new WrongUsageException("commands.worldborder.warning.usage", new Object[0]);
+                    throw new WrongUsageException("commands.worldborder.warning.usage");
                 }
 
                 int j = parseInt(args[2], 0);
@@ -152,35 +152,35 @@ public class CommandWorldBorder extends CommandBase
                 {
                     if (args.length != 3)
                     {
-                        throw new WrongUsageException("commands.worldborder.warning.time.usage", new Object[0]);
+                        throw new WrongUsageException("commands.worldborder.warning.time.usage");
                     }
 
                     int k = worldborder.getWarningTime();
                     worldborder.setWarningTime(j);
-                    notifyOperators(sender, this, "commands.worldborder.warning.time.success", new Object[] {Integer.valueOf(j), Integer.valueOf(k)});
+                    notifyOperators(sender, this, "commands.worldborder.warning.time.success", Integer.valueOf(j), Integer.valueOf(k));
                 }
                 else if (args[1].equals("distance"))
                 {
                     if (args.length != 3)
                     {
-                        throw new WrongUsageException("commands.worldborder.warning.distance.usage", new Object[0]);
+                        throw new WrongUsageException("commands.worldborder.warning.distance.usage");
                     }
 
                     int l = worldborder.getWarningDistance();
                     worldborder.setWarningDistance(j);
-                    notifyOperators(sender, this, "commands.worldborder.warning.distance.success", new Object[] {Integer.valueOf(j), Integer.valueOf(l)});
+                    notifyOperators(sender, this, "commands.worldborder.warning.distance.success", Integer.valueOf(j), Integer.valueOf(l));
                 }
             }
             else
             {
                 if (!args[0].equals("get"))
                 {
-                    throw new WrongUsageException("commands.worldborder.usage", new Object[0]);
+                    throw new WrongUsageException("commands.worldborder.usage");
                 }
 
                 double d7 = worldborder.getDiameter();
                 sender.setCommandStat(CommandResultStats.Type.QUERY_RESULT, MathHelper.floor_double(d7 + 0.5D));
-                sender.addChatMessage(new ChatComponentTranslation("commands.worldborder.get.success", new Object[] {String.format("%.0f", new Object[]{Double.valueOf(d7)})}));
+                sender.addChatMessage(new ChatComponentTranslation("commands.worldborder.get.success", String.format("%.0f", Double.valueOf(d7))));
             }
         }
     }
@@ -192,6 +192,6 @@ public class CommandWorldBorder extends CommandBase
 
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, new String[] {"set", "center", "damage", "warning", "add", "get"}): (args.length == 2 && args[0].equals("damage") ? getListOfStringsMatchingLastWord(args, new String[] {"buffer", "amount"}): (args.length >= 2 && args.length <= 3 && args[0].equals("center") ? func_181043_b(args, 1, pos) : (args.length == 2 && args[0].equals("warning") ? getListOfStringsMatchingLastWord(args, new String[] {"time", "distance"}): null)));
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, "set", "center", "damage", "warning", "add", "get"): (args.length == 2 && args[0].equals("damage") ? getListOfStringsMatchingLastWord(args, "buffer", "amount"): (args.length >= 2 && args.length <= 3 && args[0].equals("center") ? func_181043_b(args, 1, pos) : (args.length == 2 && args[0].equals("warning") ? getListOfStringsMatchingLastWord(args, "time", "distance"): null)));
     }
 }

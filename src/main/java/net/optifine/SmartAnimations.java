@@ -7,8 +7,8 @@ import net.optifine.shaders.Shaders;
 public class SmartAnimations
 {
     private static boolean active;
-    private static BitSet spritesRendered = new BitSet();
-    private static BitSet texturesRendered = new BitSet();
+    private static final BitSet spritesRendered = new BitSet();
+    private static final BitSet texturesRendered = new BitSet();
 
     public static boolean isActive()
     {
@@ -38,7 +38,7 @@ public class SmartAnimations
 
     public static boolean isSpriteRendered(int animationIndex)
     {
-        return animationIndex < 0 ? false : spritesRendered.get(animationIndex);
+        return animationIndex >= 0 && spritesRendered.get(animationIndex);
     }
 
     public static void resetSpritesRendered()
@@ -56,7 +56,7 @@ public class SmartAnimations
 
     public static boolean isTextureRendered(int texId)
     {
-        return texId < 0 ? false : texturesRendered.get(texId);
+        return texId >= 0 && texturesRendered.get(texId);
     }
 
     public static void resetTexturesRendered()

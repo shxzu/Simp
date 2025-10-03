@@ -36,7 +36,7 @@ public class NBTTagFloat extends NBTBase.NBTPrimitive
 
     public String toString()
     {
-        return "" + this.data + "f";
+        return this.data + "f";
     }
 
     public NBTBase copy()
@@ -84,7 +84,7 @@ public class NBTTagFloat extends NBTBase.NBTPrimitive
 
     public double getDouble()
     {
-        return (double)this.data;
+        return this.data;
     }
 
     public float getFloat()

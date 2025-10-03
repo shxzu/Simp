@@ -5,10 +5,10 @@ import net.optifine.shaders.SMCLog;
 
 public class CustomUniform
 {
-    private String name;
-    private UniformType type;
-    private IExpression expression;
-    private ShaderUniformBase shaderUniform;
+    private final String name;
+    private final UniformType type;
+    private final IExpression expression;
+    private final ShaderUniformBase shaderUniform;
 
     public CustomUniform(String name, UniformType type, IExpression expression)
     {

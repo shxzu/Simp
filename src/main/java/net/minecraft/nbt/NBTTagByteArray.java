@@ -28,7 +28,7 @@ public class NBTTagByteArray extends NBTBase
     {
         sizeTracker.read(192L);
         int i = input.readInt();
-        sizeTracker.read((long)(8 * i));
+        sizeTracker.read(8L * i);
         this.data = new byte[i];
         input.readFully(this.data);
     }
@@ -52,7 +52,7 @@ public class NBTTagByteArray extends NBTBase
 
     public boolean equals(Object p_equals_1_)
     {
-        return super.equals(p_equals_1_) ? Arrays.equals(this.data, ((NBTTagByteArray)p_equals_1_).data) : false;
+        return super.equals(p_equals_1_) && Arrays.equals(this.data, ((NBTTagByteArray) p_equals_1_).data);
     }
 
     public int hashCode()

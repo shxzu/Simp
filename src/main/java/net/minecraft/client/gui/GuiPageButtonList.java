@@ -10,12 +10,12 @@ import net.minecraft.util.IntHashMap;
 
 public class GuiPageButtonList extends GuiListExtended
 {
-    private final List<GuiPageButtonList.GuiEntry> field_178074_u = Lists.<GuiPageButtonList.GuiEntry>newArrayList();
+    private final List<GuiPageButtonList.GuiEntry> field_178074_u = Lists.newArrayList();
     private final IntHashMap<Gui> field_178073_v = new IntHashMap();
-    private final List<GuiTextField> field_178072_w = Lists.<GuiTextField>newArrayList();
+    private final List<GuiTextField> field_178072_w = Lists.newArrayList();
     private final GuiPageButtonList.GuiListEntry[][] field_178078_x;
     private int field_178077_y;
-    private GuiPageButtonList.GuiResponder field_178076_z;
+    private final GuiPageButtonList.GuiResponder field_178076_z;
     private Gui field_178075_A;
 
     public GuiPageButtonList(Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn, GuiPageButtonList.GuiResponder p_i45536_7_, GuiPageButtonList.GuiListEntry[]... p_i45536_8_)
@@ -72,8 +72,8 @@ public class GuiPageButtonList extends GuiListExtended
         {
             GuiPageButtonList.GuiListEntry guipagebuttonlist$guilistentry = this.field_178078_x[this.field_178077_y][i];
             GuiPageButtonList.GuiListEntry guipagebuttonlist$guilistentry1 = i < this.field_178078_x[this.field_178077_y].length - 1 ? this.field_178078_x[this.field_178077_y][i + 1] : null;
-            Gui gui = (Gui)this.field_178073_v.lookup(guipagebuttonlist$guilistentry.func_178935_b());
-            Gui gui1 = guipagebuttonlist$guilistentry1 != null ? (Gui)this.field_178073_v.lookup(guipagebuttonlist$guilistentry1.func_178935_b()) : null;
+            Gui gui = this.field_178073_v.lookup(guipagebuttonlist$guilistentry.func_178935_b());
+            Gui gui1 = guipagebuttonlist$guilistentry1 != null ? this.field_178073_v.lookup(guipagebuttonlist$guilistentry1.func_178935_b()) : null;
             GuiPageButtonList.GuiEntry guipagebuttonlist$guientry = new GuiPageButtonList.GuiEntry(gui, gui1);
             this.field_178074_u.add(guipagebuttonlist$guientry);
         }
@@ -124,7 +124,7 @@ public class GuiPageButtonList extends GuiListExtended
 
     public Gui func_178061_c(int p_178061_1_)
     {
-        return (Gui)this.field_178073_v.lookup(p_178061_1_);
+        return this.field_178073_v.lookup(p_178061_1_);
     }
 
     private void func_178060_e(int p_178060_1_, int p_178060_2_)
@@ -133,7 +133,7 @@ public class GuiPageButtonList extends GuiListExtended
         {
             if (guipagebuttonlist$guilistentry != null)
             {
-                this.func_178066_a((Gui)this.field_178073_v.lookup(guipagebuttonlist$guilistentry.func_178935_b()), false);
+                this.func_178066_a(this.field_178073_v.lookup(guipagebuttonlist$guilistentry.func_178935_b()), false);
             }
         }
 
@@ -141,7 +141,7 @@ public class GuiPageButtonList extends GuiListExtended
         {
             if (guipagebuttonlist$guilistentry1 != null)
             {
-                this.func_178066_a((Gui)this.field_178073_v.lookup(guipagebuttonlist$guilistentry1.func_178935_b()), true);
+                this.func_178066_a(this.field_178073_v.lookup(guipagebuttonlist$guilistentry1.func_178935_b()), true);
             }
         }
     }
@@ -164,7 +164,7 @@ public class GuiPageButtonList extends GuiListExtended
 
     private Gui func_178058_a(GuiPageButtonList.GuiListEntry p_178058_1_, int p_178058_2_, boolean p_178058_3_)
     {
-        return (Gui)(p_178058_1_ instanceof GuiPageButtonList.GuiSlideEntry ? this.func_178067_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiPageButtonList.GuiSlideEntry)p_178058_1_) : (p_178058_1_ instanceof GuiPageButtonList.GuiButtonEntry ? this.func_178065_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiPageButtonList.GuiButtonEntry)p_178058_1_) : (p_178058_1_ instanceof GuiPageButtonList.EditBoxEntry ? this.func_178068_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiPageButtonList.EditBoxEntry)p_178058_1_) : (p_178058_1_ instanceof GuiPageButtonList.GuiLabelEntry ? this.func_178063_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiPageButtonList.GuiLabelEntry)p_178058_1_, p_178058_3_) : null))));
+        return p_178058_1_ instanceof GuiSlideEntry ? this.func_178067_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiSlideEntry)p_178058_1_) : (p_178058_1_ instanceof GuiButtonEntry ? this.func_178065_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiButtonEntry)p_178058_1_) : (p_178058_1_ instanceof EditBoxEntry ? this.func_178068_a(this.width / 2 - 155 + p_178058_2_, 0, (EditBoxEntry)p_178058_1_) : (p_178058_1_ instanceof GuiLabelEntry ? this.func_178063_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiLabelEntry)p_178058_1_, p_178058_3_) : null)));
     }
 
     public void func_181155_a(boolean p_181155_1_)
@@ -219,7 +219,7 @@ public class GuiPageButtonList extends GuiListExtended
 
     private GuiTextField func_178068_a(int p_178068_1_, int p_178068_2_, GuiPageButtonList.EditBoxEntry p_178068_3_)
     {
-        GuiTextField guitextfield = new GuiTextField(p_178068_3_.func_178935_b(), this.mc.minecraftFontRendererObj, p_178068_1_, p_178068_2_, 150, 20);
+        GuiTextField guitextfield = new GuiTextField(p_178068_3_.func_178935_b(), this.mc.fontRendererObj, p_178068_1_, p_178068_2_, 150, 20);
         guitextfield.setText(p_178068_3_.func_178936_c());
         guitextfield.func_175207_a(this.field_178076_z);
         guitextfield.setVisible(p_178068_3_.func_178934_d());
@@ -233,11 +233,11 @@ public class GuiPageButtonList extends GuiListExtended
 
         if (p_178063_4_)
         {
-            guilabel = new GuiLabel(this.mc.minecraftFontRendererObj, p_178063_3_.func_178935_b(), p_178063_1_, p_178063_2_, this.width - p_178063_1_ * 2, 20, -1);
+            guilabel = new GuiLabel(this.mc.fontRendererObj, p_178063_3_.func_178935_b(), p_178063_1_, p_178063_2_, this.width - p_178063_1_ * 2, 20, -1);
         }
         else
         {
-            guilabel = new GuiLabel(this.mc.minecraftFontRendererObj, p_178063_3_.func_178935_b(), p_178063_1_, p_178063_2_, 150, 20, -1);
+            guilabel = new GuiLabel(this.mc.fontRendererObj, p_178063_3_.func_178935_b(), p_178063_1_, p_178063_2_, 150, 20, -1);
         }
 
         guilabel.visible = p_178063_3_.func_178934_d();
@@ -248,9 +248,8 @@ public class GuiPageButtonList extends GuiListExtended
 
     public void func_178062_a(char p_178062_1_, int p_178062_2_)
     {
-        if (this.field_178075_A instanceof GuiTextField)
+        if (this.field_178075_A instanceof GuiTextField guitextfield)
         {
-            GuiTextField guitextfield = (GuiTextField)this.field_178075_A;
 
             if (!GuiScreen.isKeyComboCtrlV(p_178062_2_))
             {
@@ -279,7 +278,7 @@ public class GuiPageButtonList extends GuiListExtended
                         ++k;
                     }
 
-                    this.field_178075_A = (Gui)this.field_178072_w.get(k);
+                    this.field_178075_A = this.field_178072_w.get(k);
                     guitextfield = (GuiTextField)this.field_178075_A;
                     guitextfield.setFocused(true);
                     int l = guitextfield.yPosition + this.slotHeight;
@@ -308,7 +307,7 @@ public class GuiPageButtonList extends GuiListExtended
 
                 for (String s1 : astring)
                 {
-                    ((GuiTextField)this.field_178072_w.get(j)).setText(s1);
+                    this.field_178072_w.get(j).setText(s1);
 
                     if (j == this.field_178072_w.size() - 1)
                     {
@@ -330,7 +329,7 @@ public class GuiPageButtonList extends GuiListExtended
 
     public GuiPageButtonList.GuiEntry getListEntry(int index)
     {
-        return (GuiPageButtonList.GuiEntry)this.field_178074_u.get(index);
+        return this.field_178074_u.get(index);
     }
 
     public int getSize()
@@ -355,7 +354,7 @@ public class GuiPageButtonList extends GuiListExtended
         public EditBoxEntry(int p_i45534_1_, String p_i45534_2_, boolean p_i45534_3_, Predicate<String> p_i45534_4_)
         {
             super(p_i45534_1_, p_i45534_2_, p_i45534_3_);
-            this.field_178951_a = (Predicate)Objects.firstNonNull(p_i45534_4_, Predicates.alwaysTrue());
+            this.field_178951_a = Objects.firstNonNull(p_i45534_4_, Predicates.alwaysTrue());
         }
 
         public Predicate<String> func_178950_a()

@@ -10,7 +10,7 @@ import net.minecraft.world.World;
 
 public class EntityDropParticleFX extends EntityFX
 {
-    private Material materialType;
+    private final Material materialType;
     private int bobTimer;
 
     protected EntityDropParticleFX(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, Material p_i1203_8_)
@@ -69,7 +69,7 @@ public class EntityDropParticleFX extends EntityFX
             this.particleBlue = 4.0F / (float)(40 - this.bobTimer + 8);
         }
 
-        this.motionY -= (double)this.particleGravity;
+        this.motionY -= this.particleGravity;
 
         if (this.bobTimer-- > 0)
         {
@@ -98,7 +98,7 @@ public class EntityDropParticleFX extends EntityFX
             if (this.materialType == Material.water)
             {
                 this.setDead();
-                this.worldObj.spawnParticle(EnumParticleTypes.WATER_SPLASH, this.posX, this.posY, this.posZ, 0.0D, 0.0D, 0.0D, new int[0]);
+                this.worldObj.spawnParticle(EnumParticleTypes.WATER_SPLASH, this.posX, this.posY, this.posZ, 0.0D, 0.0D, 0.0D);
             }
             else
             {
@@ -119,7 +119,7 @@ public class EntityDropParticleFX extends EntityFX
 
             if (iblockstate.getBlock() instanceof BlockLiquid)
             {
-                d0 = (double)BlockLiquid.getLiquidHeightPercent(((Integer)iblockstate.getValue(BlockLiquid.LEVEL)).intValue());
+                d0 = BlockLiquid.getLiquidHeightPercent(iblockstate.getValue(BlockLiquid.LEVEL).intValue());
             }
 
             double d1 = (double)(MathHelper.floor_double(this.posY) + 1) - d0;

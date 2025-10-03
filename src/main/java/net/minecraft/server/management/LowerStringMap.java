@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 public class LowerStringMap<V> implements Map<String, V>
 {
-    private final Map<String, V> internalMap = Maps.<String, V>newLinkedHashMap();
+    private final Map<String, V> internalMap = Maps.newLinkedHashMap();
 
     public int size()
     {
@@ -49,7 +49,7 @@ public class LowerStringMap<V> implements Map<String, V>
     {
         for (Entry <? extends String, ? extends V > entry : p_putAll_1_.entrySet())
         {
-            this.put((String)entry.getKey(), entry.getValue());
+            this.put(entry.getKey(), entry.getValue());
         }
     }
 

@@ -9,13 +9,13 @@ import java.util.Map;
 
 public class RegionFileCache
 {
-    private static final Map<File, RegionFile> regionsByFilename = Maps.<File, RegionFile>newHashMap();
+    private static final Map<File, RegionFile> regionsByFilename = Maps.newHashMap();
 
     public static synchronized RegionFile createOrLoadRegionFile(File worldDir, int chunkX, int chunkZ)
     {
         File file1 = new File(worldDir, "region");
         File file2 = new File(file1, "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mca");
-        RegionFile regionfile = (RegionFile)regionsByFilename.get(file2);
+        RegionFile regionfile = regionsByFilename.get(file2);
 
         if (regionfile != null)
         {

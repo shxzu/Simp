@@ -18,7 +18,7 @@ public abstract class EntityAITarget extends EntityAIBase
 {
     protected final EntityCreature taskOwner;
     protected boolean shouldCheckSight;
-    private boolean nearbyOnly;
+    private final boolean nearbyOnly;
     private int targetSearchStatus;
     private int targetSearchDelay;
     private int targetUnseenTicks;
@@ -99,7 +99,7 @@ public abstract class EntityAITarget extends EntityAIBase
 
     public void resetTask()
     {
-        this.taskOwner.setAttackTarget((EntityLivingBase)null);
+        this.taskOwner.setAttackTarget(null);
     }
 
     public static boolean isSuitableTarget(EntityLiving attacker, EntityLivingBase target, boolean includeInvincibles, boolean checkSight)
@@ -177,10 +177,7 @@ public abstract class EntityAITarget extends EntityAIBase
                     this.targetSearchStatus = this.canEasilyReach(target) ? 1 : 2;
                 }
 
-                if (this.targetSearchStatus == 2)
-                {
-                    return false;
-                }
+                return this.targetSearchStatus != 2;
             }
 
             return true;

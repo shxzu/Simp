@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 public class ResourceIndex
 {
     private static final Logger logger = LogManager.getLogger();
-    private final Map<String, File> resourceMap = Maps.<String, File>newHashMap();
+    private final Map<String, File> resourceMap = Maps.newHashMap();
 
     public ResourceIndex(File p_i1047_1_, String p_i1047_2_)
     {
@@ -34,15 +34,15 @@ public class ResourceIndex
             try
             {
                 bufferedreader = Files.newReader(file2, Charsets.UTF_8);
-                JsonObject jsonobject = (new JsonParser()).parse((Reader)bufferedreader).getAsJsonObject();
-                JsonObject jsonobject1 = JsonUtils.getJsonObject(jsonobject, "objects", (JsonObject)null);
+                JsonObject jsonobject = (new JsonParser()).parse(bufferedreader).getAsJsonObject();
+                JsonObject jsonobject1 = JsonUtils.getJsonObject(jsonobject, "objects", null);
 
                 if (jsonobject1 != null)
                 {
                     for (Entry<String, JsonElement> entry : jsonobject1.entrySet())
                     {
                         JsonObject jsonobject2 = (JsonObject)entry.getValue();
-                        String s = (String)entry.getKey();
+                        String s = entry.getKey();
                         String[] astring = s.split("/", 2);
                         String s1 = astring.length == 1 ? astring[0] : astring[0] + ":" + astring[1];
                         String s2 = JsonUtils.getString(jsonobject2, "hash");
@@ -57,11 +57,11 @@ public class ResourceIndex
             }
             catch (FileNotFoundException var21)
             {
-                logger.error("Can\'t find the resource index file: " + file2);
+                logger.error("Can't find the resource index file: " + file2);
             }
             finally
             {
-                IOUtils.closeQuietly((Reader)bufferedreader);
+                IOUtils.closeQuietly(bufferedreader);
             }
         }
     }

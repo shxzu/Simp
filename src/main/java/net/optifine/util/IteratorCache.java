@@ -7,13 +7,13 @@ import java.util.List;
 
 public class IteratorCache
 {
-    private static Deque<IteratorCache.IteratorReusable<Object>> dequeIterators = new ArrayDeque();
+    private static final Deque<IteratorCache.IteratorReusable<Object>> dequeIterators = new ArrayDeque();
 
     public static Iterator<Object> getReadOnly(List list)
     {
         synchronized (dequeIterators)
         {
-            IteratorCache.IteratorReusable<Object> iteratorreusable = (IteratorCache.IteratorReusable)dequeIterators.pollFirst();
+            IteratorCache.IteratorReusable<Object> iteratorreusable = dequeIterators.pollFirst();
 
             if (iteratorreusable == null)
             {

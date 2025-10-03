@@ -30,8 +30,8 @@ public class BlockFire extends Block
     public static final PropertyBool SOUTH = PropertyBool.create("south");
     public static final PropertyBool WEST = PropertyBool.create("west");
     public static final PropertyInteger UPPER = PropertyInteger.create("upper", 0, 2);
-    private final Map<Block, Integer> encouragements = Maps.<Block, Integer>newIdentityHashMap();
-    private final Map<Block, Integer> flammabilities = Maps.<Block, Integer>newIdentityHashMap();
+    private final Map<Block, Integer> encouragements = Maps.newIdentityHashMap();
+    private final Map<Block, Integer> flammabilities = Maps.newIdentityHashMap();
 
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
@@ -158,7 +158,7 @@ public class BlockFire extends Block
             }
             else
             {
-                int i = ((Integer)state.getValue(AGE)).intValue();
+                int i = state.getValue(AGE).intValue();
 
                 if (i < 15)
                 {
@@ -261,13 +261,13 @@ public class BlockFire extends Block
 
     private int getFlammability(Block blockIn)
     {
-        Integer integer = (Integer)this.flammabilities.get(blockIn);
+        Integer integer = this.flammabilities.get(blockIn);
         return integer == null ? 0 : integer.intValue();
     }
 
     private int getEncouragement(Block blockIn)
     {
-        Integer integer = (Integer)this.encouragements.get(blockIn);
+        Integer integer = this.encouragements.get(blockIn);
         return integer == null ? 0 : integer.intValue();
     }
 
@@ -376,7 +376,7 @@ public class BlockFire extends Block
     {
         if (rand.nextInt(24) == 0)
         {
-            worldIn.playSound((double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), "fire.fire", 1.0F + rand.nextFloat(), rand.nextFloat() * 0.7F + 0.3F, false);
+            worldIn.playSound((float)pos.getX() + 0.5F, (float)pos.getY() + 0.5F, (float)pos.getZ() + 0.5F, "fire.fire", 1.0F + rand.nextFloat(), rand.nextFloat() * 0.7F + 0.3F, false);
         }
 
         if (!World.doesBlockHaveSolidTopSurface(worldIn, pos.down()) && !Blocks.fire.canCatchFire(worldIn, pos.down()))
@@ -388,7 +388,7 @@ public class BlockFire extends Block
                     double d3 = (double)pos.getX() + rand.nextDouble() * 0.10000000149011612D;
                     double d8 = (double)pos.getY() + rand.nextDouble();
                     double d13 = (double)pos.getZ() + rand.nextDouble();
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d3, d8, d13, 0.0D, 0.0D, 0.0D, new int[0]);
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d3, d8, d13, 0.0D, 0.0D, 0.0D);
                 }
             }
 
@@ -399,7 +399,7 @@ public class BlockFire extends Block
                     double d4 = (double)(pos.getX() + 1) - rand.nextDouble() * 0.10000000149011612D;
                     double d9 = (double)pos.getY() + rand.nextDouble();
                     double d14 = (double)pos.getZ() + rand.nextDouble();
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d4, d9, d14, 0.0D, 0.0D, 0.0D, new int[0]);
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d4, d9, d14, 0.0D, 0.0D, 0.0D);
                 }
             }
 
@@ -410,7 +410,7 @@ public class BlockFire extends Block
                     double d5 = (double)pos.getX() + rand.nextDouble();
                     double d10 = (double)pos.getY() + rand.nextDouble();
                     double d15 = (double)pos.getZ() + rand.nextDouble() * 0.10000000149011612D;
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d5, d10, d15, 0.0D, 0.0D, 0.0D, new int[0]);
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d5, d10, d15, 0.0D, 0.0D, 0.0D);
                 }
             }
 
@@ -421,7 +421,7 @@ public class BlockFire extends Block
                     double d6 = (double)pos.getX() + rand.nextDouble();
                     double d11 = (double)pos.getY() + rand.nextDouble();
                     double d16 = (double)(pos.getZ() + 1) - rand.nextDouble() * 0.10000000149011612D;
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d6, d11, d16, 0.0D, 0.0D, 0.0D, new int[0]);
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d6, d11, d16, 0.0D, 0.0D, 0.0D);
                 }
             }
 
@@ -432,7 +432,7 @@ public class BlockFire extends Block
                     double d7 = (double)pos.getX() + rand.nextDouble();
                     double d12 = (double)(pos.getY() + 1) - rand.nextDouble() * 0.10000000149011612D;
                     double d17 = (double)pos.getZ() + rand.nextDouble();
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d7, d12, d17, 0.0D, 0.0D, 0.0D, new int[0]);
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d7, d12, d17, 0.0D, 0.0D, 0.0D);
                 }
             }
         }
@@ -443,7 +443,7 @@ public class BlockFire extends Block
                 double d0 = (double)pos.getX() + rand.nextDouble();
                 double d1 = (double)pos.getY() + rand.nextDouble() * 0.5D + 0.5D;
                 double d2 = (double)pos.getZ() + rand.nextDouble();
-                worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
+                worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d0, d1, d2, 0.0D, 0.0D, 0.0D);
             }
         }
     }
@@ -465,11 +465,11 @@ public class BlockFire extends Block
 
     public int getMetaFromState(IBlockState state)
     {
-        return ((Integer)state.getValue(AGE)).intValue();
+        return state.getValue(AGE).intValue();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {AGE, NORTH, EAST, SOUTH, WEST, UPPER, FLIP, ALT});
+        return new BlockState(this, AGE, NORTH, EAST, SOUTH, WEST, UPPER, FLIP, ALT);
     }
 }

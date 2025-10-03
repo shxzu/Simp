@@ -55,14 +55,13 @@ public class EnchantmentDamage extends Enchantment
 
     public boolean canApply(ItemStack stack)
     {
-        return stack.getItem() instanceof ItemAxe ? true : super.canApply(stack);
+        return stack.getItem() instanceof ItemAxe || super.canApply(stack);
     }
 
     public void onEntityDamaged(EntityLivingBase user, Entity target, int level)
     {
-        if (target instanceof EntityLivingBase)
+        if (target instanceof EntityLivingBase entitylivingbase)
         {
-            EntityLivingBase entitylivingbase = (EntityLivingBase)target;
 
             if (this.damageType == 2 && entitylivingbase.getCreatureAttribute() == EnumCreatureAttribute.ARTHROPOD)
             {

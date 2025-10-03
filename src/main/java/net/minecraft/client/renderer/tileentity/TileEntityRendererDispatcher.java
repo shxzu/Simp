@@ -3,7 +3,7 @@ package net.minecraft.client.renderer.tileentity;
 import com.google.common.collect.Maps;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.MinecraftFontRenderer;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
@@ -35,7 +35,7 @@ public class TileEntityRendererDispatcher
 {
     public Map<Class, TileEntitySpecialRenderer> mapSpecialRenderers = Maps.newHashMap();
     public static TileEntityRendererDispatcher instance = new TileEntityRendererDispatcher();
-    public MinecraftFontRenderer minecraftFontRenderer;
+    public FontRenderer fontRenderer;
     public static double staticPlayerX;
     public static double staticPlayerY;
     public static double staticPlayerZ;
@@ -48,7 +48,7 @@ public class TileEntityRendererDispatcher
     public double entityY;
     public double entityZ;
     public TileEntity tileEntityRendered;
-    private Tessellator batchBuffer = new Tessellator(2097152);
+    private final Tessellator batchBuffer = new Tessellator(2097152);
     private boolean drawingBatch = false;
 
     private TileEntityRendererDispatcher()
@@ -76,7 +76,7 @@ public class TileEntityRendererDispatcher
 
         if (tileentityspecialrenderer == null && teClass != TileEntity.class)
         {
-            tileentityspecialrenderer = this.<TileEntity>getSpecialRendererByClass((Class<? extends TileEntity>) teClass.getSuperclass());
+            tileentityspecialrenderer = this.getSpecialRendererByClass((Class<? extends TileEntity>) teClass.getSuperclass());
             this.mapSpecialRenderers.put(teClass, tileentityspecialrenderer);
         }
 
@@ -88,7 +88,7 @@ public class TileEntityRendererDispatcher
         return tileEntityIn != null && !tileEntityIn.isInvalid() ? this.getSpecialRendererByClass(tileEntityIn.getClass()) : null;
     }
 
-    public void cacheActiveRenderInfo(World worldIn, TextureManager textureManagerIn, MinecraftFontRenderer fontrendererIn, Entity entityIn, float partialTicks)
+    public void cacheActiveRenderInfo(World worldIn, TextureManager textureManagerIn, FontRenderer fontrendererIn, Entity entityIn, float partialTicks)
     {
         if (this.worldObj != worldIn)
         {
@@ -97,7 +97,7 @@ public class TileEntityRendererDispatcher
 
         this.renderEngine = textureManagerIn;
         this.entity = entityIn;
-        this.minecraftFontRenderer = fontrendererIn;
+        this.fontRenderer = fontrendererIn;
         this.entityYaw = entityIn.prevRotationYaw + (entityIn.rotationYaw - entityIn.prevRotationYaw) * partialTicks;
         this.entityPitch = entityIn.prevRotationPitch + (entityIn.rotationPitch - entityIn.prevRotationPitch) * partialTicks;
         this.entityX = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double)partialTicks;
@@ -111,18 +111,13 @@ public class TileEntityRendererDispatcher
         {
             boolean flag = true;
 
-            if (Reflector.ForgeTileEntity_hasFastRenderer.exists())
-            {
-                flag = !this.drawingBatch || !Reflector.callBoolean(tileentityIn, Reflector.ForgeTileEntity_hasFastRenderer, new Object[0]);
-            }
-
             if (flag)
             {
                 RenderHelper.enableStandardItemLighting();
                 int i = this.worldObj.getCombinedLight(tileentityIn.getPos(), 0);
                 int j = i % 65536;
                 int k = i / 65536;
-                OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j / 1.0F, (float)k / 1.0F);
+                OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j, (float) k);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             }
 
@@ -161,7 +156,7 @@ public class TileEntityRendererDispatcher
 
     public void renderTileEntityAt(TileEntity tileEntityIn, double x, double y, double z, float partialTicks, int destroyStage)
     {
-        TileEntitySpecialRenderer<TileEntity> tileentityspecialrenderer = this.<TileEntity>getSpecialRenderer(tileEntityIn);
+        TileEntitySpecialRenderer<TileEntity> tileentityspecialrenderer = this.getSpecialRenderer(tileEntityIn);
 
         if (tileentityspecialrenderer != null)
         {
@@ -169,14 +164,7 @@ public class TileEntityRendererDispatcher
             {
                 this.tileEntityRendered = tileEntityIn;
 
-                if (this.drawingBatch && Reflector.callBoolean(tileEntityIn, Reflector.ForgeTileEntity_hasFastRenderer, new Object[0]))
-                {
-                    tileentityspecialrenderer.renderTileEntityFast(tileEntityIn, x, y, z, partialTicks, destroyStage, this.batchBuffer.getWorldRenderer());
-                }
-                else
-                {
-                    tileentityspecialrenderer.renderTileEntityAt(tileEntityIn, x, y, z, partialTicks, destroyStage);
-                }
+                tileentityspecialrenderer.renderTileEntityAt(tileEntityIn, x, y, z, partialTicks, destroyStage);
 
                 this.tileEntityRendered = null;
             }
@@ -195,9 +183,9 @@ public class TileEntityRendererDispatcher
         this.worldObj = worldIn;
     }
 
-    public MinecraftFontRenderer getFontRenderer()
+    public FontRenderer getFontRenderer()
     {
-        return this.minecraftFontRenderer;
+        return this.fontRenderer;
     }
 
     public void preDrawBatch()

@@ -32,12 +32,12 @@ public class CommandEmote extends CommandBase
     {
         if (args.length <= 0)
         {
-            throw new WrongUsageException("commands.me.usage", new Object[0]);
+            throw new WrongUsageException("commands.me.usage");
         }
         else
         {
             IChatComponent ichatcomponent = getChatComponentFromNthArg(sender, args, 0, !(sender instanceof EntityPlayer));
-            MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentTranslation("chat.type.emote", new Object[] {sender.getDisplayName(), ichatcomponent}));
+            MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentTranslation("chat.type.emote", sender.getDisplayName(), ichatcomponent));
         }
     }
 

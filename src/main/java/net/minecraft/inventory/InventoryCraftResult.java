@@ -8,7 +8,7 @@ import net.minecraft.util.IChatComponent;
 
 public class InventoryCraftResult implements IInventory
 {
-    private ItemStack[] stackResult = new ItemStack[1];
+    private final ItemStack[] stackResult = new ItemStack[1];
 
     public int getSizeInventory()
     {
@@ -32,7 +32,7 @@ public class InventoryCraftResult implements IInventory
 
     public IChatComponent getDisplayName()
     {
-        return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
+        return this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName());
     }
 
     public ItemStack decrStackSize(int index, int count)

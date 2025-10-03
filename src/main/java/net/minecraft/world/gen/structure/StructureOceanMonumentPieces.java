@@ -680,7 +680,7 @@ public class StructureOceanMonumentPieces
     {
         private StructureOceanMonumentPieces.RoomDefinition field_175845_o;
         private StructureOceanMonumentPieces.RoomDefinition field_175844_p;
-        private List<StructureOceanMonumentPieces.Piece> field_175843_q = Lists.<StructureOceanMonumentPieces.Piece>newArrayList();
+        private final List<StructureOceanMonumentPieces.Piece> field_175843_q = Lists.newArrayList();
 
         public MonumentBuilding()
         {
@@ -706,7 +706,7 @@ public class StructureOceanMonumentPieces
             this.field_175845_o.field_175963_d = true;
             this.field_175843_q.add(new StructureOceanMonumentPieces.EntryRoom(this.coordBaseMode, this.field_175845_o));
             this.field_175843_q.add(new StructureOceanMonumentPieces.MonumentCoreRoom(this.coordBaseMode, this.field_175844_p, p_i45599_1_));
-            List<StructureOceanMonumentPieces.MonumentRoomFitHelper> list1 = Lists.<StructureOceanMonumentPieces.MonumentRoomFitHelper>newArrayList();
+            List<StructureOceanMonumentPieces.MonumentRoomFitHelper> list1 = Lists.newArrayList();
             list1.add(new StructureOceanMonumentPieces.XYDoubleRoomFitHelper());
             list1.add(new StructureOceanMonumentPieces.YZDoubleRoomFitHelper());
             list1.add(new StructureOceanMonumentPieces.ZDoubleRoomFitHelper());
@@ -853,7 +853,7 @@ public class StructureOceanMonumentPieces
             this.field_175844_p.field_175965_b[EnumFacing.EAST.getIndex()].field_175965_b[EnumFacing.UP.getIndex()].field_175963_d = true;
             this.field_175844_p.field_175965_b[EnumFacing.NORTH.getIndex()].field_175965_b[EnumFacing.UP.getIndex()].field_175963_d = true;
             this.field_175844_p.field_175965_b[EnumFacing.EAST.getIndex()].field_175965_b[EnumFacing.NORTH.getIndex()].field_175965_b[EnumFacing.UP.getIndex()].field_175963_d = true;
-            List<StructureOceanMonumentPieces.RoomDefinition> list = Lists.<StructureOceanMonumentPieces.RoomDefinition>newArrayList();
+            List<StructureOceanMonumentPieces.RoomDefinition> list = Lists.newArrayList();
 
             for (StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition4 : astructureoceanmonumentpieces$roomdefinition)
             {
@@ -952,10 +952,10 @@ public class StructureOceanMonumentPieces
 
             for (int l1 = 0; l1 < 5; ++l1)
             {
-                this.func_181655_a(worldIn, structureBoundingBoxIn, -1 - l1, 0 + l1 * 2, -1 - l1, -1 - l1, 23, 58 + l1, false);
-                this.func_181655_a(worldIn, structureBoundingBoxIn, 58 + l1, 0 + l1 * 2, -1 - l1, 58 + l1, 23, 58 + l1, false);
-                this.func_181655_a(worldIn, structureBoundingBoxIn, 0 - l1, 0 + l1 * 2, -1 - l1, 57 + l1, 23, -1 - l1, false);
-                this.func_181655_a(worldIn, structureBoundingBoxIn, 0 - l1, 0 + l1 * 2, 58 + l1, 57 + l1, 23, 58 + l1, false);
+                this.func_181655_a(worldIn, structureBoundingBoxIn, -1 - l1, l1 * 2, -1 - l1, -1 - l1, 23, 58 + l1, false);
+                this.func_181655_a(worldIn, structureBoundingBoxIn, 58 + l1, l1 * 2, -1 - l1, 58 + l1, 23, 58 + l1, false);
+                this.func_181655_a(worldIn, structureBoundingBoxIn, -l1, l1 * 2, -1 - l1, 57 + l1, 23, -1 - l1, false);
+                this.func_181655_a(worldIn, structureBoundingBoxIn, -l1, l1 * 2, 58 + l1, 57 + l1, 23, 58 + l1, false);
             }
 
             for (StructureOceanMonumentPieces.Piece structureoceanmonumentpieces$piece : this.field_175843_q)
@@ -975,8 +975,8 @@ public class StructureOceanMonumentPieces
 
             if (this.func_175818_a(p_175840_5_, p_175840_2_, 0, p_175840_2_ + 23, 20))
             {
-                this.fillWithBlocks(worldIn, p_175840_5_, p_175840_2_ + 0, 0, 0, p_175840_2_ + 24, 0, 20, field_175828_a, field_175828_a, false);
-                this.func_181655_a(worldIn, p_175840_5_, p_175840_2_ + 0, 1, 0, p_175840_2_ + 24, 10, 20, false);
+                this.fillWithBlocks(worldIn, p_175840_5_, p_175840_2_, 0, 0, p_175840_2_ + 24, 0, 20, field_175828_a, field_175828_a, false);
+                this.func_181655_a(worldIn, p_175840_5_, p_175840_2_, 1, 0, p_175840_2_ + 24, 10, 20, false);
 
                 for (int j = 0; j < 4; ++j)
                 {
@@ -1601,9 +1601,9 @@ public class StructureOceanMonumentPieces
         {
             if (p_175821_5_)
             {
-                this.fillWithBlocks(worldIn, p_175821_2_, p_175821_3_ + 0, 0, p_175821_4_ + 0, p_175821_3_ + 2, 0, p_175821_4_ + 8 - 1, field_175828_a, field_175828_a, false);
-                this.fillWithBlocks(worldIn, p_175821_2_, p_175821_3_ + 5, 0, p_175821_4_ + 0, p_175821_3_ + 8 - 1, 0, p_175821_4_ + 8 - 1, field_175828_a, field_175828_a, false);
-                this.fillWithBlocks(worldIn, p_175821_2_, p_175821_3_ + 3, 0, p_175821_4_ + 0, p_175821_3_ + 4, 0, p_175821_4_ + 2, field_175828_a, field_175828_a, false);
+                this.fillWithBlocks(worldIn, p_175821_2_, p_175821_3_, 0, p_175821_4_, p_175821_3_ + 2, 0, p_175821_4_ + 8 - 1, field_175828_a, field_175828_a, false);
+                this.fillWithBlocks(worldIn, p_175821_2_, p_175821_3_ + 5, 0, p_175821_4_, p_175821_3_ + 8 - 1, 0, p_175821_4_ + 8 - 1, field_175828_a, field_175828_a, false);
+                this.fillWithBlocks(worldIn, p_175821_2_, p_175821_3_ + 3, 0, p_175821_4_, p_175821_3_ + 4, 0, p_175821_4_ + 2, field_175828_a, field_175828_a, false);
                 this.fillWithBlocks(worldIn, p_175821_2_, p_175821_3_ + 3, 0, p_175821_4_ + 5, p_175821_3_ + 4, 0, p_175821_4_ + 8 - 1, field_175828_a, field_175828_a, false);
                 this.fillWithBlocks(worldIn, p_175821_2_, p_175821_3_ + 3, 0, p_175821_4_ + 2, p_175821_3_ + 4, 0, p_175821_4_ + 2, field_175826_b, field_175826_b, false);
                 this.fillWithBlocks(worldIn, p_175821_2_, p_175821_3_ + 3, 0, p_175821_4_ + 5, p_175821_3_ + 4, 0, p_175821_4_ + 5, field_175826_b, field_175826_b, false);
@@ -1612,7 +1612,7 @@ public class StructureOceanMonumentPieces
             }
             else
             {
-                this.fillWithBlocks(worldIn, p_175821_2_, p_175821_3_ + 0, 0, p_175821_4_ + 0, p_175821_3_ + 8 - 1, 0, p_175821_4_ + 8 - 1, field_175828_a, field_175828_a, false);
+                this.fillWithBlocks(worldIn, p_175821_2_, p_175821_3_, 0, p_175821_4_, p_175821_3_ + 8 - 1, 0, p_175821_4_ + 8 - 1, field_175828_a, field_175828_a, false);
             }
         }
 
@@ -1653,8 +1653,8 @@ public class StructureOceanMonumentPieces
                 EntityGuardian entityguardian = new EntityGuardian(worldIn);
                 entityguardian.setElder(true);
                 entityguardian.heal(entityguardian.getMaxHealth());
-                entityguardian.setLocationAndAngles((double)i + 0.5D, (double)j, (double)k + 0.5D, 0.0F, 0.0F);
-                entityguardian.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityguardian)), (IEntityLivingData)null);
+                entityguardian.setLocationAndAngles((double)i + 0.5D, j, (double)k + 0.5D, 0.0F, 0.0F);
+                entityguardian.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityguardian)), null);
                 worldIn.spawnEntityInWorld(entityguardian);
                 return true;
             }

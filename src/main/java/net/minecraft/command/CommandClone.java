@@ -35,7 +35,7 @@ public class CommandClone extends CommandBase
     {
         if (args.length < 9)
         {
-            throw new WrongUsageException("commands.clone.usage", new Object[0]);
+            throw new WrongUsageException("commands.clone.usage");
         }
         else
         {
@@ -49,7 +49,7 @@ public class CommandClone extends CommandBase
 
             if (i > 32768)
             {
-                throw new CommandException("commands.clone.tooManyBlocks", new Object[] {Integer.valueOf(i), Integer.valueOf(32768)});
+                throw new CommandException("commands.clone.tooManyBlocks", Integer.valueOf(i), Integer.valueOf(32768));
             }
             else
             {
@@ -59,7 +59,7 @@ public class CommandClone extends CommandBase
 
                 if ((args.length < 11 || !args[10].equals("force") && !args[10].equals("move")) && structureboundingbox.intersectsWith(structureboundingbox1))
                 {
-                    throw new CommandException("commands.clone.noOverlap", new Object[0]);
+                    throw new CommandException("commands.clone.noOverlap");
                 }
                 else
                 {
@@ -86,7 +86,7 @@ public class CommandClone extends CommandBase
                                 {
                                     if (args.length < 12)
                                     {
-                                        throw new WrongUsageException("commands.clone.usage", new Object[0]);
+                                        throw new WrongUsageException("commands.clone.usage");
                                     }
 
                                     block = getBlockByText(sender, args[11]);
@@ -98,10 +98,10 @@ public class CommandClone extends CommandBase
                                 }
                             }
 
-                            List<CommandClone.StaticCloneData> list = Lists.<CommandClone.StaticCloneData>newArrayList();
-                            List<CommandClone.StaticCloneData> list1 = Lists.<CommandClone.StaticCloneData>newArrayList();
-                            List<CommandClone.StaticCloneData> list2 = Lists.<CommandClone.StaticCloneData>newArrayList();
-                            LinkedList<BlockPos> linkedlist = Lists.<BlockPos>newLinkedList();
+                            List<CommandClone.StaticCloneData> list = Lists.newArrayList();
+                            List<CommandClone.StaticCloneData> list1 = Lists.newArrayList();
+                            List<CommandClone.StaticCloneData> list2 = Lists.newArrayList();
+                            LinkedList<BlockPos> linkedlist = Lists.newLinkedList();
                             BlockPos blockpos3 = new BlockPos(structureboundingbox1.minX - structureboundingbox.minX, structureboundingbox1.minY - structureboundingbox.minY, structureboundingbox1.minZ - structureboundingbox.minZ);
 
                             for (int k = structureboundingbox.minZ; k <= structureboundingbox.maxZ; ++k)
@@ -127,12 +127,12 @@ public class CommandClone extends CommandBase
                                             }
                                             else if (!iblockstate.getBlock().isFullBlock() && !iblockstate.getBlock().isFullCube())
                                             {
-                                                list2.add(new CommandClone.StaticCloneData(blockpos5, iblockstate, (NBTTagCompound)null));
+                                                list2.add(new CommandClone.StaticCloneData(blockpos5, iblockstate, null));
                                                 linkedlist.addFirst(blockpos4);
                                             }
                                             else
                                             {
-                                                list.add(new CommandClone.StaticCloneData(blockpos5, iblockstate, (NBTTagCompound)null));
+                                                list.add(new CommandClone.StaticCloneData(blockpos5, iblockstate, null));
                                                 linkedlist.addLast(blockpos4);
                                             }
                                         }
@@ -160,11 +160,11 @@ public class CommandClone extends CommandBase
                                 }
                             }
 
-                            List<CommandClone.StaticCloneData> list3 = Lists.<CommandClone.StaticCloneData>newArrayList();
+                            List<CommandClone.StaticCloneData> list3 = Lists.newArrayList();
                             list3.addAll(list);
                             list3.addAll(list1);
                             list3.addAll(list2);
-                            List<CommandClone.StaticCloneData> list4 = Lists.<CommandClone.StaticCloneData>reverse(list3);
+                            List<CommandClone.StaticCloneData> list4 = Lists.reverse(list3);
 
                             for (CommandClone.StaticCloneData commandclone$staticclonedata : list4)
                             {
@@ -225,22 +225,22 @@ public class CommandClone extends CommandBase
 
                             if (i <= 0)
                             {
-                                throw new CommandException("commands.clone.failed", new Object[0]);
+                                throw new CommandException("commands.clone.failed");
                             }
                             else
                             {
                                 sender.setCommandStat(CommandResultStats.Type.AFFECTED_BLOCKS, i);
-                                notifyOperators(sender, this, "commands.clone.success", new Object[] {Integer.valueOf(i)});
+                                notifyOperators(sender, this, "commands.clone.success", Integer.valueOf(i));
                             }
                         }
                         else
                         {
-                            throw new CommandException("commands.clone.outOfWorld", new Object[0]);
+                            throw new CommandException("commands.clone.outOfWorld");
                         }
                     }
                     else
                     {
-                        throw new CommandException("commands.clone.outOfWorld", new Object[0]);
+                        throw new CommandException("commands.clone.outOfWorld");
                     }
                 }
             }
@@ -249,7 +249,7 @@ public class CommandClone extends CommandBase
 
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length > 3 && args.length <= 6 ? func_175771_a(args, 3, pos) : (args.length > 6 && args.length <= 9 ? func_175771_a(args, 6, pos) : (args.length == 10 ? getListOfStringsMatchingLastWord(args, new String[] {"replace", "masked", "filtered"}): (args.length == 11 ? getListOfStringsMatchingLastWord(args, new String[] {"normal", "force", "move"}): (args.length == 12 && "filtered".equals(args[9]) ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : null)))));
+        return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length > 3 && args.length <= 6 ? func_175771_a(args, 3, pos) : (args.length > 6 && args.length <= 9 ? func_175771_a(args, 6, pos) : (args.length == 10 ? getListOfStringsMatchingLastWord(args, "replace", "masked", "filtered"): (args.length == 11 ? getListOfStringsMatchingLastWord(args, "normal", "force", "move"): (args.length == 12 && "filtered".equals(args[9]) ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : null)))));
     }
 
     static class StaticCloneData

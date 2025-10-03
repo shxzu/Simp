@@ -35,7 +35,7 @@ public class CommandTitle extends CommandBase
     {
         if (args.length < 2)
         {
-            throw new WrongUsageException("commands.title.usage", new Object[0]);
+            throw new WrongUsageException("commands.title.usage");
         }
         else
         {
@@ -43,12 +43,12 @@ public class CommandTitle extends CommandBase
             {
                 if ("title".equals(args[1]) || "subtitle".equals(args[1]))
                 {
-                    throw new WrongUsageException("commands.title.usage.title", new Object[0]);
+                    throw new WrongUsageException("commands.title.usage.title");
                 }
 
                 if ("times".equals(args[1]))
                 {
-                    throw new WrongUsageException("commands.title.usage.times", new Object[0]);
+                    throw new WrongUsageException("commands.title.usage.times");
                 }
             }
 
@@ -61,7 +61,7 @@ public class CommandTitle extends CommandBase
                 {
                     if (args.length != 5)
                     {
-                        throw new WrongUsageException("commands.title.usage", new Object[0]);
+                        throw new WrongUsageException("commands.title.usage");
                     }
                     else
                     {
@@ -70,12 +70,12 @@ public class CommandTitle extends CommandBase
                         int k = parseInt(args[4]);
                         S45PacketTitle s45packettitle2 = new S45PacketTitle(i, j, k);
                         entityplayermp.playerNetServerHandler.sendPacket(s45packettitle2);
-                        notifyOperators(sender, this, "commands.title.success", new Object[0]);
+                        notifyOperators(sender, this, "commands.title.success");
                     }
                 }
                 else if (args.length < 3)
                 {
-                    throw new WrongUsageException("commands.title.usage", new Object[0]);
+                    throw new WrongUsageException("commands.title.usage");
                 }
                 else
                 {
@@ -89,23 +89,23 @@ public class CommandTitle extends CommandBase
                     catch (JsonParseException jsonparseexception)
                     {
                         Throwable throwable = ExceptionUtils.getRootCause(jsonparseexception);
-                        throw new SyntaxErrorException("commands.tellraw.jsonException", new Object[] {throwable == null ? "" : throwable.getMessage()});
+                        throw new SyntaxErrorException("commands.tellraw.jsonException", throwable == null ? "" : throwable.getMessage());
                     }
 
                     S45PacketTitle s45packettitle1 = new S45PacketTitle(s45packettitle$type, ChatComponentProcessor.processComponent(sender, ichatcomponent, entityplayermp));
                     entityplayermp.playerNetServerHandler.sendPacket(s45packettitle1);
-                    notifyOperators(sender, this, "commands.title.success", new Object[0]);
+                    notifyOperators(sender, this, "commands.title.success");
                 }
             }
             else if (args.length != 2)
             {
-                throw new WrongUsageException("commands.title.usage", new Object[0]);
+                throw new WrongUsageException("commands.title.usage");
             }
             else
             {
-                S45PacketTitle s45packettitle = new S45PacketTitle(s45packettitle$type, (IChatComponent)null);
+                S45PacketTitle s45packettitle = new S45PacketTitle(s45packettitle$type, null);
                 entityplayermp.playerNetServerHandler.sendPacket(s45packettitle);
-                notifyOperators(sender, this, "commands.title.success", new Object[0]);
+                notifyOperators(sender, this, "commands.title.success");
             }
         }
     }

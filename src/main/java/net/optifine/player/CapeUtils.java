@@ -29,9 +29,8 @@ public class CapeUtils
             TextureManager texturemanager = Minecraft.getMinecraft().getTextureManager();
             ITextureObject itextureobject = texturemanager.getTexture(resourcelocation);
 
-            if (itextureobject != null && itextureobject instanceof ThreadDownloadImageData)
+            if (itextureobject != null && itextureobject instanceof ThreadDownloadImageData threaddownloadimagedata)
             {
-                ThreadDownloadImageData threaddownloadimagedata = (ThreadDownloadImageData)itextureobject;
 
                 if (threaddownloadimagedata.imageFound != null)
                 {
@@ -39,9 +38,8 @@ public class CapeUtils
                     {
                         player.setLocationOfCape(resourcelocation);
 
-                        if (threaddownloadimagedata.getImageBuffer() instanceof CapeImageBuffer)
+                        if (threaddownloadimagedata.getImageBuffer() instanceof CapeImageBuffer capeimagebuffer1)
                         {
-                            CapeImageBuffer capeimagebuffer1 = (CapeImageBuffer)threaddownloadimagedata.getImageBuffer();
                             player.setElytraOfCape(capeimagebuffer1.isElytraOfCape());
                         }
                     }
@@ -51,7 +49,7 @@ public class CapeUtils
             }
 
             CapeImageBuffer capeimagebuffer = new CapeImageBuffer(player, resourcelocation);
-            ThreadDownloadImageData threaddownloadimagedata1 = new ThreadDownloadImageData((File)null, s1, (ResourceLocation)null, capeimagebuffer);
+            ThreadDownloadImageData threaddownloadimagedata1 = new ThreadDownloadImageData(null, s1, null, capeimagebuffer);
             threaddownloadimagedata1.pipeline = true;
             texturemanager.loadTexture(resourcelocation, threaddownloadimagedata1);
         }
@@ -70,7 +68,7 @@ public class CapeUtils
 
         BufferedImage bufferedimage = new BufferedImage(i, j, 2);
         Graphics graphics = bufferedimage.getGraphics();
-        graphics.drawImage(img, 0, 0, (ImageObserver)null);
+        graphics.drawImage(img, 0, 0, null);
         graphics.dispose();
         return bufferedimage;
     }
@@ -87,14 +85,13 @@ public class CapeUtils
         TextureManager texturemanager = Config.getTextureManager();
         ITextureObject itextureobject = texturemanager.getTexture(resourcelocation);
 
-        if (itextureobject instanceof SimpleTexture)
+        if (itextureobject instanceof SimpleTexture simpletexture)
         {
-            SimpleTexture simpletexture = (SimpleTexture)itextureobject;
             simpletexture.deleteGlTexture();
             texturemanager.deleteTexture(resourcelocation);
         }
 
-        player.setLocationOfCape((ResourceLocation)null);
+        player.setLocationOfCape(null);
         player.setElytraOfCape(false);
         downloadCape(player);
     }

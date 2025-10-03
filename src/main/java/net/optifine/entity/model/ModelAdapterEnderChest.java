@@ -24,13 +24,12 @@ public class ModelAdapterEnderChest extends ModelAdapter
 
     public ModelRenderer getModelRenderer(ModelBase model, String modelPart)
     {
-        if (!(model instanceof ModelChest))
+        if (!(model instanceof ModelChest modelchest))
         {
             return null;
         }
         else
         {
-            ModelChest modelchest = (ModelChest)model;
             return modelPart.equals("lid") ? modelchest.chestLid : (modelPart.equals("base") ? modelchest.chestBelow : (modelPart.equals("knob") ? modelchest.chestKnob : null));
         }
     }

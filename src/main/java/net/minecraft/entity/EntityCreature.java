@@ -15,7 +15,7 @@ public abstract class EntityCreature extends EntityLiving
     public static final AttributeModifier FLEEING_SPEED_MODIFIER = (new AttributeModifier(FLEEING_SPEED_MODIFIER_UUID, "Fleeing speed bonus", 2.0D, 2)).setSaved(false);
     private BlockPos homePosition = BlockPos.ORIGIN;
     private float maximumHomeDistance = -1.0F;
-    private EntityAIBase aiBase = new EntityAIMoveTowardsRestriction(this, 1.0D);
+    private final EntityAIBase aiBase = new EntityAIMoveTowardsRestriction(this, 1.0D);
     private boolean isMovementAITaskSet;
 
     public EntityCreature(World worldIn)
@@ -45,7 +45,7 @@ public abstract class EntityCreature extends EntityLiving
 
     public boolean isWithinHomeDistanceFromPosition(BlockPos pos)
     {
-        return this.maximumHomeDistance == -1.0F ? true : this.homePosition.distanceSq(pos) < (double)(this.maximumHomeDistance * this.maximumHomeDistance);
+        return this.maximumHomeDistance == -1.0F || this.homePosition.distanceSq(pos) < (double) (this.maximumHomeDistance * this.maximumHomeDistance);
     }
 
     public void setHomePosAndDistance(BlockPos pos, int distance)

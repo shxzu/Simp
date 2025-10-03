@@ -310,8 +310,8 @@ public class WorldInfo
         nbt.setDouble("BorderSafeZone", this.borderSafeZone);
         nbt.setDouble("BorderDamagePerBlock", this.borderDamagePerBlock);
         nbt.setDouble("BorderSizeLerpTarget", this.borderSizeLerpTarget);
-        nbt.setDouble("BorderWarningBlocks", (double)this.borderWarningDistance);
-        nbt.setDouble("BorderWarningTime", (double)this.borderWarningTime);
+        nbt.setDouble("BorderWarningBlocks", this.borderWarningDistance);
+        nbt.setDouble("BorderWarningTime", this.borderWarningTime);
 
         if (this.difficulty != null)
         {
@@ -667,7 +667,7 @@ public class WorldInfo
         {
             public String call() throws Exception
             {
-                return String.format("ID %02d - %s, ver %d. Features enabled: %b", new Object[] {Integer.valueOf(WorldInfo.this.terrainType.getWorldTypeID()), WorldInfo.this.terrainType.getWorldTypeName(), Integer.valueOf(WorldInfo.this.terrainType.getGeneratorVersion()), Boolean.valueOf(WorldInfo.this.mapFeaturesEnabled)});
+                return String.format("ID %02d - %s, ver %d. Features enabled: %b", Integer.valueOf(WorldInfo.this.terrainType.getWorldTypeID()), WorldInfo.this.terrainType.getWorldTypeName(), Integer.valueOf(WorldInfo.this.terrainType.getGeneratorVersion()), Boolean.valueOf(WorldInfo.this.mapFeaturesEnabled));
             }
         });
         category.addCrashSectionCallable("Level generator options", new Callable<String>()
@@ -681,14 +681,14 @@ public class WorldInfo
         {
             public String call() throws Exception
             {
-                return CrashReportCategory.getCoordinateInfo((double)WorldInfo.this.spawnX, (double)WorldInfo.this.spawnY, (double)WorldInfo.this.spawnZ);
+                return CrashReportCategory.getCoordinateInfo(WorldInfo.this.spawnX, WorldInfo.this.spawnY, WorldInfo.this.spawnZ);
             }
         });
         category.addCrashSectionCallable("Level time", new Callable<String>()
         {
             public String call() throws Exception
             {
-                return String.format("%d game time, %d day time", new Object[] {Long.valueOf(WorldInfo.this.totalTime), Long.valueOf(WorldInfo.this.worldTime)});
+                return String.format("%d game time, %d day time", Long.valueOf(WorldInfo.this.totalTime), Long.valueOf(WorldInfo.this.worldTime));
             }
         });
         category.addCrashSectionCallable("Level dimension", new Callable<String>()
@@ -718,24 +718,23 @@ public class WorldInfo
                 }
                 catch (Throwable var3)
                 {
-                    ;
                 }
 
-                return String.format("0x%05X - %s", new Object[] {Integer.valueOf(WorldInfo.this.saveVersion), s});
+                return String.format("0x%05X - %s", Integer.valueOf(WorldInfo.this.saveVersion), s);
             }
         });
         category.addCrashSectionCallable("Level weather", new Callable<String>()
         {
             public String call() throws Exception
             {
-                return String.format("Rain time: %d (now: %b), thunder time: %d (now: %b)", new Object[] {Integer.valueOf(WorldInfo.this.rainTime), Boolean.valueOf(WorldInfo.this.raining), Integer.valueOf(WorldInfo.this.thunderTime), Boolean.valueOf(WorldInfo.this.thundering)});
+                return String.format("Rain time: %d (now: %b), thunder time: %d (now: %b)", Integer.valueOf(WorldInfo.this.rainTime), Boolean.valueOf(WorldInfo.this.raining), Integer.valueOf(WorldInfo.this.thunderTime), Boolean.valueOf(WorldInfo.this.thundering));
             }
         });
         category.addCrashSectionCallable("Level game mode", new Callable<String>()
         {
             public String call() throws Exception
             {
-                return String.format("Game mode: %s (ID %d). Hardcore: %b. Cheats: %b", new Object[] {WorldInfo.this.theGameType.getName(), Integer.valueOf(WorldInfo.this.theGameType.getID()), Boolean.valueOf(WorldInfo.this.hardcore), Boolean.valueOf(WorldInfo.this.allowCommands)});
+                return String.format("Game mode: %s (ID %d). Hardcore: %b. Cheats: %b", WorldInfo.this.theGameType.getName(), Integer.valueOf(WorldInfo.this.theGameType.getID()), Boolean.valueOf(WorldInfo.this.hardcore), Boolean.valueOf(WorldInfo.this.allowCommands));
             }
         });
     }

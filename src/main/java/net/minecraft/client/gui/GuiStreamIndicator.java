@@ -29,23 +29,23 @@ public class GuiStreamIndicator
             if (i > 0)
             {
                 String s = "" + i;
-                int j = this.mc.minecraftFontRendererObj.getStringWidth(s);
+                int j = this.mc.fontRendererObj.getStringWidth(s);
                 int k = 20;
                 int l = p_152437_1_ - j - 1;
                 int i1 = p_152437_2_ + 20 - 1;
-                int j1 = p_152437_2_ + 20 + this.mc.minecraftFontRendererObj.FONT_HEIGHT - 1;
+                int j1 = p_152437_2_ + 20 + this.mc.fontRendererObj.FONT_HEIGHT - 1;
                 GlStateManager.disableTexture2D();
                 Tessellator tessellator = Tessellator.getInstance();
                 WorldRenderer worldrenderer = tessellator.getWorldRenderer();
                 GlStateManager.color(0.0F, 0.0F, 0.0F, (0.65F + 0.35000002F * this.streamAlpha) / 2.0F);
                 worldrenderer.begin(7, DefaultVertexFormats.POSITION);
-                worldrenderer.pos((double)l, (double)j1, 0.0D).endVertex();
-                worldrenderer.pos((double)p_152437_1_, (double)j1, 0.0D).endVertex();
-                worldrenderer.pos((double)p_152437_1_, (double)i1, 0.0D).endVertex();
-                worldrenderer.pos((double)l, (double)i1, 0.0D).endVertex();
+                worldrenderer.pos(l, j1, 0.0D).endVertex();
+                worldrenderer.pos(p_152437_1_, j1, 0.0D).endVertex();
+                worldrenderer.pos(p_152437_1_, i1, 0.0D).endVertex();
+                worldrenderer.pos(l, i1, 0.0D).endVertex();
                 tessellator.draw();
                 GlStateManager.enableTexture2D();
-                this.mc.minecraftFontRendererObj.drawString(s, p_152437_1_ - j, p_152437_2_ + 20, 16777215);
+                this.mc.fontRendererObj.drawString(s, p_152437_1_ - j, p_152437_2_ + 20, 16777215);
             }
 
             this.render(p_152437_1_, p_152437_2_, this.func_152440_b(), 0);
@@ -65,10 +65,10 @@ public class GuiStreamIndicator
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldrenderer.pos((double)(p_152436_1_ - 16 - p_152436_4_), (double)(p_152436_2_ + 16), (double)f).tex((double)f1, (double)f4).endVertex();
-        worldrenderer.pos((double)(p_152436_1_ - p_152436_4_), (double)(p_152436_2_ + 16), (double)f).tex((double)f3, (double)f4).endVertex();
-        worldrenderer.pos((double)(p_152436_1_ - p_152436_4_), (double)(p_152436_2_ + 0), (double)f).tex((double)f3, (double)f2).endVertex();
-        worldrenderer.pos((double)(p_152436_1_ - 16 - p_152436_4_), (double)(p_152436_2_ + 0), (double)f).tex((double)f1, (double)f2).endVertex();
+        worldrenderer.pos(p_152436_1_ - 16 - p_152436_4_, p_152436_2_ + 16, f).tex(f1, f4).endVertex();
+        worldrenderer.pos(p_152436_1_ - p_152436_4_, p_152436_2_ + 16, f).tex(f3, f4).endVertex();
+        worldrenderer.pos(p_152436_1_ - p_152436_4_, p_152436_2_, f).tex(f3, f2).endVertex();
+        worldrenderer.pos(p_152436_1_ - 16 - p_152436_4_, p_152436_2_, f).tex(f1, f2).endVertex();
         tessellator.draw();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }

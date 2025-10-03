@@ -5,9 +5,9 @@ import net.optifine.expr.IExpressionFloat;
 
 public class ShaderParameterIndexed implements IExpressionFloat
 {
-    private ShaderParameterFloat type;
-    private int index1;
-    private int index2;
+    private final ShaderParameterFloat type;
+    private final int index1;
+    private final int index2;
 
     public ShaderParameterIndexed(ShaderParameterFloat type)
     {
@@ -38,6 +38,6 @@ public class ShaderParameterIndexed implements IExpressionFloat
 
     public String toString()
     {
-        return this.type.getIndexNames1() == null ? "" + this.type : (this.type.getIndexNames2() == null ? "" + this.type + "." + this.type.getIndexNames1()[this.index1] : "" + this.type + "." + this.type.getIndexNames1()[this.index1] + "." + this.type.getIndexNames2()[this.index2]);
+        return this.type.getIndexNames1() == null ? "" + this.type : (this.type.getIndexNames2() == null ? this.type + "." + this.type.getIndexNames1()[this.index1] : this.type + "." + this.type.getIndexNames1()[this.index1] + "." + this.type.getIndexNames2()[this.index2]);
     }
 }

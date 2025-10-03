@@ -197,16 +197,16 @@ public class WorldRenderer
 
     private static float getDistanceSq(FloatBuffer p_181665_0_, float p_181665_1_, float p_181665_2_, float p_181665_3_, int p_181665_4_, int p_181665_5_)
     {
-        float f = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 0 + 0);
-        float f1 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 0 + 1);
-        float f2 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 0 + 2);
-        float f3 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 1 + 0);
-        float f4 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 1 + 1);
-        float f5 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 1 + 2);
-        float f6 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 2 + 0);
+        float f = p_181665_0_.get(p_181665_5_);
+        float f1 = p_181665_0_.get(p_181665_5_ + 1);
+        float f2 = p_181665_0_.get(p_181665_5_ + 2);
+        float f3 = p_181665_0_.get(p_181665_5_ + p_181665_4_);
+        float f4 = p_181665_0_.get(p_181665_5_ + p_181665_4_ + 1);
+        float f5 = p_181665_0_.get(p_181665_5_ + p_181665_4_ + 2);
+        float f6 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 2);
         float f7 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 2 + 1);
         float f8 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 2 + 2);
-        float f9 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 3 + 0);
+        float f9 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 3);
         float f10 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 3 + 1);
         float f11 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 3 + 2);
         float f12 = (f + f3 + f6 + f9) * 0.25F - p_181665_1_;
@@ -325,8 +325,8 @@ public class WorldRenderer
     {
         if (this.quadSprite != null && this.quadSprites != null)
         {
-            u = (double)this.quadSprite.toSingleU((float)u);
-            v = (double)this.quadSprite.toSingleV((float)v);
+            u = this.quadSprite.toSingleU((float)u);
+            v = this.quadSprite.toSingleV((float)v);
             this.quadSprites[this.vertexCount / 4] = this.quadSprite;
         }
 
@@ -494,10 +494,6 @@ public class WorldRenderer
     public WorldRenderer color(float red, float green, float blue, float alpha)
     {
         return this.color((int)(red * 255.0F), (int)(green * 255.0F), (int)(blue * 255.0F), (int)(alpha * 255.0F));
-    }
-
-    public WorldRenderer color(int colorHex) {
-        return this.color(colorHex >> 16 & 255, colorHex >> 8 & 255, colorHex & 255, colorHex >> 24 & 255);
     }
 
     public WorldRenderer color(int red, int green, int blue, int alpha)
@@ -838,7 +834,6 @@ public class WorldRenderer
 
             if (j > 0)
             {
-                ;
             }
         }
     }

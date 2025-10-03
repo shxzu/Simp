@@ -9,9 +9,9 @@ import net.optifine.CustomLoadingScreens;
 
 public class GuiDownloadTerrain extends GuiScreen
 {
-    private NetHandlerPlayClient netHandlerPlayClient;
+    private final NetHandlerPlayClient netHandlerPlayClient;
     private int progress;
-    private CustomLoadingScreen customLoadingScreen = CustomLoadingScreens.getCustomLoadingScreen();
+    private final CustomLoadingScreen customLoadingScreen = CustomLoadingScreens.getCustomLoadingScreen();
 
     public GuiDownloadTerrain(NetHandlerPlayClient netHandler)
     {
@@ -48,7 +48,7 @@ public class GuiDownloadTerrain extends GuiScreen
             this.drawBackground(0);
         }
 
-        this.drawCenteredString(this.minecraftFontRendererObj, I18n.format("multiplayer.downloadingTerrain", new Object[0]), this.width / 2, this.height / 2 - 50, 16777215);
+        this.drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingTerrain"), this.width / 2, this.height / 2 - 50, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 

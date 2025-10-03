@@ -8,9 +8,9 @@ import net.optifine.BlockPosM;
 
 public class IteratorRenderChunks implements Iterator<RenderChunk>
 {
-    private ViewFrustum viewFrustum;
-    private Iterator3d Iterator3d;
-    private BlockPosM posBlock = new BlockPosM(0, 0, 0);
+    private final ViewFrustum viewFrustum;
+    private final Iterator3d Iterator3d;
+    private final BlockPosM posBlock = new BlockPosM(0, 0, 0);
 
     public IteratorRenderChunks(ViewFrustum viewFrustum, BlockPos posStart, BlockPos posEnd, int width, int height)
     {

@@ -24,7 +24,7 @@ public class EnumTypeAdapterFactory implements TypeAdapterFactory
         }
         else
         {
-            final Map<String, T> map = Maps.<String, T>newHashMap();
+            final Map<String, T> map = Maps.newHashMap();
 
             for (T t : oclass.getEnumConstants())
             {
@@ -49,11 +49,11 @@ public class EnumTypeAdapterFactory implements TypeAdapterFactory
                     if (p_read_1_.peek() == JsonToken.NULL)
                     {
                         p_read_1_.nextNull();
-                        return (T)null;
+                        return null;
                     }
                     else
                     {
-                        return (T)map.get(p_read_1_.nextString());
+                        return map.get(p_read_1_.nextString());
                     }
                 }
             };

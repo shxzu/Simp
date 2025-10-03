@@ -23,7 +23,7 @@ public class PropertyInteger extends PropertyHelper<Integer>
         }
         else
         {
-            Set<Integer> set = Sets.<Integer>newHashSet();
+            Set<Integer> set = Sets.newHashSet();
 
             for (int i = min; i <= max; ++i)
             {

@@ -23,9 +23,9 @@ import org.lwjgl.input.Keyboard;
 public class GuiRepair extends GuiContainer implements ICrafting
 {
     private static final ResourceLocation anvilResource = new ResourceLocation("textures/gui/container/anvil.png");
-    private ContainerRepair anvil;
+    private final ContainerRepair anvil;
     private GuiTextField nameField;
-    private InventoryPlayer playerInventory;
+    private final InventoryPlayer playerInventory;
 
     public GuiRepair(InventoryPlayer inventoryIn, World worldIn)
     {
@@ -40,7 +40,7 @@ public class GuiRepair extends GuiContainer implements ICrafting
         Keyboard.enableRepeatEvents(true);
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;
-        this.nameField = new GuiTextField(0, this.minecraftFontRendererObj, i + 62, j + 24, 103, 12);
+        this.nameField = new GuiTextField(0, this.fontRendererObj, i + 62, j + 24, 103, 12);
         this.nameField.setTextColor(-1);
         this.nameField.setDisabledTextColour(-1);
         this.nameField.setEnableBackgroundDrawing(false);
@@ -60,17 +60,17 @@ public class GuiRepair extends GuiContainer implements ICrafting
     {
         GlStateManager.disableLighting();
         GlStateManager.disableBlend();
-        this.minecraftFontRendererObj.drawString(I18n.format("container.repair", new Object[0]), 60, 6, 4210752);
+        this.fontRendererObj.drawString(I18n.format("container.repair"), 60, 6, 4210752);
 
         if (this.anvil.maximumCost > 0)
         {
             int i = 8453920;
             boolean flag = true;
-            String s = I18n.format("container.repair.cost", new Object[] {Integer.valueOf(this.anvil.maximumCost)});
+            String s = I18n.format("container.repair.cost", Integer.valueOf(this.anvil.maximumCost));
 
             if (this.anvil.maximumCost >= 40 && !this.mc.thePlayer.capabilities.isCreativeMode)
             {
-                s = I18n.format("container.repair.expensive", new Object[0]);
+                s = I18n.format("container.repair.expensive");
                 i = 16736352;
             }
             else if (!this.anvil.getSlot(2).getHasStack())
@@ -85,22 +85,22 @@ public class GuiRepair extends GuiContainer implements ICrafting
             if (flag)
             {
                 int j = -16777216 | (i & 16579836) >> 2 | i & -16777216;
-                int k = this.xSize - 8 - this.minecraftFontRendererObj.getStringWidth(s);
+                int k = this.xSize - 8 - this.fontRendererObj.getStringWidth(s);
                 int l = 67;
 
-                if (this.minecraftFontRendererObj.getUnicodeFlag())
+                if (this.fontRendererObj.getUnicodeFlag())
                 {
                     drawRect(k - 3, l - 2, this.xSize - 7, l + 10, -16777216);
                     drawRect(k - 2, l - 1, this.xSize - 8, l + 9, -12895429);
                 }
                 else
                 {
-                    this.minecraftFontRendererObj.drawString(s, k, l + 1, j);
-                    this.minecraftFontRendererObj.drawString(s, k + 1, l, j);
-                    this.minecraftFontRendererObj.drawString(s, k + 1, l + 1, j);
+                    this.fontRendererObj.drawString(s, k, l + 1, j);
+                    this.fontRendererObj.drawString(s, k + 1, l, j);
+                    this.fontRendererObj.drawString(s, k + 1, l + 1, j);
                 }
 
-                this.minecraftFontRendererObj.drawString(s, k, l, i);
+                this.fontRendererObj.drawString(s, k, l, i);
             }
         }
 

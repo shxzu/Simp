@@ -22,7 +22,7 @@ public class C00PacketLoginStart implements Packet<INetHandlerLoginServer>
 
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.profile = new GameProfile((UUID)null, buf.readStringFromBuffer(16));
+        this.profile = new GameProfile(null, buf.readStringFromBuffer(16));
     }
 
     public void writePacketData(PacketBuffer buf) throws IOException

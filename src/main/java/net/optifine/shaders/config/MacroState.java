@@ -21,9 +21,9 @@ import net.optifine.expr.ParseException;
 public class MacroState
 {
     private boolean active = true;
-    private Deque<Boolean> dequeState = new ArrayDeque();
-    private Deque<Boolean> dequeResolved = new ArrayDeque();
-    private Map<String, String> mapMacroValues = new HashMap();
+    private final Deque<Boolean> dequeState = new ArrayDeque();
+    private final Deque<Boolean> dequeResolved = new ArrayDeque();
+    private final Map<String, String> mapMacroValues = new HashMap();
     private static final Pattern PATTERN_DIRECTIVE = Pattern.compile("\\s*#\\s*(\\w+)\\s*(.*)");
     private static final Pattern PATTERN_DEFINED = Pattern.compile("defined\\s+(\\w+)");
     private static final Pattern PATTERN_DEFINED_FUNC = Pattern.compile("defined\\s*\\(\\s*(\\w+)\\s*\\)");
@@ -36,7 +36,7 @@ public class MacroState
     private static final String ELSE = "else";
     private static final String ELIF = "elif";
     private static final String ENDIF = "endif";
-    private static final List<String> MACRO_NAMES = Arrays.<String>asList(new String[] {"define", "undef", "ifdef", "ifndef", "if", "else", "elif", "endif"});
+    private static final List<String> MACRO_NAMES = Arrays.asList("define", "undef", "ifdef", "ifndef", "if", "else", "elif", "endif");
 
     public boolean processLine(String line)
     {
@@ -115,8 +115,8 @@ public class MacroState
         {
             if (name.equals("elif"))
             {
-                boolean flag3 = ((Boolean)this.dequeState.removeLast()).booleanValue();
-                boolean flag7 = ((Boolean)this.dequeResolved.removeLast()).booleanValue();
+                boolean flag3 = this.dequeState.removeLast().booleanValue();
+                boolean flag7 = this.dequeResolved.removeLast().booleanValue();
 
                 if (flag7)
                 {
@@ -132,8 +132,8 @@ public class MacroState
             }
             else if (name.equals("else"))
             {
-                boolean flag = ((Boolean)this.dequeState.removeLast()).booleanValue();
-                boolean flag1 = ((Boolean)this.dequeResolved.removeLast()).booleanValue();
+                boolean flag = this.dequeState.removeLast().booleanValue();
+                boolean flag1 = this.dequeResolved.removeLast().booleanValue();
                 boolean flag2 = !flag1;
                 this.dequeState.add(Boolean.valueOf(flag2));
                 this.dequeResolved.add(Boolean.valueOf(true));
@@ -170,7 +170,7 @@ public class MacroState
 
                     if ((Character.isLetter(c0) || c0 == 95) && this.mapMacroValues.containsKey(s))
                     {
-                        String s1 = (String)this.mapMacroValues.get(s);
+                        String s1 = this.mapMacroValues.get(s);
 
                         if (s1 == null)
                         {

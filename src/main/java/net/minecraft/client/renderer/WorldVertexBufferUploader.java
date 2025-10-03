@@ -25,47 +25,40 @@ public class WorldVertexBufferUploader
             int i = vertexformat.getNextOffset();
             ByteBuffer bytebuffer = p_181679_1_.getByteBuffer();
             List<VertexFormatElement> list = vertexformat.getElements();
-            boolean flag = Reflector.ForgeVertexFormatElementEnumUseage_preDraw.exists();
-            boolean flag1 = Reflector.ForgeVertexFormatElementEnumUseage_postDraw.exists();
+            boolean flag = false;
+            boolean flag1 = false;
 
             for (int j = 0; j < list.size(); ++j)
             {
-                VertexFormatElement vertexformatelement = (VertexFormatElement)list.get(j);
+                VertexFormatElement vertexformatelement = list.get(j);
                 VertexFormatElement.EnumUsage vertexformatelement$enumusage = vertexformatelement.getUsage();
 
-                if (flag)
+                int k = vertexformatelement.getType().getGlConstant();
+                int l = vertexformatelement.getIndex();
+                bytebuffer.position(vertexformat.getOffset(j));
+
+                switch (vertexformatelement$enumusage)
                 {
-                    Reflector.callVoid(vertexformatelement$enumusage, Reflector.ForgeVertexFormatElementEnumUseage_preDraw, new Object[] {vertexformat, Integer.valueOf(j), Integer.valueOf(i), bytebuffer});
-                }
-                else
-                {
-                    int k = vertexformatelement.getType().getGlConstant();
-                    int l = vertexformatelement.getIndex();
-                    bytebuffer.position(vertexformat.getOffset(j));
+                    case POSITION:
+                        GL11.glVertexPointer(vertexformatelement.getElementCount(), k, i, bytebuffer);
+                        GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+                        break;
 
-                    switch (vertexformatelement$enumusage)
-                    {
-                        case POSITION:
-                            GL11.glVertexPointer(vertexformatelement.getElementCount(), k, i, bytebuffer);
-                            GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-                            break;
+                    case UV:
+                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + l);
+                        GL11.glTexCoordPointer(vertexformatelement.getElementCount(), k, i, bytebuffer);
+                        GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
+                        break;
 
-                        case UV:
-                            OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + l);
-                            GL11.glTexCoordPointer(vertexformatelement.getElementCount(), k, i, bytebuffer);
-                            GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                            OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
-                            break;
+                    case COLOR:
+                        GL11.glColorPointer(vertexformatelement.getElementCount(), k, i, bytebuffer);
+                        GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
+                        break;
 
-                        case COLOR:
-                            GL11.glColorPointer(vertexformatelement.getElementCount(), k, i, bytebuffer);
-                            GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
-                            break;
-
-                        case NORMAL:
-                            GL11.glNormalPointer(k, i, bytebuffer);
-                            GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
-                    }
+                    case NORMAL:
+                        GL11.glNormalPointer(k, i, bytebuffer);
+                        GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
                 }
             }
 
@@ -86,37 +79,30 @@ public class WorldVertexBufferUploader
 
             for (int k1 = list.size(); j1 < k1; ++j1)
             {
-                VertexFormatElement vertexformatelement1 = (VertexFormatElement)list.get(j1);
+                VertexFormatElement vertexformatelement1 = list.get(j1);
                 VertexFormatElement.EnumUsage vertexformatelement$enumusage1 = vertexformatelement1.getUsage();
 
-                if (flag1)
+                int i1 = vertexformatelement1.getIndex();
+
+                switch (vertexformatelement$enumusage1)
                 {
-                    Reflector.callVoid(vertexformatelement$enumusage1, Reflector.ForgeVertexFormatElementEnumUseage_postDraw, new Object[] {vertexformat, Integer.valueOf(j1), Integer.valueOf(i), bytebuffer});
-                }
-                else
-                {
-                    int i1 = vertexformatelement1.getIndex();
+                    case POSITION:
+                        GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+                        break;
 
-                    switch (vertexformatelement$enumusage1)
-                    {
-                        case POSITION:
-                            GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
-                            break;
+                    case UV:
+                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + i1);
+                        GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
+                        break;
 
-                        case UV:
-                            OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + i1);
-                            GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                            OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
-                            break;
+                    case COLOR:
+                        GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
+                        GlStateManager.resetColor();
+                        break;
 
-                        case COLOR:
-                            GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
-                            GlStateManager.resetColor();
-                            break;
-
-                        case NORMAL:
-                            GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
-                    }
+                    case NORMAL:
+                        GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
                 }
             }
         }

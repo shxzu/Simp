@@ -4,7 +4,7 @@ import com.mojang.authlib.exceptions.InvalidCredentialsException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.Random;
-import net.minecraft.client.gui.MinecraftFontRenderer;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -19,27 +19,27 @@ public class GuiScreenCapeOF extends GuiScreenOF
     private long messageHideTimeMs;
     private String linkUrl;
     private GuiButtonOF buttonCopyLink;
-    private MinecraftFontRenderer minecraftFontRenderer;
+    private final FontRenderer fontRenderer;
 
     public GuiScreenCapeOF(GuiScreen parentScreenIn)
     {
-        this.minecraftFontRenderer = Config.getMinecraft().minecraftFontRendererObj;
+        this.fontRenderer = Config.getMinecraft().fontRendererObj;
         this.parentScreen = parentScreenIn;
     }
 
     public void initGui()
     {
         int i = 0;
-        this.title = I18n.format("of.options.capeOF.title", new Object[0]);
+        this.title = I18n.format("of.options.capeOF.title");
         i = i + 2;
-        this.buttonList.add(new GuiButtonOF(210, this.width / 2 - 155, this.height / 6 + 24 * (i >> 1), 150, 20, I18n.format("of.options.capeOF.openEditor", new Object[0])));
-        this.buttonList.add(new GuiButtonOF(220, this.width / 2 - 155 + 160, this.height / 6 + 24 * (i >> 1), 150, 20, I18n.format("of.options.capeOF.reloadCape", new Object[0])));
+        this.buttonList.add(new GuiButtonOF(210, this.width / 2 - 155, this.height / 6 + 24 * (i >> 1), 150, 20, I18n.format("of.options.capeOF.openEditor")));
+        this.buttonList.add(new GuiButtonOF(220, this.width / 2 - 155 + 160, this.height / 6 + 24 * (i >> 1), 150, 20, I18n.format("of.options.capeOF.reloadCape")));
         i = i + 6;
-        this.buttonCopyLink = new GuiButtonOF(230, this.width / 2 - 100, this.height / 6 + 24 * (i >> 1), 200, 20, I18n.format("of.options.capeOF.copyEditorLink", new Object[0]));
+        this.buttonCopyLink = new GuiButtonOF(230, this.width / 2 - 100, this.height / 6 + 24 * (i >> 1), 200, 20, I18n.format("of.options.capeOF.copyEditorLink"));
         this.buttonCopyLink.visible = this.linkUrl != null;
         this.buttonList.add(this.buttonCopyLink);
         i = i + 4;
-        this.buttonList.add(new GuiButtonOF(200, this.width / 2 - 100, this.height / 6 + 24 * (i >> 1), I18n.format("gui.done", new Object[0])));
+        this.buttonList.add(new GuiButtonOF(200, this.width / 2 - 100, this.height / 6 + 24 * (i >> 1), I18n.format("gui.done")));
     }
 
     protected void actionPerformed(GuiButton button)
@@ -59,7 +59,7 @@ public class GuiScreenCapeOF extends GuiScreenOF
                     String s1 = this.mc.getSession().getProfile().getId().toString().replace("-", "");
                     String s2 = this.mc.getSession().getToken();
                     Random random = new Random();
-                    Random random1 = new Random((long)System.identityHashCode(new Object()));
+                    Random random1 = new Random(System.identityHashCode(new Object()));
                     BigInteger biginteger = new BigInteger(128, random);
                     BigInteger biginteger1 = new BigInteger(128, random1);
                     BigInteger biginteger2 = biginteger.xor(biginteger1);
@@ -80,7 +80,7 @@ public class GuiScreenCapeOF extends GuiScreenOF
                 }
                 catch (InvalidCredentialsException invalidcredentialsexception)
                 {
-                    Config.showGuiMessage(I18n.format("of.message.capeOF.error1", new Object[0]), I18n.format("of.message.capeOF.error2", new Object[] {invalidcredentialsexception.getMessage()}));
+                    Config.showGuiMessage(I18n.format("of.message.capeOF.error1"), I18n.format("of.message.capeOF.error2", invalidcredentialsexception.getMessage()));
                     Config.warn("Mojang authentication failed");
                     Config.warn(invalidcredentialsexception.getClass().getName() + ": " + invalidcredentialsexception.getMessage());
                 }
@@ -114,22 +114,22 @@ public class GuiScreenCapeOF extends GuiScreenOF
     {
         this.message = msg;
         this.messageHideTimeMs = System.currentTimeMillis() + timeMs;
-        this.setLinkUrl((String)null);
+        this.setLinkUrl(null);
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.minecraftFontRenderer, this.title, this.width / 2, 20, 16777215);
+        this.drawCenteredString(this.fontRenderer, this.title, this.width / 2, 20, 16777215);
 
         if (this.message != null)
         {
-            this.drawCenteredString(this.minecraftFontRenderer, this.message, this.width / 2, this.height / 6 + 60, 16777215);
+            this.drawCenteredString(this.fontRenderer, this.message, this.width / 2, this.height / 6 + 60, 16777215);
 
             if (System.currentTimeMillis() > this.messageHideTimeMs)
             {
                 this.message = null;
-                this.setLinkUrl((String)null);
+                this.setLinkUrl(null);
             }
         }
 

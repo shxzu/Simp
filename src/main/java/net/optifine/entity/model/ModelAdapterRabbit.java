@@ -27,18 +27,17 @@ public class ModelAdapterRabbit extends ModelAdapter
 
     public ModelRenderer getModelRenderer(ModelBase model, String modelPart)
     {
-        if (!(model instanceof ModelRabbit))
+        if (!(model instanceof ModelRabbit modelrabbit))
         {
             return null;
         }
         else
         {
-            ModelRabbit modelrabbit = (ModelRabbit)model;
             Map<String, Integer> map = getMapPartFields();
 
             if (map.containsKey(modelPart))
             {
-                int i = ((Integer)map.get(modelPart)).intValue();
+                int i = map.get(modelPart).intValue();
                 return (ModelRenderer)Reflector.getFieldValue(modelrabbit, Reflector.ModelRabbit_renderers, i);
             }
             else

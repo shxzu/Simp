@@ -3,7 +3,7 @@ package net.minecraft.client.renderer.tileentity;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.MinecraftFontRenderer;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiUtilRenderComponents;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.client.model.ModelSign;
@@ -85,7 +85,7 @@ public class TileEntitySignRenderer extends TileEntitySpecialRenderer<TileEntity
 
         if (isRenderText(te))
         {
-            MinecraftFontRenderer fontrenderer = this.getFontRenderer();
+            FontRenderer fontrenderer = this.getFontRenderer();
             float f3 = 0.015625F * f;
             GlStateManager.translate(0.0F, 0.5F * f, 0.07F * f);
             GlStateManager.scale(f3, -f3, f3);
@@ -106,7 +106,7 @@ public class TileEntitySignRenderer extends TileEntitySpecialRenderer<TileEntity
                     {
                         IChatComponent ichatcomponent = te.signText[j];
                         List<IChatComponent> list = GuiUtilRenderComponents.splitText(ichatcomponent, 90, fontrenderer, false, true);
-                        String s = list != null && list.size() > 0 ? ((IChatComponent)list.get(0)).getFormattedText() : "";
+                        String s = list != null && list.size() > 0 ? list.get(0).getFormattedText() : "";
 
                         if (j == te.lineBeingEdited)
                         {
@@ -151,10 +151,7 @@ public class TileEntitySignRenderer extends TileEntitySpecialRenderer<TileEntity
                 Entity entity = Config.getMinecraft().getRenderViewEntity();
                 double d0 = p_isRenderText_0_.getDistanceSq(entity.posX, entity.posY, entity.posZ);
 
-                if (d0 > textRenderDistanceSq)
-                {
-                    return false;
-                }
+                return !(d0 > textRenderDistanceSq);
             }
 
             return true;
@@ -164,7 +161,7 @@ public class TileEntitySignRenderer extends TileEntitySpecialRenderer<TileEntity
     public static void updateTextRenderDistance()
     {
         Minecraft minecraft = Config.getMinecraft();
-        double d0 = (double)Config.limit(minecraft.gameSettings.fovSetting, 1.0F, 120.0F);
+        double d0 = Config.limit(minecraft.gameSettings.fovSetting, 1.0F, 120.0F);
         double d1 = Math.max(1.5D * (double)minecraft.displayHeight / d0, 16.0D);
         textRenderDistanceSq = d1 * d1;
     }

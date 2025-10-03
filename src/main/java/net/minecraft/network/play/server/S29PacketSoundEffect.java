@@ -22,7 +22,7 @@ public class S29PacketSoundEffect implements Packet<INetHandlerPlayClient>
 
     public S29PacketSoundEffect(String soundNameIn, double soundX, double soundY, double soundZ, float volume, float pitch)
     {
-        Validate.notNull(soundNameIn, "name", new Object[0]);
+        Validate.notNull(soundNameIn, "name");
         this.soundName = soundNameIn;
         this.posX = (int)(soundX * 8.0D);
         this.posY = (int)(soundY * 8.0D);
@@ -59,17 +59,17 @@ public class S29PacketSoundEffect implements Packet<INetHandlerPlayClient>
 
     public double getX()
     {
-        return (double)((float)this.posX / 8.0F);
+        return (float)this.posX / 8.0F;
     }
 
     public double getY()
     {
-        return (double)((float)this.posY / 8.0F);
+        return (float)this.posY / 8.0F;
     }
 
     public double getZ()
     {
-        return (double)((float)this.posZ / 8.0F);
+        return (float)this.posZ / 8.0F;
     }
 
     public float getVolume()

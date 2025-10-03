@@ -1,9 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="Simp:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/Simp_jar</output-path>
-    <root id="archive" name="Simp.jar">
-      <element id="module-output" name="Simp.main" />
-      <element id="dir-copy" path="$PROJECT_DIR$/src/main/resources" />
-    </root>
-  </artifact>
-</component>

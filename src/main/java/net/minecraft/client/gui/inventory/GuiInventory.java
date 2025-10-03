@@ -51,7 +51,7 @@ public class GuiInventory extends InventoryEffectRenderer
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        this.minecraftFontRendererObj.drawString(I18n.format("container.crafting", new Object[0]), 86, 16, 4210752);
+        this.fontRendererObj.drawString(I18n.format("container.crafting"), 86, 16, 4210752);
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
@@ -86,10 +86,10 @@ public class GuiInventory extends InventoryEffectRenderer
         GlStateManager.rotate(135.0F, 0.0F, 1.0F, 0.0F);
         RenderHelper.enableStandardItemLighting();
         GlStateManager.rotate(-135.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(-((float)Math.atan((double)(mouseY / 40.0F))) * 20.0F, 1.0F, 0.0F, 0.0F);
-        ent.renderYawOffset = (float)Math.atan((double)(mouseX / 40.0F)) * 20.0F;
-        ent.rotationYaw = (float)Math.atan((double)(mouseX / 40.0F)) * 40.0F;
-        ent.rotationPitch = -((float)Math.atan((double)(mouseY / 40.0F))) * 20.0F;
+        GlStateManager.rotate(-((float)Math.atan(mouseY / 40.0F)) * 20.0F, 1.0F, 0.0F, 0.0F);
+        ent.renderYawOffset = (float)Math.atan(mouseX / 40.0F) * 20.0F;
+        ent.rotationYaw = (float)Math.atan(mouseX / 40.0F) * 40.0F;
+        ent.rotationPitch = -((float)Math.atan(mouseY / 40.0F)) * 20.0F;
         ent.rotationYawHead = ent.rotationYaw;
         ent.prevRotationYawHead = ent.rotationYaw;
         GlStateManager.translate(0.0F, 0.0F, 0.0F);

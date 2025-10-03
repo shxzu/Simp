@@ -10,7 +10,7 @@ import net.minecraft.world.World;
 
 public class BlockAir extends Block
 {
-    private static Map mapOriginalOpacity = new IdentityHashMap();
+    private static final Map mapOriginalOpacity = new IdentityHashMap();
 
     protected BlockAir()
     {

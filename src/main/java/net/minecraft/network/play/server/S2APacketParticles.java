@@ -98,17 +98,17 @@ public class S2APacketParticles implements Packet<INetHandlerPlayClient>
 
     public double getXCoordinate()
     {
-        return (double)this.xCoord;
+        return this.xCoord;
     }
 
     public double getYCoordinate()
     {
-        return (double)this.yCoord;
+        return this.yCoord;
     }
 
     public double getZCoordinate()
     {
-        return (double)this.zCoord;
+        return this.zCoord;
     }
 
     public float getXOffset()

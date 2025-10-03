@@ -24,13 +24,12 @@ public class TileEntityUtils
 
     public static String getTileEntityName(TileEntity te)
     {
-        if (!(te instanceof IWorldNameable))
+        if (!(te instanceof IWorldNameable iworldnameable))
         {
             return null;
         }
         else
         {
-            IWorldNameable iworldnameable = (IWorldNameable)te;
             updateTileEntityName(te);
             return !iworldnameable.hasCustomName() ? null : iworldnameable.getName();
         }
@@ -75,9 +74,8 @@ public class TileEntityUtils
         }
         else
         {
-            if (te instanceof IWorldNameable)
+            if (te instanceof IWorldNameable iworldnameable)
             {
-                IWorldNameable iworldnameable = (IWorldNameable)te;
 
                 if (iworldnameable.hasCustomName())
                 {

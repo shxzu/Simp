@@ -80,13 +80,13 @@ public class EntityTrackerEntry
     private double lastTrackedEntityPosY;
     private double lastTrackedEntityPosZ;
     private boolean firstUpdateDone;
-    private boolean sendVelocityUpdates;
+    private final boolean sendVelocityUpdates;
     private int ticksSinceLastForcedTeleport;
     private Entity field_85178_v;
     private boolean ridingEntity;
     private boolean onGround;
     public boolean playerEntitiesUpdated;
-    public Set<EntityPlayerMP> trackingPlayers = Sets.<EntityPlayerMP>newHashSet();
+    public Set<EntityPlayerMP> trackingPlayers = Sets.newHashSet();
 
     public EntityTrackerEntry(Entity trackedEntityIn, int trackingDistanceThresholdIn, int updateFrequencyIn, boolean sendVelocityUpdatesIn)
     {
@@ -105,7 +105,7 @@ public class EntityTrackerEntry
 
     public boolean equals(Object p_equals_1_)
     {
-        return p_equals_1_ instanceof EntityTrackerEntry ? ((EntityTrackerEntry)p_equals_1_).trackedEntity.getEntityId() == this.trackedEntity.getEntityId() : false;
+        return p_equals_1_ instanceof EntityTrackerEntry && ((EntityTrackerEntry) p_equals_1_).trackedEntity.getEntityId() == this.trackedEntity.getEntityId();
     }
 
     public int hashCode()
@@ -133,9 +133,8 @@ public class EntityTrackerEntry
             this.sendPacketToTrackedPlayers(new S1BPacketEntityAttach(0, this.trackedEntity, this.trackedEntity.ridingEntity));
         }
 
-        if (this.trackedEntity instanceof EntityItemFrame && this.updateCounter % 10 == 0)
+        if (this.trackedEntity instanceof EntityItemFrame entityitemframe && this.updateCounter % 10 == 0)
         {
-            EntityItemFrame entityitemframe = (EntityItemFrame)this.trackedEntity;
             ItemStack itemstack = entityitemframe.getDisplayedItem();
 
             if (itemstack != null && itemstack.getItem() instanceof ItemMap)
@@ -407,9 +406,8 @@ public class EntityTrackerEntry
                         }
                     }
 
-                    if (this.trackedEntity instanceof EntityPlayer)
+                    if (this.trackedEntity instanceof EntityPlayer entityplayer)
                     {
-                        EntityPlayer entityplayer = (EntityPlayer)this.trackedEntity;
 
                         if (entityplayer.isPlayerSleeping())
                         {
@@ -417,9 +415,8 @@ public class EntityTrackerEntry
                         }
                     }
 
-                    if (this.trackedEntity instanceof EntityLivingBase)
+                    if (this.trackedEntity instanceof EntityLivingBase entitylivingbase)
                     {
-                        EntityLivingBase entitylivingbase = (EntityLivingBase)this.trackedEntity;
 
                         for (PotionEffect potioneffect : entitylivingbase.getActivePotionEffects())
                         {
@@ -471,9 +468,8 @@ public class EntityTrackerEntry
         {
             return new S0CPacketSpawnPlayer((EntityPlayer)this.trackedEntity);
         }
-        else if (this.trackedEntity instanceof EntityMinecart)
+        else if (this.trackedEntity instanceof EntityMinecart entityminecart)
         {
-            EntityMinecart entityminecart = (EntityMinecart)this.trackedEntity;
             return new S0EPacketSpawnObject(this.trackedEntity, 10, entityminecart.getMinecartType().getNetworkID());
         }
         else if (this.trackedEntity instanceof EntityBoat)
@@ -519,9 +515,8 @@ public class EntityTrackerEntry
         {
             return new S0EPacketSpawnObject(this.trackedEntity, 76);
         }
-        else if (this.trackedEntity instanceof EntityFireball)
+        else if (this.trackedEntity instanceof EntityFireball entityfireball)
         {
-            EntityFireball entityfireball = (EntityFireball)this.trackedEntity;
             S0EPacketSpawnObject s0epacketspawnobject2 = null;
             int i = 63;
 
@@ -560,9 +555,8 @@ public class EntityTrackerEntry
         {
             return new S0EPacketSpawnObject(this.trackedEntity, 51);
         }
-        else if (this.trackedEntity instanceof EntityFallingBlock)
+        else if (this.trackedEntity instanceof EntityFallingBlock entityfallingblock)
         {
-            EntityFallingBlock entityfallingblock = (EntityFallingBlock)this.trackedEntity;
             return new S0EPacketSpawnObject(this.trackedEntity, 70, Block.getStateId(entityfallingblock.getBlock()));
         }
         else if (this.trackedEntity instanceof EntityArmorStand)
@@ -573,9 +567,8 @@ public class EntityTrackerEntry
         {
             return new S10PacketSpawnPainting((EntityPainting)this.trackedEntity);
         }
-        else if (this.trackedEntity instanceof EntityItemFrame)
+        else if (this.trackedEntity instanceof EntityItemFrame entityitemframe)
         {
-            EntityItemFrame entityitemframe = (EntityItemFrame)this.trackedEntity;
             S0EPacketSpawnObject s0epacketspawnobject1 = new S0EPacketSpawnObject(this.trackedEntity, 71, entityitemframe.facingDirection.getHorizontalIndex());
             BlockPos blockpos1 = entityitemframe.getHangingPosition();
             s0epacketspawnobject1.setX(MathHelper.floor_float((float)(blockpos1.getX() * 32)));
@@ -583,9 +576,8 @@ public class EntityTrackerEntry
             s0epacketspawnobject1.setZ(MathHelper.floor_float((float)(blockpos1.getZ() * 32)));
             return s0epacketspawnobject1;
         }
-        else if (this.trackedEntity instanceof EntityLeashKnot)
+        else if (this.trackedEntity instanceof EntityLeashKnot entityleashknot)
         {
-            EntityLeashKnot entityleashknot = (EntityLeashKnot)this.trackedEntity;
             S0EPacketSpawnObject s0epacketspawnobject = new S0EPacketSpawnObject(this.trackedEntity, 77);
             BlockPos blockpos = entityleashknot.getHangingPosition();
             s0epacketspawnobject.setX(MathHelper.floor_float((float)(blockpos.getX() * 32)));
@@ -599,7 +591,7 @@ public class EntityTrackerEntry
         }
         else
         {
-            throw new IllegalArgumentException("Don\'t know how to add " + this.trackedEntity.getClass() + "!");
+            throw new IllegalArgumentException("Don't know how to add " + this.trackedEntity.getClass() + "!");
         }
     }
 

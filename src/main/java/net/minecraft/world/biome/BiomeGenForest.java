@@ -14,7 +14,7 @@ import net.minecraft.world.gen.feature.WorldGenForest;
 
 public class BiomeGenForest extends BiomeGenBase
 {
-    private int field_150632_aF;
+    private final int field_150632_aF;
     protected static final WorldGenForest field_150629_aC = new WorldGenForest(false, true);
     protected static final WorldGenForest field_150630_aD = new WorldGenForest(false, false);
     protected static final WorldGenCanopyTree field_150631_aE = new WorldGenCanopyTree(false);
@@ -76,7 +76,7 @@ public class BiomeGenForest extends BiomeGenBase
 
     public WorldGenAbstractTree genBigTreeChance(Random rand)
     {
-        return (WorldGenAbstractTree)(this.field_150632_aF == 3 && rand.nextInt(3) > 0 ? field_150631_aE : (this.field_150632_aF != 2 && rand.nextInt(5) != 0 ? this.worldGeneratorTrees : field_150630_aD));
+        return this.field_150632_aF == 3 && rand.nextInt(3) > 0 ? field_150631_aE : (this.field_150632_aF != 2 && rand.nextInt(5) != 0 ? this.worldGeneratorTrees : field_150630_aD);
     }
 
     public BlockFlower.EnumFlowerType pickRandomFlower(Random rand, BlockPos pos)

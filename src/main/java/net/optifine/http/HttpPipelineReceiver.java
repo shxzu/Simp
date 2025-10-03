@@ -5,6 +5,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import net.minecraft.src.Config;
@@ -12,7 +13,7 @@ import net.minecraft.src.Config;
 public class HttpPipelineReceiver extends Thread
 {
     private HttpPipelineConnection httpPipelineConnection = null;
-    private static final Charset ASCII = Charset.forName("ASCII");
+    private static final Charset ASCII = StandardCharsets.US_ASCII;
     private static final String HEADER_CONTENT_LENGTH = "Content-Length";
     private static final char CR = '\r';
     private static final char LF = '\n';
@@ -70,7 +71,7 @@ public class HttpPipelineReceiver extends Thread
                 if (s3.length() <= 0)
                 {
                     byte[] abyte = null;
-                    String s6 = (String)map.get("Content-Length");
+                    String s6 = map.get("Content-Length");
 
                     if (s6 != null)
                     {
@@ -84,7 +85,7 @@ public class HttpPipelineReceiver extends Thread
                     }
                     else
                     {
-                        String s7 = (String)map.get("Transfer-Encoding");
+                        String s7 = map.get("Transfer-Encoding");
 
                         if (Config.equals(s7, "chunked"))
                         {
@@ -171,8 +172,7 @@ public class HttpPipelineReceiver extends Thread
             i = j;
         }
 
-        byte[] abyte = bytearrayoutputstream.toByteArray();
-        String s = new String(abyte, ASCII);
+        String s = bytearrayoutputstream.toString(ASCII);
 
         if (flag)
         {

@@ -15,37 +15,30 @@ public class StringTranslate
 {
     private static final Pattern numericVariablePattern = Pattern.compile("%(\\d+\\$)?[\\d\\.]*[df]");
     private static final Splitter equalSignSplitter = Splitter.on('=').limit(2);
-    private static StringTranslate instance = new StringTranslate();
-    private final Map<String, String> languageList = Maps.<String, String>newHashMap();
+    private static final StringTranslate instance = new StringTranslate();
+    private final Map<String, String> languageList = Maps.newHashMap();
     private long lastUpdateTimeInMilliseconds;
 
     public StringTranslate()
     {
-        try
+        InputStream inputstream = StringTranslate.class.getResourceAsStream("/assets/minecraft/lang/en_US.lang");
+
+        for (String s : IOUtils.readLines(inputstream, Charsets.UTF_8))
         {
-            InputStream inputstream = StringTranslate.class.getResourceAsStream("/assets/minecraft/lang/en_US.lang");
-
-            for (String s : IOUtils.readLines(inputstream, Charsets.UTF_8))
+            if (!s.isEmpty() && s.charAt(0) != 35)
             {
-                if (!s.isEmpty() && s.charAt(0) != 35)
-                {
-                    String[] astring = (String[])Iterables.toArray(equalSignSplitter.split(s), String.class);
+                String[] astring = Iterables.toArray(equalSignSplitter.split(s), String.class);
 
-                    if (astring != null && astring.length == 2)
-                    {
-                        String s1 = astring[0];
-                        String s2 = numericVariablePattern.matcher(astring[1]).replaceAll("%$1s");
-                        this.languageList.put(s1, s2);
-                    }
+                if (astring != null && astring.length == 2)
+                {
+                    String s1 = astring[0];
+                    String s2 = numericVariablePattern.matcher(astring[1]).replaceAll("%$1s");
+                    this.languageList.put(s1, s2);
                 }
             }
+        }
 
-            this.lastUpdateTimeInMilliseconds = System.currentTimeMillis();
-        }
-        catch (IOException var7)
-        {
-            ;
-        }
+        this.lastUpdateTimeInMilliseconds = System.currentTimeMillis();
     }
 
     static StringTranslate getInstance()
@@ -81,7 +74,7 @@ public class StringTranslate
 
     private String tryTranslateKey(String key)
     {
-        String s = (String)this.languageList.get(key);
+        String s = this.languageList.get(key);
         return s == null ? key : s;
     }
 

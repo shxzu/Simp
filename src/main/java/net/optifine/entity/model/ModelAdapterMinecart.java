@@ -29,13 +29,12 @@ public class ModelAdapterMinecart extends ModelAdapter
 
     public ModelRenderer getModelRenderer(ModelBase model, String modelPart)
     {
-        if (!(model instanceof ModelMinecart))
+        if (!(model instanceof ModelMinecart modelminecart))
         {
             return null;
         }
         else
         {
-            ModelMinecart modelminecart = (ModelMinecart)model;
             return modelPart.equals("bottom") ? modelminecart.sideModels[0] : (modelPart.equals("back") ? modelminecart.sideModels[1] : (modelPart.equals("front") ? modelminecart.sideModels[2] : (modelPart.equals("right") ? modelminecart.sideModels[3] : (modelPart.equals("left") ? modelminecart.sideModels[4] : (modelPart.equals("dirt") ? modelminecart.sideModels[5] : null)))));
         }
     }

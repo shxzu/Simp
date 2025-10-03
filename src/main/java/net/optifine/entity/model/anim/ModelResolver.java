@@ -10,12 +10,12 @@ import net.optifine.expr.IExpression;
 
 public class ModelResolver implements IModelResolver
 {
-    private ModelAdapter modelAdapter;
-    private ModelBase model;
-    private CustomModelRenderer[] customModelRenderers;
+    private final ModelAdapter modelAdapter;
+    private final ModelBase model;
+    private final CustomModelRenderer[] customModelRenderers;
     private ModelRenderer thisModelRenderer;
     private ModelRenderer partModelRenderer;
-    private IRenderResolver renderResolver;
+    private final IRenderResolver renderResolver;
 
     public ModelResolver(ModelAdapter modelAdapter, ModelBase model, CustomModelRenderer[] customModelRenderers)
     {
@@ -45,7 +45,7 @@ public class ModelResolver implements IModelResolver
         else
         {
             IExpression iexpression1 = this.renderResolver.getParameter(name);
-            return iexpression1 != null ? iexpression1 : null;
+            return iexpression1;
         }
     }
 

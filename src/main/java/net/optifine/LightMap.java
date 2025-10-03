@@ -6,8 +6,8 @@ import net.minecraft.world.World;
 public class LightMap
 {
     private CustomColormap lightMapRgb = null;
-    private float[][] sunRgbs = new float[16][3];
-    private float[][] torchRgbs = new float[16][3];
+    private final float[][] sunRgbs = new float[16][3];
+    private final float[][] torchRgbs = new float[16][3];
 
     public LightMap(CustomColormap lightMapRgb)
     {
@@ -102,8 +102,8 @@ public class LightMap
 
     private void getLightMapColumn(float[][] origMap, float x, int offset, int width, float[][] colRgb)
     {
-        int i = (int)Math.floor((double)x);
-        int j = (int)Math.ceil((double)x);
+        int i = (int)Math.floor(x);
+        int j = (int)Math.ceil(x);
 
         if (i == j)
         {
@@ -112,10 +112,7 @@ public class LightMap
                 float[] afloat3 = origMap[offset + i1 * width + i];
                 float[] afloat4 = colRgb[i1];
 
-                for (int j1 = 0; j1 < 3; ++j1)
-                {
-                    afloat4[j1] = afloat3[j1];
-                }
+                System.arraycopy(afloat3, 0, afloat4, 0, 3);
             }
         }
         else

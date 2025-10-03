@@ -26,16 +26,16 @@ public class StateMap extends StateMapperBase
 
     protected ModelResourceLocation getModelResourceLocation(IBlockState state)
     {
-        Map<IProperty, Comparable> map = Maps.<IProperty, Comparable>newLinkedHashMap(state.getProperties());
+        Map<IProperty, Comparable> map = Maps.newLinkedHashMap(state.getProperties());
         String s;
 
         if (this.name == null)
         {
-            s = ((ResourceLocation)Block.blockRegistry.getNameForObject(state.getBlock())).toString();
+            s = Block.blockRegistry.getNameForObject(state.getBlock()).toString();
         }
         else
         {
-            s = ((IProperty)this.name).getName((Comparable)map.remove(this.name));
+            s = ((IProperty)this.name).getName(map.remove(this.name));
         }
 
         if (this.suffix != null)
@@ -55,7 +55,7 @@ public class StateMap extends StateMapperBase
     {
         private IProperty<?> name;
         private String suffix;
-        private final List < IProperty<? >> ignored = Lists. < IProperty<? >> newArrayList();
+        private final List < IProperty<? >> ignored = Lists.newArrayList();
 
         public StateMap.Builder withName(IProperty<?> builderPropertyIn)
         {

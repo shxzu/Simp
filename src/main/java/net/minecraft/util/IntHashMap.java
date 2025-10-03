@@ -1,5 +1,7 @@
 package net.minecraft.util;
 
+import java.util.Objects;
+
 public class IntHashMap<V>
 {
     private transient IntHashMap.Entry<V>[] slots = new IntHashMap.Entry[16];
@@ -30,7 +32,7 @@ public class IntHashMap<V>
             }
         }
 
-        return (V)null;
+        return null;
     }
 
     public boolean containsItem(int p_76037_1_)
@@ -121,7 +123,7 @@ public class IntHashMap<V>
     public V removeObject(int p_76049_1_)
     {
         IntHashMap.Entry<V> entry = this.removeEntry(p_76049_1_);
-        return (V)(entry == null ? null : entry.valueEntry);
+        return entry == null ? null : entry.valueEntry;
     }
 
     final IntHashMap.Entry<V> removeEntry(int p_76036_1_)
@@ -218,15 +220,12 @@ public class IntHashMap<V>
                 Object object = Integer.valueOf(this.getHash());
                 Object object1 = Integer.valueOf(entry.getHash());
 
-                if (object == object1 || object != null && object.equals(object1))
+                if (Objects.equals(object, object1))
                 {
                     Object object2 = this.getValue();
                     Object object3 = entry.getValue();
 
-                    if (object2 == object3 || object2 != null && object2.equals(object3))
-                    {
-                        return true;
-                    }
+                    return Objects.equals(object2, object3);
                 }
 
                 return false;

@@ -26,7 +26,7 @@ import net.minecraft.world.gen.feature.WorldGenerator;
 
 public class BlockSapling extends BlockBush implements IGrowable
 {
-    public static final PropertyEnum<BlockPlanks.EnumType> TYPE = PropertyEnum.<BlockPlanks.EnumType>create("type", BlockPlanks.EnumType.class);
+    public static final PropertyEnum<BlockPlanks.EnumType> TYPE = PropertyEnum.create("type", BlockPlanks.EnumType.class);
     public static final PropertyInteger STAGE = PropertyInteger.create("stage", 0, 1);
 
     protected BlockSapling()
@@ -57,7 +57,7 @@ public class BlockSapling extends BlockBush implements IGrowable
 
     public void grow(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        if (((Integer)state.getValue(STAGE)).intValue() == 0)
+        if (state.getValue(STAGE).intValue() == 0)
         {
             worldIn.setBlockState(pos, state.cycleProperty(STAGE), 4);
         }
@@ -69,12 +69,12 @@ public class BlockSapling extends BlockBush implements IGrowable
 
     public void generateTree(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        WorldGenerator worldgenerator = (WorldGenerator)(rand.nextInt(10) == 0 ? new WorldGenBigTree(true) : new WorldGenTrees(true));
+        WorldGenerator worldgenerator = rand.nextInt(10) == 0 ? new WorldGenBigTree(true) : new WorldGenTrees(true);
         int i = 0;
         int j = 0;
         boolean flag = false;
 
-        switch ((BlockPlanks.EnumType)state.getValue(TYPE))
+        switch (state.getValue(TYPE))
         {
             case SPRUCE:
                 label114:
@@ -201,7 +201,7 @@ public class BlockSapling extends BlockBush implements IGrowable
 
     public int damageDropped(IBlockState state)
     {
-        return ((BlockPlanks.EnumType)state.getValue(TYPE)).getMetadata();
+        return state.getValue(TYPE).getMetadata();
     }
 
     public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
@@ -235,13 +235,13 @@ public class BlockSapling extends BlockBush implements IGrowable
     public int getMetaFromState(IBlockState state)
     {
         int i = 0;
-        i = i | ((BlockPlanks.EnumType)state.getValue(TYPE)).getMetadata();
-        i = i | ((Integer)state.getValue(STAGE)).intValue() << 3;
+        i = i | state.getValue(TYPE).getMetadata();
+        i = i | state.getValue(STAGE).intValue() << 3;
         return i;
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {TYPE, STAGE});
+        return new BlockState(this, TYPE, STAGE);
     }
 }

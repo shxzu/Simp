@@ -9,8 +9,8 @@ public class BiomeCache
 {
     private final WorldChunkManager chunkManager;
     private long lastCleanupTime;
-    private LongHashMap<BiomeCache.Block> cacheMap = new LongHashMap();
-    private List<BiomeCache.Block> cache = Lists.<BiomeCache.Block>newArrayList();
+    private final LongHashMap<BiomeCache.Block> cacheMap = new LongHashMap();
+    private final List<BiomeCache.Block> cache = Lists.newArrayList();
 
     public BiomeCache(WorldChunkManager chunkManagerIn)
     {
@@ -22,7 +22,7 @@ public class BiomeCache
         x = x >> 4;
         z = z >> 4;
         long i = (long)x & 4294967295L | ((long)z & 4294967295L) << 32;
-        BiomeCache.Block biomecache$block = (BiomeCache.Block)this.cacheMap.getValueByKey(i);
+        BiomeCache.Block biomecache$block = this.cacheMap.getValueByKey(i);
 
         if (biomecache$block == null)
         {
@@ -52,7 +52,7 @@ public class BiomeCache
 
             for (int k = 0; k < this.cache.size(); ++k)
             {
-                BiomeCache.Block biomecache$block = (BiomeCache.Block)this.cache.get(k);
+                BiomeCache.Block biomecache$block = this.cache.get(k);
                 long l = i - biomecache$block.lastAccessTime;
 
                 if (l > 30000L || l < 0L)

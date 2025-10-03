@@ -17,7 +17,7 @@ import net.minecraft.world.chunk.IChunkProvider;
 
 public class ChunkProviderDebug implements IChunkProvider
 {
-    private static final List<IBlockState> field_177464_a = Lists.<IBlockState>newArrayList();
+    private static final List<IBlockState> field_177464_a = Lists.newArrayList();
     private static final int field_177462_b;
     private static final int field_181039_c;
     private final World world;
@@ -49,7 +49,7 @@ public class ChunkProviderDebug implements IChunkProvider
 
         Chunk chunk = new Chunk(this.world, chunkprimer, x, z);
         chunk.generateSkylightMap();
-        BiomeGenBase[] abiomegenbase = this.world.getWorldChunkManager().loadBlockGeneratorData((BiomeGenBase[])null, x * 16, z * 16, 16, 16);
+        BiomeGenBase[] abiomegenbase = this.world.getWorldChunkManager().loadBlockGeneratorData(null, x * 16, z * 16, 16, 16);
         byte[] abyte = chunk.getBiomeArray();
 
         for (int i1 = 0; i1 < abyte.length; ++i1)
@@ -76,7 +76,7 @@ public class ChunkProviderDebug implements IChunkProvider
 
                 if (i < field_177464_a.size())
                 {
-                    iblockstate = (IBlockState)field_177464_a.get(i);
+                    iblockstate = field_177464_a.get(i);
                 }
             }
         }

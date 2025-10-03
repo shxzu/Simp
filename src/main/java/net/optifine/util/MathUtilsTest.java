@@ -26,8 +26,8 @@ public class MathUtilsTest
         {
             case SIN:
             case COS:
-                d0 = (double)(-MathHelper.PI);
-                d1 = (double)MathHelper.PI;
+                d0 = -MathHelper.PI;
+                d1 = MathHelper.PI;
                 break;
 
             case ASIN:
@@ -74,7 +74,7 @@ public class MathUtilsTest
                     return;
             }
 
-            dbg(String.format("%.2f, Math: %f, Helper: %f, diff: %f", new Object[] {Double.valueOf(d2), Float.valueOf(f), Float.valueOf(f1), Float.valueOf(Math.abs(f - f1))}));
+            dbg(String.format("%.2f, Math: %f, Helper: %f, diff: %f", Double.valueOf(d2), Float.valueOf(f), Float.valueOf(f1), Float.valueOf(Math.abs(f - f1))));
         }
     }
 
@@ -83,11 +83,11 @@ public class MathUtilsTest
         System.out.println(str);
     }
 
-    private static enum OPER
+    private enum OPER
     {
         SIN,
         COS,
         ASIN,
-        ACOS;
+        ACOS
     }
 }

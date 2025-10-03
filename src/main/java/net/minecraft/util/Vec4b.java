@@ -2,10 +2,10 @@ package net.minecraft.util;
 
 public class Vec4b
 {
-    private byte field_176117_a;
-    private byte field_176115_b;
-    private byte field_176116_c;
-    private byte field_176114_d;
+    private final byte field_176117_a;
+    private final byte field_176115_b;
+    private final byte field_176116_c;
+    private final byte field_176114_d;
 
     public Vec4b(byte p_i45555_1_, byte p_i45555_2_, byte p_i45555_3_, byte p_i45555_4_)
     {
@@ -49,14 +49,13 @@ public class Vec4b
         {
             return true;
         }
-        else if (!(p_equals_1_ instanceof Vec4b))
+        else if (!(p_equals_1_ instanceof Vec4b vec4b))
         {
             return false;
         }
         else
         {
-            Vec4b vec4b = (Vec4b)p_equals_1_;
-            return this.field_176117_a != vec4b.field_176117_a ? false : (this.field_176114_d != vec4b.field_176114_d ? false : (this.field_176115_b != vec4b.field_176115_b ? false : this.field_176116_c == vec4b.field_176116_c));
+            return this.field_176117_a == vec4b.field_176117_a && (this.field_176114_d == vec4b.field_176114_d && (this.field_176115_b == vec4b.field_176115_b && this.field_176116_c == vec4b.field_176116_c));
         }
     }
 

@@ -6,8 +6,8 @@ import net.optifine.config.ConnectedParser;
 
 public class CustomPanoramaProperties
 {
-    private String path;
-    private ResourceLocation[] panoramaLocations;
+    private final String path;
+    private final ResourceLocation[] panoramaLocations;
     private int weight = 1;
     private int blur1 = 64;
     private int blur2 = 3;
@@ -85,6 +85,6 @@ public class CustomPanoramaProperties
 
     public String toString()
     {
-        return "" + this.path + ", weight: " + this.weight + ", blur: " + this.blur1 + " " + this.blur2 + " " + this.blur3 + ", overlay: " + this.overlay1Top + " " + this.overlay1Bottom + " " + this.overlay2Top + " " + this.overlay2Bottom;
+        return this.path + ", weight: " + this.weight + ", blur: " + this.blur1 + " " + this.blur2 + " " + this.blur3 + ", overlay: " + this.overlay1Top + " " + this.overlay1Bottom + " " + this.overlay2Top + " " + this.overlay2Bottom;
     }
 }

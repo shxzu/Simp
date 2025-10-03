@@ -5,7 +5,7 @@ import net.optifine.expr.IExpressionBool;
 
 public class ExpressionShaderOptionSwitch implements IExpressionBool
 {
-    private ShaderOptionSwitch shaderOption;
+    private final ShaderOptionSwitch shaderOption;
 
     public ExpressionShaderOptionSwitch(ShaderOptionSwitch shaderOption)
     {

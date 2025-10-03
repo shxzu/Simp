@@ -25,11 +25,11 @@ public class GuiMerchant extends GuiContainer
 {
     private static final Logger logger = LogManager.getLogger();
     private static final ResourceLocation MERCHANT_GUI_TEXTURE = new ResourceLocation("textures/gui/container/villager.png");
-    private IMerchant merchant;
+    private final IMerchant merchant;
     private GuiMerchant.MerchantButton nextButton;
     private GuiMerchant.MerchantButton previousButton;
     private int selectedMerchantRecipe;
-    private IChatComponent chatComponent;
+    private final IChatComponent chatComponent;
 
     public GuiMerchant(InventoryPlayer p_i45500_1_, IMerchant p_i45500_2_, World worldIn)
     {
@@ -52,8 +52,8 @@ public class GuiMerchant extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         String s = this.chatComponent.getUnformattedText();
-        this.minecraftFontRendererObj.drawString(s, this.xSize / 2 - this.minecraftFontRendererObj.getStringWidth(s) / 2, 6, 4210752);
-        this.minecraftFontRendererObj.drawString(I18n.format("container.inventory", new Object[0]), 8, this.ySize - 96 + 2, 4210752);
+        this.fontRendererObj.drawString(s, this.xSize / 2 - this.fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
+        this.fontRendererObj.drawString(I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
     }
 
     public void updateScreen()
@@ -123,7 +123,7 @@ public class GuiMerchant extends GuiContainer
                 return;
             }
 
-            MerchantRecipe merchantrecipe = (MerchantRecipe)merchantrecipelist.get(k);
+            MerchantRecipe merchantrecipe = merchantrecipelist.get(k);
 
             if (merchantrecipe.isRecipeDisabled())
             {
@@ -146,7 +146,7 @@ public class GuiMerchant extends GuiContainer
             int i = (this.width - this.xSize) / 2;
             int j = (this.height - this.ySize) / 2;
             int k = this.selectedMerchantRecipe;
-            MerchantRecipe merchantrecipe = (MerchantRecipe)merchantrecipelist.get(k);
+            MerchantRecipe merchantrecipe = merchantrecipelist.get(k);
             ItemStack itemstack = merchantrecipe.getItemToBuy();
             ItemStack itemstack1 = merchantrecipe.getSecondItemToBuy();
             ItemStack itemstack2 = merchantrecipe.getItemToSell();
@@ -158,16 +158,16 @@ public class GuiMerchant extends GuiContainer
             GlStateManager.enableLighting();
             this.itemRender.zLevel = 100.0F;
             this.itemRender.renderItemAndEffectIntoGUI(itemstack, i + 36, j + 24);
-            this.itemRender.renderItemOverlays(this.minecraftFontRendererObj, itemstack, i + 36, j + 24);
+            this.itemRender.renderItemOverlays(this.fontRendererObj, itemstack, i + 36, j + 24);
 
             if (itemstack1 != null)
             {
                 this.itemRender.renderItemAndEffectIntoGUI(itemstack1, i + 62, j + 24);
-                this.itemRender.renderItemOverlays(this.minecraftFontRendererObj, itemstack1, i + 62, j + 24);
+                this.itemRender.renderItemOverlays(this.fontRendererObj, itemstack1, i + 62, j + 24);
             }
 
             this.itemRender.renderItemAndEffectIntoGUI(itemstack2, i + 120, j + 24);
-            this.itemRender.renderItemOverlays(this.minecraftFontRendererObj, itemstack2, i + 120, j + 24);
+            this.itemRender.renderItemOverlays(this.fontRendererObj, itemstack2, i + 120, j + 24);
             this.itemRender.zLevel = 0.0F;
             GlStateManager.disableLighting();
 
@@ -185,7 +185,7 @@ public class GuiMerchant extends GuiContainer
             }
             else if (merchantrecipe.isRecipeDisabled() && (this.isPointInRegion(83, 21, 28, 21, mouseX, mouseY) || this.isPointInRegion(83, 51, 28, 21, mouseX, mouseY)))
             {
-                this.drawCreativeTabHoveringText(I18n.format("merchant.deprecated", new Object[0]), mouseX, mouseY);
+                this.drawCreativeTabHoveringText(I18n.format("merchant.deprecated"), mouseX, mouseY);
             }
 
             GlStateManager.popMatrix();

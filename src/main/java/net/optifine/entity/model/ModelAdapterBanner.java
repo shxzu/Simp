@@ -24,13 +24,12 @@ public class ModelAdapterBanner extends ModelAdapter
 
     public ModelRenderer getModelRenderer(ModelBase model, String modelPart)
     {
-        if (!(model instanceof ModelBanner))
+        if (!(model instanceof ModelBanner modelbanner))
         {
             return null;
         }
         else
         {
-            ModelBanner modelbanner = (ModelBanner)model;
             return modelPart.equals("slate") ? modelbanner.bannerSlate : (modelPart.equals("stand") ? modelbanner.bannerStand : (modelPart.equals("top") ? modelbanner.bannerTop : null));
         }
     }

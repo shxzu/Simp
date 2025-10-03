@@ -17,7 +17,6 @@ public class GrassColorReloadListener implements IResourceManagerReloadListener
         }
         catch (IOException var3)
         {
-            ;
         }
     }
 }

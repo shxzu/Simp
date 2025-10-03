@@ -8,10 +8,10 @@ import net.minecraft.world.World;
 
 public class EntityAIBeg extends EntityAIBase
 {
-    private EntityWolf theWolf;
+    private final EntityWolf theWolf;
     private EntityPlayer thePlayer;
-    private World worldObject;
-    private float minPlayerDistance;
+    private final World worldObject;
+    private final float minPlayerDistance;
     private int timeoutCounter;
 
     public EntityAIBeg(EntityWolf wolf, float minDistance)
@@ -24,13 +24,13 @@ public class EntityAIBeg extends EntityAIBase
 
     public boolean shouldExecute()
     {
-        this.thePlayer = this.worldObject.getClosestPlayerToEntity(this.theWolf, (double)this.minPlayerDistance);
-        return this.thePlayer == null ? false : this.hasPlayerGotBoneInHand(this.thePlayer);
+        this.thePlayer = this.worldObject.getClosestPlayerToEntity(this.theWolf, this.minPlayerDistance);
+        return this.thePlayer != null && this.hasPlayerGotBoneInHand(this.thePlayer);
     }
 
     public boolean continueExecuting()
     {
-        return !this.thePlayer.isEntityAlive() ? false : (this.theWolf.getDistanceSqToEntity(this.thePlayer) > (double)(this.minPlayerDistance * this.minPlayerDistance) ? false : this.timeoutCounter > 0 && this.hasPlayerGotBoneInHand(this.thePlayer));
+        return this.thePlayer.isEntityAlive() && (!(this.theWolf.getDistanceSqToEntity(this.thePlayer) > (double) (this.minPlayerDistance * this.minPlayerDistance)) && this.timeoutCounter > 0 && this.hasPlayerGotBoneInHand(this.thePlayer));
     }
 
     public void startExecuting()
@@ -54,6 +54,6 @@ public class EntityAIBeg extends EntityAIBase
     private boolean hasPlayerGotBoneInHand(EntityPlayer player)
     {
         ItemStack itemstack = player.inventory.getCurrentItem();
-        return itemstack == null ? false : (!this.theWolf.isTamed() && itemstack.getItem() == Items.bone ? true : this.theWolf.isBreedingItem(itemstack));
+        return itemstack != null && (!this.theWolf.isTamed() && itemstack.getItem() == Items.bone || this.theWolf.isBreedingItem(itemstack));
     }
 }

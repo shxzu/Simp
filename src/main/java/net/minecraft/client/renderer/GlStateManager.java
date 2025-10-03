@@ -15,31 +15,31 @@ import org.lwjgl.opengl.GL14;
 
 public class GlStateManager
 {
-    private static GlStateManager.AlphaState alphaState = new GlStateManager.AlphaState();
-    private static GlStateManager.BooleanState lightingState = new GlStateManager.BooleanState(2896);
-    private static GlStateManager.BooleanState[] lightState = new GlStateManager.BooleanState[8];
-    private static GlStateManager.ColorMaterialState colorMaterialState = new GlStateManager.ColorMaterialState();
-    private static GlStateManager.BlendState blendState = new GlStateManager.BlendState();
-    private static GlStateManager.DepthState depthState = new GlStateManager.DepthState();
-    private static GlStateManager.FogState fogState = new GlStateManager.FogState();
-    private static GlStateManager.CullState cullState = new GlStateManager.CullState();
-    private static GlStateManager.PolygonOffsetState polygonOffsetState = new GlStateManager.PolygonOffsetState();
-    private static GlStateManager.ColorLogicState colorLogicState = new GlStateManager.ColorLogicState();
-    private static GlStateManager.TexGenState texGenState = new GlStateManager.TexGenState();
-    private static GlStateManager.ClearState clearState = new GlStateManager.ClearState();
-    private static GlStateManager.StencilState stencilState = new GlStateManager.StencilState();
-    private static GlStateManager.BooleanState normalizeState = new GlStateManager.BooleanState(2977);
+    private static final GlStateManager.AlphaState alphaState = new GlStateManager.AlphaState();
+    private static final GlStateManager.BooleanState lightingState = new GlStateManager.BooleanState(2896);
+    private static final GlStateManager.BooleanState[] lightState = new GlStateManager.BooleanState[8];
+    private static final GlStateManager.ColorMaterialState colorMaterialState = new GlStateManager.ColorMaterialState();
+    private static final GlStateManager.BlendState blendState = new GlStateManager.BlendState();
+    private static final GlStateManager.DepthState depthState = new GlStateManager.DepthState();
+    private static final GlStateManager.FogState fogState = new GlStateManager.FogState();
+    private static final GlStateManager.CullState cullState = new GlStateManager.CullState();
+    private static final GlStateManager.PolygonOffsetState polygonOffsetState = new GlStateManager.PolygonOffsetState();
+    private static final GlStateManager.ColorLogicState colorLogicState = new GlStateManager.ColorLogicState();
+    private static final GlStateManager.TexGenState texGenState = new GlStateManager.TexGenState();
+    private static final GlStateManager.ClearState clearState = new GlStateManager.ClearState();
+    private static final GlStateManager.StencilState stencilState = new GlStateManager.StencilState();
+    private static final GlStateManager.BooleanState normalizeState = new GlStateManager.BooleanState(2977);
     private static int activeTextureUnit = 0;
-    private static GlStateManager.TextureState[] textureState = new GlStateManager.TextureState[32];
+    private static final GlStateManager.TextureState[] textureState = new GlStateManager.TextureState[32];
     private static int activeShadeModel = 7425;
-    private static GlStateManager.BooleanState rescaleNormalState = new GlStateManager.BooleanState(32826);
-    private static GlStateManager.ColorMask colorMaskState = new GlStateManager.ColorMask();
-    private static GlStateManager.Color colorState = new GlStateManager.Color();
+    private static final GlStateManager.BooleanState rescaleNormalState = new GlStateManager.BooleanState(32826);
+    private static final GlStateManager.ColorMask colorMaskState = new GlStateManager.ColorMask();
+    private static final GlStateManager.Color colorState = new GlStateManager.Color();
     public static boolean clearEnabled = true;
-    private static LockCounter alphaLock = new LockCounter();
-    private static GlAlphaState alphaLockState = new GlAlphaState();
-    private static LockCounter blendLock = new LockCounter();
-    private static GlBlendState blendLockState = new GlBlendState();
+    private static final LockCounter alphaLock = new LockCounter();
+    private static final GlAlphaState alphaLockState = new GlAlphaState();
+    private static final LockCounter blendLock = new LockCounter();
+    private static final GlBlendState blendLockState = new GlBlendState();
     private static boolean creatingDisplayList = false;
 
     public static void pushAttrib()
@@ -296,11 +296,6 @@ public class GlStateManager
         }
     }
 
-    public static void glFog(int p_glFog_0_, FloatBuffer p_glFog_1_)
-    {
-        GL11.glFog(p_glFog_0_, p_glFog_1_);
-    }
-
     public static void glFogi(int p_glFogi_0_, int p_glFogi_1_)
     {
         GL11.glFogi(p_glFogi_0_, p_glFogi_1_);
@@ -387,7 +382,7 @@ public class GlStateManager
 
     public static void texGen(GlStateManager.TexGen p_179105_0_, int pname, FloatBuffer params)
     {
-        GL11.glTexGen(texGenCoord(p_179105_0_).coord, pname, params);
+        GL11.glTexGenfv(texGenCoord(p_179105_0_).coord, pname, params);
     }
 
     private static GlStateManager.TexGenCoord texGenCoord(GlStateManager.TexGen p_179125_0_)
@@ -562,7 +557,7 @@ public class GlStateManager
 
     public static void getFloat(int pname, FloatBuffer params)
     {
-        GL11.glGetFloat(pname, params);
+        GL11.glGetFloatv(pname, params);
     }
 
     public static void ortho(double left, double right, double bottom, double top, double zNear, double zFar)
@@ -597,7 +592,7 @@ public class GlStateManager
 
     public static void multMatrix(FloatBuffer matrix)
     {
-        GL11.glMultMatrix(matrix);
+        GL11.glMultMatrixf(matrix);
     }
 
     public static void color(float colorRed, float colorGreen, float colorBlue, float colorAlpha)
@@ -629,7 +624,7 @@ public class GlStateManager
 
     public static void glTexCoordPointer(int p_glTexCoordPointer_0_, int p_glTexCoordPointer_1_, int p_glTexCoordPointer_2_, int p_glTexCoordPointer_3_)
     {
-        GL11.glTexCoordPointer(p_glTexCoordPointer_0_, p_glTexCoordPointer_1_, p_glTexCoordPointer_2_, (long)p_glTexCoordPointer_3_);
+        GL11.glTexCoordPointer(p_glTexCoordPointer_0_, p_glTexCoordPointer_1_, p_glTexCoordPointer_2_, p_glTexCoordPointer_3_);
     }
 
     public static void glTexCoordPointer(int p_glTexCoordPointer_0_, int p_glTexCoordPointer_1_, int p_glTexCoordPointer_2_, ByteBuffer p_glTexCoordPointer_3_)
@@ -639,7 +634,7 @@ public class GlStateManager
 
     public static void glVertexPointer(int p_glVertexPointer_0_, int p_glVertexPointer_1_, int p_glVertexPointer_2_, int p_glVertexPointer_3_)
     {
-        GL11.glVertexPointer(p_glVertexPointer_0_, p_glVertexPointer_1_, p_glVertexPointer_2_, (long)p_glVertexPointer_3_);
+        GL11.glVertexPointer(p_glVertexPointer_0_, p_glVertexPointer_1_, p_glVertexPointer_2_, p_glVertexPointer_3_);
     }
 
     public static void glVertexPointer(int p_glVertexPointer_0_, int p_glVertexPointer_1_, int p_glVertexPointer_2_, ByteBuffer p_glVertexPointer_3_)
@@ -649,7 +644,7 @@ public class GlStateManager
 
     public static void glColorPointer(int p_glColorPointer_0_, int p_glColorPointer_1_, int p_glColorPointer_2_, int p_glColorPointer_3_)
     {
-        GL11.glColorPointer(p_glColorPointer_0_, p_glColorPointer_1_, p_glColorPointer_2_, (long)p_glColorPointer_3_);
+        GL11.glColorPointer(p_glColorPointer_0_, p_glColorPointer_1_, p_glColorPointer_2_, p_glColorPointer_3_);
     }
 
     public static void glColorPointer(int p_glColorPointer_0_, int p_glColorPointer_1_, int p_glColorPointer_2_, ByteBuffer p_glColorPointer_3_)
@@ -1220,12 +1215,12 @@ public class GlStateManager
         }
     }
 
-    public static enum TexGen
+    public enum TexGen
     {
         S,
         T,
         R,
-        Q;
+        Q
     }
 
     static class TexGenCoord

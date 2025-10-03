@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 
 public class ItemDoor extends Item
 {
-    private Block block;
+    private final Block block;
 
     public ItemDoor(Block block)
     {
@@ -45,7 +45,7 @@ public class ItemDoor extends Item
             }
             else
             {
-                placeDoor(worldIn, pos, EnumFacing.fromAngle((double)playerIn.rotationYaw), this.block);
+                placeDoor(worldIn, pos, EnumFacing.fromAngle(playerIn.rotationYaw), this.block);
                 --stack.stackSize;
                 return true;
             }
@@ -60,12 +60,7 @@ public class ItemDoor extends Item
         int j = (worldIn.getBlockState(blockpos).getBlock().isNormalCube() ? 1 : 0) + (worldIn.getBlockState(blockpos.up()).getBlock().isNormalCube() ? 1 : 0);
         boolean flag = worldIn.getBlockState(blockpos1).getBlock() == door || worldIn.getBlockState(blockpos1.up()).getBlock() == door;
         boolean flag1 = worldIn.getBlockState(blockpos).getBlock() == door || worldIn.getBlockState(blockpos.up()).getBlock() == door;
-        boolean flag2 = false;
-
-        if (flag && !flag1 || j > i)
-        {
-            flag2 = true;
-        }
+        boolean flag2 = flag && !flag1 || j > i;
 
         BlockPos blockpos2 = pos.up();
         IBlockState iblockstate = door.getDefaultState().withProperty(BlockDoor.FACING, facing).withProperty(BlockDoor.HINGE, flag2 ? BlockDoor.EnumHingePosition.RIGHT : BlockDoor.EnumHingePosition.LEFT);

@@ -10,9 +10,9 @@ import net.minecraft.util.ResourceLocation;
 public class GuiScreenHorseInventory extends GuiContainer
 {
     private static final ResourceLocation horseGuiTextures = new ResourceLocation("textures/gui/container/horse.png");
-    private IInventory playerInventory;
-    private IInventory horseInventory;
-    private EntityHorse horseEntity;
+    private final IInventory playerInventory;
+    private final IInventory horseInventory;
+    private final EntityHorse horseEntity;
     private float mousePosx;
     private float mousePosY;
 
@@ -27,8 +27,8 @@ public class GuiScreenHorseInventory extends GuiContainer
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        this.minecraftFontRendererObj.drawString(this.horseInventory.getDisplayName().getUnformattedText(), 8, 6, 4210752);
-        this.minecraftFontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
+        this.fontRendererObj.drawString(this.horseInventory.getDisplayName().getUnformattedText(), 8, 6, 4210752);
+        this.fontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)

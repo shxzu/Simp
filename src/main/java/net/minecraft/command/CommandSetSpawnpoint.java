@@ -26,7 +26,7 @@ public class CommandSetSpawnpoint extends CommandBase
     {
         if (args.length > 1 && args.length < 4)
         {
-            throw new WrongUsageException("commands.spawnpoint.usage", new Object[0]);
+            throw new WrongUsageException("commands.spawnpoint.usage");
         }
         else
         {
@@ -36,7 +36,7 @@ public class CommandSetSpawnpoint extends CommandBase
             if (entityplayermp.worldObj != null)
             {
                 entityplayermp.setSpawnPoint(blockpos, true);
-                notifyOperators(sender, this, "commands.spawnpoint.success", new Object[] {entityplayermp.getName(), Integer.valueOf(blockpos.getX()), Integer.valueOf(blockpos.getY()), Integer.valueOf(blockpos.getZ())});
+                notifyOperators(sender, this, "commands.spawnpoint.success", entityplayermp.getName(), Integer.valueOf(blockpos.getX()), Integer.valueOf(blockpos.getY()), Integer.valueOf(blockpos.getZ()));
             }
         }
     }

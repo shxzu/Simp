@@ -42,6 +42,6 @@ public class ItemMultiTexture extends ItemBlock
 
     public String getUnlocalizedName(ItemStack stack)
     {
-        return super.getUnlocalizedName() + "." + (String)this.nameFunction.apply(stack);
+        return super.getUnlocalizedName() + "." + this.nameFunction.apply(stack);
     }
 }

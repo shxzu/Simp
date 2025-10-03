@@ -26,13 +26,13 @@ public class VersionCheckThread extends Thread
             if (Config.getGameSettings().snooperEnabled)
             {
                 httpurlconnection.setRequestProperty("OF-MC-Version", "1.8.9");
-                httpurlconnection.setRequestProperty("OF-MC-Brand", "" + ClientBrandRetriever.getClientModName());
+                httpurlconnection.setRequestProperty("OF-MC-Brand", ClientBrandRetriever.getClientModName());
                 httpurlconnection.setRequestProperty("OF-Edition", "HD_U");
                 httpurlconnection.setRequestProperty("OF-Release", "M6_pre2");
-                httpurlconnection.setRequestProperty("OF-Java-Version", "" + System.getProperty("java.version"));
+                httpurlconnection.setRequestProperty("OF-Java-Version", System.getProperty("java.version"));
                 httpurlconnection.setRequestProperty("OF-CpuCount", "" + Config.getAvailableProcessors());
-                httpurlconnection.setRequestProperty("OF-OpenGL-Version", "" + Config.openGlVersion);
-                httpurlconnection.setRequestProperty("OF-OpenGL-Vendor", "" + Config.openGlVendor);
+                httpurlconnection.setRequestProperty("OF-OpenGL-Version", Config.openGlVersion);
+                httpurlconnection.setRequestProperty("OF-OpenGL-Vendor", Config.openGlVendor);
             }
 
             httpurlconnection.setDoInput(true);
@@ -57,7 +57,6 @@ public class VersionCheckThread extends Thread
                     }
 
                     Config.setNewRelease(s1);
-                    return;
                 }
             }
             finally

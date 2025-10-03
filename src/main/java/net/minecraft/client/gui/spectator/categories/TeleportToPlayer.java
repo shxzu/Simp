@@ -31,12 +31,12 @@ public class TeleportToPlayer implements ISpectatorMenuView, ISpectatorMenuObjec
 
     public TeleportToPlayer()
     {
-        this(field_178674_a.<NetworkPlayerInfo>sortedCopy(Minecraft.getMinecraft().getNetHandler().getPlayerInfoMap()));
+        this(field_178674_a.sortedCopy(Minecraft.getMinecraft().getNetHandler().getPlayerInfoMap()));
     }
 
     public TeleportToPlayer(Collection<NetworkPlayerInfo> p_i45493_1_)
     {
-        this.field_178673_b = Lists.<ISpectatorMenuObject>newArrayList();
+        this.field_178673_b = Lists.newArrayList();
 
         for (NetworkPlayerInfo networkplayerinfo : field_178674_a.sortedCopy(p_i45493_1_))
         {

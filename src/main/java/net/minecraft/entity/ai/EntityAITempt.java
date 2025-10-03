@@ -8,8 +8,8 @@ import net.minecraft.pathfinding.PathNavigateGround;
 
 public class EntityAITempt extends EntityAIBase
 {
-    private EntityCreature temptedEntity;
-    private double speed;
+    private final EntityCreature temptedEntity;
+    private final double speed;
     private double targetX;
     private double targetY;
     private double targetZ;
@@ -18,8 +18,8 @@ public class EntityAITempt extends EntityAIBase
     private EntityPlayer temptingPlayer;
     private int delayTemptCounter;
     private boolean isRunning;
-    private Item temptItem;
-    private boolean scaredByPlayerMovement;
+    private final Item temptItem;
+    private final boolean scaredByPlayerMovement;
     private boolean avoidWater;
 
     public EntityAITempt(EntityCreature temptedEntityIn, double speedIn, Item temptItemIn, boolean scaredByPlayerMovementIn)
@@ -54,7 +54,7 @@ public class EntityAITempt extends EntityAIBase
             else
             {
                 ItemStack itemstack = this.temptingPlayer.getCurrentEquippedItem();
-                return itemstack == null ? false : itemstack.getItem() == this.temptItem;
+                return itemstack != null && itemstack.getItem() == this.temptItem;
             }
         }
     }
@@ -82,8 +82,8 @@ public class EntityAITempt extends EntityAIBase
                 this.targetZ = this.temptingPlayer.posZ;
             }
 
-            this.pitch = (double)this.temptingPlayer.rotationPitch;
-            this.yaw = (double)this.temptingPlayer.rotationYaw;
+            this.pitch = this.temptingPlayer.rotationPitch;
+            this.yaw = this.temptingPlayer.rotationYaw;
         }
 
         return this.shouldExecute();

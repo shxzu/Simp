@@ -38,19 +38,18 @@ public class ChatComponentSelector extends ChatComponentStyle
         {
             return true;
         }
-        else if (!(p_equals_1_ instanceof ChatComponentSelector))
+        else if (!(p_equals_1_ instanceof ChatComponentSelector chatcomponentselector))
         {
             return false;
         }
         else
         {
-            ChatComponentSelector chatcomponentselector = (ChatComponentSelector)p_equals_1_;
             return this.selector.equals(chatcomponentselector.selector) && super.equals(p_equals_1_);
         }
     }
 
     public String toString()
     {
-        return "SelectorComponent{pattern=\'" + this.selector + '\'' + ", siblings=" + this.siblings + ", style=" + this.getChatStyle() + '}';
+        return "SelectorComponent{pattern='" + this.selector + '\'' + ", siblings=" + this.siblings + ", style=" + this.getChatStyle() + '}';
     }
 }

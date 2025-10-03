@@ -8,7 +8,7 @@ import net.minecraft.util.EnumChatFormatting;
 
 public interface IScoreObjectiveCriteria
 {
-    Map<String, IScoreObjectiveCriteria> INSTANCES = Maps.<String, IScoreObjectiveCriteria>newHashMap();
+    Map<String, IScoreObjectiveCriteria> INSTANCES = Maps.newHashMap();
     IScoreObjectiveCriteria DUMMY = new ScoreDummyCriteria("dummy");
     IScoreObjectiveCriteria TRIGGER = new ScoreDummyCriteria("trigger");
     IScoreObjectiveCriteria deathCount = new ScoreDummyCriteria("deathCount");
@@ -26,15 +26,15 @@ public interface IScoreObjectiveCriteria
 
     IScoreObjectiveCriteria.EnumRenderType getRenderType();
 
-    public static enum EnumRenderType
+    enum EnumRenderType
     {
         INTEGER("integer"),
         HEARTS("hearts");
 
-        private static final Map<String, IScoreObjectiveCriteria.EnumRenderType> field_178801_c = Maps.<String, IScoreObjectiveCriteria.EnumRenderType>newHashMap();
+        private static final Map<String, IScoreObjectiveCriteria.EnumRenderType> field_178801_c = Maps.newHashMap();
         private final String field_178798_d;
 
-        private EnumRenderType(String p_i45548_3_)
+        EnumRenderType(String p_i45548_3_)
         {
             this.field_178798_d = p_i45548_3_;
         }
@@ -46,7 +46,7 @@ public interface IScoreObjectiveCriteria
 
         public static IScoreObjectiveCriteria.EnumRenderType func_178795_a(String p_178795_0_)
         {
-            IScoreObjectiveCriteria.EnumRenderType iscoreobjectivecriteria$enumrendertype = (IScoreObjectiveCriteria.EnumRenderType)field_178801_c.get(p_178795_0_);
+            IScoreObjectiveCriteria.EnumRenderType iscoreobjectivecriteria$enumrendertype = field_178801_c.get(p_178795_0_);
             return iscoreobjectivecriteria$enumrendertype == null ? INTEGER : iscoreobjectivecriteria$enumrendertype;
         }
 

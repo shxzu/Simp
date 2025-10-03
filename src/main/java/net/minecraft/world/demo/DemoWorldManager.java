@@ -45,7 +45,7 @@ public class DemoWorldManager extends ItemInWorldManager
         {
             if (j <= 6L)
             {
-                this.thisPlayerMP.addChatMessage(new ChatComponentTranslation("demo.day." + j, new Object[0]));
+                this.thisPlayerMP.addChatMessage(new ChatComponentTranslation("demo.day." + j));
             }
         }
         else if (j == 1L)
@@ -65,7 +65,7 @@ public class DemoWorldManager extends ItemInWorldManager
         }
         else if (j == 5L && i % 24000L == 22000L)
         {
-            this.thisPlayerMP.addChatMessage(new ChatComponentTranslation("demo.day.warning", new Object[0]));
+            this.thisPlayerMP.addChatMessage(new ChatComponentTranslation("demo.day.warning"));
         }
     }
 
@@ -73,7 +73,7 @@ public class DemoWorldManager extends ItemInWorldManager
     {
         if (this.field_73104_e > 100)
         {
-            this.thisPlayerMP.addChatMessage(new ChatComponentTranslation("demo.reminder", new Object[0]));
+            this.thisPlayerMP.addChatMessage(new ChatComponentTranslation("demo.reminder"));
             this.field_73104_e = 0;
         }
     }
@@ -100,7 +100,7 @@ public class DemoWorldManager extends ItemInWorldManager
 
     public boolean tryHarvestBlock(BlockPos pos)
     {
-        return this.demoTimeExpired ? false : super.tryHarvestBlock(pos);
+        return !this.demoTimeExpired && super.tryHarvestBlock(pos);
     }
 
     public boolean tryUseItem(EntityPlayer player, World worldIn, ItemStack stack)

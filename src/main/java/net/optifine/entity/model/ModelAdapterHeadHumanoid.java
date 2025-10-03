@@ -24,13 +24,12 @@ public class ModelAdapterHeadHumanoid extends ModelAdapter
 
     public ModelRenderer getModelRenderer(ModelBase model, String modelPart)
     {
-        if (!(model instanceof ModelHumanoidHead))
+        if (!(model instanceof ModelHumanoidHead modelhumanoidhead))
         {
             return null;
         }
         else
         {
-            ModelHumanoidHead modelhumanoidhead = (ModelHumanoidHead)model;
             return modelPart.equals("head") ? modelhumanoidhead.skeletonHead : (modelPart.equals("head2") ? (!Reflector.ModelHumanoidHead_head.exists() ? null : (ModelRenderer)Reflector.getFieldValue(modelhumanoidhead, Reflector.ModelHumanoidHead_head)) : null);
         }
     }

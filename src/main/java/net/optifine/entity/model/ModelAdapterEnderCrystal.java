@@ -30,13 +30,12 @@ public class ModelAdapterEnderCrystal extends ModelAdapter
 
     public ModelRenderer getModelRenderer(ModelBase model, String modelPart)
     {
-        if (!(model instanceof ModelEnderCrystal))
+        if (!(model instanceof ModelEnderCrystal modelendercrystal))
         {
             return null;
         }
         else
         {
-            ModelEnderCrystal modelendercrystal = (ModelEnderCrystal)model;
             return modelPart.equals("cube") ? (ModelRenderer)Reflector.getFieldValue(modelendercrystal, Reflector.ModelEnderCrystal_ModelRenderers, 0) : (modelPart.equals("glass") ? (ModelRenderer)Reflector.getFieldValue(modelendercrystal, Reflector.ModelEnderCrystal_ModelRenderers, 1) : (modelPart.equals("base") ? (ModelRenderer)Reflector.getFieldValue(modelendercrystal, Reflector.ModelEnderCrystal_ModelRenderers, 2) : null));
         }
     }
@@ -49,16 +48,15 @@ public class ModelAdapterEnderCrystal extends ModelAdapter
     public IEntityRenderer makeEntityRender(ModelBase modelBase, float shadowSize)
     {
         RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
-        Render render = (Render)rendermanager.getEntityRenderMap().get(EntityEnderCrystal.class);
+        Render render = rendermanager.getEntityRenderMap().get(EntityEnderCrystal.class);
 
-        if (!(render instanceof RenderEnderCrystal))
+        if (!(render instanceof RenderEnderCrystal renderendercrystal))
         {
             Config.warn("Not an instance of RenderEnderCrystal: " + render);
             return null;
         }
         else
         {
-            RenderEnderCrystal renderendercrystal = (RenderEnderCrystal)render;
 
             if (!Reflector.RenderEnderCrystal_modelEnderCrystal.exists())
             {

@@ -21,7 +21,7 @@ public class ModelRabbit extends ModelBase
     ModelRenderer rabbitTail;
     ModelRenderer rabbitNose;
     private float field_178701_m = 0.0F;
-    private float field_178699_n = 0.0F;
+    private final float field_178699_n = 0.0F;
 
     public ModelRabbit()
     {

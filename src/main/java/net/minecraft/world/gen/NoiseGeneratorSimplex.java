@@ -4,9 +4,9 @@ import java.util.Random;
 
 public class NoiseGeneratorSimplex
 {
-    private static int[][] field_151611_e = new int[][] {{1, 1, 0}, { -1, 1, 0}, {1, -1, 0}, { -1, -1, 0}, {1, 0, 1}, { -1, 0, 1}, {1, 0, -1}, { -1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}};
+    private static final int[][] field_151611_e = new int[][] {{1, 1, 0}, { -1, 1, 0}, {1, -1, 0}, { -1, -1, 0}, {1, 0, 1}, { -1, 0, 1}, {1, 0, -1}, { -1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}};
     public static final double field_151614_a = Math.sqrt(3.0D);
-    private int[] field_151608_f;
+    private final int[] field_151608_f;
     public double field_151612_b;
     public double field_151613_c;
     public double field_151610_d;
@@ -27,7 +27,6 @@ public class NoiseGeneratorSimplex
 
         for (int i = 0; i < 256; this.field_151608_f[i] = i++)
         {
-            ;
         }
 
         for (int l = 0; l < 256; ++l)

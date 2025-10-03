@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.settings.GameSettings;
-import net.minecraft.profiler.Profiler;
 import net.minecraft.src.Config;
 import net.optifine.util.MemoryMonitor;
 import org.lwjgl.opengl.GL11;
@@ -17,7 +16,6 @@ public class Lagometer
 {
     private static Minecraft mc;
     private static GameSettings gameSettings;
-    private static Profiler profiler;
     public static boolean active = false;
     public static Lagometer.TimerNano timerTick = new Lagometer.TimerNano();
     public static Lagometer.TimerNano timerScheduledExecutables = new Lagometer.TimerNano();
@@ -26,15 +24,15 @@ public class Lagometer
     public static Lagometer.TimerNano timerVisibility = new Lagometer.TimerNano();
     public static Lagometer.TimerNano timerTerrain = new Lagometer.TimerNano();
     public static Lagometer.TimerNano timerServer = new Lagometer.TimerNano();
-    private static long[] timesFrame = new long[512];
-    private static long[] timesTick = new long[512];
-    private static long[] timesScheduledExecutables = new long[512];
-    private static long[] timesChunkUpload = new long[512];
-    private static long[] timesChunkUpdate = new long[512];
-    private static long[] timesVisibility = new long[512];
-    private static long[] timesTerrain = new long[512];
-    private static long[] timesServer = new long[512];
-    private static boolean[] gcs = new boolean[512];
+    private static final long[] timesFrame = new long[512];
+    private static final long[] timesTick = new long[512];
+    private static final long[] timesScheduledExecutables = new long[512];
+    private static final long[] timesChunkUpload = new long[512];
+    private static final long[] timesChunkUpdate = new long[512];
+    private static final long[] timesVisibility = new long[512];
+    private static final long[] timesTerrain = new long[512];
+    private static final long[] timesServer = new long[512];
+    private static final boolean[] gcs = new boolean[512];
     private static int numRecordedFrameTimes = 0;
     private static long prevFrameTimeNano = -1L;
     private static long renderTimeNano = 0L;
@@ -45,7 +43,6 @@ public class Lagometer
         {
             mc = Minecraft.getMinecraft();
             gameSettings = mc.gameSettings;
-            profiler = mc.mcProfiler;
         }
 
         if (gameSettings.showDebugInfo && (gameSettings.ofLagometer || gameSettings.showLagometer))
@@ -100,7 +97,7 @@ public class Lagometer
                 GlStateManager.pushMatrix();
                 GlStateManager.enableColorMaterial();
                 GlStateManager.loadIdentity();
-                GlStateManager.ortho(0.0D, (double)mc.displayWidth, (double)mc.displayHeight, 0.0D, 1000.0D, 3000.0D);
+                GlStateManager.ortho(0.0D, mc.displayWidth, mc.displayHeight, 0.0D, 1000.0D, 3000.0D);
                 GlStateManager.matrixMode(5888);
                 GlStateManager.pushMatrix();
                 GlStateManager.loadIdentity();
@@ -141,10 +138,10 @@ public class Lagometer
                 GlStateManager.enableTexture2D();
                 int j2 = mc.displayHeight - 80;
                 int k2 = mc.displayHeight - 160;
-                mc.minecraftFontRendererObj.drawString("30", 2, k2 + 1, -8947849);
-                mc.minecraftFontRendererObj.drawString("30", 1, k2, -3881788);
-                mc.minecraftFontRendererObj.drawString("60", 2, j2 + 1, -8947849);
-                mc.minecraftFontRendererObj.drawString("60", 1, j2, -3881788);
+                mc.fontRendererObj.drawString("30", 2, k2 + 1, -8947849);
+                mc.fontRendererObj.drawString("30", 1, k2, -3881788);
+                mc.fontRendererObj.drawString("60", 2, j2 + 1, -8947849);
+                mc.fontRendererObj.drawString("60", 1, j2, -3881788);
                 GlStateManager.matrixMode(5889);
                 GlStateManager.popMatrix();
                 GlStateManager.matrixMode(5888);
@@ -160,7 +157,7 @@ public class Lagometer
                 int i2 = mc.displayHeight / scaledResolution.getScaleFactor() - 8;
                 GuiIngame guiingame = mc.ingameGUI;
                 GuiIngame.drawRect(l1 - 1, i2 - 1, l1 + 50, i2 + 10, -1605349296);
-                mc.minecraftFontRendererObj.drawString(" " + MemoryMonitor.getAllocationRateMb() + " MB/s", l1, i2, k1);
+                mc.fontRendererObj.drawString(" " + MemoryMonitor.getAllocationRateMb() + " MB/s", l1, i2, k1);
                 renderTimeNano = System.nanoTime() - i;
             }
         }
@@ -176,8 +173,8 @@ public class Lagometer
         }
         else
         {
-            tessellator.pos((double)((float)frameNum + 0.5F), (double)(baseHeight - (float)i + 0.5F), 0.0D).color(r, g, b, 255).endVertex();
-            tessellator.pos((double)((float)frameNum + 0.5F), (double)(baseHeight + 0.5F), 0.0D).color(r, g, b, 255).endVertex();
+            tessellator.pos((float)frameNum + 0.5F, baseHeight - (float)i + 0.5F, 0.0D).color(r, g, b, 255).endVertex();
+            tessellator.pos((float)frameNum + 0.5F, baseHeight + 0.5F, 0.0D).color(r, g, b, 255).endVertex();
             return i;
         }
     }
@@ -192,8 +189,8 @@ public class Lagometer
         }
         else
         {
-            tessellator.pos((double)((float)frameStart + 0.5F), (double)(baseHeight - (float)i + 0.5F), 0.0D).color(r, g, b, 255).endVertex();
-            tessellator.pos((double)((float)frameEnd + 0.5F), (double)(baseHeight - (float)i + 0.5F), 0.0D).color(r, g, b, 255).endVertex();
+            tessellator.pos((float)frameStart + 0.5F, baseHeight - (float)i + 0.5F, 0.0D).color(r, g, b, 255).endVertex();
+            tessellator.pos((float)frameEnd + 0.5F, baseHeight - (float)i + 0.5F, 0.0D).color(r, g, b, 255).endVertex();
             return i;
         }
     }

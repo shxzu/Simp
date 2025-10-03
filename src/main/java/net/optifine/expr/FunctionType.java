@@ -29,8 +29,8 @@ public enum FunctionType
     ATAN2(ExpressionType.FLOAT, "atan2", new ExpressionType[]{ExpressionType.FLOAT, ExpressionType.FLOAT}),
     TORAD(ExpressionType.FLOAT, "torad", new ExpressionType[]{ExpressionType.FLOAT}),
     TODEG(ExpressionType.FLOAT, "todeg", new ExpressionType[]{ExpressionType.FLOAT}),
-    MIN(ExpressionType.FLOAT, "min", (new ParametersVariable()).first(new ExpressionType[]{ExpressionType.FLOAT}).repeat(new ExpressionType[]{ExpressionType.FLOAT})),
-    MAX(ExpressionType.FLOAT, "max", (new ParametersVariable()).first(new ExpressionType[]{ExpressionType.FLOAT}).repeat(new ExpressionType[]{ExpressionType.FLOAT})),
+    MIN(ExpressionType.FLOAT, "min", (new ParametersVariable()).first(ExpressionType.FLOAT).repeat(ExpressionType.FLOAT)),
+    MAX(ExpressionType.FLOAT, "max", (new ParametersVariable()).first(ExpressionType.FLOAT).repeat(ExpressionType.FLOAT)),
     CLAMP(ExpressionType.FLOAT, "clamp", new ExpressionType[]{ExpressionType.FLOAT, ExpressionType.FLOAT, ExpressionType.FLOAT}),
     ABS(ExpressionType.FLOAT, "abs", new ExpressionType[]{ExpressionType.FLOAT}),
     FLOOR(ExpressionType.FLOAT, "floor", new ExpressionType[]{ExpressionType.FLOAT}),
@@ -45,7 +45,7 @@ public enum FunctionType
     SQRT(ExpressionType.FLOAT, "sqrt", new ExpressionType[]{ExpressionType.FLOAT}),
     FMOD(ExpressionType.FLOAT, "fmod", new ExpressionType[]{ExpressionType.FLOAT, ExpressionType.FLOAT}),
     TIME(ExpressionType.FLOAT, "time", new ExpressionType[0]),
-    IF(ExpressionType.FLOAT, "if", (new ParametersVariable()).first(new ExpressionType[]{ExpressionType.BOOL, ExpressionType.FLOAT}).repeat(new ExpressionType[]{ExpressionType.BOOL, ExpressionType.FLOAT}).last(new ExpressionType[]{ExpressionType.FLOAT})),
+    IF(ExpressionType.FLOAT, "if", (new ParametersVariable()).first(ExpressionType.BOOL, ExpressionType.FLOAT).repeat(ExpressionType.BOOL, ExpressionType.FLOAT).last(ExpressionType.FLOAT)),
     NOT(12, ExpressionType.BOOL, "!", new ExpressionType[]{ExpressionType.BOOL}),
     AND(3, ExpressionType.BOOL, "&&", new ExpressionType[]{ExpressionType.BOOL, ExpressionType.BOOL}),
     OR(2, ExpressionType.BOOL, "||", new ExpressionType[]{ExpressionType.BOOL, ExpressionType.BOOL}),
@@ -57,37 +57,37 @@ public enum FunctionType
     NOT_EQUAL(7, ExpressionType.BOOL, "!=", new ExpressionType[]{ExpressionType.FLOAT, ExpressionType.FLOAT}),
     BETWEEN(7, ExpressionType.BOOL, "between", new ExpressionType[]{ExpressionType.FLOAT, ExpressionType.FLOAT, ExpressionType.FLOAT}),
     EQUALS(7, ExpressionType.BOOL, "equals", new ExpressionType[]{ExpressionType.FLOAT, ExpressionType.FLOAT, ExpressionType.FLOAT}),
-    IN(ExpressionType.BOOL, "in", (new ParametersVariable()).first(new ExpressionType[]{ExpressionType.FLOAT}).repeat(new ExpressionType[]{ExpressionType.FLOAT}).last(new ExpressionType[]{ExpressionType.FLOAT})),
-    SMOOTH(ExpressionType.FLOAT, "smooth", (new ParametersVariable()).first(new ExpressionType[]{ExpressionType.FLOAT}).repeat(new ExpressionType[]{ExpressionType.FLOAT}).maxCount(4)),
+    IN(ExpressionType.BOOL, "in", (new ParametersVariable()).first(ExpressionType.FLOAT).repeat(ExpressionType.FLOAT).last(ExpressionType.FLOAT)),
+    SMOOTH(ExpressionType.FLOAT, "smooth", (new ParametersVariable()).first(ExpressionType.FLOAT).repeat(ExpressionType.FLOAT).maxCount(4)),
     TRUE(ExpressionType.BOOL, "true", new ExpressionType[0]),
     FALSE(ExpressionType.BOOL, "false", new ExpressionType[0]),
     VEC2(ExpressionType.FLOAT_ARRAY, "vec2", new ExpressionType[]{ExpressionType.FLOAT, ExpressionType.FLOAT}),
     VEC3(ExpressionType.FLOAT_ARRAY, "vec3", new ExpressionType[]{ExpressionType.FLOAT, ExpressionType.FLOAT, ExpressionType.FLOAT}),
     VEC4(ExpressionType.FLOAT_ARRAY, "vec4", new ExpressionType[]{ExpressionType.FLOAT, ExpressionType.FLOAT, ExpressionType.FLOAT, ExpressionType.FLOAT});
 
-    private int precedence;
-    private ExpressionType expressionType;
-    private String name;
-    private IParameters parameters;
+    private final int precedence;
+    private final ExpressionType expressionType;
+    private final String name;
+    private final IParameters parameters;
     public static FunctionType[] VALUES = values();
     private static final Map<Integer, Float> mapSmooth = new HashMap();
 
-    private FunctionType(ExpressionType expressionType, String name, ExpressionType[] parameterTypes)
+    FunctionType(ExpressionType expressionType, String name, ExpressionType[] parameterTypes)
     {
         this(0, expressionType, name, parameterTypes);
     }
 
-    private FunctionType(int precedence, ExpressionType expressionType, String name, ExpressionType[] parameterTypes)
+    FunctionType(int precedence, ExpressionType expressionType, String name, ExpressionType[] parameterTypes)
     {
         this(precedence, expressionType, name, new Parameters(parameterTypes));
     }
 
-    private FunctionType(ExpressionType expressionType, String name, IParameters parameters)
+    FunctionType(ExpressionType expressionType, String name, IParameters parameters)
     {
         this(0, expressionType, name, parameters);
     }
 
-    private FunctionType(int precedence, ExpressionType expressionType, String name, IParameters parameters)
+    FunctionType(int precedence, ExpressionType expressionType, String name, IParameters parameters)
     {
         this.precedence = precedence;
         this.expressionType = expressionType;
@@ -165,13 +165,13 @@ public enum FunctionType
                 return MathUtils.acos(evalFloat(args, 0));
 
             case TAN:
-                return (float)Math.tan((double)evalFloat(args, 0));
+                return (float)Math.tan(evalFloat(args, 0));
 
             case ATAN:
-                return (float)Math.atan((double)evalFloat(args, 0));
+                return (float)Math.atan(evalFloat(args, 0));
 
             case ATAN2:
-                return (float)MathHelper.atan2((double)evalFloat(args, 0), (double)evalFloat(args, 1));
+                return (float)MathHelper.atan2(evalFloat(args, 0), evalFloat(args, 1));
 
             case TORAD:
                 return MathUtils.toRad(evalFloat(args, 0));
@@ -192,7 +192,7 @@ public enum FunctionType
                 return MathHelper.abs(evalFloat(args, 0));
 
             case EXP:
-                return (float)Math.exp((double)evalFloat(args, 0));
+                return (float)Math.exp(evalFloat(args, 0));
 
             case FLOOR:
                 return (float)MathHelper.floor_float(evalFloat(args, 0));
@@ -201,13 +201,13 @@ public enum FunctionType
                 return (float)MathHelper.ceiling_float_int(evalFloat(args, 0));
 
             case FRAC:
-                return (float)MathHelper.func_181162_h((double)evalFloat(args, 0));
+                return (float)MathHelper.func_181162_h(evalFloat(args, 0));
 
             case LOG:
-                return (float)Math.log((double)evalFloat(args, 0));
+                return (float)Math.log(evalFloat(args, 0));
 
             case POW:
-                return (float)Math.pow((double)evalFloat(args, 0), (double)evalFloat(args, 1));
+                return (float)Math.pow(evalFloat(args, 0), evalFloat(args, 1));
 
             case RANDOM:
                 return (float)Math.random();

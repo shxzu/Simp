@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class NoiseGeneratorImproved extends NoiseGenerator
 {
-    private int[] permutations;
+    private final int[] permutations;
     public double xCoord;
     public double yCoord;
     public double zCoord;
@@ -28,7 +28,6 @@ public class NoiseGeneratorImproved extends NoiseGenerator
 
         for (int i = 0; i < 256; this.permutations[i] = i++)
         {
-            ;
         }
 
         for (int l = 0; l < 256; ++l)
@@ -98,9 +97,9 @@ public class NoiseGeneratorImproved extends NoiseGenerator
                     int l6 = k6 & 255;
                     d19 = d19 - (double)k6;
                     double d20 = d19 * d19 * d19 * (d19 * (d19 * 6.0D - 15.0D) + 10.0D);
-                    i5 = this.permutations[k2] + 0;
+                    i5 = this.permutations[k2];
                     j5 = this.permutations[i5] + l6;
-                    j = this.permutations[k2 + 1] + 0;
+                    j = this.permutations[k2 + 1];
                     k5 = this.permutations[j] + l6;
                     d14 = this.lerp(d18, this.func_76309_a(this.permutations[j5], d17, d19), this.grad(this.permutations[k5], d17 - 1.0D, 0.0D, d19));
                     d15 = this.lerp(d18, this.grad(this.permutations[j5 + 1], d17, 0.0D, d19 - 1.0D), this.grad(this.permutations[k5 + 1], d17 - 1.0D, 0.0D, d19 - 1.0D));

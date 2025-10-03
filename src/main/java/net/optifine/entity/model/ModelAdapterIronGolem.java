@@ -22,13 +22,12 @@ public class ModelAdapterIronGolem extends ModelAdapter
 
     public ModelRenderer getModelRenderer(ModelBase model, String modelPart)
     {
-        if (!(model instanceof ModelIronGolem))
+        if (!(model instanceof ModelIronGolem modelirongolem))
         {
             return null;
         }
         else
         {
-            ModelIronGolem modelirongolem = (ModelIronGolem)model;
             return modelPart.equals("head") ? modelirongolem.ironGolemHead : (modelPart.equals("body") ? modelirongolem.ironGolemBody : (modelPart.equals("left_arm") ? modelirongolem.ironGolemLeftArm : (modelPart.equals("right_arm") ? modelirongolem.ironGolemRightArm : (modelPart.equals("left_leg") ? modelirongolem.ironGolemLeftLeg : (modelPart.equals("right_leg") ? modelirongolem.ironGolemRightLeg : null)))));
         }
     }

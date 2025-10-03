@@ -17,7 +17,7 @@ public abstract class Enchantment
 {
     private static final Enchantment[] enchantmentsList = new Enchantment[256];
     public static final Enchantment[] enchantmentsBookList;
-    private static final Map<ResourceLocation, Enchantment> locationEnchantments = Maps.<ResourceLocation, Enchantment>newHashMap();
+    private static final Map<ResourceLocation, Enchantment> locationEnchantments = Maps.newHashMap();
     public static final Enchantment protection = new EnchantmentProtection(0, new ResourceLocation("protection"), 10, 0);
     public static final Enchantment fireProtection = new EnchantmentProtection(1, new ResourceLocation("fire_protection"), 5, 1);
     public static final Enchantment featherFalling = new EnchantmentProtection(2, new ResourceLocation("feather_falling"), 5, 2);
@@ -72,7 +72,7 @@ public abstract class Enchantment
 
     public static Enchantment getEnchantmentByLocation(String location)
     {
-        return (Enchantment)locationEnchantments.get(new ResourceLocation(location));
+        return locationEnchantments.get(new ResourceLocation(location));
     }
 
     public static Set<ResourceLocation> func_181077_c()
@@ -152,7 +152,7 @@ public abstract class Enchantment
 
     static
     {
-        List<Enchantment> list = Lists.<Enchantment>newArrayList();
+        List<Enchantment> list = Lists.newArrayList();
 
         for (Enchantment enchantment : enchantmentsList)
         {
@@ -162,6 +162,6 @@ public abstract class Enchantment
             }
         }
 
-        enchantmentsBookList = (Enchantment[])list.toArray(new Enchantment[list.size()]);
+        enchantmentsBookList = list.toArray(new Enchantment[list.size()]);
     }
 }

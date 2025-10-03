@@ -9,9 +9,9 @@ import net.minecraft.client.settings.KeyBinding;
 public class GuiControls extends GuiScreen
 {
     private static final GameSettings.Options[] optionsArr = new GameSettings.Options[] {GameSettings.Options.INVERT_MOUSE, GameSettings.Options.SENSITIVITY, GameSettings.Options.TOUCHSCREEN};
-    private GuiScreen parentScreen;
+    private final GuiScreen parentScreen;
     protected String screenTitle = "Controls";
-    private GameSettings options;
+    private final GameSettings options;
     public KeyBinding buttonId = null;
     public long time;
     private GuiKeyBindingList keyBindingList;
@@ -26,9 +26,9 @@ public class GuiControls extends GuiScreen
     public void initGui()
     {
         this.keyBindingList = new GuiKeyBindingList(this, this.mc);
-        this.buttonList.add(new GuiButton(200, this.width / 2 - 155, this.height - 29, 150, 20, I18n.format("gui.done", new Object[0])));
-        this.buttonList.add(this.buttonReset = new GuiButton(201, this.width / 2 - 155 + 160, this.height - 29, 150, 20, I18n.format("controls.resetAll", new Object[0])));
-        this.screenTitle = I18n.format("controls.title", new Object[0]);
+        this.buttonList.add(new GuiButton(200, this.width / 2 - 155, this.height - 29, 150, 20, I18n.format("gui.done")));
+        this.buttonList.add(this.buttonReset = new GuiButton(201, this.width / 2 - 155 + 160, this.height - 29, 150, 20, I18n.format("controls.resetAll")));
+        this.screenTitle = I18n.format("controls.title");
         int i = 0;
 
         for (GameSettings.Options gamesettings$options : optionsArr)
@@ -127,7 +127,7 @@ public class GuiControls extends GuiScreen
     {
         this.drawDefaultBackground();
         this.keyBindingList.drawScreen(mouseX, mouseY, partialTicks);
-        this.drawCenteredString(this.minecraftFontRendererObj, this.screenTitle, this.width / 2, 8, 16777215);
+        this.drawCenteredString(this.fontRendererObj, this.screenTitle, this.width / 2, 8, 16777215);
         boolean flag = true;
 
         for (KeyBinding keybinding : this.options.keyBindings)

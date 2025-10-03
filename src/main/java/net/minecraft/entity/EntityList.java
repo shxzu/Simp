@@ -77,12 +77,12 @@ import org.apache.logging.log4j.Logger;
 public class EntityList
 {
     private static final Logger logger = LogManager.getLogger();
-    private static final Map < String, Class <? extends Entity >> stringToClassMapping = Maps. < String, Class <? extends Entity >> newHashMap();
-    private static final Map < Class <? extends Entity > , String > classToStringMapping = Maps. < Class <? extends Entity > , String > newHashMap();
-    private static final Map < Integer, Class <? extends Entity >> idToClassMapping = Maps. < Integer, Class <? extends Entity >> newHashMap();
-    private static final Map < Class <? extends Entity > , Integer > classToIDMapping = Maps. < Class <? extends Entity > , Integer > newHashMap();
-    private static final Map<String, Integer> stringToIDMapping = Maps.<String, Integer>newHashMap();
-    public static final Map<Integer, EntityList.EntityEggInfo> entityEggs = Maps.<Integer, EntityList.EntityEggInfo>newLinkedHashMap();
+    private static final Map < String, Class <? extends Entity >> stringToClassMapping = Maps.newHashMap();
+    private static final Map < Class <? extends Entity > , String > classToStringMapping = Maps.newHashMap();
+    private static final Map < Integer, Class <? extends Entity >> idToClassMapping = Maps.newHashMap();
+    private static final Map < Class <? extends Entity > , Integer > classToIDMapping = Maps.newHashMap();
+    private static final Map<String, Integer> stringToIDMapping = Maps.newHashMap();
+    public static final Map<Integer, EntityList.EntityEggInfo> entityEggs = Maps.newLinkedHashMap();
 
     private static void addMapping(Class <? extends Entity > entityClass, String entityName, int id)
     {
@@ -124,11 +124,11 @@ public class EntityList
 
         try
         {
-            Class <? extends Entity > oclass = (Class)stringToClassMapping.get(entityName);
+            Class <? extends Entity > oclass = stringToClassMapping.get(entityName);
 
             if (oclass != null)
             {
-                entity = (Entity)oclass.getConstructor(new Class[] {World.class}).newInstance(new Object[] {worldIn});
+                entity = oclass.getConstructor(new Class[] {World.class}).newInstance(worldIn);
             }
         }
         catch (Exception exception)
@@ -151,11 +151,11 @@ public class EntityList
 
         try
         {
-            Class <? extends Entity > oclass = (Class)stringToClassMapping.get(nbt.getString("id"));
+            Class <? extends Entity > oclass = stringToClassMapping.get(nbt.getString("id"));
 
             if (oclass != null)
             {
-                entity = (Entity)oclass.getConstructor(new Class[] {World.class}).newInstance(new Object[] {worldIn});
+                entity = oclass.getConstructor(new Class[] {World.class}).newInstance(worldIn);
             }
         }
         catch (Exception exception)
@@ -185,7 +185,7 @@ public class EntityList
 
             if (oclass != null)
             {
-                entity = (Entity)oclass.getConstructor(new Class[] {World.class}).newInstance(new Object[] {worldIn});
+                entity = oclass.getConstructor(new Class[] {World.class}).newInstance(worldIn);
             }
         }
         catch (Exception exception)
@@ -203,29 +203,29 @@ public class EntityList
 
     public static int getEntityID(Entity entityIn)
     {
-        Integer integer = (Integer)classToIDMapping.get(entityIn.getClass());
+        Integer integer = classToIDMapping.get(entityIn.getClass());
         return integer == null ? 0 : integer.intValue();
     }
 
     public static Class <? extends Entity > getClassFromID(int entityID)
     {
-        return (Class)idToClassMapping.get(Integer.valueOf(entityID));
+        return idToClassMapping.get(Integer.valueOf(entityID));
     }
 
     public static String getEntityString(Entity entityIn)
     {
-        return (String)classToStringMapping.get(entityIn.getClass());
+        return classToStringMapping.get(entityIn.getClass());
     }
 
     public static int getIDFromString(String entityName)
     {
-        Integer integer = (Integer)stringToIDMapping.get(entityName);
+        Integer integer = stringToIDMapping.get(entityName);
         return integer == null ? 90 : integer.intValue();
     }
 
     public static String getStringFromID(int entityID)
     {
-        return (String)classToStringMapping.get(getClassFromID(entityID));
+        return classToStringMapping.get(getClassFromID(entityID));
     }
 
     public static void func_151514_a()
@@ -235,11 +235,11 @@ public class EntityList
     public static List<String> getEntityNameList()
     {
         Set<String> set = stringToClassMapping.keySet();
-        List<String> list = Lists.<String>newArrayList();
+        List<String> list = Lists.newArrayList();
 
         for (String s : set)
         {
-            Class <? extends Entity > oclass = (Class)stringToClassMapping.get(s);
+            Class <? extends Entity > oclass = stringToClassMapping.get(s);
 
             if ((oclass.getModifiers() & 1024) != 1024)
             {

@@ -8,7 +8,7 @@ import net.minecraft.util.EnumFacing;
 
 public class BuiltInModel implements IBakedModel
 {
-    private ItemCameraTransforms cameraTransforms;
+    private final ItemCameraTransforms cameraTransforms;
 
     public BuiltInModel(ItemCameraTransforms p_i46086_1_)
     {

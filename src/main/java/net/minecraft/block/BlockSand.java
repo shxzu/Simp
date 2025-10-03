@@ -13,7 +13,7 @@ import net.minecraft.util.IStringSerializable;
 
 public class BlockSand extends BlockFalling
 {
-    public static final PropertyEnum<BlockSand.EnumType> VARIANT = PropertyEnum.<BlockSand.EnumType>create("variant", BlockSand.EnumType.class);
+    public static final PropertyEnum<BlockSand.EnumType> VARIANT = PropertyEnum.create("variant", BlockSand.EnumType.class);
 
     public BlockSand()
     {
@@ -22,7 +22,7 @@ public class BlockSand extends BlockFalling
 
     public int damageDropped(IBlockState state)
     {
-        return ((BlockSand.EnumType)state.getValue(VARIANT)).getMetadata();
+        return state.getValue(VARIANT).getMetadata();
     }
 
     public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
@@ -35,7 +35,7 @@ public class BlockSand extends BlockFalling
 
     public MapColor getMapColor(IBlockState state)
     {
-        return ((BlockSand.EnumType)state.getValue(VARIANT)).getMapColor();
+        return state.getValue(VARIANT).getMapColor();
     }
 
     public IBlockState getStateFromMeta(int meta)
@@ -45,15 +45,15 @@ public class BlockSand extends BlockFalling
 
     public int getMetaFromState(IBlockState state)
     {
-        return ((BlockSand.EnumType)state.getValue(VARIANT)).getMetadata();
+        return state.getValue(VARIANT).getMetadata();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {VARIANT});
+        return new BlockState(this, VARIANT);
     }
 
-    public static enum EnumType implements IStringSerializable
+    public enum EnumType implements IStringSerializable
     {
         SAND(0, "sand", "default", MapColor.sandColor),
         RED_SAND(1, "red_sand", "red", MapColor.adobeColor);
@@ -64,7 +64,7 @@ public class BlockSand extends BlockFalling
         private final MapColor mapColor;
         private final String unlocalizedName;
 
-        private EnumType(int meta, String name, String unlocalizedName, MapColor mapColor)
+        EnumType(int meta, String name, String unlocalizedName, MapColor mapColor)
         {
             this.meta = meta;
             this.name = name;

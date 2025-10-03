@@ -78,14 +78,13 @@ public class JsonBlendingMode
         {
             return true;
         }
-        else if (!(p_equals_1_ instanceof JsonBlendingMode))
+        else if (!(p_equals_1_ instanceof JsonBlendingMode jsonblendingmode))
         {
             return false;
         }
         else
         {
-            JsonBlendingMode jsonblendingmode = (JsonBlendingMode)p_equals_1_;
-            return this.field_148112_f != jsonblendingmode.field_148112_f ? false : (this.field_148115_e != jsonblendingmode.field_148115_e ? false : (this.field_148114_d != jsonblendingmode.field_148114_d ? false : (this.field_148119_h != jsonblendingmode.field_148119_h ? false : (this.field_148113_g != jsonblendingmode.field_148113_g ? false : (this.field_148117_c != jsonblendingmode.field_148117_c ? false : this.field_148116_b == jsonblendingmode.field_148116_b)))));
+            return this.field_148112_f == jsonblendingmode.field_148112_f && (this.field_148115_e == jsonblendingmode.field_148115_e && (this.field_148114_d == jsonblendingmode.field_148114_d && (this.field_148119_h == jsonblendingmode.field_148119_h && (this.field_148113_g == jsonblendingmode.field_148113_g && (this.field_148117_c == jsonblendingmode.field_148117_c && this.field_148116_b == jsonblendingmode.field_148116_b)))));
         }
     }
 

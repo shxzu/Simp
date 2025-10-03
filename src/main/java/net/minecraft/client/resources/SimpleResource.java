@@ -15,7 +15,7 @@ import org.apache.commons.io.IOUtils;
 
 public class SimpleResource implements IResource
 {
-    private final Map<String, IMetadataSection> mapMetadataSections = Maps.<String, IMetadataSection>newHashMap();
+    private final Map<String, IMetadataSection> mapMetadataSections = Maps.newHashMap();
     private final String resourcePackName;
     private final ResourceLocation srResourceLocation;
     private final InputStream resourceInputStream;
@@ -52,7 +52,7 @@ public class SimpleResource implements IResource
     {
         if (!this.hasMetadata())
         {
-            return (T)null;
+            return null;
         }
         else
         {
@@ -64,11 +64,11 @@ public class SimpleResource implements IResource
                 try
                 {
                     bufferedreader = new BufferedReader(new InputStreamReader(this.mcmetaInputStream));
-                    this.mcmetaJson = (new JsonParser()).parse((Reader)bufferedreader).getAsJsonObject();
+                    this.mcmetaJson = (new JsonParser()).parse(bufferedreader).getAsJsonObject();
                 }
                 finally
                 {
-                    IOUtils.closeQuietly((Reader)bufferedreader);
+                    IOUtils.closeQuietly(bufferedreader);
                 }
             }
 
@@ -94,13 +94,12 @@ public class SimpleResource implements IResource
         {
             return true;
         }
-        else if (!(p_equals_1_ instanceof SimpleResource))
+        else if (!(p_equals_1_ instanceof SimpleResource simpleresource))
         {
             return false;
         }
         else
         {
-            SimpleResource simpleresource = (SimpleResource)p_equals_1_;
 
             if (this.srResourceLocation != null)
             {
@@ -116,17 +115,9 @@ public class SimpleResource implements IResource
 
             if (this.resourcePackName != null)
             {
-                if (!this.resourcePackName.equals(simpleresource.resourcePackName))
-                {
-                    return false;
-                }
+                return this.resourcePackName.equals(simpleresource.resourcePackName);
             }
-            else if (simpleresource.resourcePackName != null)
-            {
-                return false;
-            }
-
-            return true;
+            else return simpleresource.resourcePackName == null;
         }
     }
 

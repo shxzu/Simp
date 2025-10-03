@@ -13,7 +13,7 @@ import net.minecraft.src.Config;
 import net.minecraft.util.ResourceLocation;
 import net.optifine.CustomItems;
 import net.optifine.reflect.Reflector;
-import net.optifine.reflect.ReflectorForge;
+
 import net.optifine.shaders.Shaders;
 import net.optifine.shaders.ShadersRender;
 
@@ -23,12 +23,12 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
     protected T modelLeggings;
     protected T modelArmor;
     private final RendererLivingEntity<?> renderer;
-    private float alpha = 1.0F;
-    private float colorR = 1.0F;
-    private float colorG = 1.0F;
-    private float colorB = 1.0F;
+    private final float alpha = 1.0F;
+    private final float colorR = 1.0F;
+    private final float colorG = 1.0F;
+    private final float colorB = 1.0F;
     private boolean skipRenderGlint;
-    private static final Map<String, ResourceLocation> ARMOR_TEXTURE_RES_MAP = Maps.<String, ResourceLocation>newHashMap();
+    private static final Map<String, ResourceLocation> ARMOR_TEXTURE_RES_MAP = Maps.newHashMap();
 
     public LayerArmorBase(RendererLivingEntity<?> rendererIn)
     {
@@ -53,59 +53,18 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
     {
         ItemStack itemstack = this.getCurrentArmor(entitylivingbaseIn, armorSlot);
 
-        if (itemstack != null && itemstack.getItem() instanceof ItemArmor)
+        if (itemstack != null && itemstack.getItem() instanceof ItemArmor itemarmor)
         {
-            ItemArmor itemarmor = (ItemArmor)itemstack.getItem();
             T t = this.getArmorModel(armorSlot);
             t.setModelAttributes(this.renderer.getMainModel());
             t.setLivingAnimations(entitylivingbaseIn, p_177182_2_, p_177182_3_, partialTicks);
 
-            if (Reflector.ForgeHooksClient.exists())
-            {
-                t = this.getArmorModelHook(entitylivingbaseIn, itemstack, armorSlot, t);
-            }
-
             this.setModelPartVisible(t, armorSlot);
             boolean flag = this.isSlotForLeggings(armorSlot);
 
-            if (!Config.isCustomItems() || !CustomItems.bindCustomArmorTexture(itemstack, flag ? 2 : 1, (String)null))
+            if (!Config.isCustomItems() || !CustomItems.bindCustomArmorTexture(itemstack, flag ? 2 : 1, null))
             {
-                if (Reflector.ForgeHooksClient_getArmorTexture.exists())
-                {
-                    this.renderer.bindTexture(this.getArmorResource(entitylivingbaseIn, itemstack, flag ? 2 : 1, (String)null));
-                }
-                else
-                {
-                    this.renderer.bindTexture(this.getArmorResource(itemarmor, flag));
-                }
-            }
-
-            if (Reflector.ForgeHooksClient_getArmorTexture.exists())
-            {
-                if (ReflectorForge.armorHasOverlay(itemarmor, itemstack))
-                {
-                    int j = itemarmor.getColor(itemstack);
-                    float f3 = (float)(j >> 16 & 255) / 255.0F;
-                    float f4 = (float)(j >> 8 & 255) / 255.0F;
-                    float f5 = (float)(j & 255) / 255.0F;
-                    GlStateManager.color(this.colorR * f3, this.colorG * f4, this.colorB * f5, this.alpha);
-                    t.render(entitylivingbaseIn, p_177182_2_, p_177182_3_, p_177182_5_, p_177182_6_, p_177182_7_, scale);
-
-                    if (!Config.isCustomItems() || !CustomItems.bindCustomArmorTexture(itemstack, flag ? 2 : 1, "overlay"))
-                    {
-                        this.renderer.bindTexture(this.getArmorResource(entitylivingbaseIn, itemstack, flag ? 2 : 1, "overlay"));
-                    }
-                }
-
-                GlStateManager.color(this.colorR, this.colorG, this.colorB, this.alpha);
-                t.render(entitylivingbaseIn, p_177182_2_, p_177182_3_, p_177182_5_, p_177182_6_, p_177182_7_, scale);
-
-                if (!this.skipRenderGlint && itemstack.hasEffect() && (!Config.isCustomItems() || !CustomItems.renderCustomArmorEffect(entitylivingbaseIn, itemstack, t, p_177182_2_, p_177182_3_, partialTicks, p_177182_5_, p_177182_6_, p_177182_7_, scale)))
-                {
-                    this.renderGlint(entitylivingbaseIn, t, p_177182_2_, p_177182_3_, partialTicks, p_177182_5_, p_177182_6_, p_177182_7_, scale);
-                }
-
-                return;
+                this.renderer.bindTexture(this.getArmorResource(itemarmor, flag));
             }
 
             switch (itemarmor.getArmorMaterial())
@@ -145,7 +104,7 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 
     public T getArmorModel(int armorSlot)
     {
-        return (T)(this.isSlotForLeggings(armorSlot) ? this.modelLeggings : this.modelArmor);
+        return this.isSlotForLeggings(armorSlot) ? this.modelLeggings : this.modelArmor;
     }
 
     private boolean isSlotForLeggings(int armorSlot)
@@ -204,13 +163,13 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 
     private ResourceLocation getArmorResource(ItemArmor p_177181_1_, boolean p_177181_2_)
     {
-        return this.getArmorResource(p_177181_1_, p_177181_2_, (String)null);
+        return this.getArmorResource(p_177181_1_, p_177181_2_, null);
     }
 
     private ResourceLocation getArmorResource(ItemArmor p_177178_1_, boolean p_177178_2_, String p_177178_3_)
     {
-        String s = String.format("textures/models/armor/%s_layer_%d%s.png", new Object[] {p_177178_1_.getArmorMaterial().getName(), Integer.valueOf(p_177178_2_ ? 2 : 1), p_177178_3_ == null ? "" : String.format("_%s", new Object[]{p_177178_3_})});
-        ResourceLocation resourcelocation = (ResourceLocation)ARMOR_TEXTURE_RES_MAP.get(s);
+        String s = String.format("textures/models/armor/%s_layer_%d%s.png", p_177178_1_.getArmorMaterial().getName(), Integer.valueOf(p_177178_2_ ? 2 : 1), p_177178_3_ == null ? "" : String.format("_%s", p_177178_3_));
+        ResourceLocation resourcelocation = ARMOR_TEXTURE_RES_MAP.get(s);
 
         if (resourcelocation == null)
         {
@@ -227,7 +186,7 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 
     protected T getArmorModelHook(EntityLivingBase p_getArmorModelHook_1_, ItemStack p_getArmorModelHook_2_, int p_getArmorModelHook_3_, T p_getArmorModelHook_4_)
     {
-        return (T)p_getArmorModelHook_4_;
+        return p_getArmorModelHook_4_;
     }
 
     public ResourceLocation getArmorResource(Entity p_getArmorResource_1_, ItemStack p_getArmorResource_2_, int p_getArmorResource_3_, String p_getArmorResource_4_)
@@ -243,9 +202,8 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
             s = s.substring(i + 1);
         }
 
-        String s2 = String.format("%s:textures/models/armor/%s_layer_%d%s.png", new Object[] {s1, s, Integer.valueOf(this.isSlotForLeggings(p_getArmorResource_3_) ? 2 : 1), p_getArmorResource_4_ == null ? "" : String.format("_%s", new Object[]{p_getArmorResource_4_})});
-        s2 = Reflector.callString(Reflector.ForgeHooksClient_getArmorTexture, new Object[] {p_getArmorResource_1_, p_getArmorResource_2_, s2, Integer.valueOf(p_getArmorResource_3_), p_getArmorResource_4_});
-        ResourceLocation resourcelocation = (ResourceLocation)ARMOR_TEXTURE_RES_MAP.get(s2);
+        String s2 = String.format("%s:textures/models/armor/%s_layer_%d%s.png", s1, s, Integer.valueOf(this.isSlotForLeggings(p_getArmorResource_3_) ? 2 : 1), p_getArmorResource_4_ == null ? "" : String.format("_%s", p_getArmorResource_4_));
+        ResourceLocation resourcelocation = ARMOR_TEXTURE_RES_MAP.get(s2);
 
         if (resourcelocation == null)
         {

@@ -18,9 +18,8 @@ public class ItemNameTag extends Item
         {
             return false;
         }
-        else if (target instanceof EntityLiving)
+        else if (target instanceof EntityLiving entityliving)
         {
-            EntityLiving entityliving = (EntityLiving)target;
             entityliving.setCustomNameTag(stack.getDisplayName());
             entityliving.enablePersistence();
             --stack.stackSize;

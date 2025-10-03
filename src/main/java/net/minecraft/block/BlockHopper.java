@@ -132,7 +132,7 @@ public class BlockHopper extends BlockContainer
     {
         boolean flag = !worldIn.isBlockPowered(pos);
 
-        if (flag != ((Boolean)state.getValue(ENABLED)).booleanValue())
+        if (flag != state.getValue(ENABLED).booleanValue())
         {
             worldIn.setBlockState(pos, state.withProperty(ENABLED, Boolean.valueOf(flag)), 4);
         }
@@ -204,9 +204,9 @@ public class BlockHopper extends BlockContainer
     public int getMetaFromState(IBlockState state)
     {
         int i = 0;
-        i = i | ((EnumFacing)state.getValue(FACING)).getIndex();
+        i = i | state.getValue(FACING).getIndex();
 
-        if (!((Boolean)state.getValue(ENABLED)).booleanValue())
+        if (!state.getValue(ENABLED).booleanValue())
         {
             i |= 8;
         }
@@ -216,6 +216,6 @@ public class BlockHopper extends BlockContainer
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {FACING, ENABLED});
+        return new BlockState(this, FACING, ENABLED);
     }
 }
