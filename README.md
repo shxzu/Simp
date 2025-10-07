@@ -1,5 +1,7 @@
 # Simp Client
 
+***CURRENTLY IN RECODE PHASE! COME BACK LATER FOR SOMETHING THAT ACTUALLY RESEMBLES A REAL CLIENT SINCE THE RECODE ISN'T FINISHED YET!!***
+
 [![Download](https://img.shields.io/github/v/release/shxzu/Simp?style=for-the-badge)](https://github.com/shxzu/Simp/releases)
 [![License](https://img.shields.io/github/license/shxzu/Simp?style=for-the-badge)](LICENSE)
 [![Build](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)](https://github.com/shxzu/Simp)
@@ -21,6 +23,7 @@
 ## Download
 
 Get the latest release at [Releases Page](https://github.com/shxzu/Simp/releases).
+
 ... or get a unstable nightly build at the [Actions Page](https://github.com/shxzu/Simp/actions)
 
 ---
