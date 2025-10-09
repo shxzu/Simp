@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+
+import cc.simp.Simp;
+import cc.simp.api.events.impl.player.PostStrafeEvent;
+import cc.simp.api.events.impl.player.StrafeEvent;
+import cc.simp.utils.mc.MovementUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -12,6 +17,7 @@ import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockPattern;
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandResultStats;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.crash.CrashReport;
@@ -64,15 +70,16 @@ public abstract class Entity implements ICommandSender
     public double posX;
     public double posY;
     public double posZ;
-    public double motionX;
-    public double motionY;
-    public double motionZ;
+    public double motionX, lastMotionX;
+    public double motionY, lastMotionY;
+    public double motionZ, lastMotionZ;
     public float rotationYaw;
     public float rotationPitch;
     public float prevRotationYaw;
     public float prevRotationPitch;
+    public float movementYaw, velocityYaw, lastMovementYaw;
     private AxisAlignedBB boundingBox;
-    public boolean onGround;
+    public boolean onGround, lastGround;
     public boolean isCollidedHorizontally;
     public boolean isCollidedVertically;
     public boolean isCollided;
@@ -996,26 +1003,52 @@ public abstract class Entity implements ICommandSender
         return this.worldObj.isMaterialInBB(this.getEntityBoundingBox().expand(-0.10000000149011612D, -0.4000000059604645D, -0.10000000149011612D), Material.lava);
     }
 
-    public void moveFlying(float strafe, float forward, float friction)
-    {
+    /**
+     * Used in both water and by flying objects
+     */
+    public void moveFlying(float strafe, float forward, float friction) {
+        boolean player = this == Minecraft.getMinecraft().thePlayer;
+        float yaw = this.rotationYaw;
+
+        if (player) {
+//            if (Minecraft.getMinecraft().thePlayer.ticksExisted % 40 == 0) System.out.println(friction);
+
+            final StrafeEvent event = new StrafeEvent(forward, strafe, friction, this.movementYaw);
+
+            Simp.INSTANCE.getEventBus().post(event);
+
+            if (event.isCancelled()) {
+                return;
+            }
+
+            forward = event.getForward();
+            strafe = event.getStrafe();
+            friction = event.getFriction();
+            yaw = event.getYaw();
+        }
+
         float f = strafe * strafe + forward * forward;
 
-        if (f >= 1.0E-4F)
-        {
+        if (f >= 1.0E-4F) {
             f = MathHelper.sqrt_float(f);
 
-            if (f < 1.0F)
-            {
+            if (f < 1.0F) {
                 f = 1.0F;
             }
 
             f = friction / f;
             strafe = strafe * f;
             forward = forward * f;
-            float f1 = MathHelper.sin(this.rotationYaw * (float)Math.PI / 180.0F);
-            float f2 = MathHelper.cos(this.rotationYaw * (float)Math.PI / 180.0F);
-            this.motionX += strafe * f2 - forward * f1;
-            this.motionZ += forward * f2 + strafe * f1;
+            float f1 = MathHelper.sin(yaw * (float) Math.PI / 180.0F);
+            float f2 = MathHelper.cos(yaw * (float) Math.PI / 180.0F);
+            this.motionX += (double) (strafe * f2 - forward * f1);
+            this.motionZ += (double) (forward * f2 + strafe * f1);
+        }
+
+        if (player) {
+            final PostStrafeEvent event = new PostStrafeEvent();
+
+            Simp.INSTANCE.getEventBus().post(event);
         }
     }
 

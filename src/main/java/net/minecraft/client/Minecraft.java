@@ -2,6 +2,7 @@ package net.minecraft.client;
 
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.ClientStartupEvent;
+import cc.simp.api.events.impl.game.KeyPressEvent;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -207,7 +208,7 @@ public class Minecraft implements IThreadListener
     public int displayWidth;
     public int displayHeight;
     private boolean connectedToRealms = false;
-    private final Timer timer = new Timer(20.0F);
+    public final Timer timer = new Timer(20.0F);
     public WorldClient theWorld;
     public RenderGlobal renderGlobal;
     private RenderManager renderManager;
@@ -1381,6 +1382,16 @@ public class Minecraft implements IThreadListener
 
     public void runTick() throws IOException
     {
+        if (thePlayer != null) {
+            thePlayer.lastMotionX = thePlayer.motionX;
+            thePlayer.lastMotionY = thePlayer.motionY;
+            thePlayer.lastMotionZ = thePlayer.motionZ;
+            thePlayer.lastGround = thePlayer.onGround;
+
+            thePlayer.lastMovementYaw = thePlayer.movementYaw;
+            thePlayer.movementYaw = thePlayer.velocityYaw = thePlayer.rotationYaw;
+        }
+
         if (this.rightClickDelayTimer > 0)
         {
             --this.rightClickDelayTimer;
@@ -1574,6 +1585,7 @@ public class Minecraft implements IThreadListener
                     }
                     else
                     {
+                        Simp.INSTANCE.getEventBus().post(new KeyPressEvent(k));
                         if (k == 1)
                         {
                             this.displayInGameMenu();

@@ -1,5 +1,7 @@
 package net.minecraft.client.entity;
 
+import cc.simp.Simp;
+import cc.simp.api.events.impl.player.LookEvent;
 import com.mojang.authlib.GameProfile;
 import java.io.File;
 import net.minecraft.client.Minecraft;
@@ -22,6 +24,7 @@ import net.minecraft.world.WorldSettings;
 import net.optifine.player.CapeUtils;
 import net.optifine.player.PlayerConfigurations;
 import net.optifine.reflect.Reflector;
+import org.lwjgl.util.vector.Vector2f;
 
 public abstract class AbstractClientPlayer extends EntityPlayer
 {
@@ -208,8 +211,15 @@ public abstract class AbstractClientPlayer extends EntityPlayer
         this.reloadCapeTimeMs = p_setReloadCapeTimeMs_1_;
     }
 
-    public Vec3 getLook(float partialTicks)
-    {
-        return this.getVectorForRotation(this.rotationPitch, this.rotationYaw);
+    public Vec3 getLook(final float partialTicks) {
+        float yaw = this.rotationYaw;
+        float pitch = this.rotationPitch;
+
+        LookEvent lookEvent = new LookEvent(new Vector2f(yaw, pitch));
+        Simp.INSTANCE.getEventBus().post(lookEvent);
+        yaw = lookEvent.getRotation().x;
+        pitch = lookEvent.getRotation().y;
+
+        return this.getVectorForRotation(pitch, yaw);
     }
 }

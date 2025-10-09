@@ -1,5 +1,9 @@
 package net.minecraft.entity;
 
+import cc.simp.Simp;
+import cc.simp.api.events.impl.player.JumpEvent;
+import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.utils.mc.MovementUtils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
@@ -12,6 +16,7 @@ import java.util.UUID;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
@@ -819,7 +824,7 @@ public abstract class EntityLivingBase extends Entity
                             d1 = (Math.random() - Math.random()) * 0.01D;
                         }
 
-                        this.attackedAtYaw = (float)(MathHelper.atan2(d0, d1) * 180.0D / Math.PI - (double)this.rotationYaw);
+                        this.attackedAtYaw = (float) (MathHelper.atan2(d0, d1) * 180.0D / Math.PI - (double) this.movementYaw);
                         this.knockBack(entity, amount, d1, d0);
                     }
                     else
@@ -1316,23 +1321,40 @@ public abstract class EntityLivingBase extends Entity
         return 0.42F;
     }
 
-    protected void jump()
-    {
-        this.motionY = this.getJumpUpwardsMotion();
+    protected void jump() {
+        float jumpMotion = this.getJumpUpwardsMotion();
 
-        if (this.isPotionActive(Potion.jump))
-        {
-            this.motionY += (float)(this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
+        if (this.isPotionActive(Potion.jump)) {
+            jumpMotion += (float) (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
         }
 
-        if (this.isSprinting())
-        {
-            float f = this.rotationYaw * 0.017453292F;
-            this.motionX -= MathHelper.sin(f) * 0.2F;
-            this.motionZ += MathHelper.cos(f) * 0.2F;
-        }
+        if (this == Minecraft.getMinecraft().thePlayer) {
+            final JumpEvent event = new JumpEvent(jumpMotion, this.movementYaw);
+            Simp.INSTANCE.getEventBus().post(event);
+            jumpMotion = event.getJumpMotion();
+            this.movementYaw = event.getYaw();
+            this.velocityYaw = event.getYaw();
 
-        this.isAirBorne = true;
+            if (event.isCancelled()) {
+                return;
+            }
+            this.motionY = jumpMotion;
+
+            if (this.isSprinting()) {
+                float f = this.movementYaw * 0.017453292F;
+
+                final Minecraft mc = Minecraft.getMinecraft();
+                if (SprintModule.omni.getValue() && Simp.INSTANCE.getModuleManager().getModule(SprintModule.class).isEnabled() && mc.thePlayer.isSprinting()) {
+                    f = (float) (MovementUtils.direction() * (180 / Math.PI));
+                    f *= 0.017453292F;
+                }
+
+                this.motionX -= MathHelper.sin(f) * 0.2F;
+                this.motionZ += MathHelper.cos(f) * 0.2F;
+            }
+
+            this.isAirBorne = true;
+        }
     }
 
     protected void updateAITick()

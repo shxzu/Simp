@@ -14,7 +14,7 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Sprint", category = ModuleCategory.MOVEMENT)
 public final class SprintModule extends Module {
 
-    private final Property<Boolean> omniProperty = new Property<>("Omni", true);
+    public static Property<Boolean> omni = new Property<>("Omni", false);
 
     private int groundTicks;
 
@@ -25,7 +25,7 @@ public final class SprintModule extends Module {
     @EventLink
     public final Listener<SprintEvent> onSprintEvent = event -> {
         if (!event.isSprinting()) {
-            final boolean canSprint = MovementUtils.canSprint(omniProperty.getValue());
+            final boolean canSprint = MovementUtils.canSprint(omni.getValue());
             mc.thePlayer.setSprinting(canSprint);
             event.setSprinting(canSprint);
         }

@@ -1,5 +1,7 @@
 package net.minecraft.client.model;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
@@ -102,6 +104,10 @@ public class ModelBiped extends ModelBase
     {
         this.bipedHead.rotateAngleY = netHeadYaw / (180F / (float)Math.PI);
         this.bipedHead.rotateAngleX = headPitch / (180F / (float)Math.PI);
+        final EntityPlayerSP entityPlayer = Minecraft.getMinecraft().thePlayer;
+        if (entityIn == entityPlayer) {
+            this.bipedHead.rotateAngleX = (entityPlayer.prevRenderPitchHead + (entityPlayer.renderPitchHead - entityPlayer.prevRenderPitchHead) * Minecraft.getMinecraft().timer.renderPartialTicks) / (180.0F / (float) Math.PI);
+        }
         this.bipedRightArm.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 2.0F * limbSwingAmount * 0.5F;
         this.bipedLeftArm.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 2.0F * limbSwingAmount * 0.5F;
         this.bipedRightArm.rotateAngleZ = 0.0F;

@@ -35,7 +35,7 @@ public enum EnumChatFormatting
     private static final Map<String, EnumChatFormatting> nameMapping = Maps.newHashMap();
     private static final Pattern formattingCodePattern = Pattern.compile("(?i)" + '\u00a7' + "[0-9A-FK-OR]");
     private final String name;
-    private final char formattingCode;
+    public final char formattingCode;
     private final boolean fancyStyling;
     private final String controlString;
     private final int colorIndex;

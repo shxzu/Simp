@@ -8,6 +8,7 @@ import cc.simp.api.properties.impl.MultiModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.utils.misc.Manager;
 import cc.simp.utils.misc.StringUtils;
+import cc.simp.utils.render.Translate;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -25,6 +26,7 @@ public class Module extends Manager<Property<?>> implements Toggleable, Serializ
     private boolean enabled;
     private boolean hidden;
     private String suffix;
+    private final Translate translate = new Translate(0.0, 0.0);
 
     public void resetPropertyValues() {
         for (Property<?> property : getElements())
@@ -33,6 +35,10 @@ public class Module extends Manager<Property<?>> implements Toggleable, Serializ
 
     public String getSuffix() {
         return suffix;
+    }
+
+    public Translate getTranslate() {
+        return translate;
     }
 
     public void setSuffix(String suffix) {

@@ -8,8 +8,8 @@ import lombok.Getter;
 public enum BuildType {
 
     RELEASE("Release"),
-    ALPHA("ALPHA"),
-    BETA("BETA"),
+    ALPHA("Alpha"),
+    BETA("Beta"),
     DEV("Developer");
 
     private final String name;

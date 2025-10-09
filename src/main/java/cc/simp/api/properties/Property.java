@@ -52,6 +52,19 @@ public class Property<T> {
         }
     }
 
+    public Object getValueObj() {
+        return value;
+    }
+
+    public void setValueObj(Object value) {
+        T oldValue = this.value;
+        this.value = (T) value;
+        if (oldValue != value) {
+            for (ValueChangeListener<T> valueChangeListener : valueChangeListeners)
+                valueChangeListener.onValueChange(oldValue, (T) value);
+        }
+    }
+
     public void callFirstTime() {
         for (ValueChangeListener<T> valueChangeListener : valueChangeListeners)
             valueChangeListener.onValueChange(value, value);

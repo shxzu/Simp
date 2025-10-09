@@ -1,41 +1,16 @@
 package cc.simp.api.events.impl.player;
 
 import cc.simp.api.events.CancellableEvent;
+import cc.simp.api.events.Event;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-public final class MoveEvent extends CancellableEvent {
-
-    private double x;
-    private double y;
-    private double z;
-
-    public MoveEvent(double x, double y, double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public double getZ() {
-        return z;
-    }
-
-    public void setZ(double z) {
-        this.z = z;
-    }
-
+@Getter
+@Setter
+@AllArgsConstructor
+public class MoveEvent implements Event {
+    private float forward, strafe;
+    private boolean jump, sneak;
+    private double sneakSlowDownMultiplier;
 }

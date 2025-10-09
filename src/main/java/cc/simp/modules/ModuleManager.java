@@ -2,7 +2,10 @@ package cc.simp.modules;
 
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.KeyPressEvent;
+import cc.simp.modules.impl.client.ClickInterfaceModule;
 import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.modules.impl.visuals.ArrayListModule;
+import cc.simp.modules.impl.visuals.WatermarkModule;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -20,13 +23,16 @@ public final class ModuleManager {
                 // Combat
 
                 // Movement
-                new SprintModule()
+                new SprintModule(),
 
                 // Player
 
                 // Client
+                new ClickInterfaceModule(),
 
                 // Visuals
+                new ArrayListModule(),
+                new WatermarkModule()
         );
         getModules().forEach(Module::reflectProperties);
 
@@ -62,6 +68,7 @@ public final class ModuleManager {
     public Collection<Module> getModules() {
         return instanceMap.values();
     }
+
 
     public <T extends Module> T getModule(Class<T> moduleClass) {
         return instanceMap.getInstance(moduleClass);

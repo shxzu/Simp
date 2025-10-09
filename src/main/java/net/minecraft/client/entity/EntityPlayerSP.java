@@ -1,6 +1,7 @@
 package net.minecraft.client.entity;
 
 import cc.simp.Simp;
+import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.player.SprintEvent;
 import net.minecraft.client.Minecraft;
@@ -54,6 +55,7 @@ import net.minecraft.util.MovementInput;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
+import org.lwjgl.util.vector.Vector2f;
 
 public class EntityPlayerSP extends AbstractClientPlayer
 {
@@ -77,6 +79,8 @@ public class EntityPlayerSP extends AbstractClientPlayer
     public float renderArmPitch;
     public float prevRenderArmYaw;
     public float prevRenderArmPitch;
+    public float renderPitchHead;
+    public float prevRenderPitchHead;
     private int horseJumpPowerCounter;
     private float horseJumpPower;
     public float timeInPortal;
@@ -112,8 +116,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
     public void onUpdate()
     {
-        if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ)))
-        {
+        if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ))) {
+            prevRenderPitchHead = renderPitchHead;
+            renderPitchHead = rotationPitch;
+
+            boolean player = this == Minecraft.getMinecraft().thePlayer;
+
+            if (player) {
+                Simp.INSTANCE.getEventBus().post(new PreUpdateEvent());
+            }
+
             super.onUpdate();
 
             if (this.isRiding())
@@ -790,5 +802,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
             this.capabilities.isFlying = false;
             this.sendPlayerAbilities();
         }
+    }
+
+    public Vector2f getPreviousRotation() {
+        return new Vector2f(lastReportedYaw, lastReportedPitch);
     }
 }
