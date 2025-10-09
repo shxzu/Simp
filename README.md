@@ -1,65 +1,96 @@
-# Simp — compact, sleek Minecraft client (Recode)
+# Simp Client
 
-<p align="center">
-  <a href="https://github.com/shxzu/Simp/releases"><img alt="releases" src="https://img.shields.io/github/v/release/shxzu/Simp?style=for-the-badge"></a>
-  <a href="https://img.shields.io/github/stars/shxzu/Simp?style=for-the-badge"><img alt="stars" src="https://img.shields.io/github/stars/shxzu/Simp?style=for-the-badge"></a>
-  <a href="https://img.shields.io/github/forks/shxzu/Simp?style=for-the-badge"><img alt="forks" src="https://img.shields.io/github/forks/shxzu/Simp?style=for-the-badge"></a>
-</p>
+***CURRENTLY IN RECODE PHASE! COME BACK LATER FOR SOMETHING THAT ACTUALLY RESEMBLES A REAL CLIENT SINCE THE RECODE ISN'T FINISHED YET!!***
 
----
+[![Download](https://img.shields.io/github/v/release/shxzu/Simp?style=for-the-badge)](https://github.com/shxzu/Simp/releases)
+[![License](https://img.shields.io/github/license/shxzu/Simp?style=for-the-badge)](LICENSE)
+[![Build](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)](https://github.com/shxzu/Simp)
 
-## ✨ About
-
-**Simp** is a modern, compact, and visually-sleek Minecraft hacked client UI and codebase — **this branch is a recode** focused on performance, maintainability, and a refined UI/UX. Built with **LWJGL 3.3.6**, the client aims to provide a snappy, modular, and extensible platform for client-side quality-of-life features and offline and online/customization tooling.
-
-> ⚠️ **Disclaimer:** This project is NOT meant to hurt any Anti-Cheat or server owners! This is simply just a utility client that allows players to gain an advantage against others in servers. I DO NOT condone cheating I just enjoy making them!
+**Simp Client** is a free, open-source Minecraft client built for prediction predicting.
 
 ---
 
-## 💎 Highlights
+## Features
 
-- Recoded from the ground up — cleaner architecture, modular system, improved maintainability.
-- Sleek, compact GUI: minimal, modern, and space-efficient.
-- Built on LWJGL **3.3.6** (OpenGL / input / native bindings).
-- Modular subsystem: independant modules with properties (bool, enum, number).
-- Fast startup and lightweight runtime footprint.
-- Developer-friendly: clear module API, test harness, and example modules.
-
----
-
-## 🧭 Features
-
-- Compact click GUI with property sidebar (boolean / enum / number).
-- HUD customization: position, scale, font, opacity.
-- Performance overlays: FPS, memory, tick time.
-- Config system: save/load profiles (JSON).
-- Keybinding manager with conflict detection.
-- Functional module system: combat, movement, player, and many other categories of modules to use from.
+| Category                | Details                                                                 |
+|------------------------|-------------------------------------------------------------------------|
+| Anti-Cheat Bypass      | Bypasses Polar, Watchdog, Verus and more!                               |
+| Interface              | Minimal, and clean UI with easy customization!                          |
+| Open Source            | This means no bigrat.monster!                                           |
 
 ---
 
-## 🛠️ Tech stack
+## Download
 
-- Java 22 (or higher)  
-- LWJGL 3.3.6  
-- Maven (recommended)  
-- IDE (preferably Intellij IDEA)
+Get the latest release at [Releases Page](https://github.com/shxzu/Simp/releases).
+
+... or get a unstable nightly build at the [Actions Page](https://github.com/shxzu/Simp/actions)
 
 ---
 
-## 📦 Installation / Build
+## How to Build
 
-# Clone the repo
+**Requirements**
+
+- Java JDK 22 or higher
+- IDE of your preference (IntelliJ IDEA recommended)
+- Git
+
+**Steps**
+
 ```bash
 git clone https://github.com/shxzu/Simp.git
+cd Simp
 ```
 
-# Open in IDE and build the Maven project
-(Intellij IDEA Instructions)
+1. Open the project in your IDE.
+2. Make a run directory
+3. Create a new Run Configuration:
+   - Type: Application
+   - Main Class: (refer to screenshot below)
+   - Use classpath of module: `Simp.main`
+4. Run the client.
 
-Click the import Maven project button when opening the project folder in your IDE.
+**Example Run Configuration**
 
-(Anything other IDE isn't supported but if you find a way to import it using Eclipse, NetBeans, e.g. go ahead.)
+![run_config](https://github.com/shxzu/Simp/blob/main/assets/setup.png)
 
-# Make a run configuration
-Make sure your run directory has the "/workspace" at the end of your path!! Example: (Working Directory: C:\Users\shxzu\Documents\GitHub\Simp\workspace)
+---
+
+## Contributing
+
+please do this im lazy -puhfy
+
+| Step | Action |
+|------|--------|
+| 1    | Fork the repository |
+| 2    | Create a new branch: `git checkout -b feature/my-feature` |
+| 3    | Make your changes |
+| 4    | Commit: `git commit -m "Add my feature"` |
+| 5    | Push: `git push origin feature/my-feature` |
+| 6    | Open a pull request |
+
+---
+
+## Contact
+
+<p align="center">
+  <a href="https://discord.gg/YjU9Za5WVv">
+    <img src="https://img.shields.io/discord/1393759278833078413?color=5865F2&label=Join%20Discord&logo=discord&logoColor=white&style=for-the-badge" />
+  </a>
+</p>
+
+Need help, want to contribute, or just say hi? Join our Discord community or open a GitHub issue.
+
+---
+
+## License
+
+Licensed under the [MIT License](LICENSE).
+
+---
+
+![Last Commit](https://img.shields.io/github/last-commit/shxzu/Simp)
+![Contributors](https://img.shields.io/github/contributors/shxzu/Simp)
+
+![Alt](https://repobeats.axiom.co/api/embed/b2ed272e1429e6f0f6fe07b3047e737f32073590.svg "Repobeats analytics image")
