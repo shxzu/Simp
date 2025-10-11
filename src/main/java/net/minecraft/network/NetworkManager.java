@@ -2,6 +2,7 @@ package net.minecraft.network;
 
 import cc.simp.Simp;
 import cc.simp.api.events.impl.packet.PacketReceiveEvent;
+import cc.simp.api.events.impl.packet.PacketSendEvent;
 import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.Bootstrap;
@@ -50,6 +51,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+
+import static cc.simp.utils.Util.mc;
 
 public class NetworkManager extends SimpleChannelInboundHandler<Packet>
 {
@@ -158,28 +161,6 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
         this.packetListener = handler;
     }
 
-    public void sendPacket(Packet packetIn)
-    {
-        if (this.isChannelOpen())
-        {
-            this.flushOutboundQueue();
-            this.dispatchPacket(packetIn, null);
-        }
-        else
-        {
-            this.readWriteLock.writeLock().lock();
-
-            try
-            {
-                this.outboundPacketsQueue.add(new NetworkManager.InboundHandlerTuplePacketListener(packetIn, (GenericFutureListener[])null));
-            }
-            finally
-            {
-                this.readWriteLock.writeLock().unlock();
-            }
-        }
-    }
-
     public void sendPacket(Packet packetIn, GenericFutureListener <? extends Future <? super Void >> listener, GenericFutureListener <? extends Future <? super Void >> ... listeners)
     {
         if (this.isChannelOpen())
@@ -199,6 +180,101 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
             {
                 this.readWriteLock.writeLock().unlock();
             }
+        }
+    }
+
+    public void sendPacket(Packet packetIn) {
+
+        PacketSendEvent event = new PacketSendEvent(packetIn);
+        Simp.INSTANCE.getEventBus().post(event);
+
+        if (event.isCancelled())
+            return;
+
+        if (this.isChannelOpen()) {
+            this.flushOutboundQueue();
+            this.dispatchPacket(packetIn, null);
+        } else {
+            this.readWriteLock.writeLock().lock();
+
+            try {
+                this.outboundPacketsQueue.add(new NetworkManager.InboundHandlerTuplePacketListener(packetIn, (GenericFutureListener[]) null));
+            } finally {
+                this.readWriteLock.writeLock().unlock();
+            }
+        }
+    }
+
+    public void sendSilentPacket(final Packet packetIn) {
+        if (this.isChannelOpen()) {
+            this.flushOutboundQueue();
+            this.dispatchUnregisteredPacket(packetIn, null);
+        } else {
+            this.readWriteLock.writeLock().lock();
+
+            try {
+                this.outboundPacketsQueue.add(new NetworkManager.InboundHandlerTuplePacketListener(packetIn, (GenericFutureListener[]) null));
+            } finally {
+                this.readWriteLock.writeLock().unlock();
+            }
+        }
+    }
+
+    public void receivePacket(final Packet packet) {
+        if (this.channel.isOpen()) {
+            try {
+                packet.processPacket(this.packetListener);
+            } catch (final ThreadQuickExitException var4) {
+            }
+        }
+    }
+
+    public void receiveUnregisteredPacket(final Packet packet) {
+        if (this.channel.isOpen()) {
+            try {
+                packet.processPacket(this.packetListener);
+            } catch (final ThreadQuickExitException var4) {
+            }
+        }
+    }
+
+    private void dispatchUnregisteredPacket(final Packet inPacket, final GenericFutureListener<? extends Future<? super Void>>[] futureListeners) {
+        final EnumConnectionState enumconnectionstate = EnumConnectionState.getFromPacket(inPacket);
+        final EnumConnectionState enumconnectionstate1 = this.channel.attr(attrKeyConnectionState).get();
+
+        if (enumconnectionstate1 != enumconnectionstate) {
+            logger.debug("Disabled auto read");
+            this.channel.config().setAutoRead(false);
+        }
+
+        if (this.channel.eventLoop().inEventLoop()) {
+            if (enumconnectionstate != enumconnectionstate1) {
+                this.setConnectionState(enumconnectionstate);
+            }
+
+            final ChannelFuture channelfuture = this.channel.writeAndFlush(inPacket);
+
+            if (futureListeners != null) {
+                channelfuture.addListeners(futureListeners);
+            }
+
+            channelfuture.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        } else {
+            this.channel.eventLoop().execute(new Runnable() {
+                public void run() {
+                    if (enumconnectionstate != enumconnectionstate1) {
+                        NetworkManager.this.setConnectionState(enumconnectionstate);
+                    }
+
+                    final ChannelFuture channelfuture1 = NetworkManager.this.channel.writeAndFlush(inPacket);
+
+                    if (futureListeners != null) {
+                        channelfuture1.addListeners(futureListeners);
+                    }
+
+                    channelfuture1.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+                }
+            });
         }
     }
 
@@ -449,6 +525,8 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
             }
         }
     }
+
+
 
     static class InboundHandlerTuplePacketListener
     {

@@ -31,6 +31,10 @@ public final class ArrayListModule extends Module {
     private final Property<Boolean> line = new Property<>("Line", false);
     private final Property<Boolean> outline = new Property<>("Outline", true);
 
+    public ArrayListModule() {
+        toggle();
+    }
+
     private static final Map<Module, String> displayLabelCache = new HashMap<>();
     private static List<Module> moduleCache;
 

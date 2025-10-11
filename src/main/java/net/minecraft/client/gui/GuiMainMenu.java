@@ -1,5 +1,6 @@
 package net.minecraft.client.gui;
 
+import cc.simp.interfaces.menu.alt.AltManagerGui;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -162,7 +163,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
     private void addSingleplayerMultiplayerButtons(int p_73969_1_, int p_73969_2_) {
         this.buttonList.add(new GuiButton(1, this.width / 2 - 100, p_73969_1_, I18n.format("menu.singleplayer")));
         this.buttonList.add(new GuiButton(2, this.width / 2 - 100, p_73969_1_ + p_73969_2_, I18n.format("menu.multiplayer")));
-        this.buttonList.add(new GuiButton(14, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, I18n.format("menu.online"), false));
+        this.buttonList.add(new GuiButton(14, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, "Alt Manager", true));
     }
 
     private void addDemoButtons(int p_73972_1_, int p_73972_2_) {
@@ -193,7 +194,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
             this.mc.displayGuiScreen(new GuiMultiplayer(this));
         }
 
-        if (button.id == 14) {
+        if (button.id == 14)
+        {
+            this.mc.displayGuiScreen(new AltManagerGui());
         }
 
         if (button.id == 4) {

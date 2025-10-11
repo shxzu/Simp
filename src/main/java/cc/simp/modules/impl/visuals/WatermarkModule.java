@@ -28,10 +28,15 @@ import static cc.simp.utils.Util.mc;
 public final class WatermarkModule extends Module {
 
     public static final ModeProperty<Type> type = new ModeProperty<>("Client Watermark Type", Type.Simple);
-    public static final Property<Boolean> info = new Property<>("Watermark Info", true, () -> type.getValue() != Type.GameSense);
+    public static final Property<Boolean> info = new Property<>("Watermark Info", true, () -> type.getValue() != Type.GameSense && type.getValue() != Type.Logo);
+
+    public WatermarkModule() {
+        toggle();
+    }
 
     public enum Type {
         Simple,
+        Logo,
         Exhibition,
         GameSense
     }

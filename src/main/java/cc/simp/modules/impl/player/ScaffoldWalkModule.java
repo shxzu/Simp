@@ -8,6 +8,7 @@ import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.events.impl.player.SprintEvent;
 import cc.simp.api.events.impl.player.StrafeEvent;
+import cc.simp.api.events.impl.render.Render3DEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
@@ -21,11 +22,13 @@ import cc.simp.utils.client.Logger;
 import cc.simp.utils.client.MathUtils;
 import cc.simp.utils.mc.*;
 import cc.simp.utils.misc.MovementFix;
+import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.block.BlockAir;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.network.Packet;
@@ -33,6 +36,7 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.*;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.util.Objects;
@@ -42,9 +46,15 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Scaffold Walk", category = ModuleCategory.PLAYER)
 public final class ScaffoldWalkModule extends Module {
 
+    /*
+        im ngl I pasted a lot of this from rise and then modified it
+        ty alan for the base code
+        pls don't hate I'm too lazy to write it all from scratch for the like 3rd time -shxzu
+    */
+
     private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Normal);
-    private final NumberProperty rotationSpeed = new NumberProperty("Rotation Speed", 0, 0, 10, 1);
-    public final NumberProperty placeDelay = new NumberProperty("Place Delay", 0, 0, 5, 1);
+    private final NumberProperty rotationSpeed = new NumberProperty("Rotation Speed", 5, 0, 10, 1);
+    public final NumberProperty placeDelay = new NumberProperty("Place Delay", 2, 0, 5, 1);
     private final ModeProperty<YawOffset> yawOffset = new ModeProperty<>("Yaw Offset", YawOffset.Zero);
     public static Property<Boolean> sprint = new Property<>("Sprint", false);
     public static Property<Boolean> moveFix = new Property<>("Move Fix", false);
@@ -125,6 +135,7 @@ public final class ScaffoldWalkModule extends Module {
 
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
+        this.setSuffix(mode.getValue().toString());
         for (recursion = 0; recursion <= recursions; recursion++) {
 
             resetBinds(false, false, true, true, false, false);
@@ -200,7 +211,6 @@ public final class ScaffoldWalkModule extends Module {
                 if (canPlace && (RayCastUtils.overBlock(enumFacing.getEnumFacing(), blockFace, raycast.getValue() == RayCast.Strict) || raycast.getValue() == RayCast.None)) {
                     this.place();
 
-                    // mc.rightClickDelayTimer = 0;
                     ticksOnAir = 0;
 
                     if (!(mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock)) {
@@ -266,6 +276,41 @@ public final class ScaffoldWalkModule extends Module {
 
     @EventLink
     public final Listener<PacketReceiveEvent> onPacketReceiveEvent = PacketUtils::correctBlockCount;
+
+    @EventLink
+    public final Listener<Render3DEvent> render3DEventListener = event -> {
+        if (render.getValue()) {
+            GL11.glEnable(3042);
+            GL11.glBlendFunc(770, 771);
+            GL11.glEnable(2848);
+            GL11.glDisable(2929);
+            GL11.glDisable(3553);
+            GlStateManager.disableCull();
+            GL11.glDepthMask(false);
+            final float red = 1.0f;
+            final float green = 1.0f;
+            final float blue = 1.0f;
+            float lineWidth = 0.0f;
+            if (this.blockFace != null) {
+                if (mc.thePlayer.getDistance(this.blockFace.getX(), this.blockFace.getY(), this.blockFace.getZ()) > 1.0) {
+                    double d0 = 1.0 - mc.thePlayer.getDistance(this.blockFace.getX(), this.blockFace.getY(), this.blockFace.getZ()) / 20.0;
+                    if (d0 < 0.3) {
+                        d0 = 0.3;
+                    }
+                    lineWidth *= (float) d0;
+                }
+                RenderUtils.drawBlockESP(this.blockFace, red, green, blue, 0.3137255f, 1.0f, lineWidth);
+            }
+            GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            GL11.glDepthMask(true);
+            GlStateManager.enableCull();
+            GL11.glEnable(3553);
+            GL11.glEnable(2929);
+            GL11.glDisable(3042);
+            GL11.glBlendFunc(770, 771);
+            GL11.glDisable(2848);
+        }
+    };
 
     @Override
     public void onEnable() {
@@ -387,19 +432,6 @@ public final class ScaffoldWalkModule extends Module {
                         getRotations(yawOffset);
                     }
                 }
-
-                /* else {
-                    Vector3d position = MoveUtil.predictedPosition();
-                    Vector3d current = new Vector3d(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
-                    mc.thePlayer.setPosition(position.getX(), position.getY(), position.getZ());
-
-                    if (PlayerUtil.blockRelativeToPlayer(0,-0.1,0) instanceof BlockAir) {
-                        ChatUtil.display("Set");
-                        getRotations(yawOffset);
-                    }
-
-                    mc.thePlayer.setPosition(current.getX(), current.getY(), current.getZ());
-                }*/
                 break;
 
             case Breeze:
@@ -465,9 +497,7 @@ public final class ScaffoldWalkModule extends Module {
                 if (recursion == 0) {
                     int time = mc.thePlayer.offGroundTicks;
 
-                    if (time == 2 || time == 0) mc.rightClickMouse();
-
-                    if (time >= 3 && mc.thePlayer.offGroundTicks <= (!keepY.getValue() ? 7 : 10)) {
+                    if (time >= 3 && time <= (!keepY.getValue() ? 7 : 10)) {
                         if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue().equals(RayCast.Strict))) {
                             getRotations(0);
                         }
@@ -476,7 +506,7 @@ public final class ScaffoldWalkModule extends Module {
                         targetYaw = mc.thePlayer.rotationYaw;
                     }
 
-                    if (mc.thePlayer.offGroundTicks <= 3) {
+                    if (time <= 3) {
                         canPlace = false;
                     }
                 }

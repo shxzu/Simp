@@ -20,12 +20,12 @@ public class RotationUtils extends Util {
         return new Vector2f(yaw, pitch);
     }
 
-    public Vector2f calculate(final Entity entity) {
+    public static Vector2f calculate(final Entity entity) {
         return calculate(entity.getCustomPositionVector().add(0, Math.max(0, Math.min(mc.thePlayer.posY - entity.posY +
                 mc.thePlayer.getEyeHeight(), (entity.getEntityBoundingBox().maxY - entity.getEntityBoundingBox().minY) * 0.9)), 0));
     }
 
-    public Vector2f calculate(final Entity entity, final boolean adaptive, final double range) {
+    public static Vector2f calculate(final Entity entity, final boolean adaptive, final double range) {
         Vector2f normalRotations = calculate(entity);
         if (!adaptive || RayCastUtils.rayCast(normalRotations, range).typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
             return normalRotations;

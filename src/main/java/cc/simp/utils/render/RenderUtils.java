@@ -2,6 +2,7 @@ package cc.simp.utils.render;
 
 import cc.simp.utils.Util;
 import cc.simp.utils.render.shaders.RoundedShader;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -11,6 +12,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
@@ -230,6 +232,78 @@ public class RenderUtils extends Util {
         glDisable(GL_LINE_SMOOTH);
     }
 
+    private static void drawOutlinedBoundingBox(final AxisAlignedBB a) {
+        final Tessellator tessellator = Tessellator.getInstance();
+        final WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        worldrenderer.begin(3, DefaultVertexFormats.POSITION);
+        worldrenderer.pos((float)a.minX, (float)a.minY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.minY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.maxY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.maxY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.minY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.minY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.maxY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.maxY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.minY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.minY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.minY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.minY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.maxY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.maxY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.maxY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.maxY, (float)a.minZ).endVertex();
+        worldrenderer.endVertex();
+        tessellator.draw();
+    }
+
+    public static void drawBoundingBox(final AxisAlignedBB a) {
+        final Tessellator tessellator = Tessellator.getInstance();
+        final WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION);
+        worldrenderer.pos((float)a.minX, (float)a.minY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.minY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.maxY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.maxY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.minY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.minY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.maxY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.maxY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.minY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.minY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.maxY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.maxY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.minY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.minY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.maxY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.maxY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.minY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.minY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.minY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.minY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.maxY, (float)a.minZ).endVertex();
+        worldrenderer.pos((float)a.minX, (float)a.maxY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.maxY, (float)a.maxZ).endVertex();
+        worldrenderer.pos((float)a.maxX, (float)a.maxY, (float)a.minZ).endVertex();
+        worldrenderer.endVertex();
+        tessellator.draw();
+    }
+
+    public static void drawBlockESP(final BlockPos blockPos, final float red, final float green, final float blue, final float alpha, final float lineAlpha, final float lineWidth) {
+        GlStateManager.color(red, green, blue, alpha);
+        final float x = (float)(blockPos.getX() - mc.getRenderManager().getRenderPosX());
+        final float y = (float)(blockPos.getY() - mc.getRenderManager().getRenderPosY());
+        final float z = (float)(blockPos.getZ() - mc.getRenderManager().getRenderPosZ());
+        final Block block = mc.theWorld.getBlockState(blockPos).getBlock();
+        drawBoundingBox(new AxisAlignedBB(x, y, z, x + block.getBlockBoundsMaxX(), y + block.getBlockBoundsMaxY(), z + block.getBlockBoundsMaxZ()));
+        if (lineWidth > 0.0f) {
+            GL11.glLineWidth(lineWidth);
+            GlStateManager.color(red, green, blue, lineAlpha);
+            drawOutlinedBoundingBox(new AxisAlignedBB(x, y, z, x + block.getBlockBoundsMaxX(), y + block.getBlockBoundsMaxY(), z + block.getBlockBoundsMaxZ()));
+        }
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+    
     // This will set the alpha limit to a specified value ranging from 0-1
     public static void setAlphaLimit(float limit) {
         GlStateManager.enableAlpha();

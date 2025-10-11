@@ -3,6 +3,8 @@ package net.minecraft.client;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.ClientStartupEvent;
 import cc.simp.api.events.impl.game.KeyPressEvent;
+import cc.simp.api.events.impl.world.TickEvent;
+import cc.simp.api.events.impl.world.WorldLoadEvent;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -39,6 +41,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import javax.imageio.ImageIO;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.audio.MusicTicker;
@@ -218,7 +222,9 @@ public class Minecraft implements IThreadListener
     private Entity renderViewEntity;
     public Entity pointedEntity;
     public EffectRenderer effectRenderer;
-    private final Session session;
+    @Getter
+    @Setter
+    private Session session;
     private boolean isGamePaused;
     public FontRenderer fontRendererObj;
     public FontRenderer standardGalacticFontRenderer;
@@ -1177,7 +1183,7 @@ public class Minecraft implements IThreadListener
         }
     }
 
-    private void clickMouse()
+    public void clickMouse()
     {
         if (this.leftClickCounter <= 0)
         {
@@ -1400,6 +1406,10 @@ public class Minecraft implements IThreadListener
         if (!this.isGamePaused)
         {
             this.ingameGUI.updateTick();
+        }
+
+        if (this.theWorld != null && this.thePlayer != null) {
+            Simp.INSTANCE.getEventBus().post(new TickEvent());
         }
 
         this.entityRenderer.getMouseOver(1.0F);
@@ -2013,6 +2023,7 @@ public class Minecraft implements IThreadListener
             this.thePlayer.movementInput = new MovementInputFromOptions(this.gameSettings);
             this.playerController.setPlayerCapabilities(this.thePlayer);
             this.renderViewEntity = this.thePlayer;
+            Simp.INSTANCE.getEventBus().post(new WorldLoadEvent());
         }
         else
         {
@@ -2440,11 +2451,6 @@ public class Minecraft implements IThreadListener
     public boolean isFullScreen()
     {
         return this.fullscreen;
-    }
-
-    public Session getSession()
-    {
-        return this.session;
     }
 
     public PropertyMap getTwitchDetails()

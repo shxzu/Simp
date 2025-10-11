@@ -3,6 +3,8 @@ package net.minecraft.client.renderer.entity;
 import com.google.common.collect.Maps;
 import java.util.Collections;
 import java.util.Map;
+
+import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.state.IBlockState;
@@ -112,8 +114,11 @@ public class RenderManager
     private final Map<String, RenderPlayer> skinMap = Maps.newHashMap();
     private final RenderPlayer playerRenderer;
     private FontRenderer textRenderer;
+    @Getter
     private double renderPosX;
+    @Getter
     private double renderPosY;
+    @Getter
     private double renderPosZ;
     public TextureManager renderEngine;
     public World worldObj;
@@ -497,4 +502,5 @@ public class RenderManager
     {
         return Collections.unmodifiableMap(this.skinMap);
     }
+
 }

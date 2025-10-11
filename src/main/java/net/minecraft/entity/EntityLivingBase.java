@@ -3,6 +3,7 @@ package net.minecraft.entity;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.player.JumpEvent;
 import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.modules.impl.visuals.CameraModule;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.mc.MovementUtils;
 import com.google.common.base.Predicate;
@@ -1133,7 +1134,16 @@ public abstract class EntityLivingBase extends Entity
 
     private int getArmSwingAnimationEnd()
     {
-        return this.isPotionActive(Potion.digSpeed) ? 6 - (1 + this.getActivePotionEffect(Potion.digSpeed).getAmplifier()) : (this.isPotionActive(Potion.digSlowdown) ? 6 + (1 + this.getActivePotionEffect(Potion.digSlowdown).getAmplifier()) * 2 : 6);
+        int swingAnimationEnd = this.isPotionActive(Potion.digSpeed) ? 6 -
+                (1 + this.getActivePotionEffect(Potion.digSpeed).getAmplifier()) :
+                (int) ((this.isPotionActive(Potion.digSlowdown) ? 6 +
+                        (1 + this.getActivePotionEffect(Potion.digSlowdown).getAmplifier()) * 2 : 6));
+
+        if (Simp.INSTANCE.getModuleManager().getModule(CameraModule.class).isEnabled()) {
+            swingAnimationEnd *= (-CameraModule.swingSpeed.getValue().intValue() / 100) + 1;
+        }
+
+        return (int) (swingAnimationEnd * Minecraft.getMinecraft().timer.timerSpeed);
     }
 
     public void swingItem()

@@ -53,6 +53,7 @@ public class Simp {
         getEventBus().subscribe(rotationProcess);
         colorProcess = new ColorProcess();
         getEventBus().subscribe(colorProcess);
+        configManager.loadConfig("default");
     };
 
     public EventBus<Event> getEventBus() {

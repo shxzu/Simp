@@ -1,5 +1,7 @@
 package net.minecraft.client.renderer;
 
+import cc.simp.Simp;
+import cc.simp.api.events.impl.render.Render3DEvent;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.gson.JsonSyntaxException;
@@ -1693,6 +1695,11 @@ public class EntityRenderer implements IResourceManagerReloadListener
         {
             this.renderCloudsCheck(renderglobal, partialTicks, pass);
         }
+
+        GlStateManager.enableBlend();
+        final Render3DEvent eventRender3D = new Render3DEvent();
+        Simp.INSTANCE.getEventBus().post(eventRender3D);
+        GlStateManager.disableBlend();
 
         if (this.renderHand && !Shaders.isShadowPass)
         {

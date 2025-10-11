@@ -38,6 +38,7 @@ public final class SprintModule extends Module {
         }
 
         if (event.isSprinting()) {
+            if (Simp.INSTANCE.getModuleManager().getModule(ScaffoldWalkModule.class).isEnabled() && ScaffoldWalkModule.sprint.getValue()) return;
             if (Math.abs(MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw) - MathHelper.wrapAngleTo180_float(RotationProcess.rotations.x)) > 90 && rot.getValue()) {
                 mc.gameSettings.keyBindSprint.setPressed(false);
                 mc.thePlayer.setSprinting(false);

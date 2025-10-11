@@ -1,10 +1,15 @@
 package cc.simp.utils.misc;
 
+import com.google.gson.Gson;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class FileUtils {
+
+    public static Gson gson = new Gson();
+
     public static String readInputStream(InputStream inputStream) {
         StringBuilder stringBuilder = new StringBuilder();
 

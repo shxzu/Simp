@@ -139,7 +139,7 @@ public class Gui
         GlStateManager.enableTexture2D();
     }
 
-    public void drawCenteredString(FontRenderer fontRendererIn, String text, int x, int y, int color)
+    public static void drawCenteredString(FontRenderer fontRendererIn, String text, int x, int y, int color)
     {
         fontRendererIn.drawStringWithShadow(text, (float)(x - fontRendererIn.getStringWidth(text) / 2), (float)y, color);
     }

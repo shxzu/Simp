@@ -8,6 +8,7 @@ import net.minecraft.block.BlockTNT;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,5 +34,9 @@ public class InventoryUtils extends Util {
         return -1;
     }
 
+    public static boolean isHoldingSword() {
+        final ItemStack stack;
+        return (stack = mc.thePlayer.getCurrentEquippedItem()) != null && stack.getItem() instanceof ItemSword;
+    }
 
 }

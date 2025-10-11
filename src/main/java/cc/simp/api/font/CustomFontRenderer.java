@@ -58,7 +58,7 @@ public class CustomFontRenderer extends CustomFont {
         if (useMCustomFont) {
             return Minecraft.getMinecraft().fontRendererObj.drawString(text, x, y, color, true);
         }
-        float shadowWidth = drawString(text, x + 1D, y + .5D, color, true);
+        float shadowWidth = drawString(text, x + 1.0f, y + 1.0f, color, true);
         return Math.max(shadowWidth, drawString(text, x, y, color, false));
     }
 
@@ -66,7 +66,7 @@ public class CustomFontRenderer extends CustomFont {
         if (useMCustomFont) {
             return Minecraft.getMinecraft().fontRendererObj.drawString(text, (float) x, (float) y, color, true);
         }
-        float shadowWidth = drawString(text, x + 1, y + .5, color, true);
+        float shadowWidth = drawString(text, x + 1.0f, y + 1.0f, color, true);
         return Math.max(shadowWidth, drawString(text, x, y, color, false));
     }
 
@@ -153,7 +153,7 @@ public class CustomFontRenderer extends CustomFont {
         boolean underline = false;
         boolean render = true;
         x *= 2.0D;
-        y = (y - 3.0D) * 2.0D;
+        y = (y - 2.0D) * 2.0D;
 
         if (render) {
             GL11.glPushMatrix();

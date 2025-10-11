@@ -3,10 +3,13 @@ package cc.simp.modules;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.KeyPressEvent;
 import cc.simp.modules.impl.client.ClickInterfaceModule;
+import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.movement.SpeedModule;
 import cc.simp.modules.impl.movement.SprintModule;
 import cc.simp.modules.impl.player.ScaffoldWalkModule;
 import cc.simp.modules.impl.visuals.ArrayListModule;
+import cc.simp.modules.impl.visuals.CameraModule;
+import cc.simp.modules.impl.visuals.ESPModule;
 import cc.simp.modules.impl.visuals.WatermarkModule;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import io.github.nevalackin.homoBus.Listener;
@@ -23,6 +26,7 @@ public final class ModuleManager {
     public ModuleManager() {
         instanceMap = putInInstanceMap(
                 // Combat
+                new KillAuraModule(),
 
                 // Movement
                 new SprintModule(),
@@ -36,7 +40,9 @@ public final class ModuleManager {
 
                 // Visuals
                 new ArrayListModule(),
-                new WatermarkModule()
+                new WatermarkModule(),
+                new CameraModule(),
+                new ESPModule()
         );
         getModules().forEach(Module::reflectProperties);
 
