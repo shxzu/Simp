@@ -3,12 +3,78 @@ package cc.simp.utils.mc;
 import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.Util;
+import cc.simp.utils.client.EnumFacingOffset;
 import cc.simp.utils.client.MathUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.MathHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.*;
 import org.lwjgl.util.vector.Vector2f;
 
 public class RotationUtils extends Util {
+    public static Vector2f calculate(final Vector3d from, final Vector3d to) {
+        final Vector3d diff = to.subtract(from);
+        final double distance = Math.hypot(diff.getX(), diff.getZ());
+        final float yaw = (float) (MathHelper.atan2(diff.getZ(), diff.getX()) * MathUtils.TO_DEGREES) - 90.0F;
+        final float pitch = (float) (-(MathHelper.atan2(diff.getY(), distance) * MathUtils.TO_DEGREES));
+        return new Vector2f(yaw, pitch);
+    }
+
+    public Vector2f calculate(final Entity entity) {
+        return calculate(entity.getCustomPositionVector().add(0, Math.max(0, Math.min(mc.thePlayer.posY - entity.posY +
+                mc.thePlayer.getEyeHeight(), (entity.getEntityBoundingBox().maxY - entity.getEntityBoundingBox().minY) * 0.9)), 0));
+    }
+
+    public Vector2f calculate(final Entity entity, final boolean adaptive, final double range) {
+        Vector2f normalRotations = calculate(entity);
+        if (!adaptive || RayCastUtils.rayCast(normalRotations, range).typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+            return normalRotations;
+        }
+
+        for (double yPercent = 1; yPercent >= 0; yPercent -= 0.25 + Math.random() * 0.1) {
+            for (double xPercent = 1; xPercent >= -0.5; xPercent -= 0.5) {
+                for (double zPercent = 1; zPercent >= -0.5; zPercent -= 0.5) {
+                    Vector2f adaptiveRotations = calculate(entity.getCustomPositionVector().add(
+                            (entity.getEntityBoundingBox().maxX - entity.getEntityBoundingBox().minX) * xPercent,
+                            (entity.getEntityBoundingBox().maxY - entity.getEntityBoundingBox().minY) * yPercent,
+                            (entity.getEntityBoundingBox().maxZ - entity.getEntityBoundingBox().minZ) * zPercent));
+
+                    if (RayCastUtils.rayCast(adaptiveRotations, range).typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+                        return adaptiveRotations;
+                    }
+                }
+            }
+        }
+
+        return normalRotations;
+    }
+
+    public Vector2f calculate(final Vec3 to, final EnumFacing enumFacing) {
+        return calculate(new Vector3d(to.xCoord, to.yCoord, to.zCoord), enumFacing);
+    }
+
+    public static Vector2f calculate(final Vec3 to) {
+        return calculate(mc.thePlayer.getCustomPositionVector().add(0, mc.thePlayer.getEyeHeight(), 0), new Vector3d(to.xCoord, to.yCoord, to.zCoord));
+    }
+
+    public Vector2f calculate(final BlockPos to) {
+        return calculate(mc.thePlayer.getCustomPositionVector().add(0, mc.thePlayer.getEyeHeight(), 0), new Vector3d(to.getX(), to.getY(), to.getZ()).add(0.5, 0.5, 0.5));
+    }
+
+    public static Vector2f calculate(final Vector3d to) {
+        return calculate(mc.thePlayer.getCustomPositionVector().add(0, mc.thePlayer.getEyeHeight(), 0), to);
+    }
+
+    public static Vector2f calculate(final Vector3d position, final EnumFacing enumFacing) {
+        double x = position.getX() + 0.5D;
+        double y = position.getY() + 0.5D;
+        double z = position.getZ() + 0.5D;
+
+        x += (double) enumFacing.getDirectionVec().getX() * 0.5D;
+        y += (double) enumFacing.getDirectionVec().getY() * 0.5D;
+        z += (double) enumFacing.getDirectionVec().getZ() * 0.5D;
+        return calculate(new Vector3d(x, y, z));
+    }
 
     public static Vector2f move(final Vector2f targetRotation, final double speed) {
         return move(RotationProcess.lastRotations, targetRotation, speed);

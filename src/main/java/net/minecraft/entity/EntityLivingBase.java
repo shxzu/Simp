@@ -3,6 +3,7 @@ package net.minecraft.entity;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.player.JumpEvent;
 import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.processes.RotationProcess;
 import cc.simp.utils.mc.MovementUtils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -1590,6 +1591,10 @@ public abstract class EntityLivingBase extends Entity
         }
 
         this.onLivingUpdate();
+
+        float yaw = this.rotationYaw;
+        if (this == Minecraft.getMinecraft().thePlayer) yaw = RotationProcess.rotations.x;
+
         double d0 = this.posX - this.prevPosX;
         double d1 = this.posZ - this.prevPosZ;
         float f = (float)(d0 * d0 + d1 * d1);
@@ -1607,7 +1612,7 @@ public abstract class EntityLivingBase extends Entity
 
         if (this.swingProgress > 0.0F)
         {
-            f1 = this.rotationYaw;
+            f1 = yaw;
         }
 
         if (!this.onGround)
@@ -1663,30 +1668,28 @@ public abstract class EntityLivingBase extends Entity
 
     protected float updateDistance(float p_110146_1_, float p_110146_2_)
     {
-        float f = MathHelper.wrapAngleTo180_float(p_110146_1_ - this.renderYawOffset);
+        float yaw = this.rotationYaw;
+        if (this == Minecraft.getMinecraft().thePlayer) yaw = RotationProcess.rotations.x;
+        final float f = MathHelper.wrapAngleTo180_float(p_110146_1_ - this.renderYawOffset);
         this.renderYawOffset += f * 0.3F;
-        float f1 = MathHelper.wrapAngleTo180_float(this.rotationYaw - this.renderYawOffset);
-        boolean flag = f1 < -90.0F || f1 >= 90.0F;
+        float f1 = MathHelper.wrapAngleTo180_float(yaw - this.renderYawOffset);
+        final boolean flag = f1 < -90.0F || f1 >= 90.0F;
 
-        if (f1 < -75.0F)
-        {
+        if (f1 < -75.0F) {
             f1 = -75.0F;
         }
 
-        if (f1 >= 75.0F)
-        {
+        if (f1 >= 75.0F) {
             f1 = 75.0F;
         }
 
-        this.renderYawOffset = this.rotationYaw - f1;
+        this.renderYawOffset = yaw - f1;
 
-        if (f1 * f1 > 2500.0F)
-        {
+        if (f1 * f1 > 2500.0F) {
             this.renderYawOffset += f1 * 0.2F;
         }
 
-        if (flag)
-        {
+        if (flag) {
             p_110146_2_ *= -1.0F;
         }
 

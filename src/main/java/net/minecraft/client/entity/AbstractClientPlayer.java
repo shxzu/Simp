@@ -211,6 +211,7 @@ public abstract class AbstractClientPlayer extends EntityPlayer
         this.reloadCapeTimeMs = p_setReloadCapeTimeMs_1_;
     }
 
+    @Override
     public Vec3 getLook(final float partialTicks) {
         float yaw = this.rotationYaw;
         float pitch = this.rotationPitch;

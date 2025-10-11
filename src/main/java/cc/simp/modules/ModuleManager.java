@@ -3,7 +3,9 @@ package cc.simp.modules;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.KeyPressEvent;
 import cc.simp.modules.impl.client.ClickInterfaceModule;
+import cc.simp.modules.impl.movement.SpeedModule;
 import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.modules.impl.player.ScaffoldWalkModule;
 import cc.simp.modules.impl.visuals.ArrayListModule;
 import cc.simp.modules.impl.visuals.WatermarkModule;
 import com.google.common.collect.ImmutableClassToInstanceMap;
@@ -24,8 +26,10 @@ public final class ModuleManager {
 
                 // Movement
                 new SprintModule(),
+                new SpeedModule(),
 
                 // Player
+                new ScaffoldWalkModule(),
 
                 // Client
                 new ClickInterfaceModule(),

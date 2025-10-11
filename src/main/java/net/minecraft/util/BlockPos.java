@@ -257,6 +257,12 @@ public class BlockPos extends Vec3i
         };
     }
 
+    public boolean equalsVector(Vector3d vec) {
+        return ((Math.floor(vec.getX()) == getX() &&
+                Math.floor(vec.getY()) == getY() &&
+                Math.floor(vec.getZ()) == getZ()));
+    }
+
     public static final class MutableBlockPos extends BlockPos
     {
         private int x;

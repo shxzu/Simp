@@ -58,7 +58,6 @@ import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.NpcMerchant;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
-import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.ai.attributes.RangedAttribute;
 import net.minecraft.entity.effect.EntityLightningBolt;
@@ -177,7 +176,6 @@ import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter;
 import net.minecraft.network.play.server.S48PacketResourcePackSend;
 import net.minecraft.network.play.server.S49PacketUpdateEntityNBT;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.realms.DisconnectedRealmsScreen;
 import net.minecraft.scoreboard.IScoreObjectiveCriteria;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
@@ -999,9 +997,9 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.gameController);
         EntityPlayer entityplayer = this.gameController.thePlayer;
 
-        if (packetIn.func_149175_c() == -1)
+        if (packetIn.id() == -1)
         {
-            entityplayer.inventory.setItemStack(packetIn.func_149174_e());
+            entityplayer.inventory.setItemStack(packetIn.item());
         }
         else
         {
@@ -1012,20 +1010,20 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
                 flag = guicontainercreative.getSelectedTabIndex() != CreativeTabs.tabInventory.getTabIndex();
             }
 
-            if (packetIn.func_149175_c() == 0 && packetIn.func_149173_d() >= 36 && packetIn.func_149173_d() < 45)
+            if (packetIn.id() == 0 && packetIn.slot() >= 36 && packetIn.slot() < 45)
             {
-                ItemStack itemstack = entityplayer.inventoryContainer.getSlot(packetIn.func_149173_d()).getStack();
+                ItemStack itemstack = entityplayer.inventoryContainer.getSlot(packetIn.slot()).getStack();
 
-                if (packetIn.func_149174_e() != null && (itemstack == null || itemstack.stackSize < packetIn.func_149174_e().stackSize))
+                if (packetIn.item() != null && (itemstack == null || itemstack.stackSize < packetIn.item().stackSize))
                 {
-                    packetIn.func_149174_e().animationsToGo = 5;
+                    packetIn.item().animationsToGo = 5;
                 }
 
-                entityplayer.inventoryContainer.putStackInSlot(packetIn.func_149173_d(), packetIn.func_149174_e());
+                entityplayer.inventoryContainer.putStackInSlot(packetIn.slot(), packetIn.item());
             }
-            else if (packetIn.func_149175_c() == entityplayer.openContainer.windowId && (packetIn.func_149175_c() != 0 || !flag))
+            else if (packetIn.id() == entityplayer.openContainer.windowId && (packetIn.id() != 0 || !flag))
             {
-                entityplayer.openContainer.putStackInSlot(packetIn.func_149173_d(), packetIn.func_149174_e());
+                entityplayer.openContainer.putStackInSlot(packetIn.slot(), packetIn.item());
             }
         }
     }

@@ -92,4 +92,12 @@ public class Vec3i implements Comparable<Vec3i>
     {
         return Objects.toStringHelper(this).add("x", this.getX()).add("y", this.getY()).add("z", this.getZ()).toString();
     }
+
+    public Vec3i add(final int x, final int y, final int z) {
+        return new Vec3i(this.x + x, this.y + y, this.z + z);
+    }
+
+    public Vec3i add(final Vec3i vector) {
+        return add(vector.x, vector.y, vector.z);
+    }
 }

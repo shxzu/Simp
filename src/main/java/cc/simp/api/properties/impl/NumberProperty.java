@@ -58,4 +58,41 @@ public class NumberProperty extends Property<Double> {
     public double getIncrement() {
         return increment;
     }
+
+    public Number getRandomBetween() {
+        long min = (long) this.getMin();
+        long max = (long) this.getMax();
+
+        if (min == max) {
+            return min;
+        } else if (min > max) {
+            final long d = min;
+            min = max;
+            max = d;
+        }
+
+        long random = (long) (min + (max - min) * Math.random() * Math.random());
+        return new Number() {
+            @Override
+            public int intValue() {
+                return Math.round(random);
+            }
+
+            @Override
+            public long longValue() {
+                return random;
+            }
+
+            @Override
+            public float floatValue() {
+                return (float) random;
+            }
+
+            @Override
+            public double doubleValue() {
+                return (double) random;
+            }
+        };
+    }
+
 }
