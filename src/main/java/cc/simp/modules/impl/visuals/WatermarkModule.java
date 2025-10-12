@@ -15,13 +15,16 @@ import cc.simp.utils.render.shaders.RoundedShader;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
@@ -43,6 +46,7 @@ public final class WatermarkModule extends Module {
     public static final ModeProperty<Type> type = new ModeProperty<>("Client Watermark Type", Type.Simple);
     public static final Property<Boolean> info = new Property<>("Watermark Info", true, () -> type.getValue() != Type.GameSense && type.getValue() != Type.Logo && type.getValue() != Type.DynamicIsland);
     public static final ModeProperty<FontType> fontType = new ModeProperty<>("Font", FontType.Simp);
+    public static final Property<Boolean> useCustomFont = new Property<>("Use Custom Font", true);
 
     private long lastServerTime;
     private long lastUpdateTime;
@@ -51,6 +55,12 @@ public final class WatermarkModule extends Module {
     private float islandHeight;
     private ResourceLocation clientLogo;
     private RoundedShader bloomShader;
+
+    private int lastBlockCount = 0;
+    private int currentBlockCount = 0;
+    private float scaffoldBoxOffset = 0;
+    private float scaffoldBoxAlpha = 0;
+    private boolean scaffoldWasActive = false;
 
     public WatermarkModule() {
         toggle();
@@ -117,7 +127,8 @@ public final class WatermarkModule extends Module {
         Apple("Apple"),
         Sans("Sans"),
         Simp("Simp"),
-        SimpBold("Simp-Bold");
+        SimpBold("Simp-Bold"),
+        Minecraft("Minecraft");
 
         private final String name;
 
@@ -133,7 +144,6 @@ public final class WatermarkModule extends Module {
 
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = e -> {
-        CustomFontRenderer fr = getSelectedFont();
         ScaledResolution sr = new ScaledResolution(mc);
         SimpleDateFormat sdfDate = new SimpleDateFormat("hh:mm a");
         Date now = new Date();
@@ -141,7 +151,7 @@ public final class WatermarkModule extends Module {
         String text = "Simp";
 
         if (type.getValue() == Type.DynamicIsland) {
-            renderDynamicIsland(fr, sr);
+            renderDynamicIsland(sr);
             return;
         }
 
@@ -159,12 +169,20 @@ public final class WatermarkModule extends Module {
             String serverInfo = (mc.getCurrentServerData() != null) ? mc.getCurrentServerData().serverIP : "Singleplayer";
             text = String.format(EnumChatFormatting.WHITE + "%s v%s | %d FPS | %s",
                     Simp.NAME, Simp.VERSION, Minecraft.getDebugFPS(), serverInfo);
-            RenderUtils.drawBorderedRect(0, 0.5f, fr.getStringWidth(text) + 4, 7 * sr.getScaleFactor(), 2, new Color(0, 0, 0, 100).getRGB(), ColorProcess.getColor().getRGB(), true, false, false, false);
+            int textWidth = useCustomFont.getValue() && fontType.getValue() != FontType.Minecraft ?
+                    getCustomFontRenderer().getStringWidth(text) : mc.fontRendererObj.getStringWidth(text);
+            RenderUtils.drawBorderedRect(0, 0.5f, textWidth + 4, 7 * sr.getScaleFactor(), 2, new Color(0, 0, 0, 100).getRGB(), ColorProcess.getColor().getRGB(), true, false, false, false);
         }
-        fr.drawStringWithShadow(text, 2, 2, ColorProcess.getColor().getRGB());
+
+        if (useCustomFont.getValue() && fontType.getValue() != FontType.Minecraft) {
+            CustomFontRenderer fr = getCustomFontRenderer();
+            fr.drawStringWithShadow(text, 2, 2, ColorProcess.getColor().getRGB());
+        } else {
+            mc.fontRendererObj.drawStringWithShadow(text, 2, 2, ColorProcess.getColor().getRGB());
+        }
     };
 
-    private CustomFontRenderer getSelectedFont() {
+    private CustomFontRenderer getCustomFontRenderer() {
         switch (fontType.getValue()) {
             case Arial:
                 return createFontRenderer("arial", 18, Font.PLAIN);
@@ -189,7 +207,7 @@ public final class WatermarkModule extends Module {
         }
     }
 
-    private void renderDynamicIsland(CustomFontRenderer fr, ScaledResolution sr) {
+    private void renderDynamicIsland(ScaledResolution sr) {
         if (System.currentTimeMillis() - lastServerTime > 5000) {
             updateServerInfo();
             lastServerTime = System.currentTimeMillis();
@@ -201,8 +219,18 @@ public final class WatermarkModule extends Module {
         String clientText = "Simp";
         String serverText = currentServer != null ? currentServer : "Loading...";
 
-        int clientWidth = fr.getStringWidth(clientText);
-        int smallTextWidth = fr.getStringWidth(" | " + serverText + " | " + Simp.VERSION);
+        int clientWidth, smallTextWidth, fontHeight;
+        if (useCustomFont.getValue() && fontType.getValue() != FontType.Minecraft) {
+            CustomFontRenderer fr = getCustomFontRenderer();
+            clientWidth = fr.getStringWidth(clientText);
+            smallTextWidth = fr.getStringWidth(" | " + serverText + " | " + Simp.VERSION);
+            fontHeight = fr.getHeight();
+        } else {
+            FontRenderer fr = mc.fontRendererObj;
+            clientWidth = fr.getStringWidth(clientText);
+            smallTextWidth = fr.getStringWidth(" | " + serverText + " | " + Simp.VERSION);
+            fontHeight = fr.FONT_HEIGHT;
+        }
 
         int totalWidth = clientWidth + smallTextWidth + 29;
         int height = 24;
@@ -252,16 +280,202 @@ public final class WatermarkModule extends Module {
         }
 
         int textX = logoX + 20;
-        int textY = yPos + (height - fr.getHeight())/2 + 1;
+        int textY = yPos + (height - fontHeight) / 2 + 1;
 
         int clientColor = ColorProcess.getColor().getRGB();
-        fr.drawString(clientText, textX, textY, clientColor);
-        fr.drawString(
-                " | " + serverText + " | " + Simp.VERSION,
-                textX + fr.getStringWidth(clientText),
-                textY,
-                0xAAAAAA
-        );
+
+        if (useCustomFont.getValue() && fontType.getValue() != FontType.Minecraft) {
+            CustomFontRenderer fr = getCustomFontRenderer();
+            fr.drawString(clientText, textX, textY, clientColor);
+            fr.drawString(
+                    " | " + serverText + " | " + Simp.VERSION,
+                    textX + clientWidth,
+                    textY,
+                    0xAAAAAA
+            );
+        } else {
+            FontRenderer fr = mc.fontRendererObj;
+            fr.drawString(clientText, textX, textY, clientColor);
+            fr.drawString(
+                    " | " + serverText + " | " + Simp.VERSION,
+                    textX + clientWidth,
+                    textY,
+                    0xAAAAAA
+            );
+        }
+
+        renderScaffoldIndicator(sr, centerX, yPos, height, alpha);
+    }
+
+    private void renderScaffoldIndicator(ScaledResolution sr, int centerX, int yPos, int mainHeight, float alpha) {
+        Module scaffoldModule = getScaffoldModule();
+        boolean scaffoldActive = scaffoldModule != null && scaffoldModule.isEnabled();
+
+        float targetAlpha = scaffoldActive ? 1.0f : 0.0f;
+        scaffoldBoxAlpha = RenderUtils.lerp(scaffoldBoxAlpha, targetAlpha, alpha * 2);
+
+        float targetOffset = scaffoldActive ? 35f : 0f;
+        scaffoldBoxOffset = RenderUtils.lerp(scaffoldBoxOffset, targetOffset, alpha * 2);
+
+        if (scaffoldBoxAlpha < 0.01f) return;
+
+        ItemStack heldItem = mc.thePlayer.getHeldItem();
+        if (heldItem == null) return;
+
+        currentBlockCount = getBlockCount(heldItem);
+
+        if (!scaffoldWasActive && scaffoldActive) {
+            lastBlockCount = currentBlockCount;
+        }
+        scaffoldWasActive = scaffoldActive;
+
+        int boxWidth = 90;
+        int boxHeight = 24;
+        int boxX = (int) (centerX - boxWidth / 2);
+        int boxY = (int) (yPos + mainHeight + scaffoldBoxOffset);
+
+        GlStateManager.enableBlend();
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        bloomShader.init();
+        setupShaderUniforms(bloomShader, boxX, boxY, boxWidth, boxHeight, 8f);
+        bloomShader.setUniformf("color", 30f/255f, 35f/255f, 40f/255f, 0.85f * scaffoldBoxAlpha);
+        RoundedShader.drawQuads(boxX - 1, boxY - 1, boxWidth + 2, boxHeight + 2);
+        bloomShader.unload();
+
+        GlStateManager.pushMatrix();
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        RenderHelper.enableGUIStandardItemLighting();
+
+        int itemX = boxX + 4;
+        int itemY = boxY + 4;
+        mc.getRenderItem().renderItemAndEffectIntoGUI(heldItem, itemX, itemY);
+
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.disableBlend();
+        GlStateManager.popMatrix();
+
+        float progress = lastBlockCount > 0 ? (float) currentBlockCount / (float) lastBlockCount : 1.0f;
+        progress = Math.max(0, Math.min(1, progress));
+
+        int barX = itemX + 20;
+        int barY = boxY + 8;
+        int barWidth = 45;
+        int barHeight = 3;
+
+        drawRoundedRect(barX, barY, barWidth, barHeight, 1.5f, new Color(20, 20, 25, (int)(180 * scaffoldBoxAlpha)).getRGB());
+
+        if (progress > 0) {
+            int filledWidth = (int) (barWidth * progress);
+            drawGradientProgressBar(barX, barY, filledWidth, barHeight, 1.5f, scaffoldBoxAlpha);
+        }
+
+        String countText = String.valueOf(currentBlockCount);
+        int textX = barX + barWidth + 4;
+        int textY = boxY + (boxHeight - getCurrentFontHeight()) / 2 + 1;
+
+        if (useCustomFont.getValue() && fontType.getValue() != FontType.Minecraft) {
+            getCustomFontRenderer().drawString(countText, textX, textY, new Color(170, 170, 170, (int)(255 * scaffoldBoxAlpha)).getRGB());
+        } else {
+            mc.fontRendererObj.drawString(countText, textX, textY, new Color(170, 170, 170, (int)(255 * scaffoldBoxAlpha)).getRGB());
+        }
+
+        GlStateManager.disableBlend();
+    }
+
+    private int getCurrentFontHeight() {
+        if (useCustomFont.getValue() && fontType.getValue() != FontType.Minecraft) {
+            return getCustomFontRenderer().getHeight();
+        } else {
+            return mc.fontRendererObj.FONT_HEIGHT;
+        }
+    }
+
+    private Module getScaffoldModule() {
+        try {
+            java.lang.reflect.Method getInstanceMethod = Simp.class.getMethod("getInstance");
+            Simp instance = (Simp) getInstanceMethod.invoke(null);
+            java.lang.reflect.Method getModuleManagerMethod = instance.getClass().getMethod("getModuleManager");
+            Object moduleManager = getModuleManagerMethod.invoke(instance);
+            java.lang.reflect.Method getModuleMethod = moduleManager.getClass().getMethod("getModule", String.class);
+            return (Module) getModuleMethod.invoke(moduleManager, "Scaffold");
+        } catch (Exception e) {
+            try {
+                java.lang.reflect.Method getModuleMethod = Simp.class.getMethod("getModule", String.class);
+                return (Module) getModuleMethod.invoke(null, "Scaffold");
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+    }
+
+    private int getBlockCount(ItemStack stack) {
+        if (stack == null) return 0;
+
+        int count = 0;
+        for (int i = 0; i < mc.thePlayer.inventory.getSizeInventory(); i++) {
+            ItemStack invStack = mc.thePlayer.inventory.getStackInSlot(i);
+            if (invStack != null && invStack.getItem() == stack.getItem() &&
+                    invStack.getMetadata() == stack.getMetadata()) {
+                count += invStack.stackSize;
+            }
+        }
+        return count;
+    }
+
+    private void drawGradientProgressBar(int x, int y, int width, int height, float radius, float alpha) {
+        Color color1 = new Color(58, 134, 255, (int)(255 * alpha));
+        Color color2 = new Color(0, 100, 255, (int)(255 * alpha));
+
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.shadeModel(GL_SMOOTH);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+
+        float r1 = color1.getRed() / 255f;
+        float g1 = color1.getGreen() / 255f;
+        float b1 = color1.getBlue() / 255f;
+        float a1 = color1.getAlpha() / 255f;
+
+        float r2 = color2.getRed() / 255f;
+        float g2 = color2.getGreen() / 255f;
+        float b2 = color2.getBlue() / 255f;
+        float a2 = color2.getAlpha() / 255f;
+
+        worldrenderer.pos(x, y + height, 0).color(r1, g1, b1, a1).endVertex();
+        worldrenderer.pos(x + width, y + height, 0).color(r2, g2, b2, a2).endVertex();
+        worldrenderer.pos(x + width, y, 0).color(r2, g2, b2, a2).endVertex();
+        worldrenderer.pos(x, y, 0).color(r1, g1, b1, a1).endVertex();
+
+        tessellator.draw();
+
+        GlStateManager.shadeModel(GL_FLAT);
+        GlStateManager.disableBlend();
+        GlStateManager.enableTexture2D();
+    }
+
+    private void drawRoundedRect(int x, int y, int width, int height, float radius, int color) {
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        float a = (color >> 24 & 255) / 255.0F;
+        float r = (color >> 16 & 255) / 255.0F;
+        float g = (color >> 8 & 255) / 255.0F;
+        float b = (color & 255) / 255.0F;
+
+        GL11.glColor4f(r, g, b, a);
+        Gui.drawRect(x, y, x + width, y + height, color);
+
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
     }
 
     private void setupShaderUniforms(RoundedShader shader, float x, float y, float width, float height, float radius) {
