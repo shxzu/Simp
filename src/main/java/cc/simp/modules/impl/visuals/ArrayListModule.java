@@ -5,6 +5,7 @@ import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.api.properties.Property;
+import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -30,6 +31,7 @@ public final class ArrayListModule extends Module {
     private final Property<Boolean> bg = new Property<>("Background", true);
     private final Property<Boolean> line = new Property<>("Line", false);
     private final Property<Boolean> outline = new Property<>("Outline", true);
+    public static final ModeProperty<FontType> fontType = new ModeProperty<>("Font", FontType.Simp);
 
     public ArrayListModule() {
         toggle();
@@ -37,6 +39,25 @@ public final class ArrayListModule extends Module {
 
     private static final Map<Module, String> displayLabelCache = new HashMap<>();
     private static List<Module> moduleCache;
+
+    public enum FontType {
+        Arial("Arial"),
+        Apple("Apple"),
+        Sans("Sans"),
+        Simp("Simp"),
+        SimpBold("Simp-Bold");
+
+        private final String name;
+
+        FontType(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     @EventLink
     public Listener<PreUpdateEvent> preUpdateEventListener = e -> {
@@ -51,7 +72,7 @@ public final class ArrayListModule extends Module {
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = e -> {
 
-        CustomFontRenderer fr = FontProcess.getCurrentFont();
+        CustomFontRenderer fr = getSelectedFont();
 
         ScaledResolution sr = new ScaledResolution(mc);
 
@@ -121,7 +142,7 @@ public final class ArrayListModule extends Module {
                 fr.drawStringWithShadow(
                         name,
                         (float) translateX,
-                        (float) translateY - (FontProcess.getCurrentFont() == FontProcess.getFont("mc") ? 0 : 1),
+                        (float) translateY - (fr.getNameFontTTF().equalsIgnoreCase("mc") ? 0 : 1),
                         aColor);
                 if (outline.getValue()) {
                     Gui.drawRect(translateX - 2,
@@ -184,6 +205,31 @@ public final class ArrayListModule extends Module {
         }
     };
 
+    private CustomFontRenderer getSelectedFont() {
+        switch (fontType.getValue()) {
+            case Arial:
+                return createFontRenderer("arial", 18, Font.PLAIN);
+            case Apple:
+                return createFontRenderer("apple", 18, Font.PLAIN);
+            case Sans:
+                return createFontRenderer("sans", 18, Font.PLAIN);
+            case SimpBold:
+                return createFontRenderer("simp", 18, Font.BOLD);
+            case Simp:
+            default:
+                return createFontRenderer("simp", 18, Font.PLAIN);
+        }
+    }
+
+    private CustomFontRenderer createFontRenderer(String fontName, float size, int style) {
+        try {
+            return new CustomFontRenderer(fontName, size, style, true, true);
+        } catch (Exception e) {
+            System.err.println("Failed to load font: " + fontName + ", using fallback");
+            return new CustomFontRenderer("simp", size, Font.PLAIN, true, true);
+        }
+    }
+
     private static String getDisplayLabel(Module m) {
         String label = m.getLabel();
         String suffix = m.getSuffix();
@@ -194,7 +240,7 @@ public final class ArrayListModule extends Module {
     }
 
     private void updateModulePositions(ScaledResolution scaledResolution) {
-        CustomFontRenderer fr = FontProcess.getCurrentFont();
+        CustomFontRenderer fr = getSelectedFont();
         if (moduleCache == null)
             moduleCache = new ArrayList<>(Simp.INSTANCE.getModuleManager().getModules());
 
@@ -226,14 +272,13 @@ public final class ArrayListModule extends Module {
         }
     }
 
-    private static class LengthComparator extends ModuleComparator {
+    private class LengthComparator extends ModuleComparator {
         @Override
         public int compare(Module o1, Module o2) {
-            CustomFontRenderer fr = FontProcess.getCurrentFont();
+            CustomFontRenderer fr = getSelectedFont();
             return Float.compare(
                     fr.getStringWidth(displayLabelCache.get(o2)),
                     fr.getStringWidth(displayLabelCache.get(o1)));
         }
     }
-
 }
