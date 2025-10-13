@@ -9,6 +9,19 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 public class S12PacketEntityVelocity implements Packet<INetHandlerPlayClient>
 {
     private int entityID;
+
+    public void setMotionY(int motionY) {
+        this.motionY = motionY;
+    }
+
+    public void setMotionX(int motionX) {
+        this.motionX = motionX;
+    }
+
+    public void setMotionZ(int motionZ) {
+        this.motionZ = motionZ;
+    }
+
     private int motionX;
     private int motionY;
     private int motionZ;
