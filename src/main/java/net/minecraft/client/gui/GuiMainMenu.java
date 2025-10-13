@@ -123,41 +123,8 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
     }
 
     public void initGui() {
-        this.viewportTexture = new DynamicTexture(256, 256);
-        this.backgroundTexture = this.mc.getTextureManager().getDynamicTextureLocation("background", this.viewportTexture);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-
-        if (calendar.get(2) + 1 == 12 && calendar.get(5) == 24) {
-            this.splashText = "Merry X-mas!";
-        } else if (calendar.get(2) + 1 == 1 && calendar.get(5) == 1) {
-            this.splashText = "Happy new year!";
-        } else if (calendar.get(2) + 1 == 10 && calendar.get(5) == 31) {
-            this.splashText = "OOoooOOOoooo! Spooky!";
-        }
-
-        int i = 24;
-        int j = this.height / 4 + 48;
-
-        if (this.mc.isDemo()) {
-            this.addDemoButtons(j, 24);
-        } else {
-            this.addSingleplayerMultiplayerButtons(j, 24);
-        }
-
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 100, j + 72 + 12, 98, 20, I18n.format("menu.options")));
-        this.buttonList.add(new GuiButton(4, this.width / 2 + 2, j + 72 + 12, 98, 20, I18n.format("menu.quit")));
-        this.buttonList.add(new GuiButtonLanguage(5, this.width / 2 - 124, j + 72 + 12));
-
-        synchronized (this.threadLock) {
-            this.field_92023_s = this.fontRendererObj.getStringWidth(this.openGLWarning1);
-            this.field_92024_r = this.fontRendererObj.getStringWidth(this.openGLWarning2);
-            int k = Math.max(this.field_92023_s, this.field_92024_r);
-            this.field_92022_t = (this.width - k) / 2;
-            this.field_92021_u = this.buttonList.get(0).yPosition - 24;
-            this.field_92020_v = this.field_92022_t + k;
-            this.field_92019_w = this.field_92021_u + 24;
-        }
+        // Redirect to custom main menu
+        this.mc.displayGuiScreen(new cc.simp.ui.CustomMainMenu());
     }
 
     private void addSingleplayerMultiplayerButtons(int p_73969_1_, int p_73969_2_) {
