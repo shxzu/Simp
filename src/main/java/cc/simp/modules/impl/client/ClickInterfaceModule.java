@@ -15,6 +15,10 @@ public final class ClickInterfaceModule extends Module {
 
     public enum Font {
         Simp,
+        Bold,
+        Arial,
+        Apple,
+        Sans,
         MC
     }
 

@@ -203,6 +203,20 @@ public class Gui
         tessellator.draw();
     }
 
+    public static void drawModalRectWithCustomSizedTexture(float x, float y, float u, float v, float wH, float wH2, float textureWidth, float textureHeight)
+    {
+        float f = 1.0F / textureWidth;
+        float f1 = 1.0F / textureHeight;
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+        worldrenderer.pos((double)x, (double)(y + wH2), 0.0D).tex((double)(u * f), (double)((v + (float)wH2) * f1)).endVertex();
+        worldrenderer.pos((double)(x + wH), (double)(y + wH2), 0.0D).tex((double)((u + (float)wH) * f), (double)((v + (float)wH2) * f1)).endVertex();
+        worldrenderer.pos((double)(x + wH), (double)y, 0.0D).tex((double)((u + (float)wH) * f), (double)(v * f1)).endVertex();
+        worldrenderer.pos((double)x, (double)y, 0.0D).tex((double)(u * f), (double)(v * f1)).endVertex();
+        tessellator.draw();
+    }
+
     public static void drawScaledCustomSizeModalRect(int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight)
     {
         float f = 1.0F / tileWidth;

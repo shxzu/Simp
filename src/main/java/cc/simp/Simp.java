@@ -8,6 +8,8 @@ import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.interfaces.click.ClickInterface;
 import cc.simp.modules.ModuleManager;
 import cc.simp.modules.impl.client.ClickInterfaceModule;
+import cc.simp.modules.impl.combat.KillAuraModule;
+import cc.simp.modules.impl.player.ScaffoldWalkModule;
 import cc.simp.processes.BackgroundProcess;
 import cc.simp.processes.ColorProcess;
 import cc.simp.processes.FontProcess;
@@ -54,6 +56,17 @@ public class Simp {
         colorProcess = new ColorProcess();
         getEventBus().subscribe(colorProcess);
         configManager.loadConfig("default");
+
+        // I hate the way minecraft handles rotations when the player is null so much -shxzu
+
+        if (moduleManager.getModule(KillAuraModule.class).isEnabled()) {
+            moduleManager.getModule(KillAuraModule.class).setEnabled(false);
+        }
+
+        if (moduleManager.getModule(ScaffoldWalkModule.class).isEnabled()) {
+            moduleManager.getModule(ScaffoldWalkModule.class).setEnabled(false);
+        }
+
     };
 
     public EventBus<Event> getEventBus() {

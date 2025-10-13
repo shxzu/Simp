@@ -18,7 +18,10 @@ public class FontProcess {
 
     static {
         registerFont("simp", createFont("simp", 18));
-        registerFont("simp-bold", createFont("simp-bold", 18));
+        registerFont("bold", createFont("simp-bold", 18));
+        registerFont("arial", createFont("arial", 18));
+        registerFont("apple", createFont("apple", 18));
+        registerFont("sans", createFont("sans", 18));
         registerFont("mc", createFont("mc", 18));
     }
 

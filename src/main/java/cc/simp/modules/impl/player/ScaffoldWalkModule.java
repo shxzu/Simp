@@ -9,6 +9,7 @@ import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.events.impl.player.SprintEvent;
 import cc.simp.api.events.impl.player.StrafeEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
+import cc.simp.api.events.impl.world.WorldLoadEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
@@ -312,20 +313,27 @@ public final class ScaffoldWalkModule extends Module {
         }
     };
 
+    // lazy ahh crash fix but works -shxzu
+
+    @EventLink
+    public final Listener<WorldLoadEvent> worldLoadEventListener = e -> this.toggle();
+
     @Override
     public void onEnable() {
-        targetYaw = mc.thePlayer.rotationYaw - 180 + Integer.parseInt(yawOffset.getValue().toString());
-        targetPitch = 90;
+        if (mc.thePlayer != null) {
+            targetYaw = mc.thePlayer.rotationYaw - 180 + Integer.parseInt(yawOffset.getValue().toString());
+            targetPitch = 90;
 
-        pitchDrift = (float) ((Math.random() - 0.5) * (Math.random() - 0.5) * 10);
-        yawDrift = (float) ((Math.random() - 0.5) * (Math.random() - 0.5) * 10);
+            pitchDrift = (float) ((Math.random() - 0.5) * (Math.random() - 0.5) * 10);
+            yawDrift = (float) ((Math.random() - 0.5) * (Math.random() - 0.5) * 10);
 
-        startY = Math.floor(mc.thePlayer.posY);
-        targetBlock = null;
+            startY = Math.floor(mc.thePlayer.posY);
+            targetBlock = null;
 
-        this.sneakingTicks = -1;
-        recursions = 0;
-        placements = 0;
+            this.sneakingTicks = -1;
+            recursions = 0;
+            placements = 0;
+        }
         super.onEnable();
     }
 

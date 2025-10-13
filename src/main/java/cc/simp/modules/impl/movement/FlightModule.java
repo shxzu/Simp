@@ -4,8 +4,8 @@ import cc.simp.api.events.impl.packet.PacketSendEvent;
 import cc.simp.api.events.impl.player.BlockCollideEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.properties.Property;
-import cc.simp.api.properties.impl.DoubleProperty;
 import cc.simp.api.properties.impl.ModeProperty;
+import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -25,12 +25,11 @@ import static cc.simp.utils.Util.mc;
 public final class FlightModule extends Module {
 
     private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Motion);
-    private final DoubleProperty motionSpeed = new DoubleProperty("Motion Speed", 0.9, () -> mode.getValue() == Mode.Motion, 0.1, 2.0, 0.1);
+    private final NumberProperty motionSpeed = new NumberProperty("Motion Speed", 0.9, () -> mode.getValue() == Mode.Motion, 0.1, 2.0, 0.1);
     private final Property<Boolean> fullStop = new Property<>("Stop on Disable", true);
 
     private enum Mode {
         Motion("Motion"),
-        HypixelPrediction("Hypixel Prediction"),
         Verus("Verus"),
         Collide("Collide");
 
@@ -68,24 +67,6 @@ public final class FlightModule extends Module {
                         new BlockPos(mc.thePlayer.prevPosX, mc.thePlayer.posY - 1, mc.thePlayer.prevPosZ),
                         1, new ItemStack(Blocks.stone), 1, 1, 1));
                 break;
-
-            case HypixelPrediction:
-                if (mc.thePlayer.ticksExisted % 4 == 0) {
-                    mc.thePlayer.motionY = 0.42;
-                    mc.timer.timerSpeed = 0.6f;
-                } else {
-                    mc.thePlayer.motionY = 0.0;
-                    mc.timer.timerSpeed = 1.0f;
-                }
-                break;
-        }
-    };
-
-    @EventLink
-    public final Listener<PacketSendEvent> packetSendEventListener = e -> {
-        if (mode.getValue() == Mode.HypixelPrediction) {
-            if (mc.thePlayer == null || mc.theWorld == null) return;
-            // Packet handling logic here if needed
         }
     };
 
@@ -105,10 +86,6 @@ public final class FlightModule extends Module {
     @Override
     public void onDisable() {
         mc.timer.timerSpeed = 1.0f;
-
-        if (mode.getValue() == Mode.HypixelPrediction) {
-            mc.thePlayer.capabilities.isFlying = false;
-        }
 
         if (fullStop.getValue()) {
             mc.thePlayer.motionX = 0;

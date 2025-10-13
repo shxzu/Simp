@@ -1,6 +1,7 @@
 package net.minecraft.client.gui;
 
 import cc.simp.interfaces.menu.alt.AltManagerGui;
+import cc.simp.interfaces.menu.main.CustomMainMenu;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -10,7 +11,6 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
@@ -30,11 +30,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
     private static final Logger logger = LogManager.getLogger();
@@ -124,7 +121,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 
     public void initGui() {
         // Redirect to custom main menu
-        this.mc.displayGuiScreen(new cc.simp.ui.CustomMainMenu());
+        this.mc.displayGuiScreen(new CustomMainMenu());
     }
 
     private void addSingleplayerMultiplayerButtons(int p_73969_1_, int p_73969_2_) {

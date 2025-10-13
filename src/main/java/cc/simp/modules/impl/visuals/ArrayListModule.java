@@ -5,7 +5,6 @@ import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.api.properties.Property;
-import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -16,7 +15,6 @@ import cc.simp.utils.render.RenderUtils;
 import cc.simp.utils.render.Translate;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 
@@ -32,35 +30,9 @@ public final class ArrayListModule extends Module {
     private final Property<Boolean> bg = new Property<>("Background", true);
     private final Property<Boolean> line = new Property<>("Line", false);
     private final Property<Boolean> outline = new Property<>("Outline", true);
-    public static final ModeProperty<FontType> fontType = new ModeProperty<>("Font", FontType.Simp);
-    public static final Property<Boolean> useCustomFont = new Property<>("Use Custom Font", true); // New property for font toggle
-
-    public ArrayListModule() {
-        toggle();
-    }
 
     private static final Map<Module, String> displayLabelCache = new HashMap<>();
     private static List<Module> moduleCache;
-
-    public enum FontType {
-        Arial("Arial"),
-        Apple("Apple"),
-        Sans("Sans"),
-        Simp("Simp"),
-        SimpBold("Simp-Bold"),
-        Minecraft("Minecraft"); // Added Minecraft font option
-
-        private final String name;
-
-        FontType(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
 
     @EventLink
     public Listener<PreUpdateEvent> preUpdateEventListener = e -> {
@@ -74,6 +46,9 @@ public final class ArrayListModule extends Module {
 
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = e -> {
+
+        CustomFontRenderer fr = FontProcess.getCurrentFont();
+
         ScaledResolution sr = new ScaledResolution(mc);
 
         float screenX = sr.getScaledWidth();
@@ -104,7 +79,7 @@ public final class ArrayListModule extends Module {
             final Module module = moduleCache.get(i);
             final Translate translate = module.getTranslate();
             final String name = displayLabelCache.get(module);
-            final float moduleWidth = getStringWidth(name);
+            final float moduleWidth = fr.getStringWidth(name);
             final boolean visible = module.isVisible();
             int visibleModuleIndex = i * 20;
             if (visible) {
@@ -139,23 +114,11 @@ public final class ArrayListModule extends Module {
                             translateY + 10,
                             0x780D0D0D);
                 }
-
-                // Draw text with appropriate renderer
-                if (useCustomFont.getValue() && fontType.getValue() != FontType.Minecraft) {
-                    CustomFontRenderer fr = getCustomFontRenderer();
-                    fr.drawStringWithShadow(
-                            name,
-                            (float) translateX,
-                            (float) translateY - (fr.getNameFontTTF().equalsIgnoreCase("mc") ? 0 : 1),
-                            aColor);
-                } else {
-                    mc.fontRendererObj.drawStringWithShadow(
-                            name,
-                            (float) translateX,
-                            (float) translateY,
-                            aColor);
-                }
-
+                fr.drawStringWithShadow(
+                        name,
+                        (float) translateX,
+                        (float) translateY - (FontProcess.getCurrentFont() == FontProcess.getFont("mc") ? 0 : 1),
+                        aColor);
                 if (outline.getValue()) {
                     Gui.drawRect(translateX - 2,
                             translateY - 2,
@@ -188,7 +151,7 @@ public final class ArrayListModule extends Module {
 
                         if (nextModule != null) {
                             String nextModuleName = displayLabelCache.get(nextModule);
-                            float nextModuleWidth = getStringWidth(nextModuleName);
+                            float nextModuleWidth = fr.getStringWidth(nextModuleName);
 
                             if (moduleWidth - nextModuleWidth > 0.5)
                                 Gui.drawRect(translateX - 2,
@@ -217,40 +180,6 @@ public final class ArrayListModule extends Module {
         }
     };
 
-    // Helper method to get string width based on font selection
-    private float getStringWidth(String text) {
-        if (useCustomFont.getValue() && fontType.getValue() != FontType.Minecraft) {
-            return getCustomFontRenderer().getStringWidth(text);
-        } else {
-            return mc.fontRendererObj.getStringWidth(text);
-        }
-    }
-
-    private CustomFontRenderer getCustomFontRenderer() {
-        switch (fontType.getValue()) {
-            case Arial:
-                return createFontRenderer("arial", 18, Font.PLAIN);
-            case Apple:
-                return createFontRenderer("apple", 18, Font.PLAIN);
-            case Sans:
-                return createFontRenderer("sans", 18, Font.PLAIN);
-            case SimpBold:
-                return createFontRenderer("simp", 18, Font.BOLD);
-            case Simp:
-            default:
-                return createFontRenderer("simp", 18, Font.PLAIN);
-        }
-    }
-
-    private CustomFontRenderer createFontRenderer(String fontName, float size, int style) {
-        try {
-            return new CustomFontRenderer(fontName, size, style, true, true);
-        } catch (Exception e) {
-            System.err.println("Failed to load font: " + fontName + ", using fallback");
-            return new CustomFontRenderer("simp", size, Font.PLAIN, true, true);
-        }
-    }
-
     private static String getDisplayLabel(Module m) {
         String label = m.getLabel();
         String suffix = m.getSuffix();
@@ -261,14 +190,15 @@ public final class ArrayListModule extends Module {
     }
 
     private void updateModulePositions(ScaledResolution scaledResolution) {
+        CustomFontRenderer fr = FontProcess.getCurrentFont();
         if (moduleCache == null)
             moduleCache = new ArrayList<>(Simp.INSTANCE.getModuleManager().getModules());
 
-        int y = 1;
+        int y = 2;
         for (Module module : moduleCache) {
             if (module.isEnabled()) {
                 module.getTranslate().setX(scaledResolution.getScaledWidth() -
-                        getStringWidth(getDisplayLabel(module)) - 2);
+                        fr.getStringWidth(getDisplayLabel(module)) + 2);
             } else
                 module.getTranslate().setX(scaledResolution.getScaledWidth());
             module.getTranslate().setY(y);
@@ -292,12 +222,14 @@ public final class ArrayListModule extends Module {
         }
     }
 
-    private class LengthComparator extends ModuleComparator {
+    private static class LengthComparator extends ModuleComparator {
         @Override
         public int compare(Module o1, Module o2) {
+            CustomFontRenderer fr = FontProcess.getCurrentFont();
             return Float.compare(
-                    getStringWidth(displayLabelCache.get(o2)),
-                    getStringWidth(displayLabelCache.get(o1)));
+                    fr.getStringWidth(displayLabelCache.get(o2)),
+                    fr.getStringWidth(displayLabelCache.get(o1)));
         }
     }
+
 }

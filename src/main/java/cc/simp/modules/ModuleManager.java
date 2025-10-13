@@ -3,10 +3,10 @@ package cc.simp.modules;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.KeyPressEvent;
 import cc.simp.modules.impl.client.ClickInterfaceModule;
-import cc.simp.modules.impl.combat.AntiKnockbackModule;
+import cc.simp.modules.impl.combat.VelocityModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.movement.FlightModule;
-import cc.simp.modules.impl.combat.NoSlowModule;
+import cc.simp.modules.impl.movement.NoSlowModule;
 import cc.simp.modules.impl.movement.SpeedModule;
 import cc.simp.modules.impl.movement.SprintModule;
 import cc.simp.modules.impl.player.ScaffoldWalkModule;
@@ -28,15 +28,16 @@ public final class ModuleManager {
 
     public ModuleManager() {
         instanceMap = putInInstanceMap(
+
                 // Combat
                 new KillAuraModule(),
-                new NoSlowModule(),
-                new AntiKnockbackModule(),
+                new VelocityModule(),
 
                 // Movement
                 new SprintModule(),
                 new SpeedModule(),
                 new FlightModule(),
+                new NoSlowModule(),
 
                 // Player
                 new ScaffoldWalkModule(),

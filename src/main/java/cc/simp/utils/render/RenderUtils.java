@@ -24,9 +24,6 @@ import static org.lwjgl.opengl.GL11.*;
 public class RenderUtils extends Util {
 
     public static RoundedShader roundedShader = new RoundedShader("roundedRect");
-    public static RoundedShader roundedOutlineShader = new RoundedShader("roundRectOutline");
-    private static final RoundedShader roundedTexturedShader = new RoundedShader("roundRectTexture");
-    private static final RoundedShader roundedGradientShader = new RoundedShader("roundedRectGradient");
 
     private static void setupRoundedRectUniforms(float x, float y, float width, float height, float radius, RoundedShader roundedTexturedShader) {
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
@@ -36,6 +33,11 @@ public class RenderUtils extends Util {
         roundedTexturedShader.setUniformf("radius", radius * sr.getScaleFactor());
     }
 
+    public static void drawImage(ResourceLocation resourceLocation, float x, float y, float imgWidth, float imgHeight) {
+        GlStateManager.color(1, 1, 1, 1);
+        mc.getTextureManager().bindTexture(resourceLocation);
+        Gui.drawModalRectWithCustomSizedTexture(x, y, 0, 0, imgWidth, imgHeight, imgWidth, imgHeight);
+    }
 
     public static void drawRoundedRect(float x, float y, float width, float height, float radius, Color color) {
         drawRoundedRect(x, y, width, height, radius, false, color);
