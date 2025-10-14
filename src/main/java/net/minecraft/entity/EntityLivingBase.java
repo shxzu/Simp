@@ -30,6 +30,7 @@ import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -2000,5 +2001,9 @@ public abstract class EntityLivingBase extends Entity
     protected void markPotionsDirty()
     {
         this.potionsNeedUpdate = true;
+    }
+
+    public boolean func_175148_a(EnumPlayerModelParts p_175148_1_) {
+        return (this.getDataWatcher().getWatchableObjectByte(10) & p_175148_1_.getPartMask()) == p_175148_1_.getPartMask();
     }
 }

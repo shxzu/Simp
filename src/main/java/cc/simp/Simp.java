@@ -12,10 +12,7 @@ import cc.simp.modules.ModuleManager;
 import cc.simp.modules.impl.client.ClickInterfaceModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.player.ScaffoldWalkModule;
-import cc.simp.processes.BackgroundProcess;
-import cc.simp.processes.ColorProcess;
-import cc.simp.processes.FontProcess;
-import cc.simp.processes.RotationProcess;
+import cc.simp.processes.*;
 import cc.simp.utils.client.BuildType;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -44,6 +41,7 @@ public class Simp {
     private RotationProcess rotationProcess;
     private ColorProcess colorProcess;
     private ClickInterface clickInterface;
+    private DraggingProcess draggingProcess;
 
     private Simp() {
         getEventBus().subscribe(this);
@@ -62,6 +60,8 @@ public class Simp {
         colorProcess = new ColorProcess();
         getEventBus().subscribe(colorProcess);
         configManager.loadConfig("default");
+        draggingProcess = new DraggingProcess();
+        getEventBus().subscribe(draggingProcess);
         commandHandler = new CommandHandler();
         commandHandler.commands.addAll(Arrays.asList(
                 new BindCommand(),

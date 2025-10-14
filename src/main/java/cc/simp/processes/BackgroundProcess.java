@@ -16,6 +16,7 @@ public class BackgroundProcess {
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
         if (this.cfgTimer.hasTimeElapsed(30000, true)) Simp.INSTANCE.getConfigManager().saveConfig("default");
+        DraggingProcess.update();
     };
 
 }

@@ -10,10 +10,7 @@ import cc.simp.modules.impl.movement.NoSlowModule;
 import cc.simp.modules.impl.movement.SpeedModule;
 import cc.simp.modules.impl.movement.SprintModule;
 import cc.simp.modules.impl.player.ScaffoldWalkModule;
-import cc.simp.modules.impl.visuals.ArrayListModule;
-import cc.simp.modules.impl.visuals.CameraModule;
-import cc.simp.modules.impl.visuals.ESPModule;
-import cc.simp.modules.impl.visuals.WatermarkModule;
+import cc.simp.modules.impl.visuals.*;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -49,7 +46,8 @@ public final class ModuleManager {
                 new ArrayListModule(),
                 new WatermarkModule(),
                 new CameraModule(),
-                new ESPModule()
+                new ESPModule(),
+                new TargetInterfaceModule()
         );
         getModules().forEach(Module::reflectProperties);
 

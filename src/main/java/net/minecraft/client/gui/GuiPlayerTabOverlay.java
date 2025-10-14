@@ -22,7 +22,7 @@ import net.minecraft.world.WorldSettings;
 
 public class GuiPlayerTabOverlay extends Gui
 {
-    private static final Ordering<NetworkPlayerInfo> field_175252_a = Ordering.from(new GuiPlayerTabOverlay.PlayerComparator());
+    public static final Ordering<NetworkPlayerInfo> field_175252_a = Ordering.from(new GuiPlayerTabOverlay.PlayerComparator());
     private final Minecraft mc;
     private final GuiIngame guiIngame;
     private IChatComponent footer;
