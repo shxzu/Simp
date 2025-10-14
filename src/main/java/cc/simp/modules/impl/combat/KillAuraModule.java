@@ -44,6 +44,7 @@ import static cc.simp.utils.Util.mc;
 public final class KillAuraModule extends Module {
 
     public static ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Adaptive);
+    private final NumberProperty switchSpeed = new NumberProperty("Switch Speed", 2, () -> mode.getValue() == Mode.Switch, 0, 10, 1);
     public static ModeProperty<Entities> entities = new ModeProperty<>("Entities", Entities.Optimal);
     public static NumberProperty seekRange = new NumberProperty("Seek Range", 4.2, 3, 6, 0.1);
     public static NumberProperty killRange = new NumberProperty("Kill Range", 3, 3, 6, 0.1);
@@ -143,23 +144,31 @@ public final class KillAuraModule extends Module {
     };
 
     private void selectTarget() {
+        if(targetList.isEmpty()) {
+            target = null;
+            return;
+        }
         switch (mode.getValue()) {
             case Single:
-                target = (EntityLivingBase) targetList.stream().findFirst().orElse(null);
+                target = !targetList.isEmpty() ? (EntityLivingBase) targetList.getFirst() : null;
                 break;
 
             case Switch:
-                if (switchTimer.hasTimeElapsed(1000)) {
-                    targetIndex = (targetIndex + 1) % targetList.size();
-                    switchTimer.reset();
+                if (!targetList.isEmpty()) {
+                    if (switchTimer.hasTimeElapsed(switchSpeed.getValue() * 100)) {
+                        targetIndex = (targetIndex + 1) % targetList.size();
+                        switchTimer.reset();
+                    }
+                    target = (EntityLivingBase) targetList.get(targetIndex);
                 }
-                target = (EntityLivingBase) targetList.get(targetIndex);
                 break;
 
             case Adaptive:
-                target = (EntityLivingBase) targetList.stream()
-                        .min(Comparator.comparingDouble(e -> mc.thePlayer.getDistanceToEntity(e)))
-                        .orElse(null);
+                if (!targetList.isEmpty()) {
+                    target = (EntityLivingBase) targetList.stream()
+                            .min(Comparator.comparingDouble(e -> mc.thePlayer.getDistanceToEntity(e)))
+                            .orElse(null);
+                }
                 break;
         }
     }

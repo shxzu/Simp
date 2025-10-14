@@ -1,5 +1,7 @@
 package cc.simp;
 
+import cc.simp.api.commands.CommandHandler;
+import cc.simp.api.commands.impl.*;
 import cc.simp.api.config.ConfigManager;
 import cc.simp.api.events.Event;
 import cc.simp.api.events.impl.game.ClientStartupEvent;
@@ -22,6 +24,8 @@ import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 
+import java.util.Arrays;
+
 public class Simp {
     public static final Simp INSTANCE = new Simp();
     public static final String NAME = "Simp";
@@ -34,6 +38,8 @@ public class Simp {
     private ModuleManager moduleManager;
     @Getter
     private ConfigManager configManager;
+    @Getter
+    private CommandHandler commandHandler;
     private BackgroundProcess backgroundProcess;
     private RotationProcess rotationProcess;
     private ColorProcess colorProcess;
@@ -56,6 +62,15 @@ public class Simp {
         colorProcess = new ColorProcess();
         getEventBus().subscribe(colorProcess);
         configManager.loadConfig("default");
+        commandHandler = new CommandHandler();
+        commandHandler.commands.addAll(Arrays.asList(
+                new BindCommand(),
+                new BindsCommand(),
+                new ToggleCommand(),
+                new ConfigCommand(),
+                new HideCommand()
+        ));
+        getEventBus().subscribe(commandHandler);
 
         // I hate the way minecraft handles rotations when the player is null so much -shxzu
 
@@ -68,14 +83,6 @@ public class Simp {
         }
 
     };
-
-    public EventBus<Event> getEventBus() {
-        if (eventBus == null) {
-            eventBus = new EventBus<>();
-        }
-
-        return eventBus;
-    }
 
     @EventLink
     public final Listener<KeyPressEvent> keyPressEventListener = e -> {
@@ -99,4 +106,19 @@ public class Simp {
         }
     };
 
+
+    public EventBus<Event> getEventBus() {
+        if (eventBus == null) {
+            eventBus = new EventBus<>();
+        }
+
+        return eventBus;
+    }
+
+    public static <T> T requireNonNull(T obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException();
+        }
+        return obj;
+    }
 }

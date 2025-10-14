@@ -22,7 +22,7 @@ import net.minecraft.util.EnumFacing;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "NoSlow", category = ModuleCategory.MOVEMENT)
+@ModuleInfo(label = "No Slow", category = ModuleCategory.MOVEMENT)
 public final class NoSlowModule extends Module {
 
     private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Vanilla);
@@ -84,7 +84,7 @@ public final class NoSlowModule extends Module {
                 }
                 break;
             case Prediction:
-                if (mc.thePlayer.onGroundTicks % this.amount.getValue().intValue() != 0 && mc.thePlayer.onGround) {
+                if (mc.thePlayer.onGroundTicks % amount.getValue() != 0 && MovementUtils.isOnGround()) {
                     if (food.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemFood) {
                         e.setCancelled();
                     }

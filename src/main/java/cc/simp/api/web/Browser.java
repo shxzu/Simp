@@ -1,4 +1,4 @@
-package cc.simp.api.local;
+package cc.simp.api.web;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;

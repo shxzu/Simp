@@ -313,11 +313,6 @@ public final class ScaffoldWalkModule extends Module {
         }
     };
 
-    // lazy ahh crash fix but works -shxzu
-
-    @EventLink
-    public final Listener<WorldLoadEvent> worldLoadEventListener = e -> this.toggle();
-
     @Override
     public void onEnable() {
         if (mc.thePlayer != null) {

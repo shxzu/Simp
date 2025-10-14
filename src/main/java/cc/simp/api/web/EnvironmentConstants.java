@@ -1,4 +1,4 @@
-package cc.simp.api.local;
+package cc.simp.api.web;
 
 public interface EnvironmentConstants {
 

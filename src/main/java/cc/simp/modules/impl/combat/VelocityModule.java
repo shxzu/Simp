@@ -20,17 +20,18 @@ import static cc.simp.utils.Util.mc;
 public final class VelocityModule extends Module {
 
     public static final ModeProperty<Mode> modeProperty = new ModeProperty<>("Mode", Mode.Motion);
+
     public NumberProperty horizontal = new NumberProperty("Horizontal", 100, () -> modeProperty.getValue() == Mode.Motion, 0, 100, 1);
     public NumberProperty vertical = new NumberProperty("Vertical", 100, () -> modeProperty.getValue() == Mode.Motion, 0, 100, 1);
 
+    public NumberProperty reduceX = new NumberProperty("Reduce X", 100, () -> modeProperty.getValue() == Mode.Reduce, 0, 100, 1);
+    public NumberProperty reduceZ = new NumberProperty("Reduce Z", 100, () -> modeProperty.getValue() == Mode.Reduce, 0, 100, 1);
+
     public enum Mode {
         Motion,
-        Intave,
+        Cancel,
+        Reduce,
         Jump
-    }
-
-    public VelocityModule() {
-        setSuffix(modeProperty.getValue().toString());
     }
 
     @EventLink
@@ -44,12 +45,17 @@ public final class VelocityModule extends Module {
                     p.setMotionY((int) (p.getMotionY() * vertical.getValue() / 100.0));
                 }
             }
-
+            if (modeProperty.getValue() == Mode.Cancel) {
+                if (event.getPacket() instanceof S12PacketEntityVelocity) {
+                    event.setCancelled();
+                }
+            }
         }
     };
 
     @EventLink
-    private final Listener<MotionEvent> motitonEventListener = event -> {
+    private final Listener<MotionEvent> motionEventListener = event -> {
+        setSuffix(modeProperty.getValue().toString());
         if (modeProperty.getValue() == Mode.Jump) {
             if (mc.thePlayer.hurtTime >= 8) {
                 mc.gameSettings.keyBindJump.setPressed(true);
@@ -64,17 +70,11 @@ public final class VelocityModule extends Module {
 
     @EventLink
     private final Listener<AttackEvent> attackEventListener = event -> {
-        if (modeProperty.getValue() == Mode.Intave) {
+        if (modeProperty.getValue() == Mode.Reduce) {
             if (event.target instanceof EntityLivingBase && mc.thePlayer.hurtTime > 0) {
-                if (mc.thePlayer.onGround) {
-                    mc.thePlayer.motionX *= 0.52;
-                    mc.thePlayer.motionZ *= 0.52;
-                } else {
-                    mc.thePlayer.motionX *= 0.8;
-                    mc.thePlayer.motionZ *= 0.8;
-                }
+                mc.thePlayer.motionX *= reduceX.getValue() / 100.0;
+                mc.thePlayer.motionZ *= reduceZ.getValue() / 100.0;
             }
         }
     };
-
 }
