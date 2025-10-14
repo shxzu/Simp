@@ -7,20 +7,16 @@ import cc.simp.processes.FontProcess;
 import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.io.IOException;
 
 import java.awt.*;
+import java.io.IOException;
 
 public class CustomMainMenu extends GuiScreen {
 
@@ -39,7 +35,12 @@ public class CustomMainMenu extends GuiScreen {
     private final int buttonsYOffset = 60;
 
     private final long startTime;
-    private final String[] changelogEntries;
+    private final String[] changelogEntries = {
+            "- Shxzu",
+            "- Shxzu",
+            "- My Shxzu",
+            "- Shxzu"
+    };
 
     public CustomMainMenu() {
         backgroundImage = new ResourceLocation("simp/images/mainmenu.png");
@@ -48,70 +49,6 @@ public class CustomMainMenu extends GuiScreen {
         buttonFont = FontProcess.getFont("simp");
         changelogFont = FontProcess.getFont("arial");
         timeFont = FontProcess.getFont("bold");
-
-        this.changelogEntries = fetchCommits(4);
-    }
-
-    private String[] fetchCommits(int count) {
-        List<String> entries = new ArrayList<>();
-        entries.add("- Failed to fetch commits.");
-
-        final int MAX_MSG_LENGTH = 40;
-
-        try {
-            String apiURL = "https://api.github.com/repos/shxzu/Simp/commits?per_page=" + count;
-            URL url = new URL(apiURL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "Simp-Minecraft-Client");
-
-            int responseCode = connection.getResponseCode();
-
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-
-                String responseBody = new Scanner(connection.getInputStream()).useDelimiter("\\A").next();
-
-                Pattern commitPattern = Pattern.compile(
-                        "\"commit\":\\{.*?\"message\":\"(.*?)\".*?\"author\":\\{.*?\"name\":\"(.*?)\"",
-                        Pattern.DOTALL
-                );
-                Matcher matcher = commitPattern.matcher(responseBody);
-
-                entries.clear();
-                while (matcher.find()) {
-                    String message = matcher.group(1).split("\\n")[0].trim();
-                    String author = matcher.group(2).trim();
-
-                    message = message
-                            .replaceAll("\\\\n", " ") // Replace \n with space
-                            .replaceAll("\\\\r", "") // Remove \r
-                            .replaceAll("\\\\\"", "\"") // Unescape quotes
-                            .replaceAll("^Commit #\\d+ ", "") // Remove "Commit #N " prefix
-                            .trim();
-
-                    if (message.isEmpty()) {
-                        message = "No commit message";
-                    }
-
-                    if (message.length() > MAX_MSG_LENGTH) {
-                        message = message.substring(0, MAX_MSG_LENGTH) + "...";
-                    }
-
-                    entries.add("- " + message + " (" + author + ")");
-                }
-
-                if (entries.isEmpty()) {
-                    entries.add("- No commits found or list is empty.");
-                }
-            } else {
-                entries.add("- GitHub API request failed: " + responseCode);
-            }
-        } catch (Exception e) {
-            System.err.println("Error fetching commits: " + e.getMessage());
-            entries.add("- Error fetching: " + e.getClass().getSimpleName());
-        }
-
-        return entries.toArray(new String[0]);
     }
 
     @Override
@@ -178,25 +115,23 @@ public class CustomMainMenu extends GuiScreen {
     }
 
     private void drawChangelog() {
+        int changelogWidth = 170;
         int changelogX = 20;
         int changelogY = 20;
-        float changelogWidth = 200;
 
         long time = System.currentTimeMillis() - startTime;
         float hue = (time % 3000) / 3000.0f;
         Color titleColor = Color.getHSBColor(hue, 0.8f, 1.0f);
 
-        changelogFont.drawStringWithShadow("Recent Commits", changelogX + 8, changelogY + 6, titleColor.getRGB());
+        changelogFont.drawStringWithShadow("Changelog", changelogX + 8, changelogY + 6, titleColor.getRGB());
 
         int entryY = changelogY + changelogFont.getHeight() + 14;
-
         for (int i = 0; i < changelogEntries.length; i++) {
             float entryHue = ((time + i * 500) % 3000) / 3000.0f;
             Color entryColor = Color.getHSBColor(entryHue, 0.7f, 0.95f);
 
             changelogFont.drawStringWithShadow(changelogEntries[i], changelogX + 8, entryY, entryColor.getRGB());
             entryY += changelogFont.getHeight() + 4;
-            changelogWidth = (float) changelogFont.getStringWidth(changelogEntries[i]) + 10;
         }
 
         int bgHeight = entryY - changelogY + 6;
