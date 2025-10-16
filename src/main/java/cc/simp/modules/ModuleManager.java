@@ -3,13 +3,14 @@ package cc.simp.modules;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.KeyPressEvent;
 import cc.simp.modules.impl.client.ClickInterfaceModule;
+import cc.simp.modules.impl.combat.ExtraKBModule;
 import cc.simp.modules.impl.combat.VelocityModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.movement.FlightModule;
 import cc.simp.modules.impl.movement.NoSlowModule;
 import cc.simp.modules.impl.movement.SpeedModule;
 import cc.simp.modules.impl.movement.SprintModule;
-import cc.simp.modules.impl.player.ScaffoldWalkModule;
+import cc.simp.modules.impl.player.*;
 import cc.simp.modules.impl.visuals.*;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import io.github.nevalackin.homoBus.Listener;
@@ -29,6 +30,7 @@ public final class ModuleManager {
                 // Combat
                 new KillAuraModule(),
                 new VelocityModule(),
+                new ExtraKBModule(),
 
                 // Movement
                 new SprintModule(),
@@ -38,6 +40,11 @@ public final class ModuleManager {
 
                 // Player
                 new ScaffoldWalkModule(),
+                new NoFallModule(),
+                new StealerModule(),
+                new ManagerModule(),
+                new AutoArmorModule(),
+                new InvMoveModule(),
 
                 // Client
                 new ClickInterfaceModule(),
@@ -47,7 +54,8 @@ public final class ModuleManager {
                 new WatermarkModule(),
                 new CameraModule(),
                 new ESPModule(),
-                new TargetInterfaceModule()
+                new TargetInterfaceModule(),
+                new PostProcessingModule()
         );
         getModules().forEach(Module::reflectProperties);
 

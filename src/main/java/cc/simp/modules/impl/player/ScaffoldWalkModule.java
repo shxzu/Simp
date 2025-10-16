@@ -9,7 +9,6 @@ import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.events.impl.player.SprintEvent;
 import cc.simp.api.events.impl.player.StrafeEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
-import cc.simp.api.events.impl.world.WorldLoadEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
@@ -157,8 +156,16 @@ public final class ScaffoldWalkModule extends Module {
             // Same Y
             final boolean sameY = ((keepY.getValue() || Simp.INSTANCE.getModuleManager().getModule(SpeedModule.class).isEnabled()) && !mc.gameSettings.keyBindJump.isKeyDown()) && MovementUtils.isMoving();
 
+            if (InventoryUtils.findBlock() == -1) {
+                Logger.chatPrint("No blocks in hotbar, disabling!");
+                this.toggle();
+                return;
+            }
+
             // Getting ItemSlot
-            mc.thePlayer.inventory.currentItem = InventoryUtils.findBlock();
+            if (InventoryUtils.findBlock() != -1) {
+                mc.thePlayer.inventory.currentItem = InventoryUtils.findBlock();
+            }
 
             // Used to detect when to place a block, if over air, allow placement of blocks
             if (doesNotContainBlock(1) && (!sameY || (doesNotContainBlock(2) && doesNotContainBlock(3) && doesNotContainBlock(4)))) {
@@ -214,9 +221,6 @@ public final class ScaffoldWalkModule extends Module {
 
                     ticksOnAir = 0;
 
-                    if (!(mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock)) {
-                        mc.thePlayer.inventory.mainInventory[mc.thePlayer.inventory.currentItem] = null;
-                    }
                 } else if (Math.random() > 0.3 && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit != null &&
                         mc.objectMouseOver.getBlockPos().equals(blockFace) && mc.objectMouseOver.sideHit ==
                         EnumFacing.UP && raycast.getValue() == RayCast.Strict && !(PlayerUtils.blockRelativeToPlayer(0, -1, 0) instanceof BlockAir)) {
@@ -500,7 +504,7 @@ public final class ScaffoldWalkModule extends Module {
                 if (recursion == 0) {
                     int time = mc.thePlayer.offGroundTicks;
 
-                    if (time >= 3 && time <= (!keepY.getValue() ? 7 : 10)) {
+                    if (time >= 3 && time <= (!keepY.getValue() ? 7 : 9)) {
                         if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue().equals(RayCast.Strict))) {
                             getRotations(0);
                         }
@@ -516,10 +520,6 @@ public final class ScaffoldWalkModule extends Module {
                 break;
 
             case God:
-                if (mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock && canPlace) {
-                    mc.rightClickMouse();
-                }
-
                 targetYaw = (mc.thePlayer.rotationYaw - mc.thePlayer.rotationYaw % 90) - 180 + 45 * (mc.thePlayer.rotationYaw > 0 ? 1 : -1);
                 targetPitch = 76.4f;
 

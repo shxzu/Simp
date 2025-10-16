@@ -31,7 +31,7 @@ public final class SprintModule extends Module {
             if (MovementUtils.isMoving() && !omni.getValue()) {
                 mc.gameSettings.keyBindSprint.setPressed(true);
             }
-            if (MovementUtils.isMoving() && omni.getValue()) {
+            if (omni.getValue()) {
                 mc.thePlayer.setSprinting(MovementUtils.canSprint(true));
                 event.setSprinting(MovementUtils.canSprint(true));
             }

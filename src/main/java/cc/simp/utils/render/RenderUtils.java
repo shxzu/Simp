@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
@@ -488,6 +489,25 @@ public class RenderUtils extends Util {
         }
         hue += 0.5F;
         return new Color(Color.HSBtoRGB(hue, 0.9f, 1F));
+    }
+
+
+    public static Framebuffer createFrameBuffer(Framebuffer framebuffer) {
+        return createFrameBuffer(framebuffer, false);
+    }
+
+    public static Framebuffer createFrameBuffer(Framebuffer framebuffer, boolean depth) {
+        if (framebuffer == null || framebuffer.framebufferWidth != mc.displayWidth || framebuffer.framebufferHeight != mc.displayHeight) {
+            if (framebuffer != null) {
+                framebuffer.deleteFramebuffer();
+            }
+            return new Framebuffer(mc.displayWidth, mc.displayHeight, depth);
+        }
+        return framebuffer;
+    }
+
+    public static void resetColor() {
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
 }

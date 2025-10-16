@@ -106,7 +106,7 @@ public class CustomMainMenu extends GuiScreen {
         boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
 
         Color bgColor = hovered ? new Color(60, 60, 60, 200) : new Color(40, 40, 40, 180);
-        RenderUtils.drawRoundedRect(x, y, width, height, 6, bgColor);
+        RenderUtils.drawRoundedRect(x, y, width, height, 6, true, bgColor);
 
         int textX = x + (width - buttonFont.getStringWidth(text)) / 2;
         int textY = y + (height - buttonFont.getHeight()) / 2;
@@ -135,7 +135,7 @@ public class CustomMainMenu extends GuiScreen {
         }
 
         int bgHeight = entryY - changelogY + 6;
-        RenderUtils.drawRoundedRect(changelogX, changelogY, changelogWidth, bgHeight, 8, new Color(20, 25, 30, 120));
+        RenderUtils.drawRoundedRect(changelogX, changelogY, changelogWidth, bgHeight, 8, true, new Color(20, 25, 30, 120));
     }
 
     @Override

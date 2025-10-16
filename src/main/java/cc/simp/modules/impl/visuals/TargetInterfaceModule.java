@@ -1,6 +1,7 @@
 package cc.simp.modules.impl.visuals;
 
 import cc.simp.api.events.impl.render.Render2DEvent;
+import cc.simp.api.events.impl.render.ShaderEvent;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
@@ -46,6 +47,14 @@ public final class TargetInterfaceModule extends Module {
 
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = e -> {
+        switch (mode.getValue()) {
+            case Astolfo -> drawAstolfoTargetInterface();
+            case Simp -> drawSimpTargetInterface();
+        }
+    };
+
+    @EventLink
+    public Listener<ShaderEvent> shaderEventListener = e -> {
         switch (mode.getValue()) {
             case Astolfo -> drawAstolfoTargetInterface();
             case Simp -> drawSimpTargetInterface();

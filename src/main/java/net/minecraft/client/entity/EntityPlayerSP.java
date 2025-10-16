@@ -1,6 +1,7 @@
 package net.minecraft.client.entity;
 
 import cc.simp.Simp;
+import cc.simp.api.commands.CommandHandler;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.ItemSlowdownEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
@@ -68,7 +69,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
     private float lastReportedYaw;
     private float lastReportedPitch;
     private boolean serverSneakState;
-    private boolean serverSprintState;
+    public boolean serverSprintState;
     private int positionUpdateTicks;
     private boolean hasValidHealth;
     private String clientBrand;
@@ -252,6 +253,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
     public void sendChatMessage(String message)
     {
+        if (Simp.INSTANCE.getCommandHandler().execute(message) || message.startsWith(CommandHandler.CHAT_PREFIX)) {
+            return;
+        }
         this.sendQueue.addToSendQueue(new C01PacketChatMessage(message));
     }
 

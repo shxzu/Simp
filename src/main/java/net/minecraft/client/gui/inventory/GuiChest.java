@@ -10,7 +10,7 @@ public class GuiChest extends GuiContainer
 {
     private static final ResourceLocation CHEST_GUI_TEXTURE = new ResourceLocation("textures/gui/container/generic_54.png");
     private final IInventory upperChestInventory;
-    private final IInventory lowerChestInventory;
+    public final IInventory lowerChestInventory;
     private final int inventoryRows;
 
     public GuiChest(IInventory upperInv, IInventory lowerInv)

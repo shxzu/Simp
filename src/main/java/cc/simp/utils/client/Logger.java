@@ -7,7 +7,7 @@ import net.minecraft.util.EnumChatFormatting;
 public class Logger extends Util {
     public static void chatPrint(boolean prefix, String message) {
         if (mc.thePlayer != null) {
-            if (prefix) message = "Simp | " + message;
+            if (prefix) message = EnumChatFormatting.DARK_BLUE + "Simp" + EnumChatFormatting.WHITE + " | " + EnumChatFormatting.WHITE + message;
             mc.thePlayer.addChatMessage(new ChatComponentText(message));
         }
     }
