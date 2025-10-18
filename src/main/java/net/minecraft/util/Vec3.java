@@ -1,5 +1,7 @@
 package net.minecraft.util;
 
+import net.minecraft.entity.player.EntityPlayer;
+
 public class Vec3
 {
     public double xCoord;
@@ -80,6 +82,10 @@ public class Vec3
         double d1 = vec.yCoord - this.yCoord;
         double d2 = vec.zCoord - this.zCoord;
         return MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
+    }
+
+    public double distanceTo(final EntityPlayer vec) {
+        return distanceTo(new Vec3(vec.posX, vec.posY, vec.posZ));
     }
 
     public double squareDistanceTo(Vec3 vec)
@@ -169,5 +175,9 @@ public class Vec3
         double d1 = this.yCoord;
         double d2 = this.zCoord * (double)f - this.xCoord * (double)f1;
         return new Vec3(d0, d1, d2);
+    }
+
+    public Vec3 floor() {
+        return new Vec3(Math.floor(this.xCoord), Math.floor(this.yCoord), Math.floor(this.zCoord));
     }
 }

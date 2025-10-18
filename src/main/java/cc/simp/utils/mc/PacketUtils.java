@@ -4,12 +4,14 @@ import cc.simp.Simp;
 import cc.simp.api.events.impl.packet.PacketReceiveEvent;
 import cc.simp.api.events.impl.packet.PacketSendEvent;
 import cc.simp.utils.Util;
+import cc.simp.utils.misc.PacketList;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class PacketUtils extends Util {
@@ -77,5 +79,43 @@ public class PacketUtils extends Util {
         }
         mc.getNetHandler().getNetworkManager().receiveUnregisteredPacket(p);
     }
-    
+
+    public static boolean isClientPacket(final Packet<?> packet) {
+        return Arrays.stream(PacketList.serverbound).anyMatch(clazz -> clazz == packet.getClass());
+    }
+
+    public static void queue(final Packet<?> packet) {
+        if (packet == null) {
+            System.out.println("Packet is null");
+            return;
+        }
+
+        if (isClientPacket(packet)) {
+            mc.getNetHandler().addToSendQueue(packet);
+        } else {
+            mc.getNetHandler().addToReceiveQueue(packet);
+        }
+    }
+    public static class TimedPacket {
+        private final Packet<?> packet;
+        private final long time;
+
+        public TimedPacket(final Packet<?> packet, final long time) {
+            this.packet = packet;
+            this.time = time;
+        }
+
+        public TimedPacket(final Packet<?> packet) {
+            this.packet = packet;
+            this.time = System.currentTimeMillis();
+        }
+
+        public Packet<?> getPacket() {
+            return packet;
+        }
+
+        public long getTime() {
+            return time;
+        }
+    }
 }

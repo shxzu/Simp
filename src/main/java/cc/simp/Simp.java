@@ -41,7 +41,7 @@ public class Simp {
     private RotationProcess rotationProcess;
     private ColorProcess colorProcess;
     private ClickInterface clickInterface;
-    private DraggingProcess draggingProcess;
+    private LagProcess lagProcess;
 
     private Simp() {
         getEventBus().subscribe(this);
@@ -60,8 +60,8 @@ public class Simp {
         colorProcess = new ColorProcess();
         getEventBus().subscribe(colorProcess);
         configManager.loadConfig("default");
-        draggingProcess = new DraggingProcess();
-        getEventBus().subscribe(draggingProcess);
+        lagProcess = new LagProcess();
+        getEventBus().subscribe(lagProcess);
         commandHandler = new CommandHandler();
         commandHandler.commands.addAll(Arrays.asList(
                 new BindCommand(),

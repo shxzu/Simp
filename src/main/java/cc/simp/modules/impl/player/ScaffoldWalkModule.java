@@ -33,7 +33,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
-import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.*;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -52,10 +51,11 @@ public final class ScaffoldWalkModule extends Module {
         pls don't hate I'm too lazy to write it all from scratch for the like 3rd time -shxzu
     */
 
-    private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Normal);
+    private static final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Normal);
     private final NumberProperty rotationSpeed = new NumberProperty("Rotation Speed", 5, 0, 10, 1);
     public final NumberProperty placeDelay = new NumberProperty("Place Delay", 2, 0, 5, 1);
     private final ModeProperty<YawOffset> yawOffset = new ModeProperty<>("Yaw Offset", YawOffset.Zero);
+    public static Property<Boolean> safeTelly = new Property<>("Safe Telly", true, () -> mode.getValue() == Mode.Telly);
     public static Property<Boolean> sprint = new Property<>("Sprint", false);
     public static Property<Boolean> moveFix = new Property<>("Move Fix", false);
     private final ModeProperty<RayCast> raycast = new ModeProperty<>("Ray Cast", RayCast.None);
@@ -252,7 +252,7 @@ public final class ScaffoldWalkModule extends Module {
         }
 
         if (keepY.getValue() && jump.getValue()) {
-            if (mc.thePlayer.onGround && MovementUtils.isMoving() && mc.thePlayer.posY == startY) {
+            if (mc.thePlayer.onGround && MovementUtils.isMoving() && mc.thePlayer.posY == startY && isNearEdge() && (mode.getValue() != Mode.Telly || mc.thePlayer.onGroundTicks >= 1)) {
                 mc.thePlayer.jump();
             }
         }
@@ -516,6 +516,9 @@ public final class ScaffoldWalkModule extends Module {
                     if (time <= 3) {
                         canPlace = false;
                     }
+                    if (safeTelly.getValue()) {
+                        mc.gameSettings.keyBindSneak.setPressed(isNearEdge() && !mc.thePlayer.onGround);
+                    }
                 }
                 break;
 
@@ -654,6 +657,23 @@ public final class ScaffoldWalkModule extends Module {
 
     public boolean doesNotContainBlock(int down) {
         return PlayerUtils.blockRelativeToPlayer(offset.getX(), -down + offset.getY(), offset.getZ()).isReplaceable(mc.theWorld, new BlockPos(mc.thePlayer).down(down));
+    }
+
+    public static boolean isNearEdge() {
+        final double x = mc.thePlayer.posX;
+        final double z = mc.thePlayer.posZ;
+        final int y = (int)Math.floor(mc.thePlayer.posY) - 2;
+        for (double expand = 0.15, dx = -expand; dx <= expand; dx += expand) {
+            for (double dz = -expand; dz <= expand; dz += expand) {
+                if (dx != 0.0 || dz != 0.0) {
+                    final BlockPos pos = new BlockPos(x + dx, y, z + dz);
+                    if (!mc.theWorld.getBlockState(pos).getBlock().isFullBlock()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 }

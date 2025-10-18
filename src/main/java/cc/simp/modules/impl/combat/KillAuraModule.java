@@ -2,7 +2,6 @@ package cc.simp.modules.impl.combat;
 
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.HitSlowDownEvent;
-import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.world.WorldLoadEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
@@ -10,6 +9,7 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.LagProcess;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.client.MathUtils;
 import cc.simp.utils.client.Timer;
@@ -34,6 +34,7 @@ import org.lwjgl.util.vector.Vector2f;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -82,6 +83,7 @@ public final class KillAuraModule extends Module {
     public enum AutoBlock {
         None,
         Fake,
+        Blink,
         Switch,
         Legit,
         Predictive,
@@ -94,8 +96,10 @@ public final class KillAuraModule extends Module {
     private List<Entity> targetList = new CopyOnWriteArrayList<>();
     private static final Timer attackTimer = new Timer();
     private static final Timer switchTimer = new Timer();
+    int blockTicks = 0;
     private int targetIndex;
     static long delay = 0;
+    boolean switched = false;
 
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
@@ -117,6 +121,11 @@ public final class KillAuraModule extends Module {
         }
 
         calculateRotations();
+        if (ab.getValue() != AutoBlock.None) {
+            if (mc.thePlayer.getDistanceToEntity(target) <= blockingRange.getValue() && InventoryUtils.isHoldingSword()) {
+                autoblock();
+            }
+        }
         attack();
     };
 
@@ -130,21 +139,14 @@ public final class KillAuraModule extends Module {
 
     @EventLink
     public final Listener<WorldLoadEvent> worldLoadEventListener = e -> {
-        if (autoBlocking) {
-            if (ab.getValue() == AutoBlock.Legit || ab.getValue() == AutoBlock.Predictive) {
-                mc.gameSettings.keyBindUseItem.setPressed(false);
-            } else if (InventoryUtils.isHoldingSword()) {
-                PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
-            }
-            autoBlocking = false;
-        }
+        unblock();
         canAttack = true;
         target = null;
         targetList.clear();
     };
 
     private void selectTarget() {
-        if(targetList.isEmpty()) {
+        if (targetList.isEmpty()) {
             target = null;
             return;
         }
@@ -208,39 +210,67 @@ public final class KillAuraModule extends Module {
         }
 
         switch (ab.getValue()) {
+            case Fake:
+                autoBlocking = true;
+                break;
             case Legit:
                 if (mc.thePlayer.ticksExisted % 4 == 0) {
                     mc.gameSettings.keyBindUseItem.setPressed(true);
                     autoBlocking = true;
                 } else {
-                    mc.gameSettings.keyBindUseItem.setPressed(false);
-                    autoBlocking = false;
+                   unblock();
                 }
-                canAttack = !autoBlocking;
                 break;
             case Predictive:
                 if (mc.thePlayer.hurtTime >= 4 && mc.thePlayer.hurtTime != 10) {
                     mc.gameSettings.keyBindUseItem.setPressed(true);
                     autoBlocking = true;
                 } else {
-                    mc.gameSettings.keyBindUseItem.setPressed(false);
-                    autoBlocking = false;
+                    unblock();
                 }
-                canAttack = !autoBlocking;
                 break;
             case Vanilla:
                 PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                 autoBlocking = true;
                 break;
+            case Blink:
+                if (mc.playerController.curBlockDamageMP != 0 && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                    blockTicks = 0;
+                }
+
+                blockTicks++;
+                if (blockTicks >= 3) blockTicks = 1;
+
+                switch (blockTicks) {
+                    case 1:
+                        PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                        autoBlocking = true;
+                        LagProcess.dispatch();
+                    case 2:
+                        if (mc.thePlayer.ticksExisted % 2 == 0) {
+                            LagProcess.blink();
+                        }
+                        break;
+                }
+                break;
             case Switch:
-                if (mc.thePlayer.ticksExisted % 4 == 0) {
-                    PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
-                    autoBlocking = true;
-                    PacketUtils.sendPacket(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem + 1) % 8));
-                    if (mc.thePlayer.isBlocking()) {
-                        PacketUtils.sendPacket(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem)));
-                        autoBlocking = false;
-                    }
+                if (mc.playerController.curBlockDamageMP != 0 && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                    blockTicks = 0;
+                }
+
+                blockTicks++;
+                if (blockTicks >= 3) blockTicks = 1;
+
+                switch (blockTicks) {
+                    case 1:
+                        PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                        autoBlocking = true;
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem + 1) % 8));
+                    case 2:
+                        if (mc.thePlayer.ticksExisted % 2 == 0) {
+                            PacketUtils.sendPacket(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem)));
+                        }
+                        break;
                 }
                 break;
         }
@@ -248,10 +278,15 @@ public final class KillAuraModule extends Module {
 
     private void unblock() {
         if (!autoBlocking) return;
-
+        if (ab.getValue() == AutoBlock.Fake) {
+            autoBlocking = false;
+            return;
+        }
         if (ab.getValue() == AutoBlock.Legit || ab.getValue() == AutoBlock.Predictive) {
             mc.gameSettings.keyBindUseItem.setPressed(false);
-        } else if (InventoryUtils.isHoldingSword()) {
+            canAttack = true;
+        }
+        if (ab.getValue() != AutoBlock.Legit && ab.getValue() != AutoBlock.Predictive && InventoryUtils.isHoldingSword()) {
             PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
         }
         autoBlocking = false;
@@ -276,11 +311,6 @@ public final class KillAuraModule extends Module {
             mc.playerController.attackEntity(mc.thePlayer, target);
         } else {
             mc.clickMouse();
-        }
-        if (ab.getValue() != AutoBlock.None) {
-            if (mc.thePlayer.getDistanceToEntity(target) <= blockingRange.getValue() && InventoryUtils.isHoldingSword()) {
-                autoblock();
-            }
         }
     }
 

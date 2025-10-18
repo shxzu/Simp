@@ -219,7 +219,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
     private final GuiScreen guiScreenServer;
     private Minecraft gameController;
     private WorldClient clientWorldController;
-    private boolean doneLoadingTerrain;
+    public boolean doneLoadingTerrain;
     private final Map<UUID, NetworkPlayerInfo> playerInfoMap = Maps.newHashMap();
     public int currentServerMaxPlayers = 20;
     private boolean field_147308_k = false;
@@ -1914,5 +1914,9 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         }
 
         this.netManager.sendPacket(p);
+    }
+
+    public void addToReceiveQueue(final Packet packet) {
+        this.netManager.receivePacket(packet);
     }
 }

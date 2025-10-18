@@ -25,6 +25,7 @@ public class ExtraKBModule extends Module {
 
     @EventLink
     private final Listener<AttackEvent> attackEventListener = event -> {
+        setSuffix(modeProperty.getValue().toString());
         switch (modeProperty.getValue()) {
             case Legit:
                 if (!mc.gameSettings.keyBindForward.isKeyDown() || mc.thePlayer.isSneaking()) {

@@ -3,11 +3,14 @@ package cc.simp.modules.impl.combat;
 import cc.simp.api.events.impl.packet.PacketReceiveEvent;
 import cc.simp.api.events.impl.player.AttackEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
+import cc.simp.api.events.impl.world.WorldLoadEvent;
+import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.LagProcess;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.settings.GameSettings;
@@ -27,10 +30,14 @@ public final class VelocityModule extends Module {
     public NumberProperty reduceX = new NumberProperty("Reduce X", 100, () -> modeProperty.getValue() == Mode.Reduce, 0, 100, 1);
     public NumberProperty reduceZ = new NumberProperty("Reduce Z", 100, () -> modeProperty.getValue() == Mode.Reduce, 0, 100, 1);
 
+    private final NumberProperty delay = new NumberProperty("Delay", 10, () -> modeProperty.getValue() == Mode.Delay, 1, 50, 1);
+    private final Property<Boolean> legit = new Property<>("Legit Lag", true, () -> modeProperty.getValue() == Mode.Delay);
+
     public enum Mode {
         Motion,
         Cancel,
         Reduce,
+        Delay,
         Jump
     }
 
@@ -47,7 +54,13 @@ public final class VelocityModule extends Module {
             }
             if (modeProperty.getValue() == Mode.Cancel) {
                 if (event.getPacket() instanceof S12PacketEntityVelocity) {
-                    event.setCancelled();
+                    S12PacketEntityVelocity p = (S12PacketEntityVelocity) event.getPacket();
+                    if (p.getEntityID() == mc.thePlayer.getEntityId()) {
+                        p.setMotionX(0);
+                        p.setMotionZ(0);
+                        p.setMotionY(0);
+                    }
+                    event.setCancelled(true);
                 }
             }
         }
@@ -64,6 +77,11 @@ public final class VelocityModule extends Module {
                 mc.gameSettings.keyBindJump.setPressed(false);
             } else if (mc.thePlayer.hurtTime > 1) {
                 mc.gameSettings.keyBindJump.setPressed(GameSettings.isKeyDown(mc.gameSettings.keyBindJump));
+            }
+        }
+        if (modeProperty.getValue() == Mode.Delay) {
+            if (mc.thePlayer.hurtTime > 0) {
+                LagProcess.spoof(delay.getValue().intValue() * 50, legit.getValue(), true, legit.getValue(), false);
             }
         }
     };

@@ -3,9 +3,8 @@ package cc.simp.modules;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.KeyPressEvent;
 import cc.simp.modules.impl.client.ClickInterfaceModule;
-import cc.simp.modules.impl.combat.ExtraKBModule;
-import cc.simp.modules.impl.combat.VelocityModule;
-import cc.simp.modules.impl.combat.KillAuraModule;
+import cc.simp.modules.impl.client.DisablerModule;
+import cc.simp.modules.impl.combat.*;
 import cc.simp.modules.impl.movement.FlightModule;
 import cc.simp.modules.impl.movement.NoSlowModule;
 import cc.simp.modules.impl.movement.SpeedModule;
@@ -29,8 +28,10 @@ public final class ModuleManager {
 
                 // Combat
                 new KillAuraModule(),
+                new TPAuraModule(),
                 new VelocityModule(),
                 new ExtraKBModule(),
+                new BackTrackModule(),
 
                 // Movement
                 new SprintModule(),
@@ -48,6 +49,7 @@ public final class ModuleManager {
 
                 // Client
                 new ClickInterfaceModule(),
+                new DisablerModule(),
 
                 // Visuals
                 new ArrayListModule(),

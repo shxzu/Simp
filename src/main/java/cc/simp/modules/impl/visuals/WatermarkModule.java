@@ -55,6 +55,7 @@ public final class WatermarkModule extends Module {
 
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = e -> {
+        setSuffix(type.getValue().toString());
         CustomFontRenderer fr = FontProcess.getCurrentFont();
         ScaledResolution sr = new ScaledResolution(mc);
         if (type.getValue() != Type.Logo && type.getValue() != Type.Island) {

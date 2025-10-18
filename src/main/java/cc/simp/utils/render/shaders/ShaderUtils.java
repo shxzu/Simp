@@ -60,7 +60,7 @@ public class ShaderUtils extends Util {
     }
 
     public ShaderUtils(String fragmentShaderLoc) {
-        this(fragmentShaderLoc, "demise/shader/vertex.vsh");
+        this(fragmentShaderLoc, "simp/shaders/vertex.vsh");
     }
 
     public void init() {

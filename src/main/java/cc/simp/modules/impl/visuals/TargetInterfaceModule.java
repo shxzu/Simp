@@ -47,6 +47,7 @@ public final class TargetInterfaceModule extends Module {
 
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = e -> {
+        setSuffix(mode.getValue().toString());
         switch (mode.getValue()) {
             case Astolfo -> drawAstolfoTargetInterface();
             case Simp -> drawSimpTargetInterface();

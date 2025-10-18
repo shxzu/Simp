@@ -38,6 +38,7 @@ public class InvMoveModule extends Module {
 
     @EventLink
     private final Listener<PreUpdateEvent> preUpdateEventListener = event -> {
+        setSuffix(mode.getValue().toString());
         if (!(mc.currentScreen instanceof GuiChat)) {
             KeyBinding[] keyBindingArray = this.moveKeys;
             int n = this.moveKeys.length;

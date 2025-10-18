@@ -510,4 +510,34 @@ public class RenderUtils extends Util {
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
+    public static void drawLine(double x, double y, double z, double x1, double y1, double z1, final Color color, final float width) {
+        x = x - mc.getRenderManager().getRenderPosX();
+        x1 = x1 - mc.getRenderManager().getRenderPosX();
+        y = y - mc.getRenderManager().getRenderPosY();
+        y1 = y1 - mc.getRenderManager().getRenderPosY();
+        z = z - mc.getRenderManager().getRenderPosZ();
+        z1 = z1 - mc.getRenderManager().getRenderPosZ();
+
+        GL11.glPushMatrix();
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glBlendFunc(770, 771);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glLineWidth(width);
+
+        color(color.getRGB());
+        GL11.glBegin(2);
+        GL11.glVertex3d(x, y, z);
+        GL11.glVertex3d(x1, y1, z1);
+        GL11.glEnd();
+
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glPopMatrix();
+        color(Color.WHITE.getRGB());
+    }
+
 }

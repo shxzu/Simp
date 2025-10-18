@@ -1,0 +1,128 @@
+package cc.simp.utils.render.animations;
+
+import cc.simp.utils.client.Timer;
+
+/**
+ * This animation superclass was made by Foggy and advanced by cedo
+ *
+ * @author Foggy
+ * @author cedo
+ * @since 7/21/2020 (yes 2020)
+ * @since 7/29/2021
+ */
+public abstract class Animation {
+
+    public Timer timerUtil = new Timer();
+    protected int duration;
+    protected double endPoint;
+    protected Direction direction;
+	private double startPoint;
+
+    public Animation(int ms, double endPoint) {
+        this(ms, endPoint, Direction.FORWARDS);
+    }
+
+    public Animation(int ms, double endPoint, Direction direction) {
+        this.duration = ms; //Time in milliseconds of how long you want the animation to take.
+        this.endPoint = endPoint; //The desired distance for the animated object to go.
+        this.direction = direction; //Direction in which the graph is going. If backwards, will start from endPoint and go to 0.
+    }
+    public Animation(int ms, double startPoint, double endPoint, Direction direction) {
+        this.duration = ms; //Time in milliseconds of how long you want the animation to take.
+        this.endPoint = endPoint; //The desired distance for the animated object to go.
+        this.direction = direction;
+        this.startPoint = startPoint;
+    }
+
+
+    public Animation(int ms, double startPoint, double endPoint) {
+    	this.duration = ms; //Time in milliseconds of how long you want the animation to take.
+        this.endPoint = endPoint; //The desired distance for the animated object to go.
+        this.startPoint = startPoint;
+	}
+
+	public boolean finished(Direction direction) {
+        return isDone() && this.direction.equals(direction);
+    }
+
+    public double getLinearOutput() {
+        return 1 - ((timerUtil.getTime() / (double) duration) * endPoint);
+    }
+
+    public double getEndPoint() {
+        return endPoint;
+    }
+
+    public void setEndPoint(double endPoint) {
+        this.endPoint = endPoint;
+    }
+
+    public void reset() {
+        timerUtil.reset();
+    }
+
+    public boolean isDone() {
+        return timerUtil.hasTimeElapsed(duration);
+    }
+
+    public void changeDirection() {
+        setDirection(direction.opposite());
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public Animation setDirection(Direction direction) {
+        if (this.direction != direction) {
+            this.direction = direction;
+            timerUtil.setTime(System.currentTimeMillis() - (duration - Math.min(duration, timerUtil.getTime())));
+        }
+        return this;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    protected boolean correctOutput() {
+        return false;
+    }
+
+    public Double getOutput() {
+        double elapsedTime = timerUtil.getTime(); // Get elapsed time
+        double progress = elapsedTime / (double) duration; // Progress as a fraction of total duration
+
+        if (direction.forwards()) {
+            if (isDone()) {
+                return endPoint;
+            }
+
+            return interpolate(startPoint, endPoint, getEquation(progress));
+        } else {
+            if (isDone()) {
+                return startPoint;
+            }
+
+            if (correctOutput()) {
+                double revTime = Math.min(duration, Math.max(0, duration - elapsedTime));
+                double reverseProgress = revTime / (double) duration;
+                return interpolate(startPoint, endPoint, getEquation(reverseProgress));
+            }
+
+            return interpolate(startPoint, endPoint, 1 - getEquation(progress));
+        }
+    }
+
+    private double interpolate(double start, double end, double factor) {
+        return start + (end - start) * factor;
+    }
+
+
+
+
+    //This is where the animation equation should go, for example, a logistic function. Output should range from 0 - 1.
+    //This will take the timer's time as an input, x.
+    protected abstract double getEquation(double x);
+
+}

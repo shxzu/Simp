@@ -313,7 +313,6 @@ public class ItemRenderer {
                     EnumAction enumaction = this.itemToRender.getItemUseAction();
 
                     if (Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && KillAuraModule.target != null && InventoryUtils.isHoldingSword() && KillAuraModule.autoBlocking) enumaction = EnumAction.BLOCK;
-                    if (Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && KillAuraModule.target != null && InventoryUtils.isHoldingSword() && KillAuraModule.ab.getValue() == KillAuraModule.AutoBlock.Fake) enumaction = EnumAction.BLOCK;
 
                     switch (enumaction)
                     {
