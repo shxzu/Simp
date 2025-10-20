@@ -26,6 +26,10 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>viaversion</id>
+            <url>https://repo.viaversion.com/#/everything</url>
+        </repository>
     </repositories>
 
     <build>
@@ -100,6 +104,26 @@
     </build>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.viaversion</groupId>
+            <artifactId>viaversion</artifactId>
+            <version>5.5.2-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.viaversion</groupId>
+            <artifactId>viabackwards</artifactId>
+            <version>5.5.2-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.viaversion</groupId>
+            <artifactId>viarewind</artifactId>
+            <version>4.0.11</version>
+        </dependency>
+
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
