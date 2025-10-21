@@ -14,6 +14,7 @@ import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.player.ScaffoldWalkModule;
 import cc.simp.processes.*;
 import cc.simp.utils.client.BuildType;
+import de.florianmichael.viamcp.ViaMCP;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import io.github.nevalackin.homoBus.bus.impl.EventBus;
@@ -80,6 +81,15 @@ public class Simp {
 
         if (moduleManager.getModule(ScaffoldWalkModule.class).isEnabled()) {
             moduleManager.getModule(ScaffoldWalkModule.class).setEnabled(false);
+        }
+
+        // ViaMCP!!!
+
+        try {
+            ViaMCP.create();
+            ViaMCP.INSTANCE.initAsyncSlider();
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
 
     };

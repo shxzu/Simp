@@ -41,6 +41,8 @@ public final class VelocityModule extends Module {
         Jump
     }
 
+    boolean delayed = false;
+
     @EventLink
     public final Listener<PacketReceiveEvent> packetReceiveEventListener = event -> {
         if (modeProperty.getValue() == Mode.Motion) {
@@ -60,7 +62,6 @@ public final class VelocityModule extends Module {
                         p.setMotionZ(0);
                         p.setMotionY(0);
                     }
-                    event.setCancelled(true);
                 }
             }
         }
@@ -82,6 +83,11 @@ public final class VelocityModule extends Module {
         if (modeProperty.getValue() == Mode.Delay) {
             if (mc.thePlayer.hurtTime > 0) {
                 LagProcess.spoof(delay.getValue().intValue() * 50, legit.getValue(), true, legit.getValue(), false);
+                delayed = true;
+            } else if (delayed) {
+                LagProcess.disable();
+                LagProcess.dispatch();
+                delayed = false;
             }
         }
     };

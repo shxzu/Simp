@@ -4,6 +4,8 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.List;
+
+import de.florianmichael.viamcp.ViaMCP;
 import net.minecraft.client.multiplayer.GuiConnecting;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
@@ -80,6 +82,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
 
     public void createButtons()
     {
+        this.buttonList.add(ViaMCP.INSTANCE.getAsyncVersionSlider());
         this.buttonList.add(this.btnEditServer = new GuiButton(7, this.width / 2 - 154, this.height - 28, 70, 20, I18n.format("selectServer.edit")));
         this.buttonList.add(this.btnDeleteServer = new GuiButton(2, this.width / 2 - 74, this.height - 28, 70, 20, I18n.format("selectServer.delete")));
         this.buttonList.add(this.btnSelectServer = new GuiButton(1, this.width / 2 - 154, this.height - 52, 100, 20, I18n.format("selectServer.select")));

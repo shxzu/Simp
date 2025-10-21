@@ -292,6 +292,24 @@ public class RenderUtils extends Util {
         tessellator.draw();
     }
 
+    public static void renderBoundingBox(AxisAlignedBB aabb, Color color, int alpha) {
+        AxisAlignedBB bb = aabb;
+        GlStateManager.pushMatrix();
+        GlUtils.setup2DRendering();
+        GlUtils.enableCaps(GL_BLEND, GL_POINT_SMOOTH, GL_POLYGON_SMOOTH, GL_LINE_SMOOTH);
+
+        glLineWidth(5);
+        float actualAlpha = .3f * alpha;
+        glColor4f(color.getRed(), color.getGreen(), color.getBlue(), actualAlpha);
+        color(color.getRGB(), actualAlpha);
+        RenderGlobal.drawOutlinedBoundingBox(bb, color.getRed(), color.getGreen(), color.getBlue(), alpha);
+
+        GlUtils.disableCaps();
+        GlUtils.end2DRendering();
+
+        GlStateManager.popMatrix();
+    }
+
     public static void drawBlockESP(final BlockPos blockPos, final float red, final float green, final float blue, final float alpha, final float lineAlpha, final float lineWidth) {
         GlStateManager.color(red, green, blue, alpha);
         final float x = (float)(blockPos.getX() - mc.getRenderManager().getRenderPosX());

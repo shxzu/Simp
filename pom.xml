@@ -26,6 +26,15 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <name>Central2</name>
+            <id>Central2</id>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>viaversion-repo</id>
+            <url>https://repo.viaversion.com</url>
+        </repository>
     </repositories>
 
     <build>
@@ -100,6 +109,26 @@
     </build>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.viaversion</groupId>
+            <artifactId>viaversion</artifactId>
+            <version>5.3.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.viaversion</groupId>
+            <artifactId>viabackwards</artifactId>
+            <version>5.3.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.viaversion</groupId>
+            <artifactId>viarewind</artifactId>
+            <version>4.0.7</version>
+        </dependency>
+
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
