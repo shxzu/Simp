@@ -1,6 +1,7 @@
 package net.minecraft.entity;
 
 import cc.simp.Simp;
+import cc.simp.api.events.impl.game.MinMotionEvent;
 import cc.simp.api.events.impl.player.JumpEvent;
 import cc.simp.modules.impl.movement.SprintModule;
 import cc.simp.modules.impl.visuals.CameraModule;
@@ -1733,18 +1734,23 @@ public abstract class EntityLivingBase extends Entity
             this.motionZ *= 0.98D;
         }
 
-        if (Math.abs(this.motionX) < 0.005D)
-        {
+
+        double minimumMotion = 0.005D;
+        if (this == Minecraft.getMinecraft().thePlayer) {
+            final MinMotionEvent minimumMotionEvent = new MinMotionEvent(minimumMotion);
+            Simp.INSTANCE.getEventBus().post(minimumMotionEvent);
+            minimumMotion = minimumMotionEvent.getMinimumMotion();
+        }
+
+        if (Math.abs(this.motionX) < minimumMotion) {
             this.motionX = 0.0D;
         }
 
-        if (Math.abs(this.motionY) < 0.005D)
-        {
+        if (Math.abs(this.motionY) < minimumMotion) {
             this.motionY = 0.0D;
         }
 
-        if (Math.abs(this.motionZ) < 0.005D)
-        {
+        if (Math.abs(this.motionZ) < minimumMotion) {
             this.motionZ = 0.0D;
         }
 
