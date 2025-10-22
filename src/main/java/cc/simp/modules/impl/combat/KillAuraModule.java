@@ -15,6 +15,8 @@ import cc.simp.utils.client.MathUtils;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.mc.*;
 import cc.simp.utils.misc.MovementFix;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import lombok.NonNull;
@@ -307,8 +309,13 @@ public final class KillAuraModule extends Module {
         if (target.getDistanceToEntity(mc.thePlayer) > killRange.getValue()) return;
         if (!legit.getValue()) {
             if (!canAttack) return;
-            mc.thePlayer.swingItem();
-            mc.playerController.attackEntity(mc.thePlayer, target);
+            if (ViaLoadingBase.getInstance().getTargetVersion().newerThan(ProtocolVersion.v1_8)) {
+                mc.playerController.attackEntity(mc.thePlayer, target);
+                mc.thePlayer.swingItem();
+            } else {
+                mc.thePlayer.swingItem();
+                mc.playerController.attackEntity(mc.thePlayer, target);
+            }
         } else {
             mc.clickMouse();
         }

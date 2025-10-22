@@ -3,6 +3,7 @@ package cc.simp.processes;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.MinMotionEvent;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
+import cc.simp.api.events.impl.packet.PacketReceiveEvent;
 import cc.simp.api.events.impl.packet.PacketSendEvent;
 import cc.simp.api.events.impl.player.HitSlowDownEvent;
 import cc.simp.api.events.impl.player.StrafeEvent;
@@ -58,6 +59,19 @@ public class BackgroundProcess {
 
     };
 
+    @EventLink
+    public final Listener<PacketReceiveEvent> packetReceiveEventListener = event -> {
+        // Lag Fix Continues
+        if (!event.isCancelled() && ViaLoadingBase.getInstance()
+                .getTargetVersion().newerThan(ProtocolVersion.v1_8) && event.getPacket() instanceof S18PacketEntityTeleport) {
+            S18PacketEntityTeleport tp = ((S18PacketEntityTeleport) event.getPacket());
+            if (tp.getEntityId() == mc.thePlayer.getEntityId()) {
+                if (ViaLoadingBase.getInstance().getTargetVersion().newerThan(ProtocolVersion.v1_8)) {
+                    LagProcess.dispatch();
+                }
+            }
+        }
+    };
 
     @EventLink
     public final Listener<PacketSendEvent> onPacketSend = event -> {
@@ -98,17 +112,6 @@ public class BackgroundProcess {
                 C02PacketUseEntity use = ((C02PacketUseEntity) event.getPacket());
 
                 event.setCancelled(event.isCancelled() || !use.getAction().equals(C02PacketUseEntity.Action.ATTACK));
-            }
-        }
-
-        // Lag Fix Continues
-        if (!event.isCancelled() && ViaLoadingBase.getInstance()
-                .getTargetVersion().newerThan(ProtocolVersion.v1_8) && event.getPacket() instanceof S18PacketEntityTeleport) {
-            S18PacketEntityTeleport tp = ((S18PacketEntityTeleport) event.getPacket());
-            if (tp.getEntityId() == mc.thePlayer.getEntityId()) {
-                if (ViaLoadingBase.getInstance().getTargetVersion().newerThan(ProtocolVersion.v1_8)) {
-                    LagProcess.dispatch();
-                }
             }
         }
 

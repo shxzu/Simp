@@ -29,6 +29,8 @@ public final class ModuleManager {
                 // Combat
                 new KillAuraModule(),
                 new TPAuraModule(),
+                new TickBaseModule(),
+                new LagRangeModule(),
                 new VelocityModule(),
                 new ExtraKBModule(),
                 new BackTrackModule(),
@@ -42,6 +44,7 @@ public final class ModuleManager {
                 // Player
                 new ScaffoldWalkModule(),
                 new NoFallModule(),
+                new AutoToolModule(),
                 new StealerModule(),
                 new ManagerModule(),
                 new AutoArmorModule(),

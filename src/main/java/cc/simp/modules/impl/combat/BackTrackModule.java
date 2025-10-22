@@ -1,6 +1,5 @@
 package cc.simp.modules.impl.combat;
 
-import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.packet.PacketReceiveEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
@@ -12,12 +11,10 @@ import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.LagProcess;
 import cc.simp.utils.client.MathUtils;
-import cc.simp.utils.render.ESPUtils;
 import cc.simp.utils.render.RenderUtils;
 import cc.simp.utils.render.animations.ContinualAnimation;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S14PacketEntity;
@@ -34,6 +31,8 @@ public final class BackTrackModule extends Module {
 
     public static NumberProperty minDelayProperty = new NumberProperty("Min Delay", 50.0, 0.0, 5000.0, 10.0);
     public static NumberProperty maxDelayProperty = new NumberProperty("Max Delay", 200.0, 0.0, 5000.0, 10.0);
+    public static NumberProperty activateDist = new NumberProperty("Activate Distance", 0.0, 0.0, 10.0, 0.1);
+    public static NumberProperty deactivateDist = new NumberProperty("Deactivate Distance", 10.0, 0.0, 10.0, 0.1);
     public static ModeProperty<Mode> modeProperty = new ModeProperty<>("Mode", Mode.Constant);
     public Property<Boolean> cancelClientPacketsProperty = new Property<>("Cancel Client Packets", true);
     public Property<Boolean> swingCheckProperty = new Property<>("Swing Check", true);
@@ -57,8 +56,6 @@ public final class BackTrackModule extends Module {
 
         setSuffix(ping + " ms");
 
-        if (!e.isPre()) {
-
             if (mc.thePlayer.isDead) {
                 LagProcess.disable();
                 LagProcess.dispatch();
@@ -81,7 +78,7 @@ public final class BackTrackModule extends Module {
             double realDistance = realPosition.distanceTo(mc.thePlayer);
             double clientDistance = target.getDistanceToEntity(mc.thePlayer);
 
-            boolean on = realDistance > clientDistance && realDistance > 2.3 && realDistance < 5.9 && shouldActive(target) && (releaseOnDamageProperty.getValue() && mc.thePlayer.hurtTime == 0 || !releaseOnDamageProperty.getValue());
+            boolean on = realDistance > clientDistance && realDistance >= activateDist.getValue() && realDistance <= deactivateDist.getValue() && shouldActive(target) && (!releaseOnDamageProperty.getValue() || mc.thePlayer.hurtTime == 0);
 
             if (on) {
                 if (shouldActive(target)) {
@@ -95,7 +92,6 @@ public final class BackTrackModule extends Module {
                 LagProcess.disable();
                 LagProcess.dispatch();
             }
-        }
     };
 
     @EventLink
@@ -109,7 +105,7 @@ public final class BackTrackModule extends Module {
         double realDistance = realPosition.distanceTo(mc.thePlayer);
         double clientDistance = target.getDistanceToEntity(mc.thePlayer);
 
-        boolean on = realDistance > clientDistance && realDistance > 2.3 && realDistance < 5.9;
+        boolean on = realDistance > clientDistance && realDistance >= activateDist.getValue() && realDistance <= deactivateDist.getValue();
 
         if (on) {
             if (packet instanceof S14PacketEntity) {

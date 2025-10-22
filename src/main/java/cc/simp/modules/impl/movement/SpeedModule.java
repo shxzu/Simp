@@ -101,6 +101,21 @@ public final class SpeedModule extends Module {
             case RotateExploit:
                 mc.gameSettings.keyBindJump.setPressed(MovementUtils.isMoving() && MovementUtils.isOnGround());
                 break;
+            case NCP:
+                if (MovementUtils.isMoving() && !mc.gameSettings.keyBindJump.isKeyDown()) {
+                    MovementUtils.setSpeed(0.34f);
+                    if (mc.thePlayer.offGroundTicks >= 3) {
+                        mc.timer.timerSpeed = 1.4f;
+                    } else
+                        mc.timer.timerSpeed = 1.0f;
+                    if (mc.thePlayer.onGround) {
+                        mc.thePlayer.jump();
+                    }
+                }
+                if (!MovementUtils.isMoving()) {
+                    mc.timer.timerSpeed = 1.0f;
+                }
+                break;
         }
     };
 
@@ -113,7 +128,7 @@ public final class SpeedModule extends Module {
 
     @Override
     public void onDisable() {
-        if (mode.getValue() == Mode.UpdatedNCP) {
+        if (mode.getValue() == Mode.UpdatedNCP || mode.getValue() == Mode.NCP) {
             mc.timer.timerSpeed = 1.0f;
             mc.thePlayer.jumpMovementFactor = 0.02F;
         }

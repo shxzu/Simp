@@ -5,10 +5,10 @@ import cc.simp.utils.Util;
 import cc.simp.utils.client.EnumFacingOffset;
 import cc.simp.utils.client.MathUtils;
 import net.minecraft.block.Block;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
+import net.minecraft.block.BlockAir;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.util.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -128,5 +128,51 @@ public class PlayerUtils extends Util {
         return blockRelativeToPlayer(-Math.sin(MovementUtils.direction()) * offsetXZ, offsetY, Math.cos(MovementUtils.direction()) * offsetXZ);
     }
 
+    public static class PredictProcess {
+        public final Vec3 position;
+        public final float fallDistance;
+        private final boolean onGround;
+        public final boolean isCollidedHorizontally;
+        public final EntityPlayerSP player;
+        public int tick;
+
+        public PredictProcess(Vec3 position, float fallDistance, boolean onGround, boolean isCollidedHorizontally, EntityPlayerSP player) {
+            this.position = position;
+            this.fallDistance = fallDistance;
+            this.onGround = onGround;
+            this.isCollidedHorizontally = isCollidedHorizontally;
+            this.player = player;
+        }
+
+        public PredictProcess(Vec3 position, float fallDistance, boolean onGround, boolean isCollidedHorizontally) {
+            this.position = position;
+            this.fallDistance = fallDistance;
+            this.onGround = onGround;
+            this.isCollidedHorizontally = isCollidedHorizontally;
+            this.player = mc.thePlayer;
+        }
+    }
+
+    public static boolean insideBlock() {
+        if (mc.thePlayer.ticksExisted < 5) {
+            return false;
+        }
+
+        final EntityPlayerSP player = mc.thePlayer;
+        final WorldClient world = mc.theWorld;
+        final AxisAlignedBB bb = player.getEntityBoundingBox();
+        for (int x = MathHelper.floor_double(bb.minX); x < MathHelper.floor_double(bb.maxX) + 1; ++x) {
+            for (int y = MathHelper.floor_double(bb.minY); y < MathHelper.floor_double(bb.maxY) + 1; ++y) {
+                for (int z = MathHelper.floor_double(bb.minZ); z < MathHelper.floor_double(bb.maxZ) + 1; ++z) {
+                    final Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
+                    final AxisAlignedBB boundingBox;
+                    if (block != null && !(block instanceof BlockAir) && (boundingBox = block.getCollisionBoundingBox(world, new BlockPos(x, y, z), world.getBlockState(new BlockPos(x, y, z)))) != null && player.getEntityBoundingBox().intersectsWith(boundingBox)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
 }

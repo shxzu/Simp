@@ -396,8 +396,8 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
 
         if (Epoll.isAvailable() && useNativeTransport)
         {
-            oclass = EpollSocketChannel.class;
-            lazyloadbase = CLIENT_EPOLL_EVENTLOOP;
+            oclass = NioSocketChannel.class;
+            lazyloadbase = CLIENT_NIO_EVENTLOOP;
         }
         else
         {

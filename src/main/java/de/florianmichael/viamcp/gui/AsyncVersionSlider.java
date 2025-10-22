@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class AsyncVersionSlider extends GuiButton {
-    private float dragValue = (float) ViaLoadingBase.PROTOCOLS.indexOf(ViaLoadingBase.getInstance().getTargetVersion()) / (ViaLoadingBase.PROTOCOLS.size() - 1);
+    private float dragValue = (float) 0;
 
     private final List<ProtocolVersion> values;
     private float sliderValue;
