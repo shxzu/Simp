@@ -34,6 +34,7 @@ public final class ModuleManager {
                 new VelocityModule(),
                 new ExtraKBModule(),
                 new BackTrackModule(),
+                new WTapModule(),
 
                 // Movement
                 new SprintModule(),
