@@ -36,14 +36,17 @@ import static org.lwjgl.opengl.GL11.*;
 public final class WatermarkModule extends Module {
 
     public static final ModeProperty<Type> type = new ModeProperty<>("Client Watermark Type", Type.Simple);
-    public static final Property<Boolean> info = new Property<>("Watermark Info", true, () -> type.getValue() != Type.GameSense && type.getValue() != Type.Logo && type.getValue() != Type.Island);
+    public static final Property<Boolean> info = new Property<>("Watermark Info", true, () -> type.getValue() != Type.GameSense && type.getValue() != Type.Logo && type.getValue() != Type.Island && type.getValue() != Type.Tutorial2017 && type.getValue() != Type.Wurst);
 
     public enum Type {
         Simple,
         Exhibition,
         GameSense,
         Logo,
-        Island
+        Island,
+        Tutorial2017,
+        Wurst,
+        Test
     }
 
     private long lastServerTime;
@@ -52,13 +55,14 @@ public final class WatermarkModule extends Module {
     private float islandWidth;
     private float islandHeight;
     private ResourceLocation clientLogo;
+    private ResourceLocation wurstLogo = new ResourceLocation("simp/images/wurst.png");
 
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = e -> {
         setSuffix(type.getValue().toString());
         CustomFontRenderer fr = FontProcess.getCurrentFont();
         ScaledResolution sr = new ScaledResolution(mc);
-        if (type.getValue() != Type.Logo && type.getValue() != Type.Island) {
+        if (type.getValue() != Type.Logo && type.getValue() != Type.Island && type.getValue() != Type.Tutorial2017 && type.getValue() != Type.Wurst) {
             SimpleDateFormat sdfDate = new SimpleDateFormat("hh:mm a");
             Date now = new Date();
             String strDate = sdfDate.format(now);
@@ -80,18 +84,46 @@ public final class WatermarkModule extends Module {
                 RenderUtils.drawBorderedRect(0, 0.5f, fr.getStringWidth(text) + 4, 7 * sr.getScaleFactor(), 2, new Color(0, 0, 0, 100).getRGB(), ColorProcess.getColor().getRGB(), true, false, false, false);
             }
             fr.drawStringWithShadow(text, 2, 2, ColorProcess.getColor().getRGB());
+
+            //Logo
         } else if (type.getValue() == Type.Logo) {
             RenderUtils.drawImage(new ResourceLocation("simp/images/simp_light.png"), 2, 2, (float) 157 / 2, (float) 125 / 2);
+
+            //dyinamicisland
         } else if (type.getValue() == Type.Island) {
             renderDynamicIsland(sr);
+
+            //Tutorial2017
+        } else if (type.getValue() == Type.Tutorial2017) {
+            Gui.drawRect(2, 2, 45, 14, 0x80000000);
+            fr.drawString("Simp", 4, 4, 0x5555FF);
+            Gui.drawRect(2, 15, 45, 27, 0x80000000);
+            fr.drawString("FPS: " + mc.getDebugFPS(), 4, 17, -1);
+
+            //Wurst
+        } else if (type.getValue() == Type.Wurst) {
+            RenderUtils.drawRect(0, 10, 223, 21, new Color(255, 255, 255, 100));
+            RenderUtils.drawImage(wurstLogo, 2, 7f, 758 / 8.5f, 192 / 8.5f);
+            fr.drawString("v7.46.1" + " MC1.8.9 (outdated)", 95, 17, Color.BLACK.getRGB());
+
+            //Test
+        } else if (type.getValue() == Type.Test) {
+            float x = 0f, y = 10f, w = 223f, h = 21f, r = 6f;
+            RenderUtils.drawRoundedRectNoShaders(x, y, w, h, r, new Color(255, 255, 255, 100).getRGB());
+
+            String text = "Simp";
+            float textX = x + (w - fr.getStringWidth(text)) / 2f;
+            float textY = y + (h - fr.FONT_HEIGHT) / 2f;
+            fr.drawString(text, textX, textY, Color.BLUE.brighter().getRGB());
         }
+
     };
 
     @EventLink
     public Listener<ShaderEvent> shaderEventListener = e -> {
         CustomFontRenderer fr = FontProcess.getCurrentFont();
         ScaledResolution sr = new ScaledResolution(mc);
-        if (type.getValue() != Type.Logo && type.getValue() != Type.Island) {
+        if (type.getValue() != Type.Logo && type.getValue() != Type.Island && type.getValue() != Type.Tutorial2017 && type.getValue() != Type.Wurst) {
             SimpleDateFormat sdfDate = new SimpleDateFormat("hh:mm a");
             Date now = new Date();
             String strDate = sdfDate.format(now);
@@ -117,6 +149,15 @@ public final class WatermarkModule extends Module {
             RenderUtils.drawImage(new ResourceLocation("simp/images/simp_light.png"), 2, 2, (float) 157 / 2, (float) 125 / 2);
         } else if (type.getValue() == Type.Island) {
             renderDynamicIsland(sr);
+        } else if (type.getValue() == Type.Tutorial2017) {
+            Gui.drawRect(2, 2, 45, 14, 0x80000000);
+            fr.drawString("Simp", 4, 4, 0x5555FF);
+            Gui.drawRect(2, 15, 45, 27, 0x80000000);
+            fr.drawString("FPS: " + mc.getDebugFPS(), 4, 17, -1);
+        } else if (type.getValue() == Type.Wurst) {
+            RenderUtils.drawRect(0, 10, 185, 22, new Color(255, 255, 255, 100));
+            RenderUtils.drawImage(wurstLogo, 2, 5.5f, 758 / 8.5f, 192 / 8.5f);
+            fr.drawString("v" + Simp.VERSION + " MC 1.8.9", 95, 14, Color.BLACK.getRGB());
         }
     };
 
