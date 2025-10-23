@@ -60,7 +60,8 @@ public final class ModuleManager {
                 new CameraModule(),
                 new ESPModule(),
                 new TargetInterfaceModule(),
-                new PostProcessingModule()
+                new PostProcessingModule(),
+                new HelloDeveloperModule()
         );
         getModules().forEach(Module::reflectProperties);
 

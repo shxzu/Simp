@@ -37,6 +37,7 @@ public final class WatermarkModule extends Module {
 
     public static final ModeProperty<Type> type = new ModeProperty<>("Client Watermark Type", Type.Simple);
     public static final Property<Boolean> info = new Property<>("Watermark Info", true, () -> type.getValue() != Type.GameSense && type.getValue() != Type.Logo && type.getValue() != Type.Island && type.getValue() != Type.Tutorial2017 && type.getValue() != Type.Wurst);
+    public static final Property<String> customName = new Property<>("Custom Name", "Simp");
 
     public enum Type {
         Simple,
@@ -62,56 +63,55 @@ public final class WatermarkModule extends Module {
         setSuffix(type.getValue().toString());
         CustomFontRenderer fr = FontProcess.getCurrentFont();
         ScaledResolution sr = new ScaledResolution(mc);
+        String clientName = customName.getValue();
+
         if (type.getValue() != Type.Logo && type.getValue() != Type.Island && type.getValue() != Type.Tutorial2017 && type.getValue() != Type.Wurst) {
             SimpleDateFormat sdfDate = new SimpleDateFormat("hh:mm a");
             Date now = new Date();
             String strDate = sdfDate.format(now);
-            String text = "Simp";
+            String text = clientName;
             if (type.getValue() == Type.Exhibition) {
-                text = "S" + EnumChatFormatting.GRAY + "imp ";
-                if (info.getValue())
-                    text = "S" + EnumChatFormatting.GRAY + "imp " + EnumChatFormatting.WHITE + Simp.VERSION + EnumChatFormatting.GRAY + " [" + EnumChatFormatting.WHITE + strDate + EnumChatFormatting.GRAY + "]" + EnumChatFormatting.GRAY + " [FPS: " + EnumChatFormatting.WHITE + mc.getDebugFPS() + EnumChatFormatting.GRAY + "]";
+                if (!clientName.isEmpty()) {
+                    text = String.valueOf(clientName.charAt(0)) + EnumChatFormatting.GRAY + clientName.substring(1) + " ";
+                    if (info.getValue())
+                        text = String.valueOf(clientName.charAt(0)) + EnumChatFormatting.GRAY + clientName.substring(1) + " " + EnumChatFormatting.WHITE + Simp.VERSION + EnumChatFormatting.GRAY + " [" + EnumChatFormatting.WHITE + strDate + EnumChatFormatting.GRAY + "]" + EnumChatFormatting.GRAY + " [FPS: " + EnumChatFormatting.WHITE + mc.getDebugFPS() + EnumChatFormatting.GRAY + "]";
+                }
             } else if (type.getValue() == Type.Simple) {
                 if (info.getValue()) {
-                    text = "Simp" + EnumChatFormatting.WHITE + " " + EnumChatFormatting.WHITE + Simp.VERSION;
+                    text = clientName + EnumChatFormatting.WHITE + " " + EnumChatFormatting.WHITE + Simp.VERSION;
                 } else {
-                    text = "Simp";
+                    text = clientName;
                 }
             } else if (type.getValue() == Type.GameSense) {
                 String serverInfo = (mc.getCurrentServerData() != null) ? mc.getCurrentServerData().serverIP : "Singleplayer";
                 text = String.format(EnumChatFormatting.WHITE + "%s v%s | %d FPS | %s",
-                        Simp.NAME, Simp.VERSION, Minecraft.getDebugFPS(), serverInfo);
+                        clientName, Simp.VERSION, Minecraft.getDebugFPS(), serverInfo);
                 RenderUtils.drawBorderedRect(0, 0.5f, fr.getStringWidth(text) + 4, 7 * sr.getScaleFactor(), 2, new Color(0, 0, 0, 100).getRGB(), ColorProcess.getColor().getRGB(), true, false, false, false);
             }
             fr.drawStringWithShadow(text, 2, 2, ColorProcess.getColor().getRGB());
 
-            //Logo
         } else if (type.getValue() == Type.Logo) {
             RenderUtils.drawImage(new ResourceLocation("simp/images/simp_light.png"), 2, 2, (float) 157 / 2, (float) 125 / 2);
 
-            //dyinamicisland
         } else if (type.getValue() == Type.Island) {
-            renderDynamicIsland(sr);
+            renderDynamicIsland(sr, clientName);
 
-            //Tutorial2017
         } else if (type.getValue() == Type.Tutorial2017) {
             Gui.drawRect(2, 2, 45, 14, 0x80000000);
-            fr.drawString("Simp", 4, 4, 0x5555FF);
+            fr.drawString(clientName, 4, 4, 0x5555FF);
             Gui.drawRect(2, 15, 45, 27, 0x80000000);
             fr.drawString("FPS: " + mc.getDebugFPS(), 4, 17, -1);
 
-            //Wurst
         } else if (type.getValue() == Type.Wurst) {
             RenderUtils.drawRect(0, 10, 223, 21, new Color(255, 255, 255, 100));
             RenderUtils.drawImage(wurstLogo, 2, 7f, 758 / 8.5f, 192 / 8.5f);
             fr.drawString("v7.46.1" + " MC1.8.9 (outdated)", 95, 17, Color.BLACK.getRGB());
 
-            //Test
         } else if (type.getValue() == Type.Test) {
             float x = 0f, y = 10f, w = 223f, h = 21f, r = 6f;
             RenderUtils.drawRoundedRectNoShaders(x, y, w, h, r, new Color(255, 255, 255, 100).getRGB());
 
-            String text = "Simp";
+            String text = clientName;
             float textX = x + (w - fr.getStringWidth(text)) / 2f;
             float textY = y + (h - fr.FONT_HEIGHT) / 2f;
             fr.drawString(text, textX, textY, Color.BLUE.brighter().getRGB());
@@ -123,35 +123,39 @@ public final class WatermarkModule extends Module {
     public Listener<ShaderEvent> shaderEventListener = e -> {
         CustomFontRenderer fr = FontProcess.getCurrentFont();
         ScaledResolution sr = new ScaledResolution(mc);
+        String clientName = customName.getValue();
+
         if (type.getValue() != Type.Logo && type.getValue() != Type.Island && type.getValue() != Type.Tutorial2017 && type.getValue() != Type.Wurst) {
             SimpleDateFormat sdfDate = new SimpleDateFormat("hh:mm a");
             Date now = new Date();
             String strDate = sdfDate.format(now);
-            String text = "Simp";
+            String text = clientName;
             if (type.getValue() == Type.Exhibition) {
-                text = "S" + EnumChatFormatting.GRAY + "imp ";
-                if (info.getValue())
-                    text = "S" + EnumChatFormatting.GRAY + "imp " + EnumChatFormatting.WHITE + Simp.VERSION + EnumChatFormatting.GRAY + " [" + EnumChatFormatting.WHITE + strDate + EnumChatFormatting.GRAY + "]" + EnumChatFormatting.GRAY + " [FPS: " + EnumChatFormatting.WHITE + mc.getDebugFPS() + EnumChatFormatting.GRAY + "]";
+                if (!clientName.isEmpty()) {
+                    text = String.valueOf(clientName.charAt(0)) + EnumChatFormatting.GRAY + clientName.substring(1) + " ";
+                    if (info.getValue())
+                        text = String.valueOf(clientName.charAt(0)) + EnumChatFormatting.GRAY + clientName.substring(1) + " " + EnumChatFormatting.WHITE + Simp.VERSION + EnumChatFormatting.GRAY + " [" + EnumChatFormatting.WHITE + strDate + EnumChatFormatting.GRAY + "]" + EnumChatFormatting.GRAY + " [FPS: " + EnumChatFormatting.WHITE + mc.getDebugFPS() + EnumChatFormatting.GRAY + "]";
+                }
             } else if (type.getValue() == Type.Simple) {
                 if (info.getValue()) {
-                    text = "Simp" + EnumChatFormatting.WHITE + " " + EnumChatFormatting.WHITE + Simp.VERSION;
+                    text = clientName + EnumChatFormatting.WHITE + " " + EnumChatFormatting.WHITE + Simp.VERSION;
                 } else {
-                    text = "Simp";
+                    text = clientName;
                 }
             } else if (type.getValue() == Type.GameSense) {
                 String serverInfo = (mc.getCurrentServerData() != null) ? mc.getCurrentServerData().serverIP : "Singleplayer";
                 text = String.format(EnumChatFormatting.WHITE + "%s v%s | %d FPS | %s",
-                        Simp.NAME, Simp.VERSION, Minecraft.getDebugFPS(), serverInfo);
+                        clientName, Simp.VERSION, Minecraft.getDebugFPS(), serverInfo);
                 RenderUtils.drawBorderedRect(0, 0.5f, fr.getStringWidth(text) + 4, 7 * sr.getScaleFactor(), 2, new Color(0, 0, 0, 100).getRGB(), ColorProcess.getColor().getRGB(), true, false, false, false);
             }
             fr.drawStringWithShadow(text, 2, 2, ColorProcess.getColor().getRGB());
         } else if (type.getValue() == Type.Logo) {
             RenderUtils.drawImage(new ResourceLocation("simp/images/simp_light.png"), 2, 2, (float) 157 / 2, (float) 125 / 2);
         } else if (type.getValue() == Type.Island) {
-            renderDynamicIsland(sr);
+            renderDynamicIsland(sr, clientName);
         } else if (type.getValue() == Type.Tutorial2017) {
             Gui.drawRect(2, 2, 45, 14, 0x80000000);
-            fr.drawString("Simp", 4, 4, 0x5555FF);
+            fr.drawString(clientName, 4, 4, 0x5555FF);
             Gui.drawRect(2, 15, 45, 27, 0x80000000);
             fr.drawString("FPS: " + mc.getDebugFPS(), 4, 17, -1);
         } else if (type.getValue() == Type.Wurst) {
@@ -161,7 +165,7 @@ public final class WatermarkModule extends Module {
         }
     };
 
-    private void renderDynamicIsland(ScaledResolution sr) {
+    private void renderDynamicIsland(ScaledResolution sr, String clientName) {
         CustomFontRenderer fr = FontProcess.getCurrentFont();
         if (System.currentTimeMillis() - lastServerTime > 5000) {
             updateServerInfo();

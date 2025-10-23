@@ -66,10 +66,12 @@ public class Simp {
         commandHandler = new CommandHandler();
         commandHandler.commands.addAll(Arrays.asList(
                 new BindCommand(),
+                new ClientNameCommand(),
                 new BindsCommand(),
                 new ToggleCommand(),
                 new ConfigCommand(),
-                new HideCommand()
+                new HideCommand(),
+                new HelpCommand()
         ));
         getEventBus().subscribe(commandHandler);
 
