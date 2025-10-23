@@ -8,7 +8,7 @@ import net.minecraft.util.IChatComponent;
 
 public class S02PacketChat implements Packet<INetHandlerPlayClient>
 {
-    private IChatComponent chatComponent;
+    public IChatComponent chatComponent;
     private byte type;
 
     public S02PacketChat()

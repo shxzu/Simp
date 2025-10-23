@@ -61,7 +61,8 @@ public final class ModuleManager {
                 new ESPModule(),
                 new TargetInterfaceModule(),
                 new PostProcessingModule(),
-                new HelloDeveloperModule()
+                new HelloDeveloperModule(),
+                new NickHiderModule()
         );
         getModules().forEach(Module::reflectProperties);
 
