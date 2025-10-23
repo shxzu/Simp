@@ -1,6 +1,11 @@
 package net.minecraft.client.gui.inventory;
 
 import com.google.common.collect.Sets;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.io.IOException;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
@@ -49,6 +54,8 @@ public abstract class GuiContainer extends GuiScreen
     private int lastClickButton;
     private boolean doubleClick;
     private ItemStack shiftClickedSlot;
+    private Set<Integer> clickedSlots = new HashSet<>();
+    private Map<Integer, Long> clickTimes = new HashMap<>();
 
     public GuiContainer(Container inventorySlotsIn)
     {
@@ -106,6 +113,7 @@ public abstract class GuiContainer extends GuiScreen
             }
         }
 
+        this.renderSlotHighlight();
         RenderHelper.disableStandardItemLighting();
         this.drawGuiContainerForegroundLayer(mouseX, mouseY);
         RenderHelper.enableGUIStandardItemLighting();
@@ -165,6 +173,46 @@ public abstract class GuiContainer extends GuiScreen
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
         RenderHelper.enableStandardItemLighting();
+    }
+
+    private void renderSlotHighlight() {
+        long currentTime = Minecraft.getSystemTime();
+        Iterator<Integer> iterator = clickedSlots.iterator();
+
+        while (iterator.hasNext()) {
+            Integer slotNumber = iterator.next();
+            Long clickTime = clickTimes.get(slotNumber);
+
+            if (clickTime != null) {
+                long timeSinceClick = currentTime - clickTime;
+                float alpha = 1.0f - (timeSinceClick / 800.0f);
+
+                if (alpha > 0) {
+                    for (Slot slot : this.inventorySlots.inventorySlots) {
+                        if (slot.slotNumber == slotNumber) {
+                            int x = slot.xDisplayPosition;
+                            int y = slot.yDisplayPosition;
+
+                            int overlayAlpha = (int)(alpha * 150);
+                            int borderAlpha = (int)(alpha * 200);
+
+                            int overlayColor = (overlayAlpha << 24) | 0xFFFFFF;
+                            int borderColor = (borderAlpha << 24) | 0xFFFFFF;
+
+                            drawRect(x, y, x + 16, y + 16, overlayColor);
+                            drawRect(x, y, x + 16, y + 1, borderColor);
+                            drawRect(x, y + 15, x + 16, y + 16, borderColor);
+                            drawRect(x, y, x + 1, y + 16, borderColor);
+                            drawRect(x + 15, y, x + 16, y + 16, borderColor);
+                            break;
+                        }
+                    }
+                } else {
+                    iterator.remove();
+                    clickTimes.remove(slotNumber);
+                }
+            }
+        }
     }
 
     private void drawItemStack(ItemStack stack, int x, int y, String altText)
@@ -312,8 +360,12 @@ public abstract class GuiContainer extends GuiScreen
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        boolean flag = mouseButton == this.mc.gameSettings.keyBindPickBlock.getKeyCode() + 100;
         Slot slot = this.getSlotAtPosition(mouseX, mouseY);
+        if (slot != null) {
+            clickedSlots.add(slot.slotNumber);
+            clickTimes.put(slot.slotNumber, Minecraft.getSystemTime());
+        }
+        boolean flag = mouseButton == this.mc.gameSettings.keyBindPickBlock.getKeyCode() + 100;
         long i = Minecraft.getSystemTime();
         this.doubleClick = this.lastClickSlot == slot && i - this.lastClickTime < 250L && this.lastClickButton == mouseButton;
         this.ignoreMouseUp = false;
