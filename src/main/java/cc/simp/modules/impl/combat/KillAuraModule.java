@@ -2,6 +2,7 @@ package cc.simp.modules.impl.combat;
 
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.HitSlowDownEvent;
+import cc.simp.api.events.impl.world.TickEvent;
 import cc.simp.api.events.impl.world.WorldLoadEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
@@ -20,11 +21,15 @@ import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import lombok.NonNull;
+import net.minecraft.block.Block;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.*;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
@@ -33,10 +38,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.util.vector.Vector2f;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -52,8 +58,9 @@ public final class KillAuraModule extends Module {
     public static NumberProperty seekRange = new NumberProperty("Seek Range", 4.2, 3, 6, 0.1);
     public static NumberProperty killRange = new NumberProperty("Kill Range", 3, 3, 6, 0.1);
     public static NumberProperty blockingRange = new NumberProperty("Blocking Range", 4.2, 3, 6, 0.1);
-    private static final NumberProperty max = new NumberProperty("Max CPS", 13.0, 0.0, 20.0, 0.5);
-    private static final NumberProperty min = new NumberProperty("Min CPS", 9.0, 0.0, 20.0, 0.5);
+    public static final Property<Boolean> newCombat = new Property<>("New Combat Delays", false);
+    private static final NumberProperty min = new NumberProperty("Min CPS", 9.0, () -> !newCombat.getValue(),0.0, 20.0, 0.5);
+    private static final NumberProperty max = new NumberProperty("Max CPS", 13.0, () -> !newCombat.getValue(), 0.0, 20.0, 0.5);
     public static ModeProperty<AutoBlock> ab = new ModeProperty<>("Auto Block", AutoBlock.Fake);
     public static ModeProperty<Rotations> rotations = new ModeProperty<>("Rotations", Rotations.Regular);
     private final NumberProperty speed = new NumberProperty("Rotation Speed", 5, 0, 10, 1);
@@ -101,7 +108,7 @@ public final class KillAuraModule extends Module {
     int blockTicks = 0;
     private int targetIndex;
     static long delay = 0;
-    boolean switched = false;
+    static int elapsedTicks = 0;
 
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
@@ -176,6 +183,11 @@ public final class KillAuraModule extends Module {
                 break;
         }
     }
+
+    @EventLink
+    public final Listener<TickEvent> tickEventListener = e -> {
+        elapsedTicks++;
+    };
 
     private void calculateRotations() {
         if (target == null || rotations.getValue() == Rotations.None) return;
@@ -323,12 +335,40 @@ public final class KillAuraModule extends Module {
 
     private static boolean hitTimerDone() {
         boolean returnVal = false;
-        if (attackTimer.hasTimeElapsed(delay, false)) {
-            returnVal = true;
-            attackTimer.reset();
-            delay = (long) (1000 / MathUtils.getRandom(max.getValue().floatValue(), Math.min(min.getValue().floatValue(), max.getValue().floatValue() - 1)));
+        if(!newCombat.getValue()) {
+            if (attackTimer.hasTimeElapsed(delay, false)) {
+                returnVal = true;
+                attackTimer.reset();
+                delay = (long) (1000 / MathUtils.getRandom(max.getValue().floatValue(), Math.min(min.getValue().floatValue(), max.getValue().floatValue() - 1)));
+            }
+        } else {
+            if (elapsedTicks >= getNewCombatDelay()) {
+                elapsedTicks = 0;
+                returnVal = true;
+            }
         }
         return returnVal;
+    }
+
+    private static int getNewCombatDelay() {
+        int toolDelay = 3;
+        if (mc.thePlayer.inventory.getCurrentItem() == null) {
+            return toolDelay;
+        } else {
+            if (mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemSword) {
+                toolDelay = 12;
+            }
+            if (mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemTool) {
+                toolDelay = 20;
+            }
+            if (mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemPickaxe) {
+                toolDelay = 16;
+            }
+            if (mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemAxe) {
+                toolDelay = 25;
+            }
+        }
+        return toolDelay;
     }
 
     private List<Entity> getTargets() {

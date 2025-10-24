@@ -10,6 +10,7 @@ import cc.simp.api.events.impl.player.StrafeEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.events.impl.world.BlockCollisionEvent;
 import cc.simp.modules.impl.client.ClickInterfaceModule;
+import cc.simp.utils.client.Logger;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.mc.PacketUtils;
 import cc.simp.utils.misc.PlayPongC2SPacket;
@@ -27,6 +28,7 @@ import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
+import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.network.play.server.S18PacketEntityTeleport;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.AxisAlignedBB;
@@ -63,13 +65,11 @@ public class BackgroundProcess {
     public final Listener<PacketReceiveEvent> packetReceiveEventListener = event -> {
         // Lag Fix Continues
         if (!event.isCancelled() && ViaLoadingBase.getInstance()
-                .getTargetVersion().newerThan(ProtocolVersion.v1_8) && event.getPacket() instanceof S18PacketEntityTeleport) {
-            S18PacketEntityTeleport tp = ((S18PacketEntityTeleport) event.getPacket());
-            if (tp.getEntityId() == mc.thePlayer.getEntityId()) {
+                .getTargetVersion().newerThan(ProtocolVersion.v1_8) && event.getPacket() instanceof S08PacketPlayerPosLook) {
                 if (ViaLoadingBase.getInstance().getTargetVersion().newerThan(ProtocolVersion.v1_8)) {
                     LagProcess.dispatch();
+                    Logger.chatPrint("Dispatched lag packets due to teleport.");
                 }
-            }
         }
     };
 

@@ -32,7 +32,6 @@ public final class ModuleManager {
                 new TickBaseModule(),
                 new LagRangeModule(),
                 new VelocityModule(),
-                new ExtraKBModule(),
                 new BackTrackModule(),
                 new WTapModule(),
 
@@ -43,7 +42,7 @@ public final class ModuleManager {
                 new NoSlowModule(),
 
                 // Player
-                new ScaffoldWalkModule(),
+                new ScaffoldModule(),
                 new NoFallModule(),
                 new AutoToolModule(),
                 new StealerModule(),
@@ -62,7 +61,7 @@ public final class ModuleManager {
                 new ESPModule(),
                 new TargetInterfaceModule(),
                 new PostProcessingModule(),
-                new HelloDeveloperModule(),
+                new GreetingModule(),
                 new NickHiderModule()
         );
         getModules().forEach(Module::reflectProperties);

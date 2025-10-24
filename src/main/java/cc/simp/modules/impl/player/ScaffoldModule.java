@@ -5,10 +5,11 @@ import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.packet.PacketReceiveEvent;
 import cc.simp.api.events.impl.packet.PacketSendEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
-import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.events.impl.player.SprintEvent;
 import cc.simp.api.events.impl.player.StrafeEvent;
+import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
+import cc.simp.api.events.impl.render.ShaderEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
@@ -16,6 +17,8 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.movement.SpeedModule;
+import cc.simp.processes.ColorProcess;
+import cc.simp.processes.FontProcess;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.client.EnumFacingOffset;
 import cc.simp.utils.client.Logger;
@@ -23,12 +26,17 @@ import cc.simp.utils.client.MathUtils;
 import cc.simp.utils.mc.*;
 import cc.simp.utils.misc.MovementFix;
 import cc.simp.utils.render.RenderUtils;
+import cc.simp.utils.render.animations.Animation;
+import cc.simp.utils.render.animations.Direction;
+import cc.simp.utils.render.animations.impl.DecelerateAnimation;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.block.BlockAir;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.network.Packet;
@@ -38,63 +46,49 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.util.Objects;
+import java.awt.*;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "Scaffold Walk", category = ModuleCategory.PLAYER)
-public final class ScaffoldWalkModule extends Module {
-
-    /*
-        im ngl I pasted a lot of this from rise and then modified it
-        ty alan for the base code
-        pls don't hate I'm too lazy to write it all from scratch for the like 3rd time -shxzu
-    */
+@ModuleInfo(label = "Scaffold", category = ModuleCategory.PLAYER)
+public final class ScaffoldModule extends Module {
 
     private static final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Normal);
     private final NumberProperty rotationSpeed = new NumberProperty("Rotation Speed", 5, 0, 10, 1);
     public final NumberProperty placeDelay = new NumberProperty("Place Delay", 2, 0, 5, 1);
-    private final ModeProperty<YawOffset> yawOffset = new ModeProperty<>("Yaw Offset", YawOffset.Zero);
-    public static Property<Boolean> safeTelly = new Property<>("Safe Telly", true, () -> mode.getValue() == Mode.Telly);
     public static Property<Boolean> sprint = new Property<>("Sprint", false);
-    public static Property<Boolean> moveFix = new Property<>("Move Fix", false);
-    private final ModeProperty<RayCast> raycast = new ModeProperty<>("Ray Cast", RayCast.None);
-    public static Property<Boolean> jump = new Property<>("Auto Jump", false);
+    public static Property<Boolean> moveFix = new Property<>("Move Fix", true);
+    private final ModeProperty<RayCast> raycast = new ModeProperty<>("Ray Cast", RayCast.Normal);
+    public static Property<Boolean> jump = new Property<>("Auto Jump", false, () -> mode.getValue() != Mode.SlowTelly && mode.getValue() != Mode.FastTelly && mode.getValue() != Mode.Hypixel);
     public static Property<Boolean> keepY = new Property<>("Keep Y", false);
-    private final Property<Boolean> sneak = new Property<>("Sneak", false);
-    public final NumberProperty startSneaking = new NumberProperty("Start Sneaking", 0, sneak::getValue, 0, 5, 1);
-    public final NumberProperty stopSneaking = new NumberProperty("Stop Sneaking", 0, sneak::getValue, 0, 5, 1);
-    public final NumberProperty sneakEvery = new NumberProperty("Blocks To Sneak", 1, sneak::getValue, 1, 10, 1);
-    public final NumberProperty sneakingSpeed = new NumberProperty("Sneaking Speed", 0.2, sneak::getValue, 0.2, 1, 0.05);
     private final NumberProperty expand = new NumberProperty("Expand", 0, 0, 4, 1);
-    private final Property<Boolean> render = new Property<>("Render", true);
+    private final Property<Boolean> render = new Property<>("Render Selection", true);
+    private final Property<Boolean> counter = new Property<>("Block Counter", true);
 
     private enum Mode {
-        Normal,
-        Telly,
-        Breeze,
-        God
-    }
+        Normal("Normal"),
+        StaticYaw("Static Yaw"),
+        Hypixel("Hypixel"),
+        SlowTelly("Slow Telly"),
+        FastTelly("Fast Telly"),
+        Breezily("Breezily"),
+        GodBridge("God Bridge");
 
-    private enum RayCast {
-        None,
-        Normal,
-        Strict
-    }
-
-    private enum YawOffset {
-        Zero("0"),
-        FortyFive("45"),
-        NegativeFortyFive("-45");
         public String name;
 
-        YawOffset(String name) {
+        Mode(String name) {
             this.name = name;
         }
 
         public String toString() {
             return name;
         }
+    }
+
+    private enum RayCast {
+        None,
+        Normal,
+        Strict
     }
 
     private Vec3 targetBlock;
@@ -105,180 +99,131 @@ public final class ScaffoldWalkModule extends Module {
     @Getter
     @Setter
     private int ticksOnAir;
-    private int sneakingTicks;
-    private int placements;
-    private int slow;
-    private int pause;
-    public int recursions, recursion;
     public double startY;
     private boolean canPlace;
     private int directionalChange;
     private int blockCount;
+    private Animation anim = new DecelerateAnimation(250, 1);
 
     @EventLink
     public final Listener<MotionEvent> motionEventListener = event -> {
         if (!event.isPre()) return;
         this.offset = new Vec3i(0, 0, 0);
-
-        if (targetBlock == null || enumFacing == null || blockFace == null) {
-            return;
-        }
     };
-
-    public void runMode() {
-        if (jump.getValue() && !keepY.getValue()) {
-            if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
-                mc.thePlayer.jump();
-            }
-        }
-    }
 
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
         this.setSuffix(mode.getValue().toString());
-        for (recursion = 0; recursion <= recursions; recursion++) {
+        resetBinds(false, false, true, true, false, false);
 
-            resetBinds(false, false, true, true, false, false);
+        if (expand.getValue().intValue() != 0) {
+            double direction = MovementUtils.direction(mc.thePlayer.rotationYaw, mc.gameSettings.keyBindForward.isKeyDown() ? 1 :
+                    mc.gameSettings.keyBindBack.isKeyDown() ? -1 : 0, mc.gameSettings.keyBindRight.isKeyDown() ? -1 :
+                    mc.gameSettings.keyBindLeft.isKeyDown() ? 1 : 0);
 
-            if (expand.getValue().intValue() != 0) {
-                double direction = MovementUtils.direction(mc.thePlayer.rotationYaw, mc.gameSettings.keyBindForward.isKeyDown() ? 1 :
-                        mc.gameSettings.keyBindBack.isKeyDown() ? -1 : 0, mc.gameSettings.keyBindRight.isKeyDown() ? -1 :
-                        mc.gameSettings.keyBindLeft.isKeyDown() ? 1 : 0);
-
-                for (int range = 0; range <= expand.getValue().intValue(); range++) {
-                    if (PlayerUtils.blockAheadOfPlayer(range, this.offset.getY() - 0.5) instanceof BlockAir) {
-                        this.offset = this.offset.add(new Vec3i((int) (-Math.sin(direction) * (range + 1)), 0, (int) (Math.cos(direction) * (range + 1))));
-                        break;
-                    }
+            for (int range = 0; range <= expand.getValue().intValue(); range++) {
+                if (PlayerUtils.blockAheadOfPlayer(range, this.offset.getY() - 0.5) instanceof BlockAir) {
+                    this.offset = this.offset.add(new Vec3i((int) (-Math.sin(direction) * (range + 1)), 0, (int) (Math.cos(direction) * (range + 1))));
+                    break;
                 }
-            }
-
-            // Same Y
-            final boolean sameY = ((keepY.getValue() || Simp.INSTANCE.getModuleManager().getModule(SpeedModule.class).isEnabled()) && !mc.gameSettings.keyBindJump.isKeyDown()) && MovementUtils.isMoving();
-
-            if (InventoryUtils.findBlock() == -1) {
-                Logger.chatPrint("No blocks in hotbar, disabling!");
-                this.toggle();
-                return;
-            }
-
-            // Getting ItemSlot
-            if (InventoryUtils.findBlock() != -1) {
-                mc.thePlayer.inventory.currentItem = InventoryUtils.findBlock();
-            }
-
-            // Used to detect when to place a block, if over air, allow placement of blocks
-            if (doesNotContainBlock(1) && (!sameY || (doesNotContainBlock(2) && doesNotContainBlock(3) && doesNotContainBlock(4)))) {
-                ticksOnAir++;
-            } else {
-                ticksOnAir = 0;
-            }
-
-            canPlace = mc.thePlayer.inventory.currentItem == InventoryUtils.findBlock() &&
-                    ticksOnAir > placeDelay.getValue() * Math.random();
-
-            if (recursion == 0) this.calculateSneaking();
-
-            // Gets block to place
-            targetBlock = PlayerUtils.getPlacePossibility(offset.getX(), offset.getY(), offset.getZ(), sameY ? (int) Math.floor(startY) : null);
-
-            if (targetBlock == null) {
-                return;
-            }
-
-            // Gets EnumFacing
-            enumFacing = PlayerUtils.getEnumFacing(targetBlock, offset.getY() < 0);
-
-            if (enumFacing == null) {
-                return;
-            }
-
-            final BlockPos position = new BlockPos(targetBlock.xCoord, targetBlock.yCoord, targetBlock.zCoord);
-
-            blockFace = position.add(enumFacing.getOffset().xCoord, enumFacing.getOffset().yCoord, enumFacing.getOffset().zCoord);
-
-            if (blockFace == null || enumFacing == null || enumFacing.getEnumFacing() == null) {
-                return;
-            }
-
-            this.calculateRotations();
-
-            if (targetBlock == null || enumFacing == null || blockFace == null) {
-                return;
-            }
-
-            if (startY - 1 != Math.floor(targetBlock.yCoord) && sameY) {
-                return;
-            }
-
-            if (mc.thePlayer.inventory.getCurrentItem() == null || !(mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock)) {
-                return;
-            }
-
-            if (mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock) {
-                if (canPlace && (RayCastUtils.overBlock(enumFacing.getEnumFacing(), blockFace, raycast.getValue() == RayCast.Strict) || raycast.getValue() == RayCast.None)) {
-                    this.place();
-
-                    ticksOnAir = 0;
-
-                } else if (Math.random() > 0.3 && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit != null &&
-                        mc.objectMouseOver.getBlockPos().equals(blockFace) && mc.objectMouseOver.sideHit ==
-                        EnumFacing.UP && raycast.getValue() == RayCast.Strict && !(PlayerUtils.blockRelativeToPlayer(0, -1, 0) instanceof BlockAir)) {
-                    mc.rightClickMouse();
-                }
-            }
-
-            // For Same Y
-            if (mc.gameSettings.keyBindJump.isKeyDown() && mc.thePlayer.posY % 1 > 0.5) {
-                startY = Math.floor(mc.thePlayer.posY);
-            }
-
-            if ((mc.thePlayer.posY < startY || mc.thePlayer.onGround) && !MovementUtils.isMoving()) {
-                startY = Math.floor(mc.thePlayer.posY);
             }
         }
+
+        // Same Y
+        final boolean sameY = ((keepY.getValue() || Simp.INSTANCE.getModuleManager().getModule(SpeedModule.class).isEnabled()) && !mc.gameSettings.keyBindJump.isKeyDown()) && MovementUtils.isMoving();
+
+        if (InventoryUtils.findBlock() == -1) {
+            Logger.chatPrint("No blocks in hotbar, disabling!");
+            this.toggle();
+            return;
+        }
+
+        // Getting ItemSlot
+        if (InventoryUtils.findBlock() != -1) {
+            mc.thePlayer.inventory.currentItem = InventoryUtils.findBlock();
+        }
+
+        // Used to detect when to place a block, if over air, allow placement of blocks
+        if (doesNotContainBlock(1) && (!sameY || (doesNotContainBlock(2) && doesNotContainBlock(3) && doesNotContainBlock(4)))) {
+            ticksOnAir++;
+        } else {
+            ticksOnAir = 0;
+        }
+
+        canPlace = mc.thePlayer.inventory.currentItem == InventoryUtils.findBlock() &&
+                ticksOnAir > placeDelay.getValue() * Math.random();
+
+        // Gets block to place
+        targetBlock = PlayerUtils.getPlacePossibility(offset.getX(), offset.getY(), offset.getZ(), sameY ? (int) Math.floor(startY) : null);
+
+        if (targetBlock == null) {
+            return;
+        }
+
+        // Gets EnumFacing
+        enumFacing = PlayerUtils.getEnumFacing(targetBlock, offset.getY() < 0);
+
+        if (enumFacing == null) {
+            return;
+        }
+
+        final BlockPos position = new BlockPos(targetBlock.xCoord, targetBlock.yCoord, targetBlock.zCoord);
+
+        blockFace = position.add(enumFacing.getOffset().xCoord, enumFacing.getOffset().yCoord, enumFacing.getOffset().zCoord);
+
+        if (blockFace == null || enumFacing == null || enumFacing.getEnumFacing() == null) {
+            return;
+        }
+
+        this.doRotations();
+
+        if (targetBlock == null || enumFacing == null || blockFace == null) {
+            return;
+        }
+
+        if (startY - 1 != Math.floor(targetBlock.yCoord) && sameY) {
+            return;
+        }
+
+        if (mc.thePlayer.inventory.getCurrentItem() == null || !(mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock)) {
+            return;
+        }
+
+        if (mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock) {
+            if (canPlace && (RayCastUtils.overBlock(enumFacing.getEnumFacing(), blockFace, raycast.getValue() == RayCast.Strict) || raycast.getValue() == RayCast.None)) {
+                this.place();
+
+                ticksOnAir = 0;
+
+            } else if (Math.random() > 0.3 && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit != null &&
+                    mc.objectMouseOver.getBlockPos().equals(blockFace) && mc.objectMouseOver.sideHit ==
+                    EnumFacing.UP && raycast.getValue() == RayCast.Strict && !(PlayerUtils.blockRelativeToPlayer(0, -1, 0) instanceof BlockAir)) {
+                mc.rightClickMouse();
+            }
+        }
+
+        // For Same Y
+        if (mc.gameSettings.keyBindJump.isKeyDown() && mc.thePlayer.posY % 1 > 0.5) {
+            startY = Math.floor(mc.thePlayer.posY);
+        }
+
+        if ((mc.thePlayer.posY < startY || mc.thePlayer.onGround) && !MovementUtils.isMoving()) {
+            startY = Math.floor(mc.thePlayer.posY);
+        }
     };
-
-
-    @EventLink
-    public final Listener<MoveEvent> onMove = this::calculateSneaking;
 
     @EventLink
     public final Listener<StrafeEvent> onStrafe = event -> {
-        this.runMode();
-
-        if (!Objects.equals(yawOffset.getValue().name, "0") && !moveFix.getValue()) {
-            MovementUtils.useDiagonalSpeed();
-        }
-
-        if (keepY.getValue() && jump.getValue()) {
-            if (mc.thePlayer.onGround && MovementUtils.isMoving() && mc.thePlayer.posY == startY && isNearEdge() && (mode.getValue() != Mode.Telly || mc.thePlayer.onGroundTicks >= 1)) {
-                mc.thePlayer.jump();
-            }
-        }
-    };
-
-    @EventLink
-    public final Listener<PacketSendEvent> onPacketSend = event -> {
-        Packet<?> packet = event.getPacket();
-
-        if (packet instanceof C08PacketPlayerBlockPlacement) {
-            C08PacketPlayerBlockPlacement c08PacketPlayerBlockPlacement = (C08PacketPlayerBlockPlacement) packet;
-
-            if (!c08PacketPlayerBlockPlacement.getPosition().equalsVector(new Vector3d(-1, -1, -1))) {
-                placements--;
-            }
-        }
+        this.jump();
     };
 
     @EventLink
     public final Listener<SprintEvent> sprintEventListener = event -> {
         if (sprint.getValue()) {
-            mc.thePlayer.setSprinting(MovementUtils.canSprint(true));
-            event.setSprinting(MovementUtils.canSprint(true));
+            mc.thePlayer.setSprinting(true);
+            event.setSprinting(true);
         }
     };
-
     @EventLink
     public final Listener<PacketReceiveEvent> onPacketReceiveEvent = PacketUtils::correctBlockCount;
 
@@ -317,10 +262,17 @@ public final class ScaffoldWalkModule extends Module {
         }
     };
 
+    @EventLink
+    public final Listener<Render2DEvent> render2DEventListener = event -> renderBlockCounter();
+
+    @EventLink
+    public final Listener<ShaderEvent> shaderEventListener = event -> renderBlockCounter();
+
     @Override
     public void onEnable() {
+        anim = new DecelerateAnimation(250, 1);
         if (mc.thePlayer != null) {
-            targetYaw = mc.thePlayer.rotationYaw - 180 + Integer.parseInt(yawOffset.getValue().toString());
+            targetYaw = mc.thePlayer.rotationYaw - 180;
             targetPitch = 90;
 
             pitchDrift = (float) ((Math.random() - 0.5) * (Math.random() - 0.5) * 10);
@@ -328,18 +280,43 @@ public final class ScaffoldWalkModule extends Module {
 
             startY = Math.floor(mc.thePlayer.posY);
             targetBlock = null;
-
-            this.sneakingTicks = -1;
-            recursions = 0;
-            placements = 0;
         }
         super.onEnable();
     }
 
     @Override
     public void onDisable() {
+        anim = new DecelerateAnimation(250, 1);
         resetBinds();
         super.onDisable();
+    }
+
+    private void renderBlockCounter() {
+        if(!counter.getValue()) return;
+        anim.setDirection(this.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
+        if (!this.isEnabled() && anim.isDone()) return;
+        ScaledResolution sr = new ScaledResolution(mc);
+        float output = anim.getOutput().floatValue();
+        float x, y;
+        if (mc.thePlayer.inventory.getCurrentItem() != null && mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock) blockCount = mc.thePlayer.inventory.getCurrentItem().stackSize;
+        float blockWH = mc.thePlayer.inventory.getCurrentItem() != null ? 15 : -2;
+        int spacing = 3;
+        String text = "§l" + blockCount + "§r block" + (blockCount != 1 ? "s" : "");
+        float textWidth = FontProcess.getFont("bold").getStringWidth(text);
+
+        float totalWidth = ((textWidth + blockWH + spacing) + 6) * output;
+        x = sr.getScaledWidth() / 2f - (totalWidth / 2f);
+        y = sr.getScaledHeight() - (sr.getScaledHeight() / 2f - 20);
+        float height = 20;
+        RenderUtils.startScissor(x - 1.5f, y - 1.5f, totalWidth + 3, height + 3);
+
+        RenderUtils.drawRoundedRect(x, y, totalWidth, height, 5, ColorProcess.getColor().darker());
+
+        FontProcess.getFont("bold").drawString(text, x + 3 + blockWH + spacing, y + height / 2f - FontProcess.getFont("bold").getHeight()  / 2f + .5f, -1);
+        RenderHelper.enableGUIStandardItemLighting();
+        mc.getRenderItem().renderItemAndEffectIntoGUI(mc.thePlayer.inventory.getCurrentItem(), (int) x + 3, (int) (y + 10 - (blockWH / 2)));
+        RenderHelper.disableStandardItemLighting();
+        RenderUtils.endScissor();
     }
 
     public void resetBinds() {
@@ -360,69 +337,7 @@ public final class ScaffoldWalkModule extends Module {
             mc.gameSettings.keyBindBack.setPressed(Keyboard.isKeyDown(mc.gameSettings.keyBindBack.getKeyCode()));
     }
 
-    public void calculateSneaking() {
-        if (ticksOnAir == 0) mc.gameSettings.keyBindSneak.setPressed(false);
-
-        this.sneakingTicks--;
-
-        if (!this.sneak.getValue() && pause <= 0) {
-            return;
-        }
-
-        int ahead = startSneaking.getRandomBetween().intValue();
-        int place = placeDelay.getRandomBetween().intValue();
-        int after = stopSneaking.getRandomBetween().intValue();
-
-        if (pause > 0) {
-            pause--;
-
-            sneakingTicks = 0;
-            placements = 0;
-        }
-
-        if (this.sneakingTicks >= 0) {
-            mc.gameSettings.keyBindSneak.setPressed(true);
-            return;
-        }
-
-        if (ticksOnAir > 0) {
-            this.sneakingTicks = (int) (double) (after);
-        }
-
-        if (ticksOnAir > 0 || PlayerUtils.blockRelativeToPlayer(mc.thePlayer.motionX * ahead, MovementUtils.HEAD_HITTER_MOTION, mc.thePlayer.motionZ * ahead) instanceof BlockAir) {
-            if (placements <= 0) {
-                this.sneakingTicks = (int) (double) (ahead + place + after);
-                placements = sneakEvery.getRandomBetween().intValue();
-            }
-        }
-    }
-
-    public void calculateSneaking(MoveEvent moveEvent) {
-        forward = moveEvent.getForward();
-        strafe = moveEvent.getStrafe();
-
-        if (slow-- > 0) {
-            moveEvent.setForward(0);
-            moveEvent.setStrafe(0);
-        }
-
-        if (!this.sneak.getValue()) {
-            return;
-        }
-
-        double speed = this.sneakingSpeed.getValue().doubleValue();
-
-        if (speed <= 0.2) {
-            return;
-        }
-
-        moveEvent.setSneakSlowDownMultiplier(speed);
-    }
-
-    public void calculateRotations() {
-        int yawOffset = Integer.parseInt(this.yawOffset.getValue().name);
-
-        /* Smoothing rotations */
+    public void doRotations() {
         final double minRotationSpeed = this.rotationSpeed.getValue();
         final double maxRotationSpeed = this.rotationSpeed.getValue() * Math.random();
         float rotationSpeed = (float) MathUtils.getRandom(minRotationSpeed, maxRotationSpeed);
@@ -436,12 +351,23 @@ public final class ScaffoldWalkModule extends Module {
 
                 if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
                     if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
-                        getRotations(yawOffset);
+                        getBaseRotations();
                     }
                 }
                 break;
 
-            case Breeze:
+            case StaticYaw:
+                mc.entityRenderer.getMouseOver(1);
+
+                if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
+                    if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
+                        getBaseRotations();
+                        targetYaw = mc.thePlayer.rotationYaw - 180;
+                    }
+                }
+                break;
+
+            case Breezily:
                 if (canPlace) {
                     if (enumFacing.getEnumFacing() == EnumFacing.UP) {
                         targetPitch = 90;
@@ -500,29 +426,47 @@ public final class ScaffoldWalkModule extends Module {
                 }
 
                 break;
-            case Telly:
-                if (recursion == 0) {
-                    int time = mc.thePlayer.offGroundTicks;
-
-                    if (time >= 3 && time <= (!keepY.getValue() ? 7 : 9)) {
+            case SlowTelly:
+                    if (mc.thePlayer.offGroundTicks >= 3 && mc.thePlayer.offGroundTicks <= (!keepY.getValue() ? 9 : 10)) {
                         if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue().equals(RayCast.Strict))) {
-                            getRotations(0);
+                            getBaseRotations();
                         }
                     } else {
-                        getRotations(Integer.parseInt(String.valueOf(this.yawOffset.getValue().name)));
+                        getBaseRotations();
                         targetYaw = mc.thePlayer.rotationYaw;
                     }
-
-                    if (time <= 3) {
+                    if (mc.thePlayer.offGroundTicks <= 3) {
                         canPlace = false;
                     }
-                    if (safeTelly.getValue()) {
-                        mc.gameSettings.keyBindSneak.setPressed(isNearEdge() && !mc.thePlayer.onGround);
+                break;
+            case FastTelly:
+                if (mc.thePlayer.offGroundTicks >= 3 && mc.thePlayer.offGroundTicks <= (!keepY.getValue() ? 8 : 9)) {
+                    if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue().equals(RayCast.Strict))) {
+                        getBaseRotations();
                     }
+                } else {
+                    getBaseRotations();
+                    targetYaw = mc.thePlayer.rotationYaw;
+                }
+                if (mc.thePlayer.offGroundTicks <= 3) {
+                    canPlace = false;
                 }
                 break;
+            case Hypixel:
+                if (mc.thePlayer.offGroundTicks >= 3 && mc.thePlayer.offGroundTicks <= (!keepY.getValue() ? 9 : 10)) {
+                    if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue().equals(RayCast.Strict))) {
+                        getBaseRotations();
+                    }
+                } else {
+                    targetPitch = 62;
+                    targetYaw = mc.thePlayer.rotationYaw;
+                }
 
-            case God:
+                if (mc.thePlayer.offGroundTicks <= 3) {
+                    canPlace = false;
+                }
+                break;
+            case GodBridge:
                 targetYaw = (mc.thePlayer.rotationYaw - mc.thePlayer.rotationYaw % 90) - 180 + 45 * (mc.thePlayer.rotationYaw > 0 ? 1 : -1);
                 targetPitch = 76.4f;
 
@@ -568,14 +512,14 @@ public final class ScaffoldWalkModule extends Module {
         }
     }
 
-    public void getRotations(final int yawOffset) {
+    public void getBaseRotations() {
         EntityPlayer player = mc.thePlayer;
         double difference = player.posY + player.getEyeHeight() - targetBlock.yCoord -
                 0.5 - (Math.random() - 0.5) * 0.1;
 
         MovingObjectPosition movingObjectPosition = null;
 
-        for (int offset = -180 + yawOffset; offset <= 180; offset += 45) {
+        for (int offset = -180; offset <= 180; offset += 45) {
             player.setPosition(player.posX, player.posY - difference, player.posZ);
             movingObjectPosition = RayCastUtils.rayCast(new Vector2f((float) (player.rotationYaw + (offset * 3)), 0), 4.5);
             player.setPosition(player.posX, player.posY + difference, player.posZ);
@@ -643,8 +587,6 @@ public final class ScaffoldWalkModule extends Module {
     }
 
     private void place() {
-        if (pause > 3) return;
-
         Vec3 hitVec = this.getHitVec();
 
         if (raycast.getValue() == RayCast.Strict) {
@@ -654,6 +596,23 @@ public final class ScaffoldWalkModule extends Module {
         }
     }
 
+    public void jump() {
+        if(jump.getValue()) {
+            if (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel) {
+                jump.setValue(false);
+            }
+        }
+        if (keepY.getValue() && jump.getValue() || (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel && keepY.getValue())) {
+            if (mc.thePlayer.onGround && MovementUtils.isMoving() && mc.thePlayer.posY == startY && isNearEdge() && (mode.getValue() != Mode.SlowTelly || mc.thePlayer.onGroundTicks >= 1)) {
+                mc.thePlayer.jump();
+            }
+        }
+        if (jump.getValue() || (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel) && !keepY.getValue()) {
+            if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
+                mc.thePlayer.jump();
+            }
+        }
+    }
 
     public boolean doesNotContainBlock(int down) {
         return PlayerUtils.blockRelativeToPlayer(offset.getX(), -down + offset.getY(), offset.getZ()).isReplaceable(mc.theWorld, new BlockPos(mc.thePlayer).down(down));
@@ -675,6 +634,5 @@ public final class ScaffoldWalkModule extends Module {
         }
         return false;
     }
-
+    
 }
-

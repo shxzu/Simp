@@ -62,16 +62,16 @@ public final class BackTrackModule extends Module {
                 return;
             }
 
-            target = (EntityPlayer) KillAuraModule.target;
-
-            if (target == null) {
+            if (!(KillAuraModule.target instanceof EntityPlayer)) {
                 LagProcess.disable();
                 LagProcess.dispatch();
                 return;
             }
 
+            target = (EntityPlayer) KillAuraModule.target;
 
-            if (swingCheckProperty.getValue() && !mc.thePlayer.isSwingInProgress)
+
+        if (swingCheckProperty.getValue() && !mc.thePlayer.isSwingInProgress)
                 return;
 
 

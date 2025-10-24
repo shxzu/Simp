@@ -21,7 +21,7 @@ import static cc.simp.utils.Util.mc;
 public class NickHiderModule extends Module {
 
     private final String fakeName = EnumChatFormatting.RED + "" + EnumChatFormatting.BOLD + "You";
-    private final String fakeServerIP = EnumChatFormatting.YELLOW + "simpclient.com";
+    private final String fakeServerIP = EnumChatFormatting.YELLOW + "github.com/shxzu/Simp";
 
     public static final Property<Boolean> serverIP = new Property<>("ServerIP", true);
 
