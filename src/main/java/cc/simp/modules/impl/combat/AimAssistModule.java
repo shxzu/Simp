@@ -1,5 +1,6 @@
 package cc.simp.modules.impl.combat;
 
+import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
 import cc.simp.api.properties.Property;
@@ -7,6 +8,8 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.RotationProcess;
+import cc.simp.utils.misc.MovementFix;
 import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -15,12 +18,13 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "AimAssist", category = ModuleCategory.COMBAT)
+@ModuleInfo(label = "Aim Assist", category = ModuleCategory.COMBAT)
 public final class AimAssistModule extends Module {
 
     private final NumberProperty searchRange = new NumberProperty("Search Range", 4.0, 1.0, 8.0, 0.1);
@@ -34,8 +38,7 @@ public final class AimAssistModule extends Module {
     private long lastClickTime;
 
     @EventLink
-    public final Listener<MotionEvent> motionEventListener = e -> {
-        if (e.isPre()) {
+    public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
             angleCalled = true;
 
             if (onlyOnClick.getValue() && Mouse.isButtonDown(0) && angleCalled) {
@@ -54,12 +57,10 @@ public final class AimAssistModule extends Module {
 
             if (angleCalled && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.MISS) {
                 float[] rotations = getRotationsToEntity(target);
-                e.setYaw(rotations[0]);
-                e.setPitch(rotations[1]);
+                RotationProcess.setRotations(new Vector2f(rotations[0], rotations[1]), 5, MovementFix.NORMAL);
             }
 
             angleCalled = false;
-        }
     };
 
     @EventLink

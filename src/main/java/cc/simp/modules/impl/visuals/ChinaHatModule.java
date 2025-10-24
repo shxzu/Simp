@@ -17,7 +17,7 @@ import java.awt.*;
 import static cc.simp.utils.Util.mc;
 import static org.lwjgl.opengl.GL11.*;
 
-@ModuleInfo(label = "ChinaHat", category = ModuleCategory.VISUALS)
+@ModuleInfo(label = "China Hat", category = ModuleCategory.VISUALS)
 public final class ChinaHatModule extends Module {
 
     private final ModeProperty<Quality> quality = new ModeProperty<>("Quality", Quality.SMOOTH);

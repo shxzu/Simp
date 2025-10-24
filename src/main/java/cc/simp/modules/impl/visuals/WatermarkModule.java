@@ -11,17 +11,13 @@ import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.ColorProcess;
 import cc.simp.processes.FontProcess;
-import cc.simp.utils.render.GlUtils;
 import cc.simp.utils.render.RenderUtils;
-import cc.simp.utils.render.shaders.RoundedShader;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 
@@ -30,13 +26,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static cc.simp.utils.Util.mc;
-import static org.lwjgl.opengl.GL11.*;
 
 @ModuleInfo(label = "Watermark", category = ModuleCategory.VISUALS)
 public final class WatermarkModule extends Module {
 
     public static final ModeProperty<Type> type = new ModeProperty<>("Client Watermark Type", Type.Simple);
-    public static final Property<Boolean> info = new Property<>("Watermark Info", true, () -> type.getValue() != Type.GameSense && type.getValue() != Type.Logo && type.getValue() != Type.Island && type.getValue() != Type.Tutorial2017 && type.getValue() != Type.Wurst);
+    public static final Property<Boolean> info = new Property<>("Watermark Info", true, () -> type.getValue() != Type.GameSense && type.getValue() != Type.Logo && type.getValue() != Type.Island && type.getValue() != Type.Tutorial2017 && type.getValue() != Type.Wurst && type.getValue() != Type.Nursultan);
     public static final Property<String> customName = new Property<>("Custom Name", "Simp");
 
     public enum Type {
@@ -47,7 +42,7 @@ public final class WatermarkModule extends Module {
         Island,
         Tutorial2017,
         Wurst,
-        Test
+        Nursultan
     }
 
     private long lastServerTime;
@@ -97,24 +92,24 @@ public final class WatermarkModule extends Module {
             renderDynamicIsland(sr, clientName);
 
         } else if (type.getValue() == Type.Tutorial2017) {
-            Gui.drawRect(2, 2, 45, 14, 0x80000000);
+            RenderUtils.drawRect(2, 2, fr.getStringWidth(clientName) + 4, fr.FONT_HEIGHT + 2, new Color(0, 0, 0, 100));
             fr.drawString(clientName, 4, 4, 0x5555FF);
-            Gui.drawRect(2, 15, 45, 27, 0x80000000);
+            RenderUtils.drawRect(2, 15, fr.getStringWidth("FPS: " + mc.getDebugFPS()) + 4, fr.FONT_HEIGHT + 2, new Color(0, 0, 0, 100));
             fr.drawString("FPS: " + mc.getDebugFPS(), 4, 17, -1);
 
         } else if (type.getValue() == Type.Wurst) {
             RenderUtils.drawRect(0, 10, 223, 21, new Color(255, 255, 255, 100));
-            RenderUtils.drawImage(wurstLogo, 2, 7f, 758 / 8.5f, 192 / 8.5f);
-            fr.drawString("v7.46.1" + " MC1.8.9 (outdated)", 95, 17, Color.BLACK.getRGB());
+            RenderUtils.drawImage(wurstLogo, 0, 10f, 758 / 8.5f, 192 / 8.5f);
+            mc.fontRendererObj.drawString("v7.46.1" + " MC1.8.9 (outdated)",  92, 17, Color.BLACK.getRGB());
 
-        } else if (type.getValue() == Type.Test) {
-            float x = 0f, y = 10f, w = 223f, h = 21f, r = 6f;
-            RenderUtils.drawRoundedRectNoShaders(x, y, w, h, r, new Color(255, 255, 255, 100).getRGB());
+        }
 
-            String text = clientName;
-            float textX = x + (w - fr.getStringWidth(text)) / 2f;
-            float textY = y + (h - fr.FONT_HEIGHT) / 2f;
-            fr.drawString(text, textX, textY, Color.BLUE.brighter().getRGB());
+        if (type.getValue() == Type.Nursultan) {
+            int ping = mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()).getResponseTime();
+            if (mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()) == null) ping = 0;
+            String skibidi = EnumChatFormatting.BLUE + clientName + EnumChatFormatting.WHITE + " - " + mc.getDebugFPS() + " FPS" + " - " + ping + "ms";
+            RenderUtils.drawRoundedRect(2, 2, fr.getStringWidth(skibidi) + 4, fr.FONT_HEIGHT + 4, 6, new Color(0, 0, 0, 200));
+            fr.drawStringWithShadow(skibidi, 4, 4, Color.WHITE.getRGB());
         }
 
     };
@@ -154,14 +149,21 @@ public final class WatermarkModule extends Module {
         } else if (type.getValue() == Type.Island) {
             renderDynamicIsland(sr, clientName);
         } else if (type.getValue() == Type.Tutorial2017) {
-            Gui.drawRect(2, 2, 45, 14, 0x80000000);
+            RenderUtils.drawRect(2, 2, fr.getStringWidth(clientName) + 4, fr.FONT_HEIGHT + 2, new Color(0, 0, 0, 100));
             fr.drawString(clientName, 4, 4, 0x5555FF);
-            Gui.drawRect(2, 15, 45, 27, 0x80000000);
+            RenderUtils.drawRect(2, 15, fr.getStringWidth("FPS: " + mc.getDebugFPS()) + 4, fr.FONT_HEIGHT + 2, new Color(0, 0, 0, 100));
             fr.drawString("FPS: " + mc.getDebugFPS(), 4, 17, -1);
         } else if (type.getValue() == Type.Wurst) {
-            RenderUtils.drawRect(0, 10, 185, 22, new Color(255, 255, 255, 100));
-            RenderUtils.drawImage(wurstLogo, 2, 5.5f, 758 / 8.5f, 192 / 8.5f);
-            fr.drawString("v" + Simp.VERSION + " MC 1.8.9", 95, 14, Color.BLACK.getRGB());
+            RenderUtils.drawRect(0, 10, 223, 21, new Color(255, 255, 255, 100));
+            RenderUtils.drawImage(wurstLogo, 0, 10f, 758 / 8.5f, 192 / 8.5f);
+            mc.fontRendererObj.drawString("v7.46.1" + " MC1.8.9 (outdated)",  92, 17, Color.BLACK.getRGB());
+        }
+        if (type.getValue() == Type.Nursultan) {
+            int ping = mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()).getResponseTime();
+            if (mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()) == null) ping = 0;
+            String skibidi = clientName + " - " + mc.getDebugFPS() + " FPS" + " - " + ping + "ms";
+            RenderUtils.drawRoundedRect(2, 2, fr.getStringWidth(skibidi) + 4, fr.FONT_HEIGHT + 4, 6, new Color(0, 0, 0, 200));
+            fr.drawStringWithShadow(skibidi, 4, 4, Color.WHITE.getRGB());
         }
     };
 

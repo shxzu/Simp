@@ -19,7 +19,7 @@ import net.minecraft.util.MovingObjectPosition;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "WTap", category = ModuleCategory.COMBAT)
+@ModuleInfo(label = "W Tap", category = ModuleCategory.COMBAT)
 public class WTapModule extends Module {
 
     public ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Legit);

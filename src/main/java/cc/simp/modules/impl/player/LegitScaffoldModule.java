@@ -15,7 +15,7 @@ import org.lwjgl.input.Keyboard;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "LegitScaffold", category = ModuleCategory.PLAYER)
+@ModuleInfo(label = "Legit Scaffold", category = ModuleCategory.PLAYER)
 public final class LegitScaffoldModule extends Module {
 
     private final NumberProperty delay = new NumberProperty("Delay", 50.0, 0.0, 200.0, 10.0);

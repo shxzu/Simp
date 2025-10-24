@@ -20,7 +20,7 @@ import java.awt.*;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "NameTags", category = ModuleCategory.VISUALS)
+@ModuleInfo(label = "Name Tags", category = ModuleCategory.VISUALS)
 public final class NameTagsModule extends Module {
 
     private final Property<Boolean> showArmor = new Property<>("Show Armor", true);

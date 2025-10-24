@@ -19,7 +19,7 @@ import java.awt.*;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "ItemESP", category = ModuleCategory.VISUALS)
+@ModuleInfo(label = "Item ESP", category = ModuleCategory.VISUALS)
 public final class ItemESPModule extends Module {
 
     @EventLink

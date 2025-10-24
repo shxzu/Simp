@@ -12,7 +12,7 @@ import net.minecraft.potion.PotionEffect;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "FullBright", category = ModuleCategory.VISUALS)
+@ModuleInfo(label = "Full Bright", category = ModuleCategory.VISUALS)
 public final class FullBrightModule extends Module {
 
     private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.GAMMA);
