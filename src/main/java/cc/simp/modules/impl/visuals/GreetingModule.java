@@ -2,7 +2,6 @@ package cc.simp.modules.impl.visuals;
 
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.font.CustomFontRenderer;
-import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -15,37 +14,22 @@ import java.awt.*;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "Hello", category = ModuleCategory.VISUALS)
-public class HelloDeveloperModule extends Module {
-
-    public static final ModeProperty<Type> mode = new ModeProperty<>("Mode", Type.Developer);
-
-    public enum Type {
-        Developer,
-        Beta,
-        User,
-        Neckhurt
-    }
+@ModuleInfo(label = "Greeting", category = ModuleCategory.VISUALS)
+public class GreetingModule extends Module {
 
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = e -> {
         CustomFontRenderer fr = FontProcess.getCurrentFont();
         ScaledResolution sr = new ScaledResolution(mc);
 
-        String text = "";
-        switch (mode.getValue()) {
-            case Developer:
-                text = "Hello §bDeveloper!";
-                break;
-            case Beta:
-                text = "Hello §aBeta!";
-                break;
-            case User:
-                text = "Hello §7User!";
-                break;
-            case Neckhurt:
-                text = "Hello §0Neckhurt!";
-                break;
+        String user = mc.thePlayer.getName();
+
+        String text = "Hello §b" + user + "!";
+
+        if(user.equalsIgnoreCase("shxzu_")) {
+            text = "Hello §bDeveloper!";
+        } else if(user.equalsIgnoreCase("TheAdamMC")) {
+            text = "Hello §bDeveloper!";
         }
 
         float textWidth = fr.getStringWidth(text);

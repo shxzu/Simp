@@ -32,9 +32,12 @@ public final class ModuleManager {
                 new TickBaseModule(),
                 new LagRangeModule(),
                 new VelocityModule(),
-                new ExtraKBModule(),
                 new BackTrackModule(),
                 new WTapModule(),
+                new AutoClickerModule(),
+                new AimAssistModule(),
+                new AutoRodModule(),
+                new NoHitDelayModule(),
 
                 // Movement
                 new SprintModule(),
@@ -43,13 +46,14 @@ public final class ModuleManager {
                 new NoSlowModule(),
 
                 // Player
-                new ScaffoldWalkModule(),
+                new ScaffoldModule(),
                 new NoFallModule(),
                 new AutoToolModule(),
                 new StealerModule(),
                 new ManagerModule(),
                 new AutoArmorModule(),
                 new InvMoveModule(),
+                new LegitScaffoldModule(),
 
                 // Client
                 new ClickInterfaceModule(),
@@ -62,8 +66,12 @@ public final class ModuleManager {
                 new ESPModule(),
                 new TargetInterfaceModule(),
                 new PostProcessingModule(),
-                new HelloDeveloperModule(),
-                new NickHiderModule()
+                new NickHiderModule(),
+                new NameTagsModule(),
+                new StorageESPModule(),
+                new ChinaHatModule(),
+                new FullBrightModule(),
+                new ItemESPModule()
         );
         getModules().forEach(Module::reflectProperties);
 

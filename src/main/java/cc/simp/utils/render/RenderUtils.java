@@ -235,7 +235,7 @@ public class RenderUtils extends Util {
         glDisable(GL_LINE_SMOOTH);
     }
 
-    private static void drawOutlinedBoundingBox(final AxisAlignedBB a) {
+    public static void drawOutlinedBoundingBox(final AxisAlignedBB a) {
         final Tessellator tessellator = Tessellator.getInstance();
         final WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);

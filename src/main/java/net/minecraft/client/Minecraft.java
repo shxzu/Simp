@@ -232,7 +232,7 @@ public class Minecraft implements IThreadListener
     public GuiScreen currentScreen;
     public LoadingScreenRenderer loadingScreen;
     public EntityRenderer entityRenderer;
-    private int leftClickCounter;
+    public int leftClickCounter;
     private final int tempDisplayWidth;
     private final int tempDisplayHeight;
     private IntegratedServer theIntegratedServer;

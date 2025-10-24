@@ -115,11 +115,11 @@ public class RenderManager
     private final RenderPlayer playerRenderer;
     private FontRenderer textRenderer;
     @Getter
-    private double renderPosX;
+    public double renderPosX;
     @Getter
-    private double renderPosY;
+    public double renderPosY;
     @Getter
-    private double renderPosZ;
+    public double renderPosZ;
     public TextureManager renderEngine;
     public World worldObj;
     public Entity livingPlayer;

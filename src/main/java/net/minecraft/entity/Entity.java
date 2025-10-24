@@ -9,6 +9,8 @@ import cc.simp.Simp;
 import cc.simp.api.events.impl.player.PostStrafeEvent;
 import cc.simp.api.events.impl.player.StrafeEvent;
 import cc.simp.utils.mc.MovementUtils;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -1721,9 +1723,8 @@ public abstract class Entity implements ICommandSender
         }
     }
 
-    public float getCollisionBorderSize()
-    {
-        return 0.1F;
+    public float getCollisionBorderSize() {
+        return ViaLoadingBase.getInstance().getTargetVersion().newerThan(ProtocolVersion.v1_8) ? 0 : 0.1f;
     }
 
     public Vec3 getLookVec()

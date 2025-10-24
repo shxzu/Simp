@@ -1,15 +1,20 @@
 package cc.simp.modules.impl.combat;
 
 import cc.simp.Simp;
+import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.properties.Property;
+import cc.simp.api.properties.impl.ModeProperty;
+import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.utils.mc.PacketUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.util.MovingObjectPosition;
 
 import static cc.simp.utils.Util.mc;
@@ -17,24 +22,60 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "WTap", category = ModuleCategory.COMBAT)
 public class WTapModule extends Module {
 
+    public ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Legit);
     public static final Property<Boolean> onlyWithKillaura = new Property<>("Only With Killaura", false);
-    public static final Property<Integer> wtapChance = new Property<>("WTap Chance", 100);
+    public static final NumberProperty wtapChance = new NumberProperty("WTap Chance", 100, 0, 100, 1);
+
+    private enum Mode {
+        Legit,
+        Packet,
+        Silent
+    }
 
     private boolean shouldWTap;
     private int wtapTicks;
 
     @EventLink
-    public Listener<Render2DEvent> onRender2D = event -> {
+    public Listener<PreUpdateEvent> preUpdateEventListener = event -> {
         if (mc.thePlayer == null || mc.theWorld == null) return;
+        if (!mc.thePlayer.isSprinting() || !mc.gameSettings.keyBindForward.isPressed()) return;
 
-        if (shouldWTap && wtapTicks > 0) {
-            if (wtapTicks == 2) {
-                mc.gameSettings.keyBindForward.setPressed(false);
-            } else if (wtapTicks == 1) {
-                mc.gameSettings.keyBindForward.setPressed(true);
-                shouldWTap = false;
+        if (mode.getValue() == Mode.Legit) {
+            if (shouldWTap && wtapTicks > 0) {
+                if (wtapTicks == 2) {
+                    mc.gameSettings.keyBindForward.setPressed(false);
+                } else if (wtapTicks == 1) {
+                    mc.gameSettings.keyBindForward.setPressed(true);
+                    shouldWTap = false;
+                }
+                wtapTicks--;
             }
-            wtapTicks--;
+        }
+
+        if (mode.getValue() == Mode.Packet) {
+            if (shouldWTap && wtapTicks > 0) {
+                if (wtapTicks == 2) {
+                    PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
+                } else if (wtapTicks == 1) {
+                    PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
+                    shouldWTap = false;
+                }
+                wtapTicks--;
+            }
+        }
+
+        if (mode.getValue() == Mode.Silent) {
+            if (shouldWTap && wtapTicks > 0) {
+                if (wtapTicks == 2) {
+                    mc.thePlayer.setSprinting(false);
+                } else if (wtapTicks == 1) {
+                    mc.getNetHandler().addToSendQueue(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
+                    mc.thePlayer.serverSprintState = true;
+                    mc.thePlayer.setSprinting(true);
+                    shouldWTap = false;
+                }
+                wtapTicks--;
+            }
         }
 
         if (mc.thePlayer.isSwingInProgress && mc.objectMouseOver != null &&
@@ -43,7 +84,7 @@ public class WTapModule extends Module {
             Entity target = mc.objectMouseOver.entityHit;
 
             if (target instanceof EntityPlayer) {
-                int chance = Math.max(0, Math.min(100, wtapChance.getValue()));
+                int chance = Math.max(0, Math.min(100, wtapChance.getValue().intValue()));
                 if (mc.theWorld.rand.nextInt(100) < chance) {
                     if (!onlyWithKillaura.getValue() || isKillauraActive()) {
                         triggerWTap();
@@ -59,12 +100,8 @@ public class WTapModule extends Module {
     }
 
     private boolean isKillauraActive() {
-        Module killaura = getModule("Killaura");
-        return killaura != null && killaura.isEnabled();
-    }
-
-    private Module getModule(String name) {
-        return Simp.INSTANCE.getModuleManager().getModule(name);
+        Module killAura = Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class);
+        return killAura != null && killAura.isEnabled();
     }
 
     @Override

@@ -11,7 +11,7 @@ import cc.simp.interfaces.click.ClickInterface;
 import cc.simp.modules.ModuleManager;
 import cc.simp.modules.impl.client.ClickInterfaceModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
-import cc.simp.modules.impl.player.ScaffoldWalkModule;
+import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.processes.*;
 import cc.simp.utils.client.BuildType;
 import de.florianmichael.viamcp.ViaMCP;
@@ -81,8 +81,8 @@ public class Simp {
             moduleManager.getModule(KillAuraModule.class).setEnabled(false);
         }
 
-        if (moduleManager.getModule(ScaffoldWalkModule.class).isEnabled()) {
-            moduleManager.getModule(ScaffoldWalkModule.class).setEnabled(false);
+        if (moduleManager.getModule(ScaffoldModule.class).isEnabled()) {
+            moduleManager.getModule(ScaffoldModule.class).setEnabled(false);
         }
 
         // ViaMCP!!!
