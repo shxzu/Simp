@@ -427,20 +427,20 @@ public final class ScaffoldModule extends Module {
 
                 break;
             case SlowTelly:
-                    if (mc.thePlayer.offGroundTicks >= 3 && mc.thePlayer.offGroundTicks <= (!keepY.getValue() ? 9 : 10)) {
-                        if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue().equals(RayCast.Strict))) {
-                            getBaseRotations();
-                        }
-                    } else {
+                if (mc.thePlayer.offGroundTicks >= 3 && mc.thePlayer.offGroundTicks <= (!keepY.getValue() ? 7 : 8)) {
+                    if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue().equals(RayCast.Strict))) {
                         getBaseRotations();
-                        targetYaw = mc.thePlayer.rotationYaw;
                     }
-                    if (mc.thePlayer.offGroundTicks <= 3) {
-                        canPlace = false;
-                    }
+                } else {
+                    getBaseRotations();
+                    targetYaw = mc.thePlayer.rotationYaw;
+                }
+                if (mc.thePlayer.offGroundTicks <= 3) {
+                    canPlace = false;
+                }
                 break;
             case FastTelly:
-                if (mc.thePlayer.offGroundTicks >= 3 && mc.thePlayer.offGroundTicks <= (!keepY.getValue() ? 8 : 9)) {
+                if (mc.thePlayer.offGroundTicks >= 3 && mc.thePlayer.offGroundTicks <= (!keepY.getValue() ? 9 : 10)) {
                     if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue().equals(RayCast.Strict))) {
                         getBaseRotations();
                     }
@@ -453,15 +453,14 @@ public final class ScaffoldModule extends Module {
                 }
                 break;
             case Hypixel:
-                if (mc.thePlayer.offGroundTicks >= 3 && mc.thePlayer.offGroundTicks <= (!keepY.getValue() ? 9 : 10)) {
+                if (mc.thePlayer.offGroundTicks >= 3 && mc.thePlayer.offGroundTicks <= (!keepY.getValue() ? 6 : 7)) {
                     if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue().equals(RayCast.Strict))) {
                         getBaseRotations();
                     }
                 } else {
-                    targetPitch = 62;
+                    getBaseRotations();
                     targetYaw = mc.thePlayer.rotationYaw;
                 }
-
                 if (mc.thePlayer.offGroundTicks <= 3) {
                     canPlace = false;
                 }
