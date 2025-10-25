@@ -3,6 +3,7 @@ package cc.simp.modules;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.KeyPressEvent;
 import cc.simp.modules.impl.client.ClickInterfaceModule;
+import cc.simp.modules.impl.client.ClientSpooferModule;
 import cc.simp.modules.impl.client.DisablerModule;
 import cc.simp.modules.impl.combat.*;
 import cc.simp.modules.impl.movement.FlightModule;
@@ -58,6 +59,7 @@ public final class ModuleManager {
                 // Client
                 new ClickInterfaceModule(),
                 new DisablerModule(),
+                new ClientSpooferModule(),
 
                 // Visuals
                 new ArrayListModule(),
