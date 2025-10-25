@@ -1292,7 +1292,7 @@ public class Minecraft implements IThreadListener
 
                 if (itemstack1 != null && this.playerController.sendUseItem(this.thePlayer, this.theWorld, itemstack1))
                 {
-                    this.entityRenderer.itemRenderer.resetEquippedProgress2();
+                    this.entityRenderer.itemRenderer.resetEquippedProgress();
                 }
             }
         }

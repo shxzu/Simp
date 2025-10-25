@@ -1,5 +1,6 @@
 package cc.simp.modules.impl.visuals;
 
+import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
@@ -15,6 +16,7 @@ public final class CameraModule extends Module {
     public static NumberProperty z = new NumberProperty("Z", 0.0F, -2.0F, 2.0F, 0.05f);
     public static NumberProperty scale = new NumberProperty("Scale", 1, 0.1, 2, 0.1);
     public static NumberProperty swingSpeed = new NumberProperty("Swing Speed", 1, -200, 50, 1);
+    public static Property<Boolean> equipProgress = new Property<>("Equip Progress", false);
 
     public CameraModule() {
         this.toggle();

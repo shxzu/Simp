@@ -6,6 +6,7 @@ import cc.simp.utils.Util;
 import cc.simp.utils.client.EnumFacingOffset;
 import cc.simp.utils.client.MathUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.*;
@@ -119,11 +120,24 @@ public class RotationUtils extends Util {
         return new Vector2f(yaw, MathHelper.clamp_float(pitch, -90, 90));
     }
 
-    public Vector2f relateToPlayerRotation(final Vector2f rotation) {
-        final Vector2f previousRotation = mc.thePlayer.getPreviousRotation();
-        final float yaw = previousRotation.x + MathHelper.wrapAngleTo180_float(rotation.x - previousRotation.x);
-        final float pitch = MathHelper.clamp_float(rotation.y, -90, 90);
-        return new Vector2f(yaw, pitch);
+    public static float[] faceTrajectory(Entity target, boolean predict, float predictSize, float gravity, float velocity) {
+        EntityPlayerSP player = mc.thePlayer;
+
+        double posX = target.posX + (predict ? (target.posX - target.prevPosX) * predictSize : 0.0) - (player.posX + (predict ? player.posX - player.prevPosX : 0.0));
+        double posY = target.getEntityBoundingBox().minY + (predict ? (target.getEntityBoundingBox().minY - target.prevPosY) * predictSize : 0.0) + target.getEyeHeight() - 0.15 - (player.getEntityBoundingBox().minY + (predict ? player.posY - player.prevPosY : 0.0)) - player.getEyeHeight();
+        double posZ = target.posZ + (predict ? (target.posZ - target.prevPosZ) * predictSize : 0.0) - (player.posZ + (predict ? player.posZ - player.prevPosZ : 0.0));
+        double posSqrt = Math.sqrt(posX * posX + posZ * posZ);
+
+        velocity = Math.min((velocity * velocity + velocity * 2) / 3, 1f);
+
+        float gravityModifier = 0.12f * gravity;
+
+        return new float[]{
+                (float) Math.toDegrees(Math.atan2(posZ, posX)) - 90f,
+                (float) -Math.toDegrees(Math.atan((velocity * velocity - Math.sqrt(
+                        velocity * velocity * velocity * velocity - gravityModifier * (gravityModifier * posSqrt * posSqrt + 2 * posY * velocity * velocity)
+                )) / (gravityModifier * posSqrt)))
+        };
     }
 
     public static Vector2f resetRotation(final Vector2f rotation) {

@@ -55,6 +55,7 @@ public final class ModuleManager {
                 new AutoArmorModule(),
                 new InvMoveModule(),
                 new LegitScaffoldModule(),
+                new BedNukerModule(),
 
                 // Client
                 new ClickInterfaceModule(),

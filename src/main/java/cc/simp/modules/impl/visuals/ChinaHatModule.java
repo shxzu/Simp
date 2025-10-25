@@ -7,6 +7,7 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.ColorProcess;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.renderer.GlStateManager;
@@ -130,9 +131,7 @@ public final class ChinaHatModule extends Module {
     };
 
     private Color getChinaHatColor() {
-        long time = System.currentTimeMillis();
-        float hue = (time % 10000) / 10000.0f;
-        return Color.getHSBColor(hue, 0.8f, 1.0f);
+      return ColorProcess.getColor();
     }
 
     @Override

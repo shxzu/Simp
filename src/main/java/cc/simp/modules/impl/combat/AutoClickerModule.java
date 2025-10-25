@@ -1,5 +1,6 @@
 package cc.simp.modules.impl.combat;
 
+import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.properties.Property;
@@ -31,7 +32,7 @@ public final class AutoClickerModule extends Module {
     private long rightLastClick = 0;
 
     @EventLink
-    public final Listener<MoveEvent> moveEventListener = e -> {
+    public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
             handleRightClick();
             handleLeftClick();
     };

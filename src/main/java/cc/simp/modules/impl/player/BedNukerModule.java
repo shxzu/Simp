@@ -1,11 +1,14 @@
 package cc.simp.modules.impl.player;
 
+import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.RotationProcess;
+import cc.simp.utils.misc.MovementFix;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.block.Block;
@@ -17,14 +20,16 @@ import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
+import org.lwjgl.util.vector.Vector2f;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "BedNuker", category = ModuleCategory.PLAYER)
+@ModuleInfo(label = "Bed Nuker", category = ModuleCategory.PLAYER)
 public final class BedNukerModule extends Module {
 
     private final NumberProperty breakRange = new NumberProperty("Break Range", 4.5, 1.0, 6.0, 0.1);
     private final Property<Boolean> whitelistOwnBed = new Property<>("Whitelist Own Bed", true);
+    private final Property<Boolean> moveFix = new Property<>("Movement Fix", true);
 
     private BlockPos bedPos;
     private boolean rotate = false;
@@ -33,8 +38,7 @@ public final class BedNukerModule extends Module {
     private Vec3 home;
 
     @EventLink
-    public final Listener<MotionEvent> motionEventListener = e -> {
-        if (e.isPre()) {
+    public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
             if (mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock) {
                 reset(true);
                 return;
@@ -45,15 +49,13 @@ public final class BedNukerModule extends Module {
             if (bedPos != null) {
                 if (rotate) {
                     float[] rot = getRotationToBlock(bedPos, getEnumFacing(bedPos));
-                    e.setYaw(rot[0]);
-                    e.setPitch(rot[1]);
+                    RotationProcess.setRotations(new Vector2f(rot[0], rot[1]), 7, moveFix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
                     rotate = false;
                 }
                 mine(bedPos);
             } else {
                 reset(true);
             }
-        }
     };
 
     private void getBedPos() {

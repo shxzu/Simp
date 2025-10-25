@@ -2,6 +2,7 @@ package cc.simp.modules.impl.combat;
 
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
+import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
@@ -36,13 +37,13 @@ public class WTapModule extends Module {
     private int wtapTicks;
 
     @EventLink
-    public Listener<PreUpdateEvent> preUpdateEventListener = event -> {
+    public Listener<MoveEvent> moveEventListener = event -> {
         if (mc.thePlayer == null || mc.theWorld == null) return;
-        if (!mc.thePlayer.isSprinting() || !mc.gameSettings.keyBindForward.isPressed()) return;
 
         if (mode.getValue() == Mode.Legit) {
             if (shouldWTap && wtapTicks > 0) {
                 if (wtapTicks == 2) {
+                    if (!mc.gameSettings.keyBindForward.isPressed()) return;
                     mc.gameSettings.keyBindForward.setPressed(false);
                 } else if (wtapTicks == 1) {
                     mc.gameSettings.keyBindForward.setPressed(true);
@@ -55,6 +56,7 @@ public class WTapModule extends Module {
         if (mode.getValue() == Mode.Packet) {
             if (shouldWTap && wtapTicks > 0) {
                 if (wtapTicks == 2) {
+                    if (!mc.gameSettings.keyBindForward.isPressed()) return;
                     PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
                 } else if (wtapTicks == 1) {
                     PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
@@ -67,6 +69,7 @@ public class WTapModule extends Module {
         if (mode.getValue() == Mode.Silent) {
             if (shouldWTap && wtapTicks > 0) {
                 if (wtapTicks == 2) {
+                    if (!mc.gameSettings.keyBindForward.isPressed()) return;
                     mc.thePlayer.setSprinting(false);
                 } else if (wtapTicks == 1) {
                     mc.getNetHandler().addToSendQueue(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
@@ -113,9 +116,6 @@ public class WTapModule extends Module {
 
     @Override
     public void onDisable() {
-        if (mc.gameSettings != null) {
-            mc.gameSettings.keyBindForward.setPressed(true);
-        }
         shouldWTap = false;
         wtapTicks = 0;
         super.onDisable();

@@ -12,16 +12,14 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
 
-@ModuleInfo(label = "ClientSpoofer", category = ModuleCategory.CLIENT)
+@ModuleInfo(label = "Client Spoofer", category = ModuleCategory.CLIENT)
 public final class ClientSpooferModule extends Module {
 
-    private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.LUNAR);
-    private final Property<String> customName = new Property<>("Custom Name", "A client", () -> mode.getValue() == Mode.CUSTOM);
+    private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Lunar);
 
     private enum Mode {
-        LUNAR("Lunar"),
-        FEATHER("Feather"),
-        CUSTOM("Custom");
+        Lunar("Lunar"),
+        Feather("Feather");
 
         public final String name;
 
@@ -40,14 +38,11 @@ public final class ClientSpooferModule extends Module {
         if (e.getPacket() instanceof C17PacketCustomPayload) {
             String data;
             switch (mode.getValue()) {
-                case LUNAR:
+                case Lunar:
                     data = "lunarclient:v2.14.5-2411";
                     break;
-                case FEATHER:
+                case Feather:
                     data = "Feather Forge";
-                    break;
-                case CUSTOM:
-                    data = customName.getValue();
                     break;
                 default:
                     data = "";

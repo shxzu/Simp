@@ -31,7 +31,6 @@ public final class AimAssistModule extends Module {
     private final Property<Boolean> onlyOnClick = new Property<>("Only On Click", true);
     private final NumberProperty resetTime = new NumberProperty("Reset Time", 500.0, () -> onlyOnClick.getValue(), 0.0, 1000.0, 1.0);
     private final Property<Boolean> teamCheck = new Property<>("Team Check", false);
-    private final Property<Boolean> targetESP = new Property<>("Target ESP", false);
 
     private EntityLivingBase target;
     private boolean angleCalled;
@@ -57,20 +56,11 @@ public final class AimAssistModule extends Module {
 
             if (angleCalled && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.MISS) {
                 float[] rotations = getRotationsToEntity(target);
-                RotationProcess.setRotations(new Vector2f(rotations[0], rotations[1]), 5, MovementFix.NORMAL);
+                mc.thePlayer.rotationYaw = rotations[0];
+                mc.thePlayer.rotationPitch = rotations[1];
             }
 
             angleCalled = false;
-    };
-
-    @EventLink
-    public final Listener<Render3DEvent> render3DEventListener = e -> {
-        if (target != null && targetESP.getValue()) {
-            double x = target.posX - mc.getRenderManager().renderPosX;
-            double y = target.posY - mc.getRenderManager().renderPosY + target.height;
-            double z = target.posZ - mc.getRenderManager().renderPosZ;
-            RenderUtils.drawCircle(x, y, 0.5, Color.RED.getRGB());
-        }
     };
 
     private EntityLivingBase getTarget(float range, boolean teamCheck) {

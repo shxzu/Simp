@@ -599,10 +599,7 @@ public class ItemRenderer {
     }
 
     public void resetEquippedProgress() {
-        this.equippedProgress = 0.0F;
-    }
-
-    public void resetEquippedProgress2() {
+        if (Simp.INSTANCE.getModuleManager().getModule(CameraModule.class).isEnabled() && CameraModule.equipProgress.getValue() == false) return;
         this.equippedProgress = 0.0F;
     }
 }

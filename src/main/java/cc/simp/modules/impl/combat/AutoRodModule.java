@@ -1,11 +1,16 @@
 package cc.simp.modules.impl.combat;
 
+import cc.simp.Simp;
+import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.RotationProcess;
+import cc.simp.utils.mc.RotationUtils;
+import cc.simp.utils.misc.MovementFix;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.entity.Entity;
@@ -17,6 +22,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
+import org.lwjgl.util.vector.Vector2f;
 
 import static cc.simp.utils.Util.mc;
 
@@ -28,7 +34,9 @@ public final class AutoRodModule extends Module {
     private final NumberProperty maxDelay = new NumberProperty("Max Delay", 100.0, 0.0, 1000.0, 5.0);
     private final NumberProperty maxRecastDelay = new NumberProperty("Max Recast Delay", 100.0, 0.0, 1000.0, 5.0);
     private final NumberProperty fov = new NumberProperty("FOV", 90.0, 0.0, 360.0, 1.0);
+    private final Property<Boolean> ka = new Property<>("Only On Kill Aura", false);
     private final Property<Boolean> rotate = new Property<>("Rotate", true);
+    private final NumberProperty predictSize = new NumberProperty("Predict Size", 2, rotate::getValue, 0.1f, 10, 0.1f);
     private final Property<Boolean> players = new Property<>("Players", true);
     private final Property<Boolean> nonPlayers = new Property<>("Non Players", true);
     private final Property<Boolean> teams = new Property<>("Teams", true);
@@ -42,37 +50,46 @@ public final class AutoRodModule extends Module {
     private long lastRecastTime;
 
     @EventLink
-    public final Listener<MotionEvent> motionEventListener = e -> {
-        if (e.isPre()) {
-            currentTarget = findTarget();
+    public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
 
-            if (currentTarget == null || !mc.thePlayer.canEntityBeSeen(currentTarget) || mc.thePlayer.isUsingItem()) {
-                reset();
-                return;
-            }
+        currentTarget = findTarget();
 
-            float range = mc.thePlayer.getDistanceToEntity(currentTarget);
+        if (currentTarget == null || !mc.thePlayer.canEntityBeSeen(currentTarget) || mc.thePlayer.isUsingItem()) {
+            reset();
+            return;
+        }
 
-            if (range >= minRange.getValue() && range <= maxRange.getValue()) {
-                if (getRotationDifference(currentTarget) <= fov.getValue()) {
-                    if (!usingRod) {
-                        if (System.currentTimeMillis() - lastUseTime >= maxDelay.getValue() || currentTarget.hurtTime <= 3) {
-                            int rod = findRod();
-                            if (rod != -1) {
-                                useRod(rod);
-                                usingRod = true;
-                                lastRecastTime = System.currentTimeMillis();
-                            }
-                        }
-                    } else {
-                        if (System.currentTimeMillis() - lastRecastTime >= maxRecastDelay.getValue() || currentTarget.hurtTime >= 9) {
-                            reset();
+        float range = mc.thePlayer.getDistanceToEntity(currentTarget);
+
+        if (range >= minRange.getValue() && range <= maxRange.getValue()) {
+            if (getRotationDifference(currentTarget) <= fov.getValue()) {
+                if (!usingRod) {
+                    if (System.currentTimeMillis() - lastUseTime >= maxDelay.getValue() || currentTarget.hurtTime <= 3) {
+                        int rod = findRod();
+                        if (rod != -1) {
+                            useRod(rod);
+                            usingRod = true;
+                            lastRecastTime = System.currentTimeMillis();
                         }
                     }
+                } else {
+                    if (System.currentTimeMillis() - lastRecastTime >= maxRecastDelay.getValue() || currentTarget.hurtTime >= 9) {
+                        reset();
+                    }
                 }
-            } else {
-                reset();
             }
+        } else {
+            reset();
+        }
+
+        if ((!Simp.INSTANCE.getModuleManager().getModule((KillAuraModule.class)).isEnabled() && ka.getValue())) {
+            return;
+        }
+
+        if (rotate.getValue() && KillAuraModule.target == null && range > minRange.getValue() && range <= maxRange.getValue()) {
+            float[] finalRotation = RotationUtils.faceTrajectory(currentTarget, true, predictSize.getValue().floatValue(), 0.03f, 2f);
+
+            RotationProcess.setRotations(new Vector2f(finalRotation[0], finalRotation[1]), 10, MovementFix.NORMAL);
         }
     };
 
