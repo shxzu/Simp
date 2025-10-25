@@ -9,7 +9,7 @@ import io.github.nevalackin.homoBus.annotations.EventLink;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "NoHitDelay", category = ModuleCategory.COMBAT)
+@ModuleInfo(label = "No Hit Delay", category = ModuleCategory.COMBAT)
 public final class NoHitDelayModule extends Module {
 
     @EventLink

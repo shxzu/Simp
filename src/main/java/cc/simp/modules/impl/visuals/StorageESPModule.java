@@ -23,7 +23,7 @@ import java.util.List;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "StorageESP", category = ModuleCategory.VISUALS)
+@ModuleInfo(label = "Storage ESP", category = ModuleCategory.VISUALS)
 public final class StorageESPModule extends Module {
 
     private final Property<Boolean> chests = new Property<>("Chests", true);

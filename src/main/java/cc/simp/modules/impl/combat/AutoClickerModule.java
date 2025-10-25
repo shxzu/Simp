@@ -1,6 +1,7 @@
 package cc.simp.modules.impl.combat;
 
 import cc.simp.api.events.impl.player.MotionEvent;
+import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
@@ -14,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "AutoClicker", category = ModuleCategory.COMBAT)
+@ModuleInfo(label = "Auto Clicker", category = ModuleCategory.COMBAT)
 public final class AutoClickerModule extends Module {
 
     private final Property<Boolean> left = new Property<>("Left Click", true);
@@ -30,11 +31,9 @@ public final class AutoClickerModule extends Module {
     private long rightLastClick = 0;
 
     @EventLink
-    public final Listener<MotionEvent> motionEventListener = e -> {
-        if (e.isPre()) {
+    public final Listener<MoveEvent> moveEventListener = e -> {
             handleRightClick();
             handleLeftClick();
-        }
     };
 
     private void handleRightClick() {

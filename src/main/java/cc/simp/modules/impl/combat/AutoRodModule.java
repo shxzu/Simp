@@ -20,7 +20,7 @@ import net.minecraft.util.MovingObjectPosition;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "AutoRod", category = ModuleCategory.COMBAT)
+@ModuleInfo(label = "Auto Rod", category = ModuleCategory.COMBAT)
 public final class AutoRodModule extends Module {
 
     private final NumberProperty minRange = new NumberProperty("Min Range", 3.0, 1.0, 8.0, 0.1);

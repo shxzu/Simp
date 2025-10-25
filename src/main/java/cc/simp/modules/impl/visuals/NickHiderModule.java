@@ -17,7 +17,7 @@ import java.util.Collection;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "NickHider", category = ModuleCategory.VISUALS)
+@ModuleInfo(label = "Nick Hider", category = ModuleCategory.VISUALS)
 public class NickHiderModule extends Module {
 
     private final String fakeName = EnumChatFormatting.RED + "" + EnumChatFormatting.BOLD + "You";
