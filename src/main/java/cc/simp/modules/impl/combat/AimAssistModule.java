@@ -8,6 +8,7 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.modules.impl.client.AntiBotModule;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.misc.MovementFix;
 import cc.simp.utils.render.RenderUtils;
@@ -54,10 +55,9 @@ public final class AimAssistModule extends Module {
                 return;
             }
 
-            if (angleCalled && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.MISS) {
+            if (angleCalled && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
                 float[] rotations = getRotationsToEntity(target);
-                mc.thePlayer.rotationYaw = rotations[0];
-                mc.thePlayer.rotationPitch = rotations[1];
+                RotationProcess.setRotations(new Vector2f(rotations[0], rotations[1]), 5, MovementFix.NORMAL);
             }
 
             angleCalled = false;
@@ -68,6 +68,7 @@ public final class AimAssistModule extends Module {
         double closestDistance = range;
 
         for (Entity entity : mc.theWorld.loadedEntityList) {
+            if (!AntiBotModule.botList.contains(entity)) return null;
             if (entity instanceof EntityLivingBase && entity != mc.thePlayer && !entity.isDead) {
                 EntityLivingBase living = (EntityLivingBase) entity;
 

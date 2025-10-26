@@ -47,7 +47,7 @@ public final class LagRangeModule extends Module {
 
     @EventLink
     public Listener<PreUpdateEvent> onPreUpdate = event -> {
-        setSuffix(modeProperty.getValue().toString());
+        setSuffix(modeProperty.getValue() == Mode.Range ? String.valueOf(rangeToUnblinkProperty.getValue().intValue()) : String.valueOf(timer.getTime()));
 
         if(modeProperty.getValue() == Mode.Time) {
             if(timer.hasTimeElapsed(500L) && !blinked) {

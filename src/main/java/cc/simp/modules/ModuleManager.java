@@ -2,14 +2,9 @@ package cc.simp.modules;
 
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.KeyPressEvent;
-import cc.simp.modules.impl.client.ClickInterfaceModule;
-import cc.simp.modules.impl.client.ClientSpooferModule;
-import cc.simp.modules.impl.client.DisablerModule;
+import cc.simp.modules.impl.client.*;
 import cc.simp.modules.impl.combat.*;
-import cc.simp.modules.impl.movement.FlightModule;
-import cc.simp.modules.impl.movement.NoSlowModule;
-import cc.simp.modules.impl.movement.SpeedModule;
-import cc.simp.modules.impl.movement.SprintModule;
+import cc.simp.modules.impl.movement.*;
 import cc.simp.modules.impl.player.*;
 import cc.simp.modules.impl.visuals.*;
 import com.google.common.collect.ImmutableClassToInstanceMap;
@@ -30,6 +25,8 @@ public final class ModuleManager {
                 // Combat
                 new KillAuraModule(),
                 new TPAuraModule(),
+                new TargetStrafeModule(),
+                new CriticalsModule(),
                 new TickBaseModule(),
                 new LagRangeModule(),
                 new VelocityModule(),
@@ -38,6 +35,7 @@ public final class ModuleManager {
                 new AutoClickerModule(),
                 new AimAssistModule(),
                 new AutoRodModule(),
+                new AutoPotModule(),
                 new NoHitDelayModule(),
 
                 // Movement
@@ -45,11 +43,17 @@ public final class ModuleManager {
                 new SpeedModule(),
                 new FlightModule(),
                 new NoSlowModule(),
+                new StepModule(),
+                new PhaseModule(),
 
                 // Player
                 new ScaffoldModule(),
                 new NoFallModule(),
+                new AntiVoidModule(),
                 new AutoToolModule(),
+                new FastBreakModule(),
+                new FastUseModule(),
+                new FastPlaceModule(),
                 new StealerModule(),
                 new ManagerModule(),
                 new AutoArmorModule(),
@@ -59,13 +63,20 @@ public final class ModuleManager {
 
                 // Client
                 new ClickInterfaceModule(),
+                new AntiBotModule(),
                 new DisablerModule(),
+                new FakeLagModule(),
                 new ClientSpooferModule(),
+                new TimerModule(),
+                new BlinkModule(),
+                new NoRotateModule(),
+                new InsultsModule(),
 
                 // Visuals
                 new ArrayListModule(),
                 new WatermarkModule(),
                 new CameraModule(),
+                new AmbienceModule(),
                 new ESPModule(),
                 new TargetInterfaceModule(),
                 new PostProcessingModule(),

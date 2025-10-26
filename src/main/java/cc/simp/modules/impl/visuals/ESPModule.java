@@ -6,6 +6,7 @@ import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.modules.impl.client.AntiBotModule;
 import cc.simp.processes.ColorProcess;
 import cc.simp.utils.render.ESPUtils;
 import io.github.nevalackin.homoBus.Listener;
@@ -46,6 +47,7 @@ public final class ESPModule extends Module {
                 GlStateManager.disableCull();
                 GL11.glDepthMask(false);
                 for (Entity entity : mc.theWorld.loadedEntityList) {
+                    if(!AntiBotModule.botList.contains(entity)) return;
                     if (players.getValue() ? entity instanceof EntityPlayer : entity != null && entity != null && !entity.equals(mc.thePlayer)) {
                         ESPUtils.drawEntityESP(entity, red, green, blue, 0.5f, 1.0f, 6.0f);
                     }
@@ -67,7 +69,8 @@ public final class ESPModule extends Module {
                 GlStateManager.disableCull();
                 GL11.glDepthMask(false);
                 for (Entity entity : mc.theWorld.loadedEntityList) {
-                    if (players.getValue() ? entity instanceof EntityPlayer : entity != null && entity != null && !entity.equals(mc.thePlayer)) {
+                    if (!AntiBotModule.botList.contains(entity)) return;
+                    if (players.getValue() ? entity instanceof EntityPlayer && !entity.equals(mc.thePlayer) : entity != null && !entity.equals(mc.thePlayer)) {
                         ESPUtils.drawEntityESP(entity, red, green, blue, 0.5f, 1.0f, 0.0f);
                     }
                 }
@@ -88,6 +91,7 @@ public final class ESPModule extends Module {
                 GlStateManager.disableCull();
                 GL11.glDepthMask(false);
                 for (Entity entity : mc.theWorld.loadedEntityList) {
+                    if(!AntiBotModule.botList.contains(entity)) return;
                     if (players.getValue() ? entity instanceof EntityPlayer : entity != null && entity != null && !entity.equals(mc.thePlayer)) {
                         ESPUtils.drawOutlineEntityESP(entity, red, green, blue, 0.5f, 1.0f, 0.0f);
                     }
@@ -109,6 +113,7 @@ public final class ESPModule extends Module {
                 GlStateManager.disableCull();
                 GL11.glDepthMask(false);
                 for (Entity entity : mc.theWorld.loadedEntityList) {
+                    if(!AntiBotModule.botList.contains(entity)) return;
                     if (players.getValue() ? entity instanceof EntityPlayer : entity != null && entity != null && !entity.equals(mc.thePlayer)) {
                         ESPUtils.drawCornerESP(entity, red, green, blue);
                     }
@@ -130,6 +135,7 @@ public final class ESPModule extends Module {
                 GlStateManager.disableCull();
                 GL11.glDepthMask(false);
                 for (Entity entity : mc.theWorld.loadedEntityList) {
+                    if(!AntiBotModule.botList.contains(entity)) return;
                     if (players.getValue() ? entity instanceof EntityPlayer : entity != null && entity != null && !entity.equals(mc.thePlayer)) {
                         ESPUtils.drawFake2DESP(entity, red, green, blue);
                     }

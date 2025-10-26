@@ -22,7 +22,7 @@ import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Manager", category = ModuleCategory.PLAYER)
 public final class ManagerModule extends Module {
-    public ModeProperty modeProperty = new ModeProperty<>("Mode", Mode.Open);
+    public ModeProperty<Mode> modeProperty = new ModeProperty<>("Mode", Mode.Open);
     public Property<Boolean> stopProperty = new Property<>("Stop", true, () -> this.modeProperty.getValue() == Mode.Spoof);
     public Property<Boolean> throwGarbageProperty = new Property<>("Throw Garbage", true);
     public NumberProperty startDelayProperty = new NumberProperty("Start Delay", 150.0, 0.0, 1000.0, 1.0);
@@ -47,7 +47,7 @@ public final class ManagerModule extends Module {
     public Timer startTimer = new Timer();
     public Timer timer = new Timer();
 
-    private enum Mode {
+    public enum Mode {
         Open,
         Spoof
     }

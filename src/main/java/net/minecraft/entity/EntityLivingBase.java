@@ -631,6 +631,10 @@ public abstract class EntityLivingBase extends Entity
         return this.activePotionsMap.get(Integer.valueOf(potionIn.id));
     }
 
+    public PotionEffect getActivePotionEffect(final int potionId) {
+        return this.activePotionsMap.get(potionId);
+    }
+
     public void addPotionEffect(PotionEffect potioneffectIn)
     {
         if (this.isPotionApplicable(potioneffectIn))

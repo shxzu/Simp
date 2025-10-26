@@ -110,6 +110,12 @@ object Display {
     fun create(pixelFormat: PixelFormat?) {
         // Setup an error callback. The default implementation
         GLFWErrorCallback.createPrint(System.err).set()
+
+        if(System.getProperty("os.name").lowercase().contains("linux")) {
+            // on linux we need to set x11 hint before init because idk why wayland doesn't work
+            GLFW.glfwInitHint(GLFW.GLFW_PLATFORM, GLFW.GLFW_PLATFORM_X11)
+        }
+
         check(GLFW.glfwInit()) { "Unable to initialize GLFW" }
         // Configure GLFW
         GLFW.glfwDefaultWindowHints() // optional, the current window hints are already the default

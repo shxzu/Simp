@@ -248,7 +248,7 @@ public class Minecraft implements IThreadListener
     private final Proxy proxy;
     private ISaveFormat saveLoader;
     private static int debugFPS;
-    private int rightClickDelayTimer;
+    public int rightClickDelayTimer;
     private String serverName;
     private int serverPort;
     public boolean inGameHasFocus;

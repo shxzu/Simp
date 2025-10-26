@@ -97,6 +97,10 @@ public class MovementUtils extends Util {
         e.setPosZ(z * speed);
     }
 
+    public static double predictedMotion(final double motion) {
+        return (motion - 0.08) * 0.98F;
+    }
+
     public void strafe(MotionEvent event) {
         strafe(event, getSpeed());
     }

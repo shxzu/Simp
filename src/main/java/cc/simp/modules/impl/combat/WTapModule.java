@@ -40,6 +40,8 @@ public class WTapModule extends Module {
     public Listener<MoveEvent> moveEventListener = event -> {
         if (mc.thePlayer == null || mc.theWorld == null) return;
 
+        setSuffix(mode.getValue().toString());
+
         if (mode.getValue() == Mode.Legit) {
             if (shouldWTap && wtapTicks > 0) {
                 if (wtapTicks == 2) {

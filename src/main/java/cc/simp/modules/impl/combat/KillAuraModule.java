@@ -10,6 +10,7 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.modules.impl.client.AntiBotModule;
 import cc.simp.processes.LagProcess;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.client.MathUtils;
@@ -102,7 +103,7 @@ public final class KillAuraModule extends Module {
     public static EntityLivingBase target;
     public static boolean autoBlocking = false;
     public static boolean canAttack = true;
-    private List<Entity> targetList = new CopyOnWriteArrayList<>();
+    List<Entity> targetList = new CopyOnWriteArrayList<>();
     private static final Timer attackTimer = new Timer();
     private static final Timer switchTimer = new Timer();
     int blockTicks = 0;
@@ -378,6 +379,7 @@ public final class KillAuraModule extends Module {
                 .filter(entity -> !entity.isDead)
                 .filter(entity -> ((EntityLivingBase) entity).getHealth() > 0)
                 .filter(entity -> mc.thePlayer.getDistanceToEntity(entity) <= seekRange.getValue())
+                .filter(entity -> !AntiBotModule.botList.contains(entity))
                 .filter(this::isValidEntity)
                 .collect(Collectors.toList());
     }

@@ -43,6 +43,7 @@ public class NoFallModule extends Module {
 
     @EventLink
     private final Listener<MotionEvent> motionEventListener = e -> {
+        setSuffix(mode.getValue().toString());
         if (mode.getValue() == Mode.Vanilla) {
             if (mc.thePlayer.fallDistance >= 3) {
                 PacketUtils.sendPacket(new C03PacketPlayer(true));

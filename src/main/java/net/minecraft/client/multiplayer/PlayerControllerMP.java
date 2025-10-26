@@ -2,6 +2,8 @@ package net.minecraft.client.multiplayer;
 
 import cc.simp.Simp;
 import cc.simp.api.events.impl.player.AttackEvent;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -37,8 +39,12 @@ public class PlayerControllerMP
     private final NetHandlerPlayClient netClientHandler;
     private BlockPos currentBlock = new BlockPos(-1, -1, -1);
     private ItemStack currentItemHittingBlock;
+    @Getter
+    @Setter
     public float curBlockDamageMP;
     private float stepSoundTickCounter;
+    @Getter
+    @Setter
     private int blockHitDelay;
     private boolean isHittingBlock;
     private WorldSettings.GameType currentGameType = WorldSettings.GameType.SURVIVAL;

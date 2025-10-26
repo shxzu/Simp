@@ -3,6 +3,8 @@ package net.minecraft.network.play.server;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
+
+import lombok.Setter;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -12,7 +14,9 @@ public class S08PacketPlayerPosLook implements Packet<INetHandlerPlayClient>
     private double x;
     private double y;
     private double z;
+    @Setter
     private float yaw;
+    @Setter
     private float pitch;
     private Set<S08PacketPlayerPosLook.EnumFlags> field_179835_f;
 

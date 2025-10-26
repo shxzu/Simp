@@ -56,6 +56,7 @@ public abstract class Entity implements ICommandSender
     public Entity riddenByEntity;
     public Entity ridingEntity;
     public boolean forceSpawn;
+    public boolean moved = false;
     public World worldObj;
     public double prevPosX;
     public double prevPosY;
@@ -264,6 +265,9 @@ public abstract class Entity implements ICommandSender
             onGroundTicks = 0;
             offGroundTicks++;
         }
+        if (getPositionVector().distanceTo(new Vec3(lastTickPosX, lastTickPosY, lastTickPosZ)) > 0.1) {
+            moved = true;
+        }
         this.onEntityUpdate();
     }
 
@@ -272,6 +276,10 @@ public abstract class Entity implements ICommandSender
         if (this.ridingEntity != null && this.ridingEntity.isDead)
         {
             this.ridingEntity = null;
+        }
+
+        if (this.ticksExisted > 10 && (Math.abs(this.prevPosX - this.posX) > 0.2 || Math.abs(this.prevPosY - this.posY) > 0.2 || Math.abs(this.prevPosZ - this.posZ) > 0.2)) {
+            this.moved = true;
         }
 
         this.prevDistanceWalkedModified = this.distanceWalkedModified;

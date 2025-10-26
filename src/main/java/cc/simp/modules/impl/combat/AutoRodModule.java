@@ -8,6 +8,7 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.modules.impl.client.AntiBotModule;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.mc.RotationUtils;
 import cc.simp.utils.misc.MovementFix;
@@ -52,6 +53,10 @@ public final class AutoRodModule extends Module {
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
 
+        if ((!Simp.INSTANCE.getModuleManager().getModule((KillAuraModule.class)).isEnabled() && ka.getValue())) {
+            return;
+        }
+
         currentTarget = findTarget();
 
         if (currentTarget == null || !mc.thePlayer.canEntityBeSeen(currentTarget) || mc.thePlayer.isUsingItem()) {
@@ -82,10 +87,6 @@ public final class AutoRodModule extends Module {
             reset();
         }
 
-        if ((!Simp.INSTANCE.getModuleManager().getModule((KillAuraModule.class)).isEnabled() && ka.getValue())) {
-            return;
-        }
-
         if (rotate.getValue() && KillAuraModule.target == null && range > minRange.getValue() && range <= maxRange.getValue()) {
             float[] finalRotation = RotationUtils.faceTrajectory(currentTarget, true, predictSize.getValue().floatValue(), 0.03f, 2f);
 
@@ -98,6 +99,7 @@ public final class AutoRodModule extends Module {
         double closestDistance = maxRange.getValue() + 0.4;
 
         for (Entity entity : mc.theWorld.loadedEntityList) {
+            if(!AntiBotModule.botList.contains(entity)) return null;
             double distance = mc.thePlayer.getDistanceToEntity(entity);
 
             if (entity != mc.thePlayer && distance <= maxRange.getValue() && entity instanceof EntityLivingBase) {

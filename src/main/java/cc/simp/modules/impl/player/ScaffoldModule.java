@@ -206,7 +206,7 @@ public final class ScaffoldModule extends Module {
 
                     ticksOnAir = 0;
 
-                } else if (Math.random() > 0.3 && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit != null &&
+                } else if (Math.random() > 0.3 && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK &&
                         mc.objectMouseOver.getBlockPos().equals(blockFace) && mc.objectMouseOver.sideHit ==
                         EnumFacing.UP && raycast.getValue() == RayCast.Strict && !(PlayerUtils.blockRelativeToPlayer(0, -1, 0) instanceof BlockAir)) {
                     mc.rightClickMouse();
@@ -592,6 +592,7 @@ public final class ScaffoldModule extends Module {
     }
 
     public void jump() {
+        if(mc.gameSettings.keyBindJump.isPressed()) return;;
         if(jump.getValue()) {
             if (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel) {
                 jump.setValue(false);

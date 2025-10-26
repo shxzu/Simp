@@ -6,6 +6,7 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.modules.impl.client.AntiBotModule;
 import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -33,6 +34,7 @@ public final class NameTagsModule extends Module {
     @EventLink
     public final Listener<Render3DEvent> render3DEventListener = e -> {
         for (EntityPlayer player : mc.theWorld.playerEntities) {
+            if(!AntiBotModule.botList.contains(player)) return;
             if (player == mc.thePlayer || player.isDead || player.isInvisible()) continue;
 
             renderNameTag(player);
