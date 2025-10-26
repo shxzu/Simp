@@ -68,7 +68,7 @@ public final class AimAssistModule extends Module {
         double closestDistance = range;
 
         for (Entity entity : mc.theWorld.loadedEntityList) {
-            if (!AntiBotModule.botList.contains(entity)) return null;
+            if (AntiBotModule.botList.contains(entity)) return null;
             if (entity instanceof EntityLivingBase && entity != mc.thePlayer && !entity.isDead) {
                 EntityLivingBase living = (EntityLivingBase) entity;
 

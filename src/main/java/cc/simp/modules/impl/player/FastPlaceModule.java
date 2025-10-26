@@ -9,7 +9,7 @@ import io.github.nevalackin.homoBus.annotations.EventLink;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "Fast Place Module", category = ModuleCategory.PLAYER)
+@ModuleInfo(label = "Fast Place", category = ModuleCategory.PLAYER)
 public final class FastPlaceModule extends Module {
 
     @EventLink

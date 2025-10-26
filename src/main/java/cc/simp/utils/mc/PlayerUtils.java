@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PlayerUtils extends Util {
-    private final HashMap<Integer, Integer> GOOD_POTIONS = new HashMap<Integer, Integer>() {{
+    private static final HashMap<Integer, Integer> GOOD_POTIONS = new HashMap<Integer, Integer>() {{
         put(6, 1); // Instant Health
         put(10, 2); // Regeneration
         put(11, 3); // Resistance

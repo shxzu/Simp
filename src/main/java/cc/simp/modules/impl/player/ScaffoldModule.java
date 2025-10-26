@@ -226,6 +226,9 @@ public final class ScaffoldModule extends Module {
 
     @EventLink
     public final Listener<StrafeEvent> onStrafe = event -> {
+        if (!moveFix.getValue()) {
+            MovementUtils.useDiagonalSpeed();
+        }
         this.jump();
     };
 

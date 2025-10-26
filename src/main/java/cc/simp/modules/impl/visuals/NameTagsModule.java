@@ -34,7 +34,7 @@ public final class NameTagsModule extends Module {
     @EventLink
     public final Listener<Render3DEvent> render3DEventListener = e -> {
         for (EntityPlayer player : mc.theWorld.playerEntities) {
-            if(!AntiBotModule.botList.contains(player)) return;
+            if(AntiBotModule.botList.contains(player)) return;
             if (player == mc.thePlayer || player.isDead || player.isInvisible()) continue;
 
             renderNameTag(player);

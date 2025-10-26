@@ -99,7 +99,7 @@ public final class AutoRodModule extends Module {
         double closestDistance = maxRange.getValue() + 0.4;
 
         for (Entity entity : mc.theWorld.loadedEntityList) {
-            if(!AntiBotModule.botList.contains(entity)) return null;
+            if(AntiBotModule.botList.contains(entity)) return null;
             double distance = mc.thePlayer.getDistanceToEntity(entity);
 
             if (entity != mc.thePlayer && distance <= maxRange.getValue() && entity instanceof EntityLivingBase) {

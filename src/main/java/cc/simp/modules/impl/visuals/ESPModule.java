@@ -37,6 +37,9 @@ public final class ESPModule extends Module {
         final float red = ColorProcess.getColor().getRed() / 255f;
         final float green = ColorProcess.getColor().getGreen() / 255f;
         final float blue = ColorProcess.getColor().getBlue() / 255f;
+        for (Entity entity : mc.theWorld.loadedEntityList) {
+            if (AntiBotModule.botList.contains(entity)) return;
+        }
         switch (mode.getValue()) {
             case Full -> {
                 GL11.glEnable(3042);
@@ -47,8 +50,7 @@ public final class ESPModule extends Module {
                 GlStateManager.disableCull();
                 GL11.glDepthMask(false);
                 for (Entity entity : mc.theWorld.loadedEntityList) {
-                    if(!AntiBotModule.botList.contains(entity)) return;
-                    if (players.getValue() ? entity instanceof EntityPlayer : entity != null && entity != null && !entity.equals(mc.thePlayer)) {
+                    if (players.getValue() ? entity instanceof EntityPlayer && !entity.equals(mc.thePlayer) : entity != null && !entity.equals(mc.thePlayer)) {
                         ESPUtils.drawEntityESP(entity, red, green, blue, 0.5f, 1.0f, 6.0f);
                     }
                 }
@@ -69,7 +71,6 @@ public final class ESPModule extends Module {
                 GlStateManager.disableCull();
                 GL11.glDepthMask(false);
                 for (Entity entity : mc.theWorld.loadedEntityList) {
-                    if (!AntiBotModule.botList.contains(entity)) return;
                     if (players.getValue() ? entity instanceof EntityPlayer && !entity.equals(mc.thePlayer) : entity != null && !entity.equals(mc.thePlayer)) {
                         ESPUtils.drawEntityESP(entity, red, green, blue, 0.5f, 1.0f, 0.0f);
                     }
@@ -91,8 +92,7 @@ public final class ESPModule extends Module {
                 GlStateManager.disableCull();
                 GL11.glDepthMask(false);
                 for (Entity entity : mc.theWorld.loadedEntityList) {
-                    if(!AntiBotModule.botList.contains(entity)) return;
-                    if (players.getValue() ? entity instanceof EntityPlayer : entity != null && entity != null && !entity.equals(mc.thePlayer)) {
+                    if (players.getValue() ? entity instanceof EntityPlayer && !entity.equals(mc.thePlayer) : entity != null && !entity.equals(mc.thePlayer)) {
                         ESPUtils.drawOutlineEntityESP(entity, red, green, blue, 0.5f, 1.0f, 0.0f);
                     }
                 }
@@ -113,8 +113,7 @@ public final class ESPModule extends Module {
                 GlStateManager.disableCull();
                 GL11.glDepthMask(false);
                 for (Entity entity : mc.theWorld.loadedEntityList) {
-                    if(!AntiBotModule.botList.contains(entity)) return;
-                    if (players.getValue() ? entity instanceof EntityPlayer : entity != null && entity != null && !entity.equals(mc.thePlayer)) {
+                    if (players.getValue() ? entity instanceof EntityPlayer && !entity.equals(mc.thePlayer) : entity != null && !entity.equals(mc.thePlayer)) {
                         ESPUtils.drawCornerESP(entity, red, green, blue);
                     }
                 }
@@ -135,8 +134,7 @@ public final class ESPModule extends Module {
                 GlStateManager.disableCull();
                 GL11.glDepthMask(false);
                 for (Entity entity : mc.theWorld.loadedEntityList) {
-                    if(!AntiBotModule.botList.contains(entity)) return;
-                    if (players.getValue() ? entity instanceof EntityPlayer : entity != null && entity != null && !entity.equals(mc.thePlayer)) {
+                    if (players.getValue() ? entity instanceof EntityPlayer && !entity.equals(mc.thePlayer) : entity != null && !entity.equals(mc.thePlayer)) {
                         ESPUtils.drawFake2DESP(entity, red, green, blue);
                     }
                 }
