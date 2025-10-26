@@ -7,18 +7,17 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.CompletableFuture;
 
+import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.interfaces.menu.alt.AltManagerGui;
 import cc.simp.interfaces.menu.alt.SessionChanger;
-import fr.litarvan.openauth.microsoft.MicrosoftAuthResult;
-import fr.litarvan.openauth.microsoft.MicrosoftAuthenticationException;
-import fr.litarvan.openauth.microsoft.MicrosoftAuthenticator;
+import cc.simp.processes.ColorProcess;
+import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.Session;
 import org.lwjgl.input.Keyboard;
 
@@ -26,66 +25,79 @@ public class GuiLoginMicrosoft extends GuiScreen {
     private GuiTextField username, password;
 
     public static String statusString;
-
     public static boolean didTheThing = false;
 
-    @Override
-    protected void actionPerformed(final GuiButton button) {
-        if (button.id == 0) {
-            if (this.username.getText().isEmpty()) {
-                statusString = "You need to enter an email!";
-                didTheThing = false;
-                return;
-            } else {
-                SessionChanger.getInstance().setUserMicrosoft(this.username.getText(), this.password.getText());
-                saveAltToFile(this.username.getText(), this.password.getText(), Minecraft.getMinecraft().getSession().getUsername());
-                didTheThing = true;
-            }
+    private final CustomFontRenderer titleFont;
+    private final CustomFontRenderer buttonFont;
+    private final CustomFontRenderer statusFont;
 
-        }
-        if (button.id == 1) {
-            Session auth = createMsSession();
-            if (auth == null) {
-                didTheThing = false;
-                return;
-            } else {
-                mc.setSession(auth);
-                didTheThing = true;
-            }
-        }
-        if (button.id == 2) {
-            this.mc.displayGuiScreen(new AltManagerGui());
-        }
+    private final int buttonWidth = 140;
+    private final int buttonHeight = 25;
+    private final int buttonSpacing = 8;
+
+    public GuiLoginMicrosoft() {
+        titleFont = FontProcess.getFont("simp");
+        buttonFont = FontProcess.getFont("simp");
+        statusFont = FontProcess.getFont("simp");
     }
 
     @Override
-    public void drawScreen(final int x2, final int y2, final float z2) {
+    public void drawScreen(final int mouseX, final int mouseY, final float partialTicks) {
         final ScaledResolution sr = new ScaledResolution(this.mc);
         Gui.drawRect(0, 0, this.width, this.height, new Color(0, 0, 0).getRGB());
         this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
+
+        int centerX = this.width / 2;
+        int centerY = sr.getScaledHeight() / 2;
+
+        titleFont.drawStringWithShadow("Microsoft Login", centerX - titleFont.getStringWidth("Microsoft Login") / 2, centerY - 80, ColorProcess.getColor().getRGB());
+
         this.username.drawTextBox();
         this.password.drawTextBox();
-        GuiLoginMicrosoft.drawCenteredString(mc.fontRendererObj, statusString, (int) (this.width / 2), (int) (sr.getScaledHeight() / 2 - 65), -1);
+
         if (!didTheThing) {
             statusString = "Email & Password";
+            statusFont.drawStringWithShadow(statusString, centerX - statusFont.getStringWidth(statusString) / 2, centerY - 105, 0xFFFFFF);
         } else {
             statusString = "Logged Into: " + Minecraft.getMinecraft().getSession().getUsername() + "!";
+            statusFont.drawStringWithShadow(statusString, centerX - statusFont.getStringWidth(statusString) / 2, centerY - 105, ColorProcess.getColor().getRGB());
         }
-        super.drawScreen(x2, y2, z2);
+
+        drawCustomButtons(mouseX, mouseY, centerX, centerY);
+
+        super.drawScreen(mouseX, mouseY, partialTicks);
+    }
+
+    private void drawCustomButtons(int mouseX, int mouseY, int centerX, int centerY) {
+        int startX = centerX - buttonWidth / 2;
+        int startY = centerY + 10;
+
+        drawButton(startX, startY, buttonWidth, buttonHeight, "login (pass)", mouseX, mouseY);
+        drawButton(startX, startY + buttonHeight + buttonSpacing, buttonWidth, buttonHeight, "login (oauth)", mouseX, mouseY);
+        drawButton(startX, startY + (buttonHeight + buttonSpacing) * 2, buttonWidth, buttonHeight, "cancel", mouseX, mouseY);
+    }
+
+    private void drawButton(int x, int y, int width, int height, String text, int mouseX, int mouseY) {
+        boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+
+        Color bgColor = hovered ? new Color(60, 60, 60, 200) : new Color(40, 40, 40, 180);
+        RenderUtils.drawRoundedRect(x, y, width, height, 6, true, bgColor);
+
+        int textX = x + (width - buttonFont.getStringWidth(text)) / 2;
+        int textY = y + (height - buttonFont.getHeight()) / 2;
+        buttonFont.drawString(text, textX, textY, hovered ? ColorProcess.getColor().getRGB() : 0xFFFFFF);
     }
 
     @Override
     public void initGui() {
         final ScaledResolution sr = new ScaledResolution(this.mc);
-        this.buttonList.clear();
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 50 - 10, this.height / 2, 120, 20, I18n.format("Login Microsoft", new Object[0])));
-        this.buttonList.add(new GuiButton(1, this.width / 2 - 50 - 10, this.height / 2 + 20, 120, 20, I18n.format("Login OAuth", new Object[0])));
-        this.buttonList.add(new GuiButton(2, this.width / 2 - 50 - 10, this.height / 2 + 80, 120, 20, I18n.format("Cancel", new Object[0])));
-        (this.username = new GuiTextField(100, this.fontRendererObj, this.width / 2 - 50 - 10, sr.getScaledHeight() / 2 - 50, 120, 20)).setFocused(true);
-        (this.password = new GuiTextField(100, this.fontRendererObj, this.width / 2 - 50 - 10, sr.getScaledHeight() / 2 - 25, 120, 20)).setFocused(false);
+        int centerX = this.width / 2;
+        int centerY = sr.getScaledHeight() / 2;
+
+        (this.username = new GuiTextField(100, this.fontRendererObj, centerX - buttonWidth / 2, centerY - 50, buttonWidth, 20)).setFocused(true);
+        (this.password = new GuiTextField(101, this.fontRendererObj, centerX - buttonWidth / 2, centerY - 25, buttonWidth, 20)).setFocused(false);
         Keyboard.enableRepeatEvents(true);
     }
-
 
     @Override
     protected void keyTyped(final char character, final int key) {
@@ -94,16 +106,17 @@ public class GuiLoginMicrosoft extends GuiScreen {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (character == '\t' && !this.username.isFocused()) {
-            this.username.setFocused(true);
-            this.password.setFocused(false);
-        }
-        if (character == '\t' && !this.password.isFocused()) {
-            this.password.setFocused(true);
-            this.username.setFocused(false);
+        if (character == '\t') {
+            if (this.username.isFocused()) {
+                this.username.setFocused(false);
+                this.password.setFocused(true);
+            } else {
+                this.username.setFocused(true);
+                this.password.setFocused(false);
+            }
         }
         if (character == '\r') {
-            this.actionPerformed(this.buttonList.get(0));
+            handlePasswordLogin();
         }
 
         if (didTheThing) {
@@ -115,14 +128,53 @@ public class GuiLoginMicrosoft extends GuiScreen {
     }
 
     @Override
-    protected void mouseClicked(final int x2, final int y2, final int button) {
+    protected void mouseClicked(final int mouseX, final int mouseY, final int button) {
         try {
-            super.mouseClicked(x2, y2, button);
+            super.mouseClicked(mouseX, mouseY, button);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.username.mouseClicked(x2, y2, button);
-        this.password.mouseClicked(x2, y2, button);
+        this.username.mouseClicked(mouseX, mouseY, button);
+        this.password.mouseClicked(mouseX, mouseY, button);
+
+        final ScaledResolution sr = new ScaledResolution(this.mc);
+        int centerX = this.width / 2;
+        int centerY = sr.getScaledHeight() / 2;
+        int startX = centerX - buttonWidth / 2;
+        int startY = centerY + 10;
+
+        if (isMouseOverButton(mouseX, mouseY, startX, startY, buttonWidth, buttonHeight)) {
+            handlePasswordLogin();
+        } else if (isMouseOverButton(mouseX, mouseY, startX, startY + buttonHeight + buttonSpacing, buttonWidth, buttonHeight)) {
+            handleOAuthLogin();
+        } else if (isMouseOverButton(mouseX, mouseY, startX, startY + (buttonHeight + buttonSpacing) * 2, buttonWidth, buttonHeight)) {
+            this.mc.displayGuiScreen(new AltManagerGui());
+        }
+    }
+
+    private void handlePasswordLogin() {
+        if (this.username.getText().isEmpty()) {
+            statusString = "You need to enter an email!";
+            didTheThing = false;
+            return;
+        }
+        SessionChanger.getInstance().setUserMicrosoft(this.username.getText(), this.password.getText());
+        saveAltToFile(this.username.getText(), this.password.getText(), Minecraft.getMinecraft().getSession().getUsername());
+        didTheThing = true;
+    }
+
+    private void handleOAuthLogin() {
+        Session auth = createMsSession();
+        if (auth == null) {
+            didTheThing = false;
+            return;
+        }
+        mc.setSession(auth);
+        didTheThing = true;
+    }
+
+    private boolean isMouseOverButton(int mouseX, int mouseY, int buttonX, int buttonY, int buttonWidth, int buttonHeight) {
+        return mouseX >= buttonX && mouseX <= buttonX + buttonWidth && mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
     }
 
     @Override
@@ -148,17 +200,6 @@ public class GuiLoginMicrosoft extends GuiScreen {
         }
     }
 
-    private void saveAltToFileOAuth(String username, String uuid, String token) {
-        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
-        File file = new File(dir, "alts.txt");
-
-        try (FileWriter fw = new FileWriter(file, true); PrintWriter out = new PrintWriter(fw)) {
-            out.println("microsoftOAuth|" + username + "|" + uuid + "|" + token);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static Session createMsSession() {
         statusString = "Awaiting for response for Microsoft login...";
         CompletableFuture<Session> future = new CompletableFuture<>();
@@ -171,5 +212,4 @@ public class GuiLoginMicrosoft extends GuiScreen {
         });
         return future.join();
     }
-
 }

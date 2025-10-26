@@ -10,7 +10,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.interfaces.menu.alt.microsoft.GuiLoginMicrosoft;
+import cc.simp.interfaces.menu.alt.microsoft.MicrosoftOAuthTranslation;
+import cc.simp.processes.ColorProcess;
+import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.RenderUtils;
 import net.minecraft.util.Session;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -30,7 +35,7 @@ public class AltManagerGui extends GuiScreen {
     private static final int BOX_HEIGHT = 300;
     private static final int ENTRY_HEIGHT = 30;
     private static final int TOP_BOX_HEIGHT = 40;
-    private static final int SCROLLBAR_WIDTH = 2;
+    private static final int SCROLLBAR_WIDTH = 4;
 
     private ArrayList<String> alts = new ArrayList<>();
     private int scrollOffset = 0;
@@ -39,7 +44,19 @@ public class AltManagerGui extends GuiScreen {
     private int dragStartY;
     private int scrollStart;
 
-    private static final int BUTTON_COPY_CURRENT = 9000;
+    private final CustomFontRenderer titleFont;
+    private final CustomFontRenderer buttonFont;
+    private final CustomFontRenderer altFont;
+
+    private final int buttonWidth = 120;
+    private final int buttonHeight = 25;
+    private final int buttonSpacing = 8;
+
+    public AltManagerGui() {
+        titleFont = FontProcess.getFont("simp");
+        buttonFont = FontProcess.getFont("simp");
+        altFont = FontProcess.getFont("simp");
+    }
 
     @Override
     public void initGui() {
@@ -51,18 +68,11 @@ public class AltManagerGui extends GuiScreen {
         int visibleEntries = (BOX_HEIGHT - TOP_BOX_HEIGHT) / ENTRY_HEIGHT;
         maxScroll = Math.max(0, alts.size() - visibleEntries);
 
-        buttonList.add(new GuiButton(BUTTON_COPY_CURRENT, BOX_X + BOX_WIDTH - 80, BOX_Y + 10, 70, 20, "Copy User"));
-
-        int y = (this.height / 4 + 48) + (this.height / 8);
-        this.buttonList.add(new GuiButton(0, (this.width / 2 - 100), y + 20 * 3, "Cancel"));
-        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, y + 20 * 1, "Use Cracked"));
-        this.buttonList.add(new GuiButton(2, this.width / 2 - 100, y, "Use Microsoft"));
-
         super.initGui();
     }
 
     private void loadAltsFromFile() {
-    	File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
         File file = new File(dir, "alts.txt");
         if (!dir.exists()) {
             dir.mkdirs();
@@ -90,9 +100,9 @@ public class AltManagerGui extends GuiScreen {
     }
 
     private void saveAltsToFile() {
-    	File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
         File file = new File(dir, "alts.txt");
-        
+
         try (PrintWriter out = new PrintWriter(file)) {
             for (String alt : alts) {
                 out.println(alt);
@@ -104,13 +114,19 @@ public class AltManagerGui extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-    	Gui.drawRect(0, 0, this.width, this.height, new Color(0, 0, 0).getRGB());
+        Gui.drawRect(0, 0, this.width, this.height, new Color(0, 0, 0).getRGB());
         this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
 
-        drawRect(BOX_X, BOX_Y, BOX_X + BOX_WIDTH, BOX_Y + TOP_BOX_HEIGHT, new Color(30, 30, 30, 180).getRGB());
-        mc.fontRendererObj.drawString("Current User:", BOX_X + 5, BOX_Y + 5, Color.WHITE.getRGB());
+        // Draw current user box
+        RenderUtils.drawRoundedRect(BOX_X, BOX_Y, BOX_WIDTH, TOP_BOX_HEIGHT, 6, true, new Color(40, 40, 40, 180));
+        titleFont.drawStringWithShadow("Current User:", BOX_X + 8, BOX_Y + 6, 0xFFFFFF);
         String currentUser = Minecraft.getMinecraft().getSession().getUsername();
-        mc.fontRendererObj.drawString(currentUser, BOX_X + 5, BOX_Y + 20, Color.LIGHT_GRAY.getRGB());
+        altFont.drawStringWithShadow(currentUser, BOX_X + 8, BOX_Y + 20, ColorProcess.getColor().getRGB());
+
+        // Draw copy button
+        int copyBtnX = BOX_X + BOX_WIDTH - 65;
+        int copyBtnY = BOX_Y + 10;
+        drawCustomButton(copyBtnX, copyBtnY, 60, 20, "copy", mouseX, mouseY);
 
         int listX = BOX_X + 5;
         int listY = BOX_Y + TOP_BOX_HEIGHT + 5;
@@ -128,42 +144,73 @@ public class AltManagerGui extends GuiScreen {
             String altName = alts.get(altIndex).split("\\|")[1];
 
             boolean hovered = mouseX >= listX && mouseX <= listX + listWidth && mouseY >= entryY && mouseY <= entryY + ENTRY_HEIGHT;
-            mc.fontRendererObj.drawString(altName, listX + 5, entryY + 8, Color.WHITE.getRGB());
-            if (hovered) {
-                drawRect(listX, entryY, listX + listWidth, entryY + ENTRY_HEIGHT, new Color(0, 0, 0, 200).getRGB());
 
-                drawHoverButton(listX + listWidth - 180, entryY + 5, "Copy");
-                drawHoverButton(listX + listWidth - 120, entryY + 5, "Login");
-                drawHoverButton(listX + listWidth - 60, entryY + 5, "Delete");
+            if (hovered) {
+                RenderUtils.drawRoundedRect(listX, entryY, listWidth, ENTRY_HEIGHT, 4, true, new Color(60, 60, 60, 150));
             }
 
-            
-            
-            
+            altFont.drawStringWithShadow(altName, listX + 5, entryY + 8, 0xFFFFFF);
+
+            if (hovered) {
+                drawHoverButton(listX + listWidth - 165, entryY + 5, "copy", mouseX, mouseY);
+                drawHoverButton(listX + listWidth - 110, entryY + 5, "login", mouseX, mouseY);
+                drawHoverButton(listX + listWidth - 55, entryY + 5, "delete", mouseX, mouseY);
+            }
         }
 
         disableScissor();
 
+        // Draw scrollbar
         int scrollbarX = BOX_X + BOX_WIDTH - SCROLLBAR_WIDTH - 2;
-        int scrollbarY = BOX_Y + TOP_BOX_HEIGHT;
+        int scrollbarY = BOX_Y + TOP_BOX_HEIGHT + 5;
         int scrollbarHeight = BOX_HEIGHT - TOP_BOX_HEIGHT - 10;
 
-        drawRect(scrollbarX, scrollbarY, scrollbarX + SCROLLBAR_WIDTH, scrollbarY + scrollbarHeight,
-                new Color(50, 50, 50, 180).getRGB());
+        RenderUtils.drawRoundedRect(scrollbarX, scrollbarY, SCROLLBAR_WIDTH, scrollbarHeight, 2, true, new Color(50, 50, 50, 180));
 
         int thumbHeight = Math.max(scrollbarHeight * visibleEntries / (alts.size() == 0 ? 1 : alts.size()), 20);
         int thumbY = scrollbarY + (scrollbarHeight - thumbHeight) * scrollOffset / (maxScroll == 0 ? 1 : maxScroll);
 
-        drawRect(scrollbarX, thumbY, scrollbarX + SCROLLBAR_WIDTH, thumbY + thumbHeight,
-                new Color(100, 100, 100, 220).getRGB());
+        RenderUtils.drawRoundedRect(scrollbarX, thumbY, SCROLLBAR_WIDTH, thumbHeight, 2, true, new Color(100, 100, 100, 220));
+
+        // Draw action buttons
+        drawActionButtons(mouseX, mouseY);
 
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
-    private void drawHoverButton(int x, int y, String label) {
+    private void drawActionButtons(int mouseX, int mouseY) {
+        int centerX = this.width / 2;
+        int startY = this.height - 100;
+
+        int totalWidth = (buttonWidth * 3) + (buttonSpacing * 2);
+        int startX = centerX - totalWidth / 2;
+
+        drawCustomButton(startX, startY, buttonWidth, buttonHeight, "cracked", mouseX, mouseY);
+        drawCustomButton(startX + buttonWidth + buttonSpacing, startY, buttonWidth, buttonHeight, "microsoft", mouseX, mouseY);
+        drawCustomButton(startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight, "back", mouseX, mouseY);
+    }
+
+    private void drawCustomButton(int x, int y, int width, int height, String text, int mouseX, int mouseY) {
+        boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+
+        Color bgColor = hovered ? new Color(60, 60, 60, 200) : new Color(40, 40, 40, 180);
+        RenderUtils.drawRoundedRect(x, y, width, height, 6, true, bgColor);
+
+        int textX = x + (width - buttonFont.getStringWidth(text)) / 2;
+        int textY = y + (height - buttonFont.getHeight()) / 2;
+        buttonFont.drawString(text, textX, textY, hovered ? ColorProcess.getColor().getRGB() : 0xFFFFFF);
+    }
+
+    private void drawHoverButton(int x, int y, String label, int mouseX, int mouseY) {
         int w = 50, h = 20;
-        drawRect(x, y, x + w, y + h, new Color(80, 80, 80, 220).getRGB());
-        mc.fontRendererObj.drawString(label, x + 8, y + 6, Color.WHITE.getRGB());
+        boolean hovered = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+
+        Color bgColor = hovered ? new Color(80, 80, 80, 240) : new Color(60, 60, 60, 200);
+        RenderUtils.drawRoundedRect(x, y, w, h, 4, true, bgColor);
+
+        int textX = x + (w - buttonFont.getStringWidth(label)) / 2;
+        int textY = y + (h - buttonFont.getHeight()) / 2;
+        buttonFont.drawString(label, textX, textY, hovered ? ColorProcess.getColor().getRGB() : 0xFFFFFF);
     }
 
     private void enableScissor(int x, int y, int width, int height) {
@@ -184,25 +231,38 @@ public class AltManagerGui extends GuiScreen {
     }
 
     @Override
-    protected void actionPerformed(GuiButton button) {
-        if (button.id == BUTTON_COPY_CURRENT) {
-            String currentUser = Minecraft.getMinecraft().getSession().getUsername();
-            copyToClipboard(currentUser);
-        }
-        if (button.id == 0) {
-            mc.displayGuiScreen(new GuiMainMenu());
-        }
-        if (button.id == 1) {
-            mc.displayGuiScreen(new GuiLogin());
-        }
-        if (button.id == 2) {
-            mc.displayGuiScreen(new GuiLoginMicrosoft());
-        }
-    }
-
-    @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
+
+        // Copy current user button
+        int copyBtnX = BOX_X + BOX_WIDTH - 65;
+        int copyBtnY = BOX_Y + 10;
+        if (mouseX >= copyBtnX && mouseX <= copyBtnX + 60 && mouseY >= copyBtnY && mouseY <= copyBtnY + 20) {
+            String currentUser = Minecraft.getMinecraft().getSession().getUsername();
+            copyToClipboard(currentUser);
+            return;
+        }
+
+        // Action buttons
+        int centerX = this.width / 2;
+        int startY = this.height - 100;
+        int totalWidth = (buttonWidth * 3) + (buttonSpacing * 2);
+        int startX = centerX - totalWidth / 2;
+
+        if (isMouseOverButton(mouseX, mouseY, startX, startY, buttonWidth, buttonHeight)) {
+            mc.displayGuiScreen(new GuiLogin());
+            return;
+        }
+
+        if (isMouseOverButton(mouseX, mouseY, startX + buttonWidth + buttonSpacing, startY, buttonWidth, buttonHeight)) {
+            mc.displayGuiScreen(new GuiLoginMicrosoft());
+            return;
+        }
+
+        if (isMouseOverButton(mouseX, mouseY, startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight)) {
+            mc.displayGuiScreen(new GuiMainMenu());
+            return;
+        }
 
         int listX = BOX_X + 5;
         int listY = BOX_Y + TOP_BOX_HEIGHT + 5;
@@ -216,14 +276,14 @@ public class AltManagerGui extends GuiScreen {
 
             int entryY = listY + i * ENTRY_HEIGHT;
 
-            int copyX = listX + listWidth - 180;
-            int loginX = listX + listWidth - 120;
-            int delX = listX + listWidth - 60;
+            int copyX = listX + listWidth - 165;
+            int loginX = listX + listWidth - 110;
+            int delX = listX + listWidth - 55;
             int btnY = entryY + 5;
             int btnW = 50, btnH = 20;
 
             if (mouseX >= copyX && mouseX <= copyX + btnW && mouseY >= btnY && mouseY <= btnY + btnH) {
-                copyToClipboard(alts.get(altIndex));
+                copyToClipboard(alts.get(altIndex).split("\\|")[1]);
                 return;
             }
 
@@ -244,11 +304,15 @@ public class AltManagerGui extends GuiScreen {
         int scrollbarHeight = BOX_HEIGHT - TOP_BOX_HEIGHT - 10;
 
         if (mouseX >= scrollbarX && mouseX <= scrollbarX + SCROLLBAR_WIDTH &&
-            mouseY >= scrollbarY && mouseY <= scrollbarY + scrollbarHeight) {
+                mouseY >= scrollbarY && mouseY <= scrollbarY + scrollbarHeight) {
             draggingScrollbar = true;
             dragStartY = mouseY;
             scrollStart = scrollOffset;
         }
+    }
+
+    private boolean isMouseOverButton(int mouseX, int mouseY, int buttonX, int buttonY, int buttonWidth, int buttonHeight) {
+        return mouseX >= buttonX && mouseX <= buttonX + buttonWidth && mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
     }
 
     private void loginWithAlt(String alt) {
@@ -263,17 +327,34 @@ public class AltManagerGui extends GuiScreen {
                 SessionChanger.getInstance().setUserMicrosoft(email, pass);
             }
         } else if (alt.startsWith("microsoftOAuth|")) {
-            String[] parts = alt.split("\\|");
-            if (parts.length >= 3) {
-                String username = parts[1];
-                String uuid = parts[2];
-                String token = parts[3];
-                Session auth = GuiLoginMicrosoft.createMsSession();
-                if (auth != null) {
-                    mc.setSession(auth);
-                }
+            String username = alt.split("\\|")[1];
+            String refreshToken = loadRefreshToken(username);
+            if (refreshToken != null) {
+                MicrosoftOAuthTranslation.LoginData login = MicrosoftOAuthTranslation.login(refreshToken);
+                mc.setSession(new Session(login.username, login.uuid, login.mcToken, "microsoft"));
             }
         }
+    }
+
+
+    private String loadRefreshToken(String username) {
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File file = new File(dir, "tokens.txt");
+
+        if (!file.exists()) return null;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split("\\|");
+                if (parts.length == 2 && parts[0].equals(username)) {
+                    return parts[1];
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

@@ -7,111 +7,154 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.SecureRandom;
 
+import cc.simp.api.font.CustomFontRenderer;
+import cc.simp.processes.ColorProcess;
+import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.RenderUtils;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.resources.I18n;
 
 public class GuiLogin extends GuiScreen {
     private GuiTextField username;
 
-    @Override
-    protected void actionPerformed(final GuiButton button) {
-        if (button.id == 0) {
-            if(this.username.getText().equals("")) {
-                this.mc.displayGuiScreen(new GuiLogin());
-            } else {
-                SessionChanger.getInstance().setUserOffline(this.username.getText());
-                saveAltToFile(this.username.getText());
-            }
+    private final CustomFontRenderer titleFont;
+    private final CustomFontRenderer buttonFont;
 
-        } else if (button.id == 1) {
-        	this.mc.displayGuiScreen(new AltManagerGui());
-        } else if (button.id == 2) {
-        	String text = generateRandomString();
-        	SessionChanger.getInstance().setUserOffline(text);
-        	saveAltToFile(text);
-        	this.mc.displayGuiScreen(new AltManagerGui());
-        }
+    private final int buttonWidth = 140;
+    private final int buttonHeight = 25;
+    private final int buttonSpacing = 8;
+
+    public GuiLogin() {
+        titleFont = FontProcess.getFont("simp");
+        buttonFont = FontProcess.getFont("simp");
     }
 
     @Override
-    public void drawScreen(final int x2, final int y2, final float z2) {
+    public void drawScreen(final int mouseX, final int mouseY, final float partialTicks) {
         final ScaledResolution sr = new ScaledResolution(this.mc);
         Gui.drawRect(0, 0, this.width, this.height, new Color(0, 0, 0).getRGB());
         this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
+
+        int centerX = this.width / 2;
+        int centerY = sr.getScaledHeight() / 2;
+
+        titleFont.drawStringWithShadow("Cracked Login", centerX - titleFont.getStringWidth("Cracked Login") / 2, centerY - 80, ColorProcess.getColor().getRGB());
+
         this.username.drawTextBox();
-        Gui.drawCenteredString(mc.fontRendererObj, "Username", (int)(this.width / 2), (int)(sr.getScaledHeight() / 2 - 65), -1);
-        super.drawScreen(x2, y2, z2);
+
+        drawCustomButtons(mouseX, mouseY, centerX, centerY);
+
+        super.drawScreen(mouseX, mouseY, partialTicks);
+    }
+
+    private void drawCustomButtons(int mouseX, int mouseY, int centerX, int centerY) {
+        int startX = centerX - buttonWidth / 2;
+        int startY = centerY + 10;
+
+        drawButton(startX, startY, buttonWidth, buttonHeight, "login", mouseX, mouseY);
+        drawButton(startX, startY + buttonHeight + buttonSpacing, buttonWidth, buttonHeight, "random", mouseX, mouseY);
+        drawButton(startX, startY + (buttonHeight + buttonSpacing) * 2, buttonWidth, buttonHeight, "cancel", mouseX, mouseY);
+    }
+
+    private void drawButton(int x, int y, int width, int height, String text, int mouseX, int mouseY) {
+        boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+
+        Color bgColor = hovered ? new Color(60, 60, 60, 200) : new Color(40, 40, 40, 180);
+        RenderUtils.drawRoundedRect(x, y, width, height, 6, true, bgColor);
+
+        int textX = x + (width - buttonFont.getStringWidth(text)) / 2;
+        int textY = y + (height - buttonFont.getHeight()) / 2;
+        buttonFont.drawString(text, textX, textY, hovered ? ColorProcess.getColor().getRGB() : 0xFFFFFF);
     }
 
     @Override
     public void initGui() {
         final ScaledResolution sr = new ScaledResolution(this.mc);
-        this.buttonList.clear();
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 50 - 10, this.height / 2 - 20, 120, 20, I18n.format("Login (Cracked)", new Object[0])));
-        this.buttonList.add(new GuiButton(2, this.width / 2 - 50 - 10, this.height / 2, 120, 20, I18n.format("Gen Cracked", new Object[0])));
-        this.buttonList.add(new GuiButton(1, this.width / 2 - 50 - 10, this.height / 2 + 20, 120, 20, I18n.format("Cancel", new Object[0])));
-        (this.username = new GuiTextField(100, this.fontRendererObj, this.width / 2 - 50 - 10, sr.getScaledHeight() / 2 - 50, 120, 20)).setFocused(true);
+        int centerX = this.width / 2;
+        int centerY = sr.getScaledHeight() / 2;
+
+        (this.username = new GuiTextField(100, this.fontRendererObj, centerX - buttonWidth / 2, centerY - 30, buttonWidth, 20)).setFocused(true);
         Keyboard.enableRepeatEvents(true);
     }
-    
+
     private static final String NUMBERS = "0123456789";
     private static final String LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final SecureRandom RANDOM = new SecureRandom();
 
     public static String generateRandomString() {
         StringBuilder result = new StringBuilder();
-        
-        // Add 4 letters
+
         for (int i = 0; i < 4; i++) {
             result.append(LETTERS.charAt(RANDOM.nextInt(LETTERS.length())));
         }
 
-     // Add 4 numbers
         for (int i = 0; i < 4; i++) {
             result.append(NUMBERS.charAt(RANDOM.nextInt(NUMBERS.length())));
         }
 
-        // Optionally, shuffle the string if you don't want a fixed pattern
-        // result = new StringBuilder(result.toString()).reverse(); // Example: simple reversal, use more complex shuffling if needed
-
         return result.toString();
     }
-   
-
 
     @Override
     protected void keyTyped(final char character, final int key) {
         try {
             super.keyTyped(character, key);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         if (character == '\t' && !this.username.isFocused()) {
             this.username.setFocused(true);
         }
         if (character == '\r') {
-            this.actionPerformed(this.buttonList.get(0));
+            handleLogin();
         }
         this.username.textboxKeyTyped(character, key);
     }
 
     @Override
-    protected void mouseClicked(final int x2, final int y2, final int button) {
+    protected void mouseClicked(final int mouseX, final int mouseY, final int button) {
         try {
-            super.mouseClicked(x2, y2, button);
-        }
-        catch (IOException e) {
+            super.mouseClicked(mouseX, mouseY, button);
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        this.username.mouseClicked(x2, y2, button);
+        this.username.mouseClicked(mouseX, mouseY, button);
+
+        final ScaledResolution sr = new ScaledResolution(this.mc);
+        int centerX = this.width / 2;
+        int centerY = sr.getScaledHeight() / 2;
+        int startX = centerX - buttonWidth / 2;
+        int startY = centerY + 10;
+
+        if (isMouseOverButton(mouseX, mouseY, startX, startY, buttonWidth, buttonHeight)) {
+            handleLogin();
+        } else if (isMouseOverButton(mouseX, mouseY, startX, startY + buttonHeight + buttonSpacing, buttonWidth, buttonHeight)) {
+            String text = generateRandomString();
+            SessionChanger.getInstance().setUserOffline(text);
+            saveAltToFile(text);
+            this.mc.displayGuiScreen(new AltManagerGui());
+        } else if (isMouseOverButton(mouseX, mouseY, startX, startY + (buttonHeight + buttonSpacing) * 2, buttonWidth, buttonHeight)) {
+            this.mc.displayGuiScreen(new AltManagerGui());
+        }
+    }
+
+    private void handleLogin() {
+        if (this.username.getText().equals("")) {
+            this.mc.displayGuiScreen(new GuiLogin());
+        } else {
+            SessionChanger.getInstance().setUserOffline(this.username.getText());
+            saveAltToFile(this.username.getText());
+            this.mc.displayGuiScreen(new AltManagerGui());
+        }
+    }
+
+    private boolean isMouseOverButton(int mouseX, int mouseY, int buttonX, int buttonY, int buttonWidth, int buttonHeight) {
+        return mouseX >= buttonX && mouseX <= buttonX + buttonWidth && mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
     }
 
     @Override
@@ -124,9 +167,9 @@ public class GuiLogin extends GuiScreen {
     public void updateScreen() {
         this.username.updateCursorCounter();
     }
-    
+
     private void saveAltToFile(String sessionUsername) {
-    	File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
         File file = new File(dir, "alts.txt");
 
         try (FileWriter fw = new FileWriter(file, true); PrintWriter out = new PrintWriter(fw)) {
