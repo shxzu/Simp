@@ -36,19 +36,19 @@ public class CustomMainMenu extends GuiScreen {
 
     private final long startTime;
     private final String[] changelogEntries = {
-            "- Shxzu",
-            "- Shxzu",
-            "- My Shxzu",
-            "- Shxzu"
+            "- more modules",
+            "- even more modules",
+            "- bug fixes",
+            "- performance improvements",
     };
 
     public CustomMainMenu() {
-        backgroundImage = new ResourceLocation("simp/images/mainmenu.png");
-        logoImage = new ResourceLocation("simp/images/simp.png");
+        backgroundImage = new ResourceLocation("simp/images/mainmenu.jpg");
+        logoImage = new ResourceLocation("simp/images/simp_light.png");
         startTime = System.currentTimeMillis();
         buttonFont = FontProcess.getFont("simp");
-        changelogFont = FontProcess.getFont("arial");
-        timeFont = FontProcess.getFont("bold");
+        changelogFont = FontProcess.getFont("simp");
+        timeFont = FontProcess.getFont("big");
     }
 
     @Override
@@ -73,7 +73,7 @@ public class CustomMainMenu extends GuiScreen {
 
         int timeX = (this.width - timeFont.getStringWidth(currentTime)) / 2;
         int timeY = this.height / 2 + scaledTimeYOffset;
-        timeFont.drawStringWithShadow(currentTime, timeX, timeY, 0xFFFFFF);
+        timeFont.drawStringWithShadow(currentTime, (float) timeX, (float) timeY, 0xFFFFFF);
 
         RenderUtils.drawImage(logoImage, (float) width / 2 - (float) 157 / 2, height / 10f, 157, 125);
 
@@ -91,15 +91,15 @@ public class CustomMainMenu extends GuiScreen {
         int totalWidth = (buttonWidth * 3) + (buttonSpacing * 2);
         int startX = centerX - totalWidth / 2;
 
-        drawButton(startX, startY, buttonWidth, buttonHeight, "Singleplayer", mouseX, mouseY);
+        drawButton(startX, startY, buttonWidth, buttonHeight, "singleplayer", mouseX, mouseY);
 
-        drawButton(startX + buttonWidth + buttonSpacing, startY, buttonWidth, buttonHeight, "Multiplayer", mouseX, mouseY);
+        drawButton(startX + buttonWidth + buttonSpacing, startY, buttonWidth, buttonHeight, "multiplayer", mouseX, mouseY);
 
-        drawButton(startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight, "Quit", mouseX, mouseY);
+        drawButton(startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight, "quit", mouseX, mouseY);
 
         int altButtonX = startX + buttonWidth + buttonSpacing + (buttonWidth - altButtonWidth) / 2;
         int altButtonY = startY + buttonHeight + buttonSpacing;
-        drawButton(altButtonX, altButtonY, altButtonWidth, altButtonHeight, "AltManager", mouseX, mouseY);
+        drawButton(altButtonX, altButtonY, altButtonWidth, altButtonHeight, "alts", mouseX, mouseY);
     }
 
     private void drawButton(int x, int y, int width, int height, String text, int mouseX, int mouseY) {
@@ -123,12 +123,12 @@ public class CustomMainMenu extends GuiScreen {
         float hue = (time % 3000) / 3000.0f;
         Color titleColor = Color.getHSBColor(hue, 0.8f, 1.0f);
 
-        changelogFont.drawStringWithShadow("Changelog", changelogX + 8, changelogY + 6, titleColor.getRGB());
+        changelogFont.drawStringWithShadow("changelog", changelogX + 8, changelogY + 6, titleColor.getRGB());
 
         int entryY = changelogY + changelogFont.getHeight() + 14;
         for (int i = 0; i < changelogEntries.length; i++) {
             float entryHue = ((time + i * 500) % 3000) / 3000.0f;
-            Color entryColor = Color.getHSBColor(entryHue, 0.7f, 0.95f);
+            Color entryColor = Color.getHSBColor(entryHue, 0.5f, 0.95f);
 
             changelogFont.drawStringWithShadow(changelogEntries[i], changelogX + 8, entryY, entryColor.getRGB());
             entryY += changelogFont.getHeight() + 4;
