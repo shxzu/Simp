@@ -105,8 +105,8 @@ public final class WatermarkModule extends Module {
         }
 
         if (type.getValue() == Type.Nursultan) {
+            if (mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()) == null || mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()).getResponseTime() == 0) return;
             int ping = mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()).getResponseTime();
-            if (mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()) == null) ping = 0;
             String skibidi = EnumChatFormatting.BLUE + clientName + EnumChatFormatting.WHITE + " - " + mc.getDebugFPS() + " FPS" + " - " + ping + "ms";
             RenderUtils.drawRoundedRect(2, 2, fr.getStringWidth(skibidi) + 4, fr.FONT_HEIGHT + 4, 6, new Color(0, 0, 0, 200));
             fr.drawStringWithShadow(skibidi, 4, 4, Color.WHITE.getRGB());
@@ -159,8 +159,8 @@ public final class WatermarkModule extends Module {
             mc.fontRendererObj.drawString("v7.46.1" + " MC1.8.9 (outdated)",  92, 17, Color.BLACK.getRGB());
         }
         if (type.getValue() == Type.Nursultan) {
+            if (mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()) == null || mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()).getResponseTime() == 0) return;
             int ping = mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()).getResponseTime();
-            if (mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()) == null) ping = 0;
             String skibidi = clientName + " - " + mc.getDebugFPS() + " FPS" + " - " + ping + "ms";
             RenderUtils.drawRoundedRect(2, 2, fr.getStringWidth(skibidi) + 4, fr.FONT_HEIGHT + 4, 6, new Color(0, 0, 0, 200));
             fr.drawStringWithShadow(skibidi, 4, 4, Color.WHITE.getRGB());

@@ -35,7 +35,7 @@ public final class TickBaseModule extends Module {
         distance = mc.thePlayer.getDistanceToEntity(target);
         double range = distance;
 
-        if (range > 1 && balance >= 50 && MODE.equals(Mode.BASING)) {
+        if (range >= 1 && balance >= 50 && MODE.equals(Mode.BASING)) {
             balance -= 50;
             mc.timer.elapsedTicks += 1;
         } else {
@@ -61,7 +61,7 @@ public final class TickBaseModule extends Module {
     public Listener<Render3DEvent> onRender3D = event -> {
         if (!MODE.equals(Mode.REDUCING) || target == null) return;
 
-        if (distance <= 4 || System.currentTimeMillis() - time >= ((range / (mc.thePlayer.isPotionActive(Potion.moveSpeed) ? 0.36 : 0.25)) * 25) + 25) {
+        if (distance <= 1 || System.currentTimeMillis() - time >= ((range / (mc.thePlayer.isPotionActive(Potion.moveSpeed) ? 0.36 : 0.25)) * 25) + 25) {
             mc.timer.timerSpeed = 1;
             MODE = Mode.BASING;
             balance = System.currentTimeMillis() - time;
