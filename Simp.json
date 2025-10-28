@@ -114,7 +114,7 @@
         },
         {
             "name": "org.lwjgl:lwjgl-stb:3.3.6",
-            "url": "https://repo1.maven2.org/maven2/"
+            "url": "https://repo1.maven.org/maven2/"
         },
         {
             "name": "org.lwjgl:lwjgl-assimp:3.3.6",
@@ -197,19 +197,16 @@
             "url": "https://repo1.maven.org/maven2/"
         },
         {
-            "name": "com.viaversion:viaversion:5.5.2-SNAPSHOT",
+            "name": "com.viaversion:viaversion:5.5.1",
             "url": "https://repo.viaversion.com/"
         },
         {
-            "name": "com.viaversion:viabackwards:5.5.2-SNAPSHOT", 
+            "name": "com.viaversion:viabackwards:5.5.1", 
             "url": "https://repo.viaversion.com/"
         },
         {
             "name": "com.viaversion:viarewind:4.0.11",
             "url": "https://repo.viaversion.com/"
-        },
-        {
-            "name": "org.yaml:snakeyaml:2.2"
         }
     ],
     "arguments": {
