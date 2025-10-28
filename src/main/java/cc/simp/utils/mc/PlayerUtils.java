@@ -6,6 +6,7 @@ import cc.simp.utils.client.EnumFacingOffset;
 import cc.simp.utils.client.MathUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.*;
@@ -35,6 +36,25 @@ public class PlayerUtils extends Util {
     }
     public static Block blockRelativeToPlayer(final double offsetX, final double offsetY, final double offsetZ) {
         return block(mc.thePlayer.posX + offsetX, mc.thePlayer.posY + offsetY, mc.thePlayer.posZ + offsetZ);
+    }
+
+    public static boolean onLiquid() {
+        boolean onLiquid = false;
+        final AxisAlignedBB playerBB = PlayerUtils.mc.thePlayer.getEntityBoundingBox();
+        final WorldClient world = PlayerUtils.mc.theWorld;
+        final int y = (int) playerBB.offset(0.0, -0.01, 0.0).minY;
+        for (int x = MathHelper.floor_double(playerBB.minX); x < MathHelper.floor_double(playerBB.maxX) + 1; ++x) {
+            for (int z = MathHelper.floor_double(playerBB.minZ); z < MathHelper.floor_double(playerBB.maxZ) + 1; ++z) {
+                final Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
+                if (block != null && !(block instanceof BlockAir)) {
+                    if (!(block instanceof BlockLiquid)) {
+                        return false;
+                    }
+                    onLiquid = true;
+                }
+            }
+        }
+        return onLiquid;
     }
 
     public static boolean isBlockUnder() {

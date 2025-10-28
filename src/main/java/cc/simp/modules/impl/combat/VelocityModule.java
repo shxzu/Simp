@@ -58,9 +58,19 @@ public final class VelocityModule extends Module {
                 if (event.getPacket() instanceof S12PacketEntityVelocity) {
                     S12PacketEntityVelocity p = (S12PacketEntityVelocity) event.getPacket();
                     if (p.getEntityID() == mc.thePlayer.getEntityId()) {
-                        p.setMotionX(0);
-                        p.setMotionZ(0);
-                        p.setMotionY(0);
+                        p.setMotionX(p.getMotionX() * 8000);
+                        p.setMotionZ(p.getMotionZ() * 8000);
+                        p.setMotionY(p.getMotionY() * 8000);
+                    }
+                }
+            }
+
+            if (modeProperty.getValue() == Mode.Delay) {
+                if (event.getPacket() instanceof S12PacketEntityVelocity) {
+                    S12PacketEntityVelocity p = (S12PacketEntityVelocity) event.getPacket();
+                    if (p.getEntityID() == mc.thePlayer.getEntityId()) {
+                            LagProcess.spoof(delay.getValue().intValue() * 100, legit.getValue(), true, legit.getValue(), false);
+                            delayed = true;
                     }
                 }
             }
@@ -80,16 +90,24 @@ public final class VelocityModule extends Module {
                 mc.gameSettings.keyBindJump.setPressed(GameSettings.isKeyDown(mc.gameSettings.keyBindJump));
             }
         }
-        if (modeProperty.getValue() == Mode.Delay) {
-            if (mc.thePlayer.hurtTime > 0) {
-                LagProcess.spoof(delay.getValue().intValue() * 50, legit.getValue(), true, legit.getValue(), false);
-                delayed = true;
-            } else if (delayed) {
-                LagProcess.disable();
-                LagProcess.dispatch();
-                delayed = false;
+
+        if (modeProperty.getValue() == Mode.Delay && mc.thePlayer.hurtTime > 0) {
+            if (mc.thePlayer.hurtTime >= 8) {
+                mc.gameSettings.keyBindJump.setPressed(true);
+            }
+            if (mc.thePlayer.hurtTime >= 4) {
+                mc.gameSettings.keyBindJump.setPressed(false);
+            } else if (mc.thePlayer.hurtTime > 1) {
+                mc.gameSettings.keyBindJump.setPressed(GameSettings.isKeyDown(mc.gameSettings.keyBindJump));
             }
         }
+
+        if (modeProperty.getValue() == Mode.Delay && delayed && mc.thePlayer.hurtTime == 0) {
+            LagProcess.disable();
+            LagProcess.dispatch();
+            delayed = false;
+        }
+
     };
 
     @EventLink

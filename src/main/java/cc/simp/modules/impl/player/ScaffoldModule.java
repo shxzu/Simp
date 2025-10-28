@@ -3,7 +3,6 @@ package cc.simp.modules.impl.player;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.packet.PacketReceiveEvent;
-import cc.simp.api.events.impl.packet.PacketSendEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.player.SprintEvent;
 import cc.simp.api.events.impl.player.StrafeEvent;
@@ -39,9 +38,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C0APacketAnimation;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.*;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -55,6 +53,7 @@ import static cc.simp.utils.Util.mc;
 public final class ScaffoldModule extends Module {
 
     private static final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Normal);
+    private static final ModeProperty<SearchAlgorithm> searchAlgorithm = new ModeProperty<>("Search Algorithm", SearchAlgorithm.Normal);
     private final NumberProperty rotationSpeed = new NumberProperty("Rotation Speed", 5, 0, 10, 1);
     public final NumberProperty placeDelay = new NumberProperty("Place Delay", 2, 0, 5, 1);
     public static Property<Boolean> swing = new Property<>("Swing", false);
@@ -91,6 +90,12 @@ public final class ScaffoldModule extends Module {
         None,
         Normal,
         Strict
+    }
+
+    private enum SearchAlgorithm {
+        Normal,
+        Other,
+        Extra
     }
 
     private Vec3 targetBlock;
@@ -309,13 +314,14 @@ public final class ScaffoldModule extends Module {
     }
 
     private void renderBlockCounter() {
-        if(!counter.getValue()) return;
+        if (!counter.getValue()) return;
         anim.setDirection(this.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
         if (!this.isEnabled() && anim.isDone()) return;
         ScaledResolution sr = new ScaledResolution(mc);
         float output = anim.getOutput().floatValue();
         float x, y;
-        if (mc.thePlayer.inventory.getCurrentItem() != null && mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock) blockCount = mc.thePlayer.inventory.getCurrentItem().stackSize;
+        if (mc.thePlayer.inventory.getCurrentItem() != null && mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock)
+            blockCount = mc.thePlayer.inventory.getCurrentItem().stackSize;
         float blockWH = mc.thePlayer.inventory.getCurrentItem() != null ? 15 : -2;
         int spacing = 3;
         String text = "§l" + blockCount + "§r block" + (blockCount != 1 ? "s" : "");
@@ -329,7 +335,7 @@ public final class ScaffoldModule extends Module {
 
         RenderUtils.drawRoundedRect(x, y, totalWidth, height, 5, new Color(ColorProcess.getColor().darker().getRed(), ColorProcess.getColor().darker().getGreen(), ColorProcess.getColor().darker().getBlue(), 130));
 
-        FontProcess.getFont("bold").drawString(text, x + 3 + blockWH + spacing, y + height / 2f - FontProcess.getFont("bold").getHeight()  / 2f + .5f, -1);
+        FontProcess.getFont("bold").drawString(text, x + 3 + blockWH + spacing, y + height / 2f - FontProcess.getFont("bold").getHeight() / 2f + .5f, -1);
         RenderHelper.enableGUIStandardItemLighting();
         mc.getRenderItem().renderItemAndEffectIntoGUI(mc.thePlayer.inventory.getCurrentItem(), (int) x + 3, (int) (y + 10 - (blockWH / 2)));
         RenderHelper.disableStandardItemLighting();
@@ -532,13 +538,111 @@ public final class ScaffoldModule extends Module {
     }
 
     public void getBaseRotations() {
-        for (int offset = -180; offset <= 180; offset += 45) {
-            double x = blockFace.getX() - mc.thePlayer.posX;
-            double z = blockFace.getZ() - mc.thePlayer.posZ;
-            double y = blockFace.getY() - ((double) mc.thePlayer.getEyeHeight() + mc.thePlayer.posY);
-            double d3 = MathHelper.sqrt_double(x * x + z * z);
-            targetYaw = (float) (MathHelper.atan2(z, x) * 180.0 / Math.PI) - 90.0F;
-            targetPitch = (float) (-(MathHelper.atan2(y, d3) * 180.0 / Math.PI));
+        switch (searchAlgorithm.getValue()) {
+            case Normal -> {
+                EntityPlayer player = mc.thePlayer;
+                double difference = player.posY + player.getEyeHeight() - targetBlock.yCoord -
+                        0.5 - (Math.random() - 0.5) * 0.1;
+
+                MovingObjectPosition movingObjectPosition = null;
+
+                for (int offset = -180; offset <= 180; offset += 45) {
+                    player.setPosition(player.posX, player.posY - difference, player.posZ);
+                    movingObjectPosition = RayCastUtils.rayCast(new Vector2f((float) (player.rotationYaw + (offset * 3)), 0), 4.5);
+                    player.setPosition(player.posX, player.posY + difference, player.posZ);
+
+                    if (movingObjectPosition == null || movingObjectPosition.hitVec == null) return;
+
+                    Vector2f rotations = RotationUtils.calculate(movingObjectPosition.hitVec);
+
+                    if (RayCastUtils.overBlock(rotations, blockFace, enumFacing.getEnumFacing())) {
+                        targetYaw = rotations.x;
+                        targetPitch = rotations.y;
+                        return;
+                    }
+                }
+
+                // Backup Rotations
+                final Vector2f rotations = RotationUtils.calculate(
+                        new Vector3d(blockFace.getX(), blockFace.getY(), blockFace.getZ()), enumFacing.getEnumFacing());
+
+                if (!RayCastUtils.overBlock(new Vector2f(targetYaw, targetPitch), blockFace, enumFacing.getEnumFacing())) {
+                    targetYaw = rotations.x;
+                    targetPitch = rotations.y;
+                }
+            }
+            case Other -> {
+                EntityPlayer player = mc.thePlayer;
+
+                // Calculate the optimal pitch based on distance and height difference
+                double deltaX = blockFace.getX() - player.posX + 0.5;
+                double deltaY = blockFace.getY() - (player.posY + player.getEyeHeight()) + 0.5;
+                double deltaZ = blockFace.getZ() - player.posZ + 0.5;
+                double horizontalDistance = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+
+                // Start with calculated rotations
+                float baseYaw = (float) Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0f;
+                float basePitch = (float) -Math.toDegrees(Math.atan2(deltaY, horizontalDistance));
+
+                // Fine-tune rotations by checking multiple angles around the base
+                float bestYaw = baseYaw;
+                float bestPitch = basePitch;
+                double bestDistance = Double.MAX_VALUE;
+
+                // Search in a grid pattern around the base rotations
+                for (float yawOffset = -15; yawOffset <= 15; yawOffset += 3) {
+                    for (float pitchOffset = -15; pitchOffset <= 15; pitchOffset += 3) {
+                        float testYaw = baseYaw + yawOffset;
+                        float testPitch = basePitch + pitchOffset;
+
+                        // Clamp pitch to valid range
+                        testPitch = MathHelper.clamp_float(testPitch, -90, 90);
+
+                        Vector2f testRotations = new Vector2f(testYaw, testPitch);
+
+                        // Check if these rotations can see the target face
+                        if (RayCastUtils.overBlock(testRotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue() == RayCast.Strict)) {
+                            // Calculate distance from current rotations for smooth transition
+                            double yawDiff = Math.abs(MathHelper.wrapAngleTo180_float(testYaw - RotationProcess.rotations.x));
+                            double pitchDiff = Math.abs(testPitch - RotationProcess.rotations.y);
+                            double totalDistance = Math.sqrt(yawDiff * yawDiff + pitchDiff * pitchDiff);
+
+                            if (totalDistance < bestDistance) {
+                                bestDistance = totalDistance;
+                                bestYaw = testYaw;
+                                bestPitch = testPitch;
+                            }
+                        }
+                    }
+                }
+
+                // If we found valid rotations, use them
+                if (bestDistance != Double.MAX_VALUE) {
+                    targetYaw = bestYaw;
+                    targetPitch = bestPitch;
+                } else {
+                    // Fallback to basic calculation
+                    final Vector2f rotations = RotationUtils.calculate(
+                            new Vector3d(blockFace.getX(), blockFace.getY(), blockFace.getZ()),
+                            enumFacing.getEnumFacing()
+                    );
+                    targetYaw = rotations.x;
+                    targetPitch = rotations.y;
+                }
+            }
+            case Extra -> {
+                if (RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, true)) {
+                    return;
+                }
+                for (float possibleYaw = mc.thePlayer.rotationYaw - 180; possibleYaw <= mc.thePlayer.rotationYaw + 360 - 180; possibleYaw += 45) {
+                    for (float possiblePitch = 90; possiblePitch > 30; possiblePitch -= possiblePitch > (mc.thePlayer.isPotionActive(Potion.moveSpeed) ? 60 : 80) ? 1 : 10) {
+                        if (RayCastUtils.overBlock(new Vector2f(possibleYaw, possiblePitch), enumFacing.getEnumFacing(), blockFace, true)) {
+                            targetYaw = possibleYaw;
+                            targetPitch = possiblePitch;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -595,8 +699,9 @@ public final class ScaffoldModule extends Module {
     }
 
     public void jump() {
-        if(mc.gameSettings.keyBindJump.isPressed()) return;;
-        if(jump.getValue()) {
+        if (mc.gameSettings.keyBindJump.isPressed()) return;
+        ;
+        if (jump.getValue()) {
             if (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel) {
                 jump.setValue(false);
             }
@@ -620,7 +725,7 @@ public final class ScaffoldModule extends Module {
     public static boolean isNearEdge() {
         final double x = mc.thePlayer.posX;
         final double z = mc.thePlayer.posZ;
-        final int y = (int)Math.floor(mc.thePlayer.posY) - 2;
+        final int y = (int) Math.floor(mc.thePlayer.posY) - 2;
         for (double expand = 0.15, dx = -expand; dx <= expand; dx += expand) {
             for (double dz = -expand; dz <= expand; dz += expand) {
                 if (dx != 0.0 || dz != 0.0) {
@@ -633,5 +738,5 @@ public final class ScaffoldModule extends Module {
         }
         return false;
     }
-    
+
 }

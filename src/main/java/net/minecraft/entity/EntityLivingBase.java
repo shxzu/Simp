@@ -117,7 +117,7 @@ public abstract class EntityLivingBase extends Entity
     private EntityLivingBase lastAttacker;
     private int lastAttackerTime;
     private float landMovementFactor;
-    private int jumpTicks;
+    public int jumpTicks;
     private float absorptionAmount;
 
     public void onKillCommand()

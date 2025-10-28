@@ -1,6 +1,8 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
+
+import lombok.Setter;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
@@ -13,7 +15,9 @@ public class S18PacketEntityTeleport implements Packet<INetHandlerPlayClient>
     private int posX;
     private int posY;
     private int posZ;
+    @Setter
     private byte yaw;
+    @Setter
     private byte pitch;
     private boolean onGround;
 

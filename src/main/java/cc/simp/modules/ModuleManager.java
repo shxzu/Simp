@@ -31,8 +31,10 @@ public final class ModuleManager {
                 new LagRangeModule(),
                 new VelocityModule(),
                 new BackTrackModule(),
+                new FastBowModule(),
                 new WTapModule(),
                 new AutoClickerModule(),
+                new KeepSprintModule(),
                 new AimAssistModule(),
                 new AutoRodModule(),
                 new AutoPotModule(),
@@ -44,6 +46,8 @@ public final class ModuleManager {
                 new FlightModule(),
                 new NoSlowModule(),
                 new StepModule(),
+                new JesusModule(),
+                new JumpDelayModule(),
                 new PhaseModule(),
 
                 // Player
@@ -53,6 +57,7 @@ public final class ModuleManager {
                 new AutoToolModule(),
                 new FastBreakModule(),
                 new FastUseModule(),
+                new RegenModule(),
                 new FastPlaceModule(),
                 new StealerModule(),
                 new ManagerModule(),
@@ -67,6 +72,8 @@ public final class ModuleManager {
                 new DisablerModule(),
                 new FakeLagModule(),
                 new ClientSpooferModule(),
+                new AutoPlayModule(),
+                new AutoRegisterModule(),
                 new TimerModule(),
                 new BlinkModule(),
                 new NoRotateModule(),
@@ -85,6 +92,7 @@ public final class ModuleManager {
                 new StorageESPModule(),
                 new ChinaHatModule(),
                 new FullBrightModule(),
+                new MotionBlurModule(),
                 new ItemESPModule()
         );
         getModules().forEach(Module::reflectProperties);
