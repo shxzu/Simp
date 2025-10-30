@@ -1,5 +1,7 @@
 package net.minecraft.client.renderer.entity;
 
+import cc.simp.Simp;
+import cc.simp.modules.impl.visuals.NameTagsModule;
 import com.google.common.collect.Lists;
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -586,6 +588,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
 
     public void renderName(T entity, double x, double y, double z)
     {
+        if (Simp.INSTANCE.getModuleManager().getModule(NameTagsModule.class).isEnabled()) return;
         {
             if (this.canRenderName(entity))
             {

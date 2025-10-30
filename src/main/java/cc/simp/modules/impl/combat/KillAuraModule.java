@@ -14,6 +14,7 @@ import cc.simp.modules.impl.client.AntiBotModule;
 import cc.simp.processes.BadPacketsProcess;
 import cc.simp.processes.LagProcess;
 import cc.simp.processes.RotationProcess;
+import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.client.MathUtils;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.mc.*;
@@ -108,9 +109,7 @@ public final class KillAuraModule extends Module {
     public static boolean canAttack = true;
     List<Entity> targetList = new CopyOnWriteArrayList<>();
     private static final Timer attackTimer = new Timer();
-    private static final Timer switchTimer = new Timer();
     int blockTicks = 0;
-    private int targetIndex;
     static long delay = 0;
     static int elapsedTicks = 0;
 
@@ -118,15 +117,18 @@ public final class KillAuraModule extends Module {
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
         setSuffix(mode.getValue().toString());
 
-        targetList = getTargets();
+        TargetSelectionProcess.setEntities(entities.getValue());
+        TargetSelectionProcess.setSeekRange(seekRange.getValue().floatValue());
+        TargetSelectionProcess.setDontTargetTeams(teams.getValue());
+
+        targetList = TargetSelectionProcess.getTargetList();
+        target = TargetSelectionProcess.getTarget();
 
         if (targetList.isEmpty()) {
             target = null;
             unblock();
             return;
         }
-
-        selectTarget();
 
         if (target == null) {
             unblock();
@@ -157,36 +159,6 @@ public final class KillAuraModule extends Module {
         target = null;
         targetList.clear();
     };
-
-    private void selectTarget() {
-        if (targetList.isEmpty()) {
-            target = null;
-            return;
-        }
-        switch (mode.getValue()) {
-            case Single:
-                target = !targetList.isEmpty() ? (EntityLivingBase) targetList.getFirst() : null;
-                break;
-
-            case Switch:
-                if (!targetList.isEmpty()) {
-                    if (switchTimer.hasTimeElapsed(switchSpeed.getValue() * 100)) {
-                        targetIndex = (targetIndex + 1) % targetList.size();
-                        switchTimer.reset();
-                    }
-                    target = (EntityLivingBase) targetList.get(targetIndex);
-                }
-                break;
-
-            case Adaptive:
-                if (!targetList.isEmpty()) {
-                    target = (EntityLivingBase) targetList.stream()
-                            .min(Comparator.comparingDouble(e -> mc.thePlayer.getDistanceToEntity(e)))
-                            .orElse(null);
-                }
-                break;
-        }
-    }
 
     @EventLink
     public final Listener<TickEvent> tickEventListener = e -> {
@@ -380,40 +352,6 @@ public final class KillAuraModule extends Module {
             }
         }
         return toolDelay;
-    }
-
-    private List<Entity> getTargets() {
-        return mc.theWorld.loadedEntityList.stream()
-                .filter(entity -> entity instanceof EntityLivingBase)
-                .filter(entity -> entity != mc.thePlayer)
-                .filter(entity -> !entity.isDead)
-                .filter(entity -> ((EntityLivingBase) entity).getHealth() > 0)
-                .filter(entity -> mc.thePlayer.getDistanceToEntity(entity) <= seekRange.getValue())
-                .filter(entity -> !AntiBotModule.botList.contains(entity))
-                .filter(this::isValidEntity)
-                .collect(Collectors.toList());
-    }
-
-    private boolean isValidEntity(Entity entity) {
-        if (teams.getValue() && inTeam(mc.thePlayer, entity)) return false;
-
-        return switch (entities.getValue()) {
-            case Optimal -> entity instanceof EntityPlayer || entity instanceof EntityMob;
-            case Players -> entity instanceof EntityPlayer;
-            case All -> true;
-        };
-    }
-
-    public static boolean inTeam(@NonNull ICommandSender entity0, @NonNull ICommandSender entity1) {
-        String s = "\u00a7" + teamColor(entity0);
-
-        return entity0.getDisplayName().getFormattedText().contains(s)
-                && entity1.getDisplayName().getFormattedText().contains(s);
-    }
-
-    public static @NonNull String teamColor(@NonNull ICommandSender player) {
-        Matcher matcher = Pattern.compile("\u00a7(.).*\u00a7r").matcher(player.getDisplayName().getFormattedText());
-        return matcher.find() ? matcher.group(1) : "f";
     }
 
     private boolean shouldBlockPredictive() {
