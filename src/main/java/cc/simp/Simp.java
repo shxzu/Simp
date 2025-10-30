@@ -43,6 +43,7 @@ public class Simp {
     private ColorProcess colorProcess;
     private ClickInterface clickInterface;
     private LagProcess lagProcess;
+    private BadPacketsProcess badPacketsProcess;
 
     private Simp() {
         getEventBus().subscribe(this);
@@ -63,6 +64,8 @@ public class Simp {
         configManager.loadConfig("default");
         lagProcess = new LagProcess();
         getEventBus().subscribe(lagProcess);
+        badPacketsProcess = new BadPacketsProcess();
+        getEventBus().subscribe(badPacketsProcess);
         commandHandler = new CommandHandler();
         commandHandler.commands.addAll(Arrays.asList(
                 new BindCommand(),

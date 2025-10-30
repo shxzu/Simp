@@ -36,6 +36,7 @@ public final class VelocityModule extends Module {
     public enum Mode {
         Motion,
         Cancel,
+        Boost,
         Reduce,
         Delay,
         Jump
@@ -54,24 +55,34 @@ public final class VelocityModule extends Module {
                     p.setMotionY((int) (p.getMotionY() * vertical.getValue() / 100.0));
                 }
             }
-            if (modeProperty.getValue() == Mode.Cancel) {
-                if (event.getPacket() instanceof S12PacketEntityVelocity) {
-                    S12PacketEntityVelocity p = (S12PacketEntityVelocity) event.getPacket();
-                    if (p.getEntityID() == mc.thePlayer.getEntityId()) {
-                        p.setMotionX(p.getMotionX() * 8000);
-                        p.setMotionZ(p.getMotionZ() * 8000);
-                        p.setMotionY(p.getMotionY() * 8000);
-                    }
+        }
+
+        if (modeProperty.getValue() == Mode.Boost) {
+            if (event.getPacket() instanceof S12PacketEntityVelocity) {
+                S12PacketEntityVelocity p = (S12PacketEntityVelocity) event.getPacket();
+                if (p.getEntityID() == mc.thePlayer.getEntityId()) {
+                    p.setMotionX(p.getMotionX() * -1);
+                    p.setMotionZ(p.getMotionZ() * -1);
+                    p.setMotionY(p.getMotionY() * -1);
                 }
             }
+        }
 
-            if (modeProperty.getValue() == Mode.Delay) {
-                if (event.getPacket() instanceof S12PacketEntityVelocity) {
-                    S12PacketEntityVelocity p = (S12PacketEntityVelocity) event.getPacket();
-                    if (p.getEntityID() == mc.thePlayer.getEntityId()) {
-                            LagProcess.spoof(delay.getValue().intValue() * 100, legit.getValue(), true, legit.getValue(), false);
-                            delayed = true;
-                    }
+        if (modeProperty.getValue() == Mode.Cancel) {
+            if (event.getPacket() instanceof S12PacketEntityVelocity) {
+                S12PacketEntityVelocity p = (S12PacketEntityVelocity) event.getPacket();
+                if (p.getEntityID() == mc.thePlayer.getEntityId()) {
+                   event.setCancelled();
+                }
+            }
+        }
+
+        if (modeProperty.getValue() == Mode.Delay) {
+            if (event.getPacket() instanceof S12PacketEntityVelocity) {
+                S12PacketEntityVelocity p = (S12PacketEntityVelocity) event.getPacket();
+                if (p.getEntityID() == mc.thePlayer.getEntityId()) {
+                    LagProcess.spoof(delay.getValue().intValue() * 10, legit.getValue(), true, legit.getValue(), false);
+                    delayed = true;
                 }
             }
         }
