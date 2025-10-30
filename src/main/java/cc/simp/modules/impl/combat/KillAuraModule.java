@@ -11,6 +11,7 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.client.AntiBotModule;
+import cc.simp.processes.BadPacketsProcess;
 import cc.simp.processes.LagProcess;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.client.MathUtils;
@@ -63,6 +64,8 @@ public final class KillAuraModule extends Module {
     private static final NumberProperty min = new NumberProperty("Min CPS", 9.0, () -> !newCombat.getValue(),0.0, 20.0, 0.5);
     private static final NumberProperty max = new NumberProperty("Max CPS", 13.0, () -> !newCombat.getValue(), 0.0, 20.0, 0.5);
     public static ModeProperty<AutoBlock> ab = new ModeProperty<>("Auto Block", AutoBlock.Fake);
+    private final NumberProperty legitBlockInterval = new NumberProperty("Legit Block Interval", 4, () -> ab.getValue() == AutoBlock.Legit, 2, 10, 1);
+    private final Property<Boolean> legitRandomize = new Property<>("Legit Randomize", true, () -> ab.getValue() == AutoBlock.Legit);
     public static ModeProperty<Rotations> rotations = new ModeProperty<>("Rotations", Rotations.Regular);
     private final NumberProperty speed = new NumberProperty("Rotation Speed", 5, 0, 10, 1);
     public static final Property<Boolean> jitter = new Property<>("Jitter Rotations", false);
@@ -219,8 +222,10 @@ public final class KillAuraModule extends Module {
     }
 
     private void autoblock() {
-        if (target == null || !InventoryUtils.isHoldingSword()) {
-            autoBlocking = false;
+        if (target == null || !InventoryUtils.isHoldingSword() || BadPacketsProcess.bad()) {
+            if (autoBlocking) {
+                unblock();
+            }
             return;
         }
 
@@ -229,17 +234,24 @@ public final class KillAuraModule extends Module {
                 autoBlocking = true;
                 break;
             case Legit:
-                if (mc.thePlayer.ticksExisted % 4 == 0) {
+                int interval = legitBlockInterval.getValue().intValue();
+                if (legitRandomize.getValue()) {
+                    interval += (mc.thePlayer.ticksExisted % 3) - 1;
+                    interval = Math.max(2, interval);
+                }
+                if (mc.thePlayer.ticksExisted % interval == 0) {
                     mc.gameSettings.keyBindUseItem.setPressed(true);
                     autoBlocking = true;
+                    canAttack = false;
                 } else {
-                   unblock();
+                    unblock();
                 }
                 break;
             case Predictive:
-                if (mc.thePlayer.hurtTime >= 4 && mc.thePlayer.hurtTime != 10) {
+                if (shouldBlockPredictive()) {
                     mc.gameSettings.keyBindUseItem.setPressed(true);
                     autoBlocking = true;
+                    canAttack = false;
                 } else {
                     unblock();
                 }
@@ -252,7 +264,6 @@ public final class KillAuraModule extends Module {
                 if (mc.playerController.curBlockDamageMP != 0 && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                     blockTicks = 0;
                 }
-
                 blockTicks++;
                 if (blockTicks >= 3) blockTicks = 1;
 
@@ -272,7 +283,6 @@ public final class KillAuraModule extends Module {
                 if (mc.playerController.curBlockDamageMP != 0 && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                     blockTicks = 0;
                 }
-
                 blockTicks++;
                 if (blockTicks >= 3) blockTicks = 1;
 
@@ -404,6 +414,42 @@ public final class KillAuraModule extends Module {
     public static @NonNull String teamColor(@NonNull ICommandSender player) {
         Matcher matcher = Pattern.compile("\u00a7(.).*\u00a7r").matcher(player.getDisplayName().getFormattedText());
         return matcher.find() ? matcher.group(1) : "f";
+    }
+
+    private boolean shouldBlockPredictive() {
+        if (target == null) return false;
+
+        // Check if target is within attack range and looking at us
+        double distance = mc.thePlayer.getDistanceToEntity(target);
+        if (distance > 6.0) return false;
+
+        // Get target's eye position and rotation
+        double targetX = target.posX;
+        double targetY = target.posY + target.getEyeHeight();
+        double targetZ = target.posZ;
+
+        // Calculate vector from target to player
+        double deltaX = mc.thePlayer.posX - targetX;
+        double deltaY = (mc.thePlayer.posY + mc.thePlayer.getEyeHeight()) - targetY;
+        double deltaZ = mc.thePlayer.posZ - targetZ;
+
+        // Calculate target's look vector
+        float yaw = (float) Math.toRadians(target.rotationYaw);
+        float pitch = (float) Math.toRadians(target.rotationPitch);
+
+        double targetLookX = -Math.sin(yaw) * Math.cos(pitch);
+        double targetLookY = -Math.sin(pitch);
+        double targetLookZ = Math.cos(yaw) * Math.cos(pitch);
+
+        // Normalize vectors
+        double deltaMag = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+        double lookMag = Math.sqrt(targetLookX * targetLookX + targetLookY * targetLookY + targetLookZ * targetLookZ);
+
+        // Calculate dot product (cosine of angle)
+        double dotProduct = (deltaX * targetLookX + deltaY * targetLookY + deltaZ * targetLookZ) / (deltaMag * lookMag);
+
+        // If angle is < 60 degrees (cos > 0.5), target is looking at us
+        return dotProduct > 0.5 && target.swingProgress > 0;
     }
 
     @Override

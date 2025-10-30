@@ -18,6 +18,7 @@ import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.movement.SpeedModule;
 import cc.simp.processes.ColorProcess;
 import cc.simp.processes.FontProcess;
+import cc.simp.processes.LagProcess;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.client.EnumFacingOffset;
 import cc.simp.utils.client.Logger;
@@ -39,6 +40,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.network.play.client.C0APacketAnimation;
+import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.*;
 import org.lwjgl.input.Keyboard;
@@ -48,6 +50,7 @@ import org.lwjgl.util.vector.Vector2f;
 import java.awt.*;
 
 import static cc.simp.utils.Util.mc;
+import static net.minecraft.network.play.client.C0BPacketEntityAction.Action.START_SNEAKING;
 
 @ModuleInfo(label = "Scaffold", category = ModuleCategory.PLAYER)
 public final class ScaffoldModule extends Module {
@@ -59,9 +62,11 @@ public final class ScaffoldModule extends Module {
     public static Property<Boolean> swing = new Property<>("Swing", false);
     public static Property<Boolean> sprint = new Property<>("Sprint", false);
     public static Property<Boolean> moveFix = new Property<>("Move Fix", true);
-    private final ModeProperty<RayCast> raycast = new ModeProperty<>("Ray Cast", RayCast.Normal);
+    private final ModeProperty<RayCast> rayCast = new ModeProperty<>("Ray Cast", RayCast.Normal);
     public static Property<Boolean> jump = new Property<>("Auto Jump", false, () -> mode.getValue() != Mode.SlowTelly && mode.getValue() != Mode.FastTelly && mode.getValue() != Mode.Hypixel);
+    public static Property<Boolean> edge = new Property<>("Jump Only On Edge", false);
     public static Property<Boolean> keepY = new Property<>("Keep Y", false);
+    private static final Property<Boolean> safeWalk = new Property<>("Safe Walk", false);
     private final NumberProperty expand = new NumberProperty("Expand", 0, 0, 4, 1);
     private final Property<Boolean> render = new Property<>("Render Selection", true);
     private final Property<Boolean> counter = new Property<>("Block Counter", true);
@@ -94,6 +99,8 @@ public final class ScaffoldModule extends Module {
 
     private enum SearchAlgorithm {
         Normal,
+        Hypixel,
+        Opal,
         Other,
         Extra
     }
@@ -114,6 +121,7 @@ public final class ScaffoldModule extends Module {
     private float rotSpeed;
     private boolean overrided;
     public int recursions, recursion;
+    private boolean blinked = false;
 
     @EventLink
     public final Listener<MotionEvent> motionEventListener = event -> {
@@ -124,7 +132,12 @@ public final class ScaffoldModule extends Module {
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
         this.setSuffix(mode.getValue().toString());
+
         resetBinds(false, false, true, true, false, false);
+
+        if(safeWalk.getValue()) {
+            mc.thePlayer.safeWalk = true;
+        }
 
         for (recursion = 0; recursion <= recursions; recursion++) {
 
@@ -206,14 +219,14 @@ public final class ScaffoldModule extends Module {
             }
 
             if (mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock) {
-                if (canPlace && (RayCastUtils.overBlock(enumFacing.getEnumFacing(), blockFace, raycast.getValue() == RayCast.Strict) || raycast.getValue() == RayCast.None)) {
+                if (canPlace && (RayCastUtils.overBlock(enumFacing.getEnumFacing(), blockFace, rayCast.getValue() == RayCast.Strict) || rayCast.getValue() == RayCast.None)) {
                     this.place();
 
                     ticksOnAir = 0;
 
                 } else if (Math.random() > 0.3 && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK &&
                         mc.objectMouseOver.getBlockPos().equals(blockFace) && mc.objectMouseOver.sideHit ==
-                        EnumFacing.UP && raycast.getValue() == RayCast.Strict && !(PlayerUtils.blockRelativeToPlayer(0, -1, 0) instanceof BlockAir)) {
+                        EnumFacing.UP && rayCast.getValue() == RayCast.Strict && !(PlayerUtils.blockRelativeToPlayer(0, -1, 0) instanceof BlockAir)) {
                     mc.rightClickMouse();
                 }
             }
@@ -309,6 +322,13 @@ public final class ScaffoldModule extends Module {
     @Override
     public void onDisable() {
         anim = new DecelerateAnimation(250, 1);
+        if (mc.thePlayer != null) {
+            mc.thePlayer.safeWalk = false;
+            if(blinked) {
+                LagProcess.disable();
+                LagProcess.dispatch();
+            }
+        }
         resetBinds();
         super.onDisable();
     }
@@ -449,7 +469,7 @@ public final class ScaffoldModule extends Module {
             case SlowTelly:
                 if (recursion == 0) {
                     if (mc.thePlayer.offGroundTicks >= 8 && mc.thePlayer.offGroundTicks < 12) {
-                        if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue().equals(RayCast.Strict))) {
+                        if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, rayCast.getValue().equals(RayCast.Strict))) {
                             getBaseRotations();
                         }
                     } else {
@@ -462,7 +482,7 @@ public final class ScaffoldModule extends Module {
             case FastTelly:
                 if (recursion == 0) {
                     if (mc.thePlayer.offGroundTicks <= 9 && mc.thePlayer.offGroundTicks > 3) {
-                        if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue().equals(RayCast.Strict))) {
+                        if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, rayCast.getValue().equals(RayCast.Strict))) {
                             getBaseRotations();
                         }
                         overrided = true;
@@ -477,17 +497,20 @@ public final class ScaffoldModule extends Module {
                 break;
             case Hypixel:
                 if (recursion == 0) {
-                    if (mc.thePlayer.offGroundTicks <= 10) {
-                        if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue().equals(RayCast.Strict))) {
+                    if (mc.thePlayer.offGroundTicks < 11) {
+                        if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, rayCast.getValue().equals(RayCast.Strict))) {
                             getBaseRotations();
                         }
-                        overrided = false;
-                    } else {
+                    } else if(MovementUtils.isOnGround()) {
                         targetPitch = mc.thePlayer.rotationPitch;
                         targetYaw = mc.thePlayer.rotationYaw;
                         canPlace = false;
-                        overrided = true;
-                        this.rotSpeed = 10;
+                    }
+
+                    if (mc.thePlayer.offGroundTicks <= 2 && mc.thePlayer.offGroundTicks > 0) {
+                        mc.gameSettings.keyBindSneak.setPressed(true);
+                    } else {
+                        mc.gameSettings.keyBindSneak.setPressed(false);
                     }
                 }
                 break;
@@ -571,6 +594,152 @@ public final class ScaffoldModule extends Module {
                     targetPitch = rotations.y;
                 }
             }
+            case Hypixel -> {
+                EntityPlayer player = mc.thePlayer;
+
+                // Calculate base direction to target
+                double deltaX = blockFace.getX() - player.posX + 0.5;
+                double deltaY = blockFace.getY() - (player.posY + player.getEyeHeight()) + 0.5;
+                double deltaZ = blockFace.getZ() - player.posZ + 0.5;
+                double horizontalDistance = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+
+                // Calculate base rotations
+                float baseYaw = (float) Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0f;
+                float basePitch = (float) -Math.toDegrees(Math.atan2(deltaY, horizontalDistance));
+
+                // Check if player is moving diagonally (similar to HypixelRotationModel)
+                float direction = (float) Math.abs(MovementUtils.direction() % 90);
+                boolean isDiagonal = direction > 15 && direction < 75;
+
+                // Adjust search range based on movement
+                float yawRange = isDiagonal ? 25f : 15f;
+                float pitchRange = isDiagonal ? 20f : 12f;
+                float yawStep = isDiagonal ? 2.5f : 3f;
+                float pitchStep = isDiagonal ? 2f : 3f;
+
+                float bestYaw = baseYaw;
+                float bestPitch = basePitch;
+                double bestDistance = Double.MAX_VALUE;
+
+                // Prioritize rotations closer to current view
+                for (float yawOffset = -yawRange; yawOffset <= yawRange; yawOffset += yawStep) {
+                    for (float pitchOffset = -pitchRange; pitchOffset <= pitchRange; pitchOffset += pitchStep) {
+                        float testYaw = baseYaw + yawOffset;
+                        float testPitch = MathHelper.clamp_float(basePitch + pitchOffset, -90, 90);
+
+                        Vector2f testRotations = new Vector2f(testYaw, testPitch);
+
+                        // Use strict raycast for Hypixel compatibility
+                        if (RayCastUtils.overBlock(testRotations, enumFacing.getEnumFacing(), blockFace, true)) {
+                            // Calculate smooth transition distance
+                            double yawDiff = Math.abs(MathHelper.wrapAngleTo180_float(testYaw - RotationProcess.rotations.x));
+                            double pitchDiff = Math.abs(testPitch - RotationProcess.rotations.y);
+                            double totalDistance = Math.sqrt(yawDiff * yawDiff + pitchDiff * pitchDiff);
+
+                            // Prefer rotations that require less movement
+                            if (totalDistance < bestDistance) {
+                                bestDistance = totalDistance;
+                                bestYaw = testYaw;
+                                bestPitch = testPitch;
+                            }
+                        }
+                    }
+                }
+
+                // Apply found rotations
+                if (bestDistance != Double.MAX_VALUE) {
+                    targetYaw = bestYaw;
+                    targetPitch = bestPitch;
+                } else {
+                    // Fallback to direct calculation
+                    final Vector2f rotations = RotationUtils.calculate(
+                            new Vector3d(blockFace.getX(), blockFace.getY(), blockFace.getZ()),
+                            enumFacing.getEnumFacing()
+                    );
+                    targetYaw = rotations.x;
+                    targetPitch = rotations.y;
+                }
+            }
+            case Opal -> {
+                EntityPlayer player = mc.thePlayer;
+
+                // Calculate base direction to target
+                double deltaX = blockFace.getX() - player.posX + 0.5;
+                double deltaY = blockFace.getY() - (player.posY + player.getEyeHeight()) + 0.5;
+                double deltaZ = blockFace.getZ() - player.posZ + 0.5;
+                double horizontalDistance = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+
+                // Calculate base rotations
+                float baseYaw = (float) Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0f;
+                float basePitch = (float) -Math.toDegrees(Math.atan2(deltaY, horizontalDistance));
+
+                // Detect movement patterns (inspired by OrganicRotationModel's organic movement)
+                float direction = (float) Math.abs(MovementUtils.direction() % 90);
+                boolean isDiagonal = direction > 15 && direction < 75;
+                boolean isMovingFast = Math.sqrt(player.motionX * player.motionX + player.motionZ * player.motionZ) > 0.15;
+
+                // Organic-style search parameters with drift and jitter consideration
+                float yawRange = isDiagonal ? (isMovingFast ? 28f : 22f) : 18f;
+                float pitchRange = isDiagonal ? (isMovingFast ? 22f : 18f) : 14f;
+                float yawStep = isDiagonal ? 2.8f : 3.5f;
+                float pitchStep = isDiagonal ? 2.2f : 2.8f;
+
+                // Add slight randomization for more organic feel
+                float randomYawOffset = (float) ((Math.random() - 0.5) * 2);
+                float randomPitchOffset = (float) ((Math.random() - 0.5) * 1.5);
+
+                float bestYaw = baseYaw;
+                float bestPitch = basePitch;
+                double bestDistance = Double.MAX_VALUE;
+                double bestCenterAlignment = Double.MAX_VALUE;
+
+                // Search with organic distribution
+                for (float yawOffset = -yawRange; yawOffset <= yawRange; yawOffset += yawStep) {
+                    for (float pitchOffset = -pitchRange; pitchOffset <= pitchRange; pitchOffset += pitchStep) {
+                        float testYaw = baseYaw + yawOffset + randomYawOffset;
+                        float testPitch = MathHelper.clamp_float(basePitch + pitchOffset + randomPitchOffset, -90, 90);
+
+                        Vector2f testRotations = new Vector2f(testYaw, testPitch);
+
+                        // Use strict raycast for better accuracy
+                        if (RayCastUtils.overBlock(testRotations, enumFacing.getEnumFacing(), blockFace, true)) {
+                            // Calculate smooth transition distance
+                            double yawDiff = Math.abs(MathHelper.wrapAngleTo180_float(testYaw - RotationProcess.rotations.x));
+                            double pitchDiff = Math.abs(testPitch - RotationProcess.rotations.y);
+                            double totalDistance = Math.sqrt(yawDiff * yawDiff + pitchDiff * pitchDiff);
+
+                            // Calculate how centered the rotation is (prefer middle of block face)
+                            double centerOffsetX = Math.abs(yawOffset);
+                            double centerOffsetY = Math.abs(pitchOffset);
+                            double centerAlignment = Math.sqrt(centerOffsetX * centerOffsetX + centerOffsetY * centerOffsetY);
+
+                            // Prefer rotations that are smooth AND well-centered (organic balance)
+                            double score = totalDistance * 0.7 + centerAlignment * 0.3;
+
+                            if (score < bestDistance) {
+                                bestDistance = score;
+                                bestCenterAlignment = centerAlignment;
+                                bestYaw = testYaw;
+                                bestPitch = testPitch;
+                            }
+                        }
+                    }
+                }
+
+                // Apply found rotations
+                if (bestDistance != Double.MAX_VALUE) {
+                    targetYaw = bestYaw;
+                    targetPitch = bestPitch;
+                } else {
+                    // Fallback to direct calculation with slight randomization
+                    final Vector2f rotations = RotationUtils.calculate(
+                            new Vector3d(blockFace.getX(), blockFace.getY(), blockFace.getZ()),
+                            enumFacing.getEnumFacing()
+                    );
+                    targetYaw = rotations.x + (float) ((Math.random() - 0.5) * 1.5);
+                    targetPitch = rotations.y + (float) ((Math.random() - 0.5));
+                }
+            }
             case Other -> {
                 EntityPlayer player = mc.thePlayer;
 
@@ -601,7 +770,7 @@ public final class ScaffoldModule extends Module {
                         Vector2f testRotations = new Vector2f(testYaw, testPitch);
 
                         // Check if these rotations can see the target face
-                        if (RayCastUtils.overBlock(testRotations, enumFacing.getEnumFacing(), blockFace, raycast.getValue() == RayCast.Strict)) {
+                        if (RayCastUtils.overBlock(testRotations, enumFacing.getEnumFacing(), blockFace, rayCast.getValue() == RayCast.Strict)) {
                             // Calculate distance from current rotations for smooth transition
                             double yawDiff = Math.abs(MathHelper.wrapAngleTo180_float(testYaw - RotationProcess.rotations.x));
                             double pitchDiff = Math.abs(testPitch - RotationProcess.rotations.y);
@@ -690,7 +859,7 @@ public final class ScaffoldModule extends Module {
     private void place() {
         Vec3 hitVec = this.getHitVec();
 
-        if (raycast.getValue() == RayCast.Strict) {
+        if (rayCast.getValue() == RayCast.Strict) {
             mc.rightClickMouse();
         } else if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.inventory.getCurrentItem(), blockFace, enumFacing.getEnumFacing(), hitVec)) {
             if (swing.getValue()) mc.thePlayer.swingItem();
@@ -707,11 +876,11 @@ public final class ScaffoldModule extends Module {
             }
         }
         if (keepY.getValue() && jump.getValue() || (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel && keepY.getValue())) {
-            if (mc.thePlayer.onGround && MovementUtils.isMoving() && mc.thePlayer.posY == startY && isNearEdge() && (mode.getValue() != Mode.SlowTelly || mc.thePlayer.onGroundTicks >= 1)) {
+            if (mc.thePlayer.onGround && MovementUtils.isMoving() && mc.thePlayer.posY == startY && (!edge.getValue() || isNearEdge())) {
                 mc.thePlayer.jump();
             }
         }
-        if (jump.getValue() || (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel) && !keepY.getValue()) {
+        if (jump.getValue() || (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel) && !keepY.getValue() && (!edge.getValue() || isNearEdge())) {
             if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
                 mc.thePlayer.jump();
             }

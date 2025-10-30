@@ -60,6 +60,7 @@ public abstract class Entity implements ICommandSender
     public World worldObj;
     public double prevPosX;
     public double prevPosY;
+    public boolean safeWalk = false;
     public double prevPosZ;
     public double posX;
     public double posY;
@@ -461,7 +462,7 @@ public abstract class Entity implements ICommandSender
             double d5 = z;
             boolean flag = this.onGround && this.isSneaking() && this instanceof EntityPlayer;
 
-            if (flag)
+            if (flag || safeWalk)
             {
                 double d6;
 
@@ -528,6 +529,8 @@ public abstract class Entity implements ICommandSender
                     }
                 }
             }
+
+            safeWalk = false;
 
             List<AxisAlignedBB> list1 = this.worldObj.getCollidingBoundingBoxes(this, this.getEntityBoundingBox().addCoord(x, y, z));
             AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
