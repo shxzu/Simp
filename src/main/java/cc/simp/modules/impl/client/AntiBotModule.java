@@ -47,28 +47,6 @@ public class AntiBotModule extends Module {
 
         setSuffix(modeProperty.getValue().toString());
 
-        // Global AntiBot Strategies
-
-        mc.theWorld.playerEntities.forEach(player -> {
-            if (player.maxHurtTime == 0) {
-                if (player.getHealth() == 20.0f) {
-                    String unformattedText = player.getDisplayName().getUnformattedText();
-                    if (unformattedText.length() >= 7 && unformattedText.charAt(2) == '[' && unformattedText.charAt(3) == 'N' && unformattedText.charAt(6) == ']') {
-                        botList.add(player);
-                    }
-                    if (player.getDisplayName().toString().contains(" ")) {
-                        botList.add(player);
-                    }
-                }
-            }
-            if (player.getDisplayName().toString().isEmpty()) {
-                botList.add(player);
-            }
-            if(player.getEntityId() < 0) {
-                botList.add(player);
-            }
-        });
-
         switch (modeProperty.getValue()) {
             case NPC:
                 mc.theWorld.playerEntities.forEach(player -> {
