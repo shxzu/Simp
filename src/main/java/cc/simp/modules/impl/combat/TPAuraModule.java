@@ -11,6 +11,7 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.client.AntiBotModule;
+import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.mc.PacketUtils;
 import cc.simp.utils.mc.PathFinderUtils;
@@ -63,7 +64,7 @@ public final class TPAuraModule extends Module {
         /*
          * Getting targets and selecting the nearest one
          */
-        final List<Entity> targets = getTargets();
+        final List<Entity> targets = TargetSelectionProcess.getTargetList();
 
         if (targets.isEmpty()) {
             target = null;
@@ -166,16 +167,4 @@ public final class TPAuraModule extends Module {
             mc.thePlayer.onCriticalHit(target);
         }
     }
-
-    private List<Entity> getTargets() {
-        return mc.theWorld.loadedEntityList.stream()
-                .filter(entity -> entity instanceof EntityPlayer)
-                .filter(entity -> entity != mc.thePlayer)
-                .filter(entity -> !entity.isDead)
-                .filter(entity -> ((EntityLivingBase) entity).getHealth() > 0)
-                .filter(entity -> mc.thePlayer.getDistanceToEntity(entity) <= reach.getValue())
-                .filter(entity -> !AntiBotModule.botList.contains(entity))
-                .collect(Collectors.toList());
-    }
-
 }

@@ -10,6 +10,7 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.LagProcess;
+import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.client.MathUtils;
 import cc.simp.utils.render.RenderUtils;
 import cc.simp.utils.render.animations.ContinualAnimation;
@@ -62,13 +63,13 @@ public final class BackTrackModule extends Module {
                 return;
             }
 
-            if (!(KillAuraModule.target instanceof EntityPlayer)) {
+            if (!(TargetSelectionProcess.getTarget() instanceof EntityPlayer)) {
                 LagProcess.disable();
                 LagProcess.dispatch();
                 return;
             }
 
-            target = (EntityPlayer) KillAuraModule.target;
+            target = (EntityPlayer) TargetSelectionProcess.getTarget();
 
 
         if (swingCheckProperty.getValue() && !mc.thePlayer.isSwingInProgress)

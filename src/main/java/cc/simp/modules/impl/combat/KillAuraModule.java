@@ -55,9 +55,9 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Kill Aura", category = ModuleCategory.COMBAT)
 public final class KillAuraModule extends Module {
 
-    public static ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Adaptive);
-    private final NumberProperty switchSpeed = new NumberProperty("Switch Speed", 2, () -> mode.getValue() == Mode.Switch, 0, 10, 1);
-    public static ModeProperty<Entities> entities = new ModeProperty<>("Entities", Entities.Optimal);
+    public static ModeProperty<TargetSelectionProcess.Mode> mode = new ModeProperty<>("Mode", TargetSelectionProcess.Mode.Adaptive);
+    public static ModeProperty<TargetSelectionProcess.Entities> entities = new ModeProperty<>("Entities", TargetSelectionProcess.Entities.Optimal);
+    private final NumberProperty switchSpeed = new NumberProperty("Switch Speed", 2, () -> mode.getValue() == TargetSelectionProcess.Mode.Switch, 0, 10, 1);
     public static NumberProperty seekRange = new NumberProperty("Seek Range", 4.2, 3, 6, 0.1);
     public static NumberProperty killRange = new NumberProperty("Kill Range", 3, 3, 6, 0.1);
     public static NumberProperty blockingRange = new NumberProperty("Blocking Range", 4.2, 3, 6, 0.1);
@@ -75,18 +75,6 @@ public final class KillAuraModule extends Module {
     public static final Property<Boolean> legit = new Property<>("Legit", true);
     public static final Property<Boolean> raycast = new Property<>("Ray Cast", true);
     private final Property<Boolean> teams = new Property<>("Teams", false);
-
-    public enum Mode {
-        Adaptive,
-        Single,
-        Switch
-    }
-
-    public enum Entities {
-        Optimal,
-        Players,
-        All
-    }
 
     public enum Rotations {
         Regular,
@@ -117,9 +105,11 @@ public final class KillAuraModule extends Module {
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
         setSuffix(mode.getValue().toString());
 
+        TargetSelectionProcess.setMode(mode.getValue());
         TargetSelectionProcess.setEntities(entities.getValue());
         TargetSelectionProcess.setSeekRange(seekRange.getValue().floatValue());
         TargetSelectionProcess.setDontTargetTeams(teams.getValue());
+        TargetSelectionProcess.setSwitchTime(switchSpeed.getValue().intValue());
 
         targetList = TargetSelectionProcess.getTargetList();
         target = TargetSelectionProcess.getTarget();
@@ -168,7 +158,7 @@ public final class KillAuraModule extends Module {
     private void calculateRotations() {
         if (target == null || rotations.getValue() == Rotations.None) return;
 
-        Vector2f rotation = RotationUtils.calculate(target, mode.getValue() == Mode.Adaptive, seekRange.getValue());
+        Vector2f rotation = RotationUtils.calculate(target, mode.getValue() == TargetSelectionProcess.Mode.Adaptive, seekRange.getValue());
 
         if (jitter.getValue()) {
             rotation.x += (float) ((Math.random() - 0.5) * 2);

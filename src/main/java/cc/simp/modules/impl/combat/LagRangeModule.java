@@ -13,6 +13,7 @@ import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.FontProcess;
 import cc.simp.processes.LagProcess;
+import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.mc.MovementUtils;
 import io.github.nevalackin.homoBus.Listener;
@@ -62,7 +63,7 @@ public final class LagRangeModule extends Module {
             }
         }
         if(modeProperty.getValue() == Mode.Range) {
-            if(KillAuraModule.target == null) {
+            if(TargetSelectionProcess.getTarget() == null) {
                 blinkToggle(false);
                 blinked = false;
                 return;
@@ -73,10 +74,10 @@ public final class LagRangeModule extends Module {
                 return;
             }
 
-            if(mc.thePlayer.getDistanceToEntity(KillAuraModule.target) <= KillAuraModule.seekRange.getValue() && (!(mc.thePlayer.getDistanceToEntity(KillAuraModule.target) <= rangeToUnblinkProperty.getValue()))) {
+            if(mc.thePlayer.getDistanceToEntity(TargetSelectionProcess.getTarget()) <= KillAuraModule.seekRange.getValue() && (!(mc.thePlayer.getDistanceToEntity(TargetSelectionProcess.getTarget()) <= rangeToUnblinkProperty.getValue()))) {
                 if(!blinked) blinkToggle(true); blinked = true;
             }
-            if(mc.thePlayer.getDistanceToEntity(KillAuraModule.target) <= rangeToUnblinkProperty.getValue()) {
+            if(mc.thePlayer.getDistanceToEntity(TargetSelectionProcess.getTarget()) <= rangeToUnblinkProperty.getValue()) {
                 if(blinked) blinkToggle(false); blinked = false;
             }
         }

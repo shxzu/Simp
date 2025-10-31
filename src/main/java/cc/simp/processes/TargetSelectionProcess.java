@@ -1,6 +1,9 @@
 package cc.simp.processes;
 
+import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
+import cc.simp.api.events.impl.player.AttackEvent;
+import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.impl.client.AntiBotModule;
 import cc.simp.utils.client.Timer;
 import io.github.nevalackin.homoBus.Listener;
@@ -43,6 +46,9 @@ public class TargetSelectionProcess {
     @Getter
     @Setter
     private static float seekRange;
+    @Getter
+    @Setter
+    private static int switchTime;
     private int targetIndex;
 
     public TargetSelectionProcess() {
@@ -50,6 +56,7 @@ public class TargetSelectionProcess {
         entities = Entities.Optimal;
         dontTargetTeams = false;
         seekRange = 4.2f;
+        switchTime = 2;
     }
 
     public enum Mode {
@@ -76,18 +83,22 @@ public class TargetSelectionProcess {
         selectTarget();
     };
 
+    @EventLink
+    public final Listener<AttackEvent> attackEventListener = event -> event.target = target;
+
     private void selectTarget() {
         if (targetList.isEmpty()) {
             target = null;
             return;
         }
+
         switch (mode) {
             case Mode.Single:
                 target = (EntityLivingBase) targetList.getFirst();
                 break;
 
             case Mode.Switch:
-                if (switchTimer.hasTimeElapsed(200)) {
+                if (switchTimer.hasTimeElapsed(switchTime * 100)) {
                     targetIndex = (targetIndex + 1) % targetList.size();
                     switchTimer.reset();
                 }
