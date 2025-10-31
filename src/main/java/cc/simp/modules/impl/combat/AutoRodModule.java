@@ -4,12 +4,14 @@ import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.properties.Property;
+import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.client.AntiBotModule;
 import cc.simp.processes.RotationProcess;
+import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.mc.RotationUtils;
 import cc.simp.utils.misc.MovementFix;
 import io.github.nevalackin.homoBus.Listener;
@@ -38,11 +40,7 @@ public final class AutoRodModule extends Module {
     private final Property<Boolean> ka = new Property<>("Only On Kill Aura", false);
     private final Property<Boolean> rotate = new Property<>("Rotate", true);
     private final NumberProperty predictSize = new NumberProperty("Predict Size", 2, rotate::getValue, 0.1f, 10, 0.1f);
-    private final Property<Boolean> players = new Property<>("Players", true);
-    private final Property<Boolean> nonPlayers = new Property<>("Non Players", true);
-    private final Property<Boolean> teams = new Property<>("Teams", true);
-    private final Property<Boolean> invisibles = new Property<>("Invisibles", false);
-    private final Property<Boolean> dead = new Property<>("Dead", false);
+    public static ModeProperty<TargetSelectionProcess.Entities> entities = new ModeProperty<>("Entities", TargetSelectionProcess.Entities.Optimal);
 
     private EntityLivingBase currentTarget;
     private boolean usingRod;
@@ -57,7 +55,8 @@ public final class AutoRodModule extends Module {
             return;
         }
 
-        currentTarget = findTarget();
+        currentTarget = TargetSelectionProcess.getTarget();
+        TargetSelectionProcess.setEntities(entities.getValue());
 
         if (currentTarget == null || !mc.thePlayer.canEntityBeSeen(currentTarget) || mc.thePlayer.isUsingItem()) {
             reset();
@@ -87,44 +86,12 @@ public final class AutoRodModule extends Module {
             reset();
         }
 
-        if (rotate.getValue() && KillAuraModule.target == null && range > minRange.getValue() && range <= maxRange.getValue()) {
+        if (rotate.getValue() && TargetSelectionProcess.getTarget() == null && range > minRange.getValue() && range <= maxRange.getValue()) {
             float[] finalRotation = RotationUtils.faceTrajectory(currentTarget, true, predictSize.getValue().floatValue(), 0.03f, 2f);
 
             RotationProcess.setRotations(new Vector2f(finalRotation[0], finalRotation[1]), 10, MovementFix.NORMAL);
         }
     };
-
-    private EntityLivingBase findTarget() {
-        EntityLivingBase target = null;
-        double closestDistance = maxRange.getValue() + 0.4;
-
-        for (Entity entity : mc.theWorld.loadedEntityList) {
-            if(AntiBotModule.botList.contains(entity)) return null;
-            double distance = mc.thePlayer.getDistanceToEntity(entity);
-
-            if (entity != mc.thePlayer && distance <= maxRange.getValue() && entity instanceof EntityLivingBase) {
-                EntityLivingBase living = (EntityLivingBase) entity;
-
-                if (living instanceof EntityAnimal || living instanceof EntityMob || living instanceof EntityVillager) {
-                    if (!nonPlayers.getValue()) continue;
-                } else if (living instanceof EntityPlayer) {
-                    if (!players.getValue()) continue;
-                    EntityPlayer player = (EntityPlayer) living;
-                    if (!teams.getValue() && isOnSameTeam(player)) continue;
-                }
-
-                if (living.isInvisible() && !invisibles.getValue()) continue;
-                if (living.isDead && !dead.getValue()) continue;
-
-                if (distance < closestDistance) {
-                    target = living;
-                    closestDistance = distance;
-                }
-            }
-        }
-
-        return target;
-    }
 
     private float getRotationDifference(EntityLivingBase entity) {
         float[] rotations = getRotationsToEntity(entity);
@@ -168,13 +135,6 @@ public final class AutoRodModule extends Module {
             oldSlot = -1;
         }
         usingRod = false;
-    }
-
-    private boolean isOnSameTeam(EntityPlayer player) {
-        if (mc.thePlayer.getTeam() != null && player.getTeam() != null) {
-            return mc.thePlayer.getTeam().isSameTeam(player.getTeam());
-        }
-        return false;
     }
 
     @Override

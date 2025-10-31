@@ -10,6 +10,7 @@ import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.client.AntiBotModule;
 import cc.simp.processes.RotationProcess;
+import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.misc.MovementFix;
 import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
@@ -39,6 +40,10 @@ public final class AimAssistModule extends Module {
 
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
+
+        TargetSelectionProcess.setSeekRange(searchRange.getValue().floatValue());
+        TargetSelectionProcess.setDontTargetTeams(teamCheck.getValue());
+
             angleCalled = true;
 
             if (onlyOnClick.getValue() && Mouse.isButtonDown(0) && angleCalled) {
@@ -46,7 +51,7 @@ public final class AimAssistModule extends Module {
             }
 
             if (!onlyOnClick.getValue() || System.currentTimeMillis() - lastClickTime <= resetTime.getValue()) {
-                target = getTarget(searchRange.getValue().floatValue(), teamCheck.getValue());
+                target = TargetSelectionProcess.getTarget();
             } else {
                 target = null;
             }
@@ -62,33 +67,6 @@ public final class AimAssistModule extends Module {
 
             angleCalled = false;
     };
-
-    private EntityLivingBase getTarget(float range, boolean teamCheck) {
-        EntityLivingBase currentTarget = null;
-        double closestDistance = range;
-
-        for (Entity entity : mc.theWorld.loadedEntityList) {
-            if (AntiBotModule.botList.contains(entity)) return null;
-            if (entity instanceof EntityLivingBase && entity != mc.thePlayer && !entity.isDead) {
-                EntityLivingBase living = (EntityLivingBase) entity;
-
-                if (living instanceof EntityPlayer) {
-                    EntityPlayer player = (EntityPlayer) living;
-                    if (teamCheck && isOnSameTeam(player)) {
-                        continue;
-                    }
-                }
-
-                double distance = mc.thePlayer.getDistanceToEntity(living);
-                if (distance <= closestDistance && mc.thePlayer.canEntityBeSeen(living)) {
-                    closestDistance = distance;
-                    currentTarget = living;
-                }
-            }
-        }
-
-        return currentTarget;
-    }
 
     private boolean isOnSameTeam(EntityPlayer player) {
         if (mc.thePlayer.getTeam() != null && player.getTeam() != null) {

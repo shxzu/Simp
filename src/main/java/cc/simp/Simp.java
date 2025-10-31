@@ -44,6 +44,7 @@ public class Simp {
     private ClickInterface clickInterface;
     private LagProcess lagProcess;
     private BadPacketsProcess badPacketsProcess;
+    private TargetSelectionProcess targetSelectionProcess;
 
     private Simp() {
         getEventBus().subscribe(this);
@@ -66,6 +67,8 @@ public class Simp {
         getEventBus().subscribe(lagProcess);
         badPacketsProcess = new BadPacketsProcess();
         getEventBus().subscribe(badPacketsProcess);
+        targetSelectionProcess = new TargetSelectionProcess();
+        getEventBus().subscribe(targetSelectionProcess);
         commandHandler = new CommandHandler();
         commandHandler.commands.addAll(Arrays.asList(
                 new BindCommand(),

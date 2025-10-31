@@ -6,6 +6,7 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.client.Logger;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -29,7 +30,7 @@ public final class TickBaseModule extends Module {
             return;
         }
 
-        target = KillAuraModule.target;
+        target = TargetSelectionProcess.getTarget();
         if (target == null) return;
 
         distance = mc.thePlayer.getDistanceToEntity(target);
