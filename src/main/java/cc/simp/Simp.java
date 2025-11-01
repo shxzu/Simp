@@ -45,6 +45,8 @@ public class Simp {
     private LagProcess lagProcess;
     private BadPacketsProcess badPacketsProcess;
     private TargetSelectionProcess targetSelectionProcess;
+    @Getter
+    private static long startTime;
 
     private Simp() {
         getEventBus().subscribe(this);
@@ -52,6 +54,7 @@ public class Simp {
 
     @EventLink
     public final Listener<ClientStartupEvent> onClientStart = e -> {
+        this.startTime = System.currentTimeMillis();
         moduleManager = new ModuleManager();
         moduleManager.postInit();
         configManager = new ConfigManager();

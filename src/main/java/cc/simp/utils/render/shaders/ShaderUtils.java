@@ -15,7 +15,7 @@ public class ShaderUtils extends Util {
         int program = glCreateProgram();
         try {
             int fragmentShaderID = switch (fragmentShaderLoc) {
-                case "shadow" -> createShader(new ByteArrayInputStream(bloom.getBytes()), GL_FRAGMENT_SHADER);
+                case "shadow" -> createShader(new ByteArrayInputStream(shadow.getBytes()), GL_FRAGMENT_SHADER);
                 case "roundRectTexture" ->
                         createShader(new ByteArrayInputStream(roundRectTexture.getBytes()), GL_FRAGMENT_SHADER);
                 case "roundRectOutline" ->
@@ -165,7 +165,7 @@ public class ShaderUtils extends Util {
         return stringBuilder.toString();
     }
 
-    private final String bloom = """
+    private final String shadow = """
             #version 120
             
             uniform sampler2D inTexture;

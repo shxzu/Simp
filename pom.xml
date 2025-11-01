@@ -110,6 +110,13 @@
 
     <dependencies>
 
+
+        <dependency>
+            <groupId>com.github.Vatuu</groupId>
+            <artifactId>discord-rpc</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
         <dependency>
             <groupId>com.viaversion</groupId>
             <artifactId>viaversion</artifactId>
@@ -412,22 +419,6 @@
             <artifactId>kotlin-test</artifactId>
             <version>${kotlin.version}</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.github.spair</groupId>
-            <artifactId>imgui-java-binding</artifactId>
-            <version>1.86.4</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.spair</groupId>
-            <artifactId>imgui-java-lwjgl3</artifactId>
-            <version>1.86.4</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.spair</groupId>
-            <artifactId>imgui-java-natives-windows</artifactId>
-            <version>1.86.4</version>
         </dependency>
     </dependencies>
 </project>

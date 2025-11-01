@@ -38,25 +38,55 @@ public class ColorProcess {
             }
             case White -> {
                 first = new Color(255, 255, 255);
-                second = new Color(200, 200, 200);
+                second = new Color(155, 155, 155);
                 colors = Pair.of(first, second);
                 color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
             }
             case Red -> {
                 first = new Color(255, 0, 0);
-                second = new Color(200, 0, 0);
+                second = new Color(100, 0, 0);
                 colors = Pair.of(first, second);
                 color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
             }
             case Purple -> {
-                first = new Color(128, 0, 128);
-                second = new Color(98, 0, 98);
+                first = new Color(100, 0, 180);
+                second = new Color(50, 0, 130);
                 colors = Pair.of(first, second);
                 color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
             }
             case Pink -> {
-                first = new Color(255, 192, 203);
-                second = new Color(235, 172, 183);
+                first = new Color(255, 90, 255);
+                second = new Color(255, 205, 255);
+                colors = Pair.of(first, second);
+                color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
+            }
+            case Vaporwave -> {
+                first = new Color(180, 0, 180);
+                second = new Color(0, 200, 255);
+                colors = Pair.of(first, second);
+                color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
+            }
+            case Sunset -> {
+                first = new Color(161, 82, 230);
+                second = new Color(255, 104, 69);
+                colors = Pair.of(first, second);
+                color = RenderUtils.interpolateColorsBackAndForth(15, 20, colors.getFirst(), colors.getSecond(), false);
+            }
+            case Tenacity -> {
+                first = new Color(236, 133, 209);
+                second = new Color(28, 167, 222);
+                colors = Pair.of(first, second);
+                color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
+            }
+            case FDP -> {
+                first = new Color(29, 116, 148);
+                second = new Color(38, 180, 113);
+                colors = Pair.of(first, second);
+                color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
+            }
+            case Rise -> {
+                first = new Color(71, 148, 253);
+                second = new Color(71, 253, 160);
                 colors = Pair.of(first, second);
                 color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
             }

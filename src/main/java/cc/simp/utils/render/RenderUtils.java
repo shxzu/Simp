@@ -119,6 +119,10 @@ public class RenderUtils extends Util {
         GlStateManager.popMatrix();
     }
 
+    public static void bindTexture(int texture) {
+        glBindTexture(GL_TEXTURE_2D, texture);
+    }
+
     public enum ArrowDirection {
         UP, DOWN, LEFT, RIGHT
     }

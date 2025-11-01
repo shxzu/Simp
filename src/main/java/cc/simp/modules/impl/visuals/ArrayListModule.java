@@ -100,11 +100,11 @@ public final class ArrayListModule extends Module {
                 int aColor = RenderUtils.interpolateColorsBackAndForth(15, visibleModuleIndex, ColorProcess.colors.getFirst(), ColorProcess.colors.getSecond(), false).getRGB();
 
                 if (ClickInterfaceModule.color.getValue() == ClickInterfaceModule.Color.Astolfo) {
-                    aColor = RenderUtils.astolfoColors(visibleModuleIndex / 5, visibleModuleIndex).getRGB();
+                    aColor = RenderUtils.astolfoColors(visibleModuleIndex / 2, visibleModuleIndex).getRGB();
                 }
 
                 if (ClickInterfaceModule.color.getValue() == ClickInterfaceModule.Color.Rainbow) {
-                    aColor = RenderUtils.rainbowColors(visibleModuleIndex / 5, visibleModuleIndex).getRGB();
+                    aColor = RenderUtils.rainbowColors(visibleModuleIndex / 2, visibleModuleIndex).getRGB();
                 }
 
                 double top = translateY - 2;

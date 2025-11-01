@@ -29,7 +29,7 @@ public class Shadow extends Util {
         }
     };
 
-    public static void renderBloom(int sourceTexture, int radius, int offset) {
+    public static void renderShadow(int sourceTexture, int radius, int offset) {
         if (radius < 0) return;
 
         bloomFramebuffer = RenderUtils.createFrameBuffer(bloomFramebuffer, true);

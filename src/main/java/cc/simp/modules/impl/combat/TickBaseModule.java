@@ -2,6 +2,7 @@ package cc.simp.modules.impl.combat;
 
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
+import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
@@ -19,6 +20,7 @@ import static cc.simp.utils.Util.mc;
 public final class TickBaseModule extends Module {
 
     private final NumberProperty lagRange = new NumberProperty("Range", 8, 1, 15, 0.1);
+    public Property<Boolean> swingCheckProperty = new Property<>("Swing Check", true);
     private Mode MODE = Mode.NONE;
     private long time, balance;
     private double range, distance;
@@ -32,6 +34,9 @@ public final class TickBaseModule extends Module {
 
         target = TargetSelectionProcess.getTarget();
         if (target == null) return;
+
+        if (swingCheckProperty.getValue() && !mc.thePlayer.isSwingInProgress)
+            return;
 
         distance = mc.thePlayer.getDistanceToEntity(target);
         double range = distance;

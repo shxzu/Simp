@@ -68,6 +68,7 @@ public final class ModuleManager {
 
                 // Client
                 new ClickInterfaceModule(),
+                new DiscordRPCModule(),
                 new AntiBotModule(),
                 new DisablerModule(),
                 new FakeLagModule(),
@@ -82,9 +83,11 @@ public final class ModuleManager {
                 // Visuals
                 new ArrayListModule(),
                 new WatermarkModule(),
+                new CapesModule(),
                 new CameraModule(),
                 new AmbienceModule(),
                 new ESPModule(),
+                new NoHurtCamModule(),
                 new TargetInterfaceModule(),
                 new PostProcessingModule(),
                 new NickHiderModule(),

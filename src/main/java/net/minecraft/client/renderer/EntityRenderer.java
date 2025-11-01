@@ -2,6 +2,7 @@ package net.minecraft.client.renderer;
 
 import cc.simp.Simp;
 import cc.simp.api.events.impl.render.Render3DEvent;
+import cc.simp.modules.impl.visuals.NoHurtCamModule;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.gson.JsonSyntaxException;
@@ -593,6 +594,10 @@ public class EntityRenderer implements IResourceManagerReloadListener
 
     private void hurtCameraEffect(float partialTicks)
     {
+
+        if(Simp.INSTANCE.getModuleManager().getModule(NoHurtCamModule.class).isEnabled())
+            return;
+
         if (this.mc.getRenderViewEntity() instanceof EntityLivingBase entitylivingbase)
         {
             float f = (float)entitylivingbase.hurtTime - partialTicks;
