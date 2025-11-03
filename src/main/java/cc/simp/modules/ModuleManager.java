@@ -85,6 +85,7 @@ public final class ModuleManager {
                 new WatermarkModule(),
                 new InfoDisplayModule(),
                 new NotificationsModule(),
+                new RadarModule(),
                 new CapesModule(),
                 new CameraModule(),
                 new AmbienceModule(),
