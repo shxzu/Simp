@@ -1,5 +1,6 @@
 package cc.simp.modules.impl.combat;
 
+import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.packet.PacketReceiveEvent;
 import cc.simp.api.events.impl.player.AttackEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
@@ -10,12 +11,24 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.BadPacketsProcess;
 import cc.simp.processes.LagProcess;
+import cc.simp.processes.RotationProcess;
+import cc.simp.utils.mc.PacketUtils;
+import cc.simp.utils.mc.RayCastUtils;
 import io.github.nevalackin.homoBus.Listener;
+import io.github.nevalackin.homoBus.Priorities;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
+import net.minecraft.network.play.server.S19PacketEntityStatus;
+import net.minecraft.network.play.server.S27PacketExplosion;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MovingObjectPosition;
 
 import static cc.simp.utils.Util.mc;
 
@@ -34,6 +47,7 @@ public final class VelocityModule extends Module {
     private final Property<Boolean> legit = new Property<>("Legit Lag", true, () -> modeProperty.getValue() == Mode.Delay);
 
     public enum Mode {
+        Grim,
         Motion,
         Cancel,
         Boost,
@@ -43,6 +57,7 @@ public final class VelocityModule extends Module {
     }
 
     boolean delayed = false;
+    private boolean realVelocity, velocity;
 
     @EventLink
     public final Listener<PacketReceiveEvent> packetReceiveEventListener = event -> {
@@ -119,6 +134,43 @@ public final class VelocityModule extends Module {
             delayed = false;
         }
 
+    };
+
+    @EventLink(value = Priorities.VERY_LOW)
+    public final Listener<PreUpdateEvent> onPreUpdate = event -> {
+        if(modeProperty.getValue() != Mode.Grim) return;
+        if (velocity && !BadPacketsProcess.bad()) {
+            PacketUtils.sendSilentPacket(new C07PacketPlayerDigging((mc.objectMouseOver != null && mc.thePlayer.isSwingInProgress && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK ? C07PacketPlayerDigging.Action.START_DESTROY_BLOCK : C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK),
+                    new BlockPos(mc.thePlayer), EnumFacing.UP));
+            velocity = false;
+        }
+    };
+    @EventLink(value = Priorities.VERY_LOW)
+    public final Listener<PacketReceiveEvent> onReceiveLow = event -> {
+        if(modeProperty.getValue() != Mode.Grim) return;
+        final Packet<?> packet = event.getPacket();
+        if (event.isCancelled()) return;
+
+        if(packet instanceof S19PacketEntityStatus) {
+            final S19PacketEntityStatus wrapper = (S19PacketEntityStatus) event.getPacket();
+
+            if(wrapper.getEntity(mc.theWorld) != mc.thePlayer || wrapper.getOpCode() != 2) {
+                return;
+            }
+
+            realVelocity = true;
+        }
+
+        if (packet instanceof S12PacketEntityVelocity && realVelocity) {
+            final S12PacketEntityVelocity wrapper = (S12PacketEntityVelocity) packet;
+
+            if (wrapper.getEntityID() == mc.thePlayer.getEntityId()) {
+                event.setCancelled();
+
+                realVelocity = false;
+                velocity = true;
+            }
+        }
     };
 
     @EventLink

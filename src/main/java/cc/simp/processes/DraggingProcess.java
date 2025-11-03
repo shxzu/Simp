@@ -1,5 +1,7 @@
 package cc.simp.processes;
 
+import cc.simp.api.config.Serializable;
+import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiChat;
@@ -10,7 +12,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class DraggingProcess {
+public class DraggingProcess implements Serializable {
 
     public static final Map<String, DraggableComponent> components = new HashMap<>();
     private static String draggingComponent = null;
@@ -34,6 +36,17 @@ public class DraggingProcess {
         public double getHeight() { return height; }
         public void setHeight(double height) { this.height = height; }
 
+        public JsonObject save() {
+            JsonObject object = new JsonObject();
+            object.addProperty("x", x);
+            object.addProperty("y", y);
+            return object;
+        }
+
+        public void load(JsonObject object) {
+            if (object.has("x")) x = object.get("x").getAsDouble();
+            if (object.has("y")) y = object.get("y").getAsDouble();
+        }
     }
 
     public static void update() {
@@ -64,7 +77,6 @@ public class DraggingProcess {
                     new Color(120, 120, 120, 70).getRGB());
         }
 
-        // Handle dragging logic
         if (draggingComponent != null) {
             if (isLeftMouseDown) {
                 DraggableComponent component = components.get(draggingComponent);
@@ -96,6 +108,24 @@ public class DraggingProcess {
                     dragStartY = mouseY - component.getY();
                     break;
                 }
+            }
+        }
+    }
+
+    @Override
+    public JsonObject save() {
+        JsonObject object = new JsonObject();
+        for (Map.Entry<String, DraggableComponent> entry : components.entrySet()) {
+            object.add(entry.getKey(), entry.getValue().save());
+        }
+        return object;
+    }
+
+    @Override
+    public void load(JsonObject object) {
+        for (Map.Entry<String, DraggableComponent> entry : components.entrySet()) {
+            if (object.has(entry.getKey())) {
+                entry.getValue().load(object.getAsJsonObject(entry.getKey()));
             }
         }
     }

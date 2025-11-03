@@ -26,7 +26,7 @@ public final class PostProcessingModule extends Module {
         if (blur.getValue()) {
             Blur.startBlur();
             Simp.INSTANCE.getEventBus().post(new ShaderEvent(ShaderEvent.ShaderType.BLUR));
-            Blur.endBlur(25, 3);
+            Blur.endBlur(10, 2);
             RenderUtils.resetColor();
         }
 

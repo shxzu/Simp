@@ -11,6 +11,8 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Session;
 
+import static cc.simp.utils.Util.mc;
+
 public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
     private final RenderPlayer playerRenderer;
 
@@ -68,8 +70,7 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
     }
 
     private boolean renderClientCape(AbstractClientPlayer entitylivingbaseIn, float partialTicks) {
-        Session session = Minecraft.getMinecraft().getSession();
-        if (session != null && entitylivingbaseIn.getName().equals(session.getUsername()) && Simp.INSTANCE.getModuleManager().getModule(CapesModule.class).isEnabled()) {
+        if (entitylivingbaseIn.equals(mc.thePlayer) && Simp.INSTANCE.getModuleManager().getModule(CapesModule.class).isEnabled()) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             switch (CapesModule.cape.getValue()) {
                 case Simp:

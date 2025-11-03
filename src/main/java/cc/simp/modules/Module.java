@@ -2,10 +2,13 @@ package cc.simp.modules;
 
 import cc.simp.Simp;
 import cc.simp.api.config.Serializable;
+import cc.simp.api.notifications.NotificationManager;
+import cc.simp.api.notifications.NotificationType;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.MultiModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
+import cc.simp.modules.impl.visuals.NotificationsModule;
 import cc.simp.utils.misc.Manager;
 import cc.simp.utils.misc.StringUtils;
 import cc.simp.utils.render.Translate;
@@ -14,6 +17,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.Minecraft;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -114,6 +118,20 @@ public class Module extends Manager<Property<?>> implements Toggleable, Serializ
     @Override
     public void toggle() {
         setEnabled(!enabled);
+        if (Minecraft.getMinecraft().thePlayer != null) {
+            if(!Simp.INSTANCE.getModuleManager().getModule(NotificationsModule.class).isEnabled()) {
+                return;
+            }
+            String titleToggle = "Module toggled";
+            String descriptionToggleOn = this.getLabel() + " was " + "§aenabled!";
+            String descriptionToggleOff = this.getLabel() + " was " + "§cdisabled!";
+
+            if (enabled) {
+                NotificationManager.post(NotificationType.SUCCESS, titleToggle, descriptionToggleOn);
+            } else {
+                NotificationManager.post(NotificationType.DISABLE, titleToggle, descriptionToggleOff);
+            }
+        }
     }
 
     @Override

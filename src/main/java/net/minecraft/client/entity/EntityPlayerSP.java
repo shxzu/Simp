@@ -118,6 +118,8 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
     public void onUpdate()
     {
+        PreUpdateEvent update = new PreUpdateEvent();
+        if(update.isCancelled()) return;
         if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ))) {
             prevRenderPitchHead = renderPitchHead;
             renderPitchHead = rotationPitch;
@@ -125,7 +127,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
             boolean player = this == Minecraft.getMinecraft().thePlayer;
 
             if (player) {
-                Simp.INSTANCE.getEventBus().post(new PreUpdateEvent());
+                Simp.INSTANCE.getEventBus().post(update);
             }
 
             super.onUpdate();

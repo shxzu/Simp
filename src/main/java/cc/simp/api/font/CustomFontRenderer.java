@@ -487,4 +487,8 @@ public class CustomFontRenderer extends CustomFont {
         return output;
     }
 
+    public float getMiddleOfBox(float height) {
+        return height / 2f - getHeight() / 2f;
+    }
+
 }

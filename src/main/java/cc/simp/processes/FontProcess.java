@@ -16,13 +16,51 @@ public class FontProcess {
     private static final Map<String, CustomFontRenderer> scaledFontCache = new HashMap<>();
     private static String currentFont = "simp";
 
+    public final static String
+            BUG = "a",
+            LIST = "b",
+            BOMB = "c",
+            EYE = "d",
+            PERSON = "e",
+            WHEELCHAIR = "f",
+            SCRIPT = "g",
+            SKIP_LEFT = "h",
+            PAUSE = "i",
+            PLAY = "j",
+            SKIP_RIGHT = "k",
+            SHUFFLE = "l",
+            INFO = "m",
+            SETTINGS = "n",
+            CHECKMARK = "o",
+            XMARK = "p",
+            TRASH = "q",
+            WARNING = "r",
+            FOLDER = "s",
+            LOAD = "t",
+            SAVE = "u",
+            UPVOTE_OUTLINE = "v",
+            UPVOTE = "w",
+            DOWNVOTE_OUTLINE = "x",
+            DOWNVOTE = "y",
+            DROPDOWN_ARROW = "z",
+            PIN = "s",
+            EDIT = "A",
+            SEARCH = "B",
+            UPLOAD = "C",
+            REFRESH = "D",
+            ADD_FILE = "E",
+            STAR_OUTLINE = "F",
+            STAR = "G";
+
     static {
         registerFont("simp", createFont("simp", 18));
         registerFont("bold", createFont("simp-bold", 18));
-        registerFont("big", createFont("simp-bold", 32));
+        registerFont("big", createFont("simp-bold", 48));
+        registerFont("noto", createFont("noto", 18));
         registerFont("arial", createFont("arial", 18));
         registerFont("apple", createFont("apple", 18));
         registerFont("sans", createFont("sans", 18));
+        registerFont("icon", createFont("icon", 40));
         registerFont("mc", createFont("mc", 18));
     }
 

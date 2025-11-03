@@ -22,7 +22,7 @@ public class ClientNameCommand extends Command {
             }
             String newName = nameBuilder.toString();
 
-            WatermarkModule.customName.setValue(newName);
+            WatermarkModule.customName = newName;
             sendChatWithPrefix("Set client name to: " + newName);
         }
     }

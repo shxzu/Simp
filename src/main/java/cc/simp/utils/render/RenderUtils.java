@@ -2,6 +2,7 @@ package cc.simp.utils.render;
 
 import cc.simp.utils.Util;
 import cc.simp.utils.render.shaders.RoundedShader;
+import cc.simp.utils.render.shaders.ShaderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -25,6 +26,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class RenderUtils extends Util {
 
     public static RoundedShader roundedShader = new RoundedShader("roundedRect");
+    public static RoundedShader roundedOutlineShader = new RoundedShader("roundRectOutline");
 
     private static void setupRoundedRectUniforms(float x, float y, float width, float height, float radius, RoundedShader roundedTexturedShader) {
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
@@ -82,42 +84,25 @@ public class RenderUtils extends Util {
         GlStateManager.disableBlend();
     }
 
-    public static void drawRoundedRectNoShaders(float x, float y, float width, float height, float radius, int color) {
-        float alpha = (color >> 24 & 255) / 255.0F;
-        float red = (color >> 16 & 255) / 255.0F;
-        float green = (color >> 8 & 255) / 255.0F;
-        float blue = (color & 255) / 255.0F;
+    public static void drawRoundOutline(float x, float y, float width, float height, float radius, float outlineThickness, Color color, Color outlineColor) {
+        resetColor();
+        GlUtils.startBlend();
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        setAlphaLimit(0);
+        roundedOutlineShader.init();
 
-        GlStateManager.pushMatrix();
-        GlStateManager.enableBlend();
-        GlStateManager.disableTexture2D();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        GlStateManager.color(red, green, blue, alpha);
+        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+        setupRoundedRectUniforms(x, y, width, height, radius, roundedOutlineShader);
+        roundedOutlineShader.setUniformf("outlineThickness", outlineThickness * sr.getScaleFactor());
+        roundedOutlineShader.setUniformf("color", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+        roundedOutlineShader.setUniformf("outlineColor", outlineColor.getRed() / 255f, outlineColor.getGreen() / 255f, outlineColor.getBlue() / 255f, outlineColor.getAlpha() / 255f);
 
-        GL11.glBegin(GL11.GL_POLYGON);
-        // Top-left corner
-        for (int i = 0; i <= 90; i += 3) {
-            GL11.glVertex2d(x + radius + Math.sin(Math.toRadians(i)) * -radius, y + radius + Math.cos(Math.toRadians(i)) * -radius);
-        }
-        // Bottom-left corner
-        for (int i = 90; i <= 180; i += 3) {
-            GL11.glVertex2d(x + radius + Math.sin(Math.toRadians(i)) * -radius, y + height - radius + Math.cos(Math.toRadians(i)) * -radius);
-        }
-        // Bottom-right corner
-        for (int i = 0; i <= 90; i += 3) {
-            GL11.glVertex2d(x + width - radius + Math.sin(Math.toRadians(i)) * radius, y + height - radius + Math.cos(Math.toRadians(i)) * radius);
-        }
-        // Top-right corner
-        for (int i = 90; i <= 180; i += 3) {
-            GL11.glVertex2d(x + width - radius + Math.sin(Math.toRadians(i)) * radius, y + radius + Math.cos(Math.toRadians(i)) * radius);
-        }
-        GL11.glEnd();
 
-        GlStateManager.resetColor();
-        GlStateManager.enableTexture2D();
-        GlStateManager.disableBlend();
-        GlStateManager.popMatrix();
+        ShaderUtils.drawQuads(x - (2 + outlineThickness), y - (2 + outlineThickness), width + (4 + outlineThickness * 2), height + (4 + outlineThickness * 2));
+        roundedOutlineShader.unload();
+        GlUtils.endBlend();
     }
+
 
     public static void bindTexture(int texture) {
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -484,6 +469,16 @@ public class RenderUtils extends Util {
         angle = (angle >= 180 ? 360 - angle : angle) * 2;
         return trueColor ? interpolateColorHue(start, end, angle / 360f) : interpolateColorC(start, end, angle / 360f);
     }
+
+    public static int blendColors(Color c1, Color c2, float ratio) {
+        ratio = Math.max(0, Math.min(1, ratio));
+        int r = (int)(c1.getRed() * (1 - ratio) + c2.getRed() * ratio);
+        int g = (int)(c1.getGreen() * (1 - ratio) + c2.getGreen() * ratio);
+        int b = (int)(c1.getBlue() * (1 - ratio) + c2.getBlue() * ratio);
+        int a = (int)(c1.getAlpha() * (1 - ratio) + c2.getAlpha() * ratio);
+        return new Color(r, g, b, a).getRGB();
+    }
+
 
     public static Color astolfoColors(int yOffset, int yTotal) {
         float speed = 2900F;

@@ -83,6 +83,8 @@ public final class ModuleManager {
                 // Visuals
                 new ArrayListModule(),
                 new WatermarkModule(),
+                new InfoDisplayModule(),
+                new NotificationsModule(),
                 new CapesModule(),
                 new CameraModule(),
                 new AmbienceModule(),
