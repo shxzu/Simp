@@ -1,5 +1,7 @@
 package net.minecraft.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Random;
 import java.util.UUID;
 import net.optifine.util.MathUtils;
@@ -500,5 +502,14 @@ public class MathHelper
             field_181165_f[k] = Math.cos(d1);
             field_181164_e[k] = d1;
         }
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) {
+            throw new IllegalArgumentException();
+        }
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }

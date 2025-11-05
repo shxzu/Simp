@@ -2,6 +2,7 @@ package cc.simp.api.notifications;
 
 import cc.simp.Simp;
 import cc.simp.api.font.CustomFontRenderer;
+import cc.simp.modules.impl.visuals.NotificationsModule;
 import cc.simp.modules.impl.visuals.PostProcessingModule;
 import cc.simp.processes.FontProcess;
 import cc.simp.utils.Util;
@@ -38,14 +39,15 @@ public class Notification extends Util {
     }
 
     public void draw(float x, float y, float width, float height) {
+        CustomFontRenderer fr = NotificationsModule.customFont.getValue() ? FontProcess.getCurrentFont() : FontProcess.getFont("mc");
         boolean lowerAlpha = Simp.INSTANCE.getModuleManager().getModule(PostProcessingModule.class).isEnabled();
         RenderUtils.drawRect(x, y, width, height, new Color(0.1F, 0.1F, 0.1F, lowerAlpha ? 0.4F : .75f));
         float percentage = Math.min((timerUtil.getTime() / getTime()), 1);
         RenderUtils.drawRect(x + (width * percentage), y + height - 1, width - (width * percentage), 1, getNotificationType().getColor());
         FontProcess.getFont("icon").drawString(getNotificationType().getIcon(), x + 3, (y + FontProcess.getFont("icon").getMiddleOfBox(height) + 1), getNotificationType().getColor().getRGB());
 
-        FontProcess.getFont("mc").drawString(getTitle(), x + 7 + FontProcess.getFont("icon").getStringWidth(getNotificationType().getIcon()), y + 4, Color.WHITE.getRGB());
-        FontProcess.getFont("mc").drawString(getDescription(), x + 7 + FontProcess.getFont("icon").getStringWidth(getNotificationType().getIcon()), y + 8.5f + FontProcess.getFont("mc").getHeight(), Color.WHITE.getRGB());
+        fr.drawString(getTitle(), x + 7 + FontProcess.getFont("icon").getStringWidth(getNotificationType().getIcon()), y + 4, Color.WHITE.getRGB());
+        fr.drawString(getDescription(), x + 7 + FontProcess.getFont("icon").getStringWidth(getNotificationType().getIcon()), y + 8.5f + FontProcess.getFont("mc").getHeight(), Color.WHITE.getRGB());
     }
 
 }

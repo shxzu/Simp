@@ -70,18 +70,8 @@ public class RadarModule extends Module {
         double playerOffsetX = mc.thePlayer.posX + (mc.thePlayer.posX - mc.thePlayer.lastTickPosX) * pTicks;
         double playerOffsetZ = mc.thePlayer.posZ + (mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ) * pTicks;
 
-        // Colors
-        Color darkest = new Color(10, 10, 10, 180);
-        Color secondDarkest = new Color(22, 22, 22, 180);
-        Color lightest = new Color(44, 44, 44, 180);
-        Color middleColor = new Color(34, 34, 34, 180);
+        Color lightest = new Color(44, 44, 44, 20);
         Color accentColor = ColorProcess.getColor();
-
-        // Draw outer borders
-        Gui.drawRect((int) (x - 3.5), (int) (y - 3.5), (int) (x + radarSize + 3.5), (int) (y + radarSize + 3.5), darkest.getRGB());
-        Gui.drawRect((int) (x - 3), (int) (y - 3), (int) (x + radarSize + 3), (int) (y + radarSize + 3), middleColor.getRGB());
-        Gui.drawRect((int) (x - 1), (int) (y - 1), (int) (x + radarSize + 1), (int) (y + radarSize + 1), lightest.getRGB());
-        Gui.drawRect((int) x, (int) y, (int) (x + radarSize), (int) (y + radarSize), secondDarkest.getRGB());
 
         // Draw inner border
         Gui.drawRect((int) (x + 2.5), (int) (y + 2.5), (int) (x + radarSize - 2.5), (int) (y + radarSize - 2.5), lightest.getRGB());
@@ -129,7 +119,6 @@ public class RadarModule extends Module {
                     float markerY = y + (radarSize / 2f) + rotY;
 
                     Gui.drawRect((int) (markerX - 1.5), (int) (markerY - 1.5), (int) (markerX + 1.5), (int) (markerY + 1.5), entityColor.getRGB());
-                    Gui.drawRect((int) (markerX - 1), (int) (markerY - 1), (int) (markerX + 1), (int) (markerY + 1), new Color(0, 0, 0, 180).getRGB());
                 }
             }
         }
@@ -137,6 +126,5 @@ public class RadarModule extends Module {
 
         // Draw local player marker (center)
         Gui.drawRect((int) (x + radarSize / 2f - 2), (int) (y + radarSize / 2f - 2), (int) (x + radarSize / 2f + 2), (int) (y + radarSize / 2f + 2), new Color(0, 255, 0).getRGB());
-        Gui.drawRect((int) (x + radarSize / 2f - 1.5), (int) (y + radarSize / 2f - 1.5), (int) (x + radarSize / 2f + 1.5), (int) (y + radarSize / 2f + 1.5), new Color(0, 0, 0, 180).getRGB());
     }
 }

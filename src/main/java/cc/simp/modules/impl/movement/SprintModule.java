@@ -1,5 +1,6 @@
 package cc.simp.modules.impl.movement;
 
+import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.player.SprintEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
@@ -26,10 +27,14 @@ public final class SprintModule extends Module {
             if (MovementUtils.isMoving() && !omni.getValue()) {
                 mc.gameSettings.keyBindSprint.setPressed(true);
             }
-            if (omni.getValue()) {
-                mc.thePlayer.setSprinting(MovementUtils.canSprint(true));
-                event.setSprinting(MovementUtils.canSprint(true));
-            }
         }
     };
+
+    @EventLink
+    public final Listener<MotionEvent> motionEventListener = event -> {
+        if (MovementUtils.isMoving() && omni.getValue()) {
+            mc.thePlayer.setSprinting(MovementUtils.canSprint(true));
+        }
+    };
+
 }

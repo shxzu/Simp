@@ -75,6 +75,13 @@ public class DraggingProcess implements Serializable {
 
             Gui.drawRect((int) x - 2, (int) y - 2, (int) (x + width) + 2, (int) (y + height) + 2,
                     new Color(120, 120, 120, 70).getRGB());
+
+            if(x > sr.getScaledWidth()) {
+                component.setX(sr.getScaledWidth() - width);
+            }
+            if(y > sr.getScaledHeight()) {
+                component.setY(sr.getScaledHeight() - height);
+            }
         }
 
         if (draggingComponent != null) {

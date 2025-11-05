@@ -2,8 +2,11 @@ package cc.simp.modules.impl.visuals;
 
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.events.impl.render.ShaderEvent;
+import cc.simp.api.font.CustomFont;
+import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.api.notifications.Notification;
 import cc.simp.api.notifications.NotificationManager;
+import cc.simp.api.properties.Property;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -20,6 +23,8 @@ import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Notifications", category = ModuleCategory.VISUALS)
 public final class NotificationsModule extends Module {
+
+    public static Property<Boolean> customFont  = new Property<>("Custom Font", false);
 
     private static boolean positionInitialized = false;
     private static final int NOTIFICATION_HEIGHT = 30;
@@ -50,6 +55,7 @@ public final class NotificationsModule extends Module {
 
     private void renderNotifications() {
         ScaledResolution sr = new ScaledResolution(mc);
+        CustomFontRenderer fr =  customFont.getValue() ? FontProcess.getCurrentFont() : FontProcess.getFont("mc");
         initializePosition(sr);
 
         NotificationManager.setToggleTime(2f);
@@ -60,8 +66,8 @@ public final class NotificationsModule extends Module {
         int maxWidth = MIN_NOTIFICATION_WIDTH;
 
         for (Notification notification : NotificationManager.getNotifications()) {
-            int titleWidth = FontProcess.getFont("mc").getStringWidth(notification.getTitle());
-            int descWidth = FontProcess.getFont("mc").getStringWidth(notification.getDescription());
+            int titleWidth = fr.getStringWidth(notification.getTitle());
+            int descWidth = fr.getStringWidth(notification.getDescription());
             int iconWidth = FontProcess.getFont("icon").getStringWidth(notification.getNotificationType().getIcon());
             int notificationWidth = Math.max(titleWidth, descWidth) + iconWidth + 15;
             maxWidth = Math.max(maxWidth, notificationWidth);
@@ -73,8 +79,9 @@ public final class NotificationsModule extends Module {
         boolean showPlaceholder = mc.currentScreen instanceof GuiChat && NotificationManager.getNotifications().isEmpty();
 
         if (showPlaceholder) {
-            float x = (float) draggableComponent.getX();
-            float y = (float) draggableComponent.getY();
+            float slideOffset = (maxWidth - MIN_NOTIFICATION_WIDTH) * (1 - 1.0f);
+            float x = (float) (draggableComponent.getX() + slideOffset);
+            float y = (float) (draggableComponent.getY() - yOffset - NOTIFICATION_HEIGHT);
             new Notification(cc.simp.api.notifications.NotificationType.INFO, "Notification", "Preview").draw(x, y, maxWidth, NOTIFICATION_HEIGHT);
             return;
         }
@@ -92,8 +99,8 @@ public final class NotificationsModule extends Module {
 
             animation.setDuration(250);
 
-            int titleWidth = FontProcess.getFont("mc").getStringWidth(notification.getTitle());
-            int descWidth = FontProcess.getFont("mc").getStringWidth(notification.getDescription());
+            int titleWidth = fr.getStringWidth(notification.getTitle());
+            int descWidth = fr.getStringWidth(notification.getDescription());
             int iconWidth = FontProcess.getFont("icon").getStringWidth(notification.getNotificationType().getIcon());
             int notificationWidth = Math.max(titleWidth, descWidth) + iconWidth + 15;
 

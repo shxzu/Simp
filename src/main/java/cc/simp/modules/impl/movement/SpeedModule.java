@@ -1,17 +1,28 @@
 package cc.simp.modules.impl.movement;
 
+import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
+import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.events.impl.player.SprintEvent;
+import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.mc.MovementUtils;
+import cc.simp.utils.mc.PacketUtils;
+import cc.simp.utils.mc.PlayerUtils;
 import cc.simp.utils.misc.MovementFix;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
+import net.minecraft.block.BlockStairs;
+import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.potion.Potion;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.MathHelper;
 import org.lwjgl.util.vector.Vector2f;
 
 import static cc.simp.utils.Util.mc;
@@ -19,7 +30,7 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Speed", category = ModuleCategory.MOVEMENT)
 public final class SpeedModule extends Module {
 
-    private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.RotateExploit);
+    private static final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.RotateExploit);
 
     private enum Mode {
         Jump("Jump"),
@@ -32,13 +43,18 @@ public final class SpeedModule extends Module {
         NCP("NCP");
 
         public String name;
+
         Mode(String name) {
             this.name = name;
         }
+
         public String toString() {
             return name;
         }
     }
+
+    double moveSpeed;
+    boolean nigger = false;
 
     @EventLink
     public final Listener<MotionEvent> motionEventListener = e -> {
@@ -102,18 +118,13 @@ public final class SpeedModule extends Module {
                 mc.gameSettings.keyBindJump.setPressed(MovementUtils.isMoving() && MovementUtils.isOnGround());
                 break;
             case NCP:
-                if (MovementUtils.isMoving() && !mc.gameSettings.keyBindJump.isKeyDown()) {
-                    MovementUtils.setSpeed(0.34f);
-                    if (mc.thePlayer.offGroundTicks >= 3) {
-                        mc.timer.timerSpeed = 1.4f;
-                    } else
-                        mc.timer.timerSpeed = 1.0f;
-                    if (mc.thePlayer.onGround) {
+                if (MovementUtils.isMoving()) {
+                    if (MovementUtils.isOnGround()) {
                         mc.thePlayer.jump();
+                        MovementUtils.strafe(MovementUtils.getSpeed() * 1.15);
+                    } else {
+                        MovementUtils.strafe();
                     }
-                }
-                if (!MovementUtils.isMoving()) {
-                    mc.timer.timerSpeed = 1.0f;
                 }
                 break;
         }
@@ -130,9 +141,10 @@ public final class SpeedModule extends Module {
     public void onDisable() {
         if (mode.getValue() == Mode.UpdatedNCP || mode.getValue() == Mode.NCP) {
             mc.timer.timerSpeed = 1.0f;
-            mc.thePlayer.jumpMovementFactor = 0.02F;
         }
-        if(mode.getValue() == Mode.Jump && mc.gameSettings.keyBindJump.isPressed()) mc.gameSettings.keyBindJump.setPressed(false);
-        if(mode.getValue() == Mode.RotateExploit && mc.gameSettings.keyBindJump.isPressed()) mc.gameSettings.keyBindJump.setPressed(false);
+        if (mode.getValue() == Mode.Jump && mc.gameSettings.keyBindJump.isPressed())
+            mc.gameSettings.keyBindJump.setPressed(false);
+        if (mode.getValue() == Mode.RotateExploit && mc.gameSettings.keyBindJump.isPressed())
+            mc.gameSettings.keyBindJump.setPressed(false);
     }
 }

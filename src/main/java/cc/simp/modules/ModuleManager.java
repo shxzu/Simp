@@ -97,6 +97,7 @@ public final class ModuleManager {
                 new NameTagsModule(),
                 new StorageESPModule(),
                 new ChinaHatModule(),
+                new HaloModule(),
                 new FullBrightModule(),
                 new MotionBlurModule(),
                 new ItemESPModule()
@@ -113,11 +114,8 @@ public final class ModuleManager {
         final int keyPressed = event.getKey();
         for (final Module module : this.getModules()) {
             final int moduleBind = module.getKey();
-            if (moduleBind == 0)
-                continue;
             if (moduleBind == keyPressed) {
                 module.toggle();
-                return;
             }
         }
     };

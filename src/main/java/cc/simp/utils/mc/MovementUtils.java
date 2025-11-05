@@ -13,15 +13,35 @@ import net.minecraft.util.MovementInput;
 
 import java.util.Arrays;
 
+import static net.minecraft.potion.Potion.*;
+
 public class MovementUtils extends Util {
 
-    public static final double HEAD_HITTER_MOTION = -0.0784000015258789;
+    public static double getBaseMoveSpeed() {
+        double baseSpeed = 0.2873;
+        if (mc.thePlayer.isPotionActive(Potion.moveSpeed)) {
+            baseSpeed *= 1.0 + 0.16 * (mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1);
+        }
+        return baseSpeed;
+    }
+
+    public static double getBaseMoveSpeed(double base) {
+        double baseSpeed = base;
+        if (mc.thePlayer.isPotionActive(Potion.moveSpeed)) {
+            baseSpeed *= 1.0 + 0.2 * (mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1);
+        }
+        if (mc.thePlayer.isPotionActive(Potion.moveSlowdown)) {
+            baseSpeed /= 1.0 + 0.2 * (mc.thePlayer.getActivePotionEffect(Potion.moveSlowdown).getAmplifier() + 1);
+        }
+        return baseSpeed;
+    }
 
     private static boolean isMovingEnoughForSprint() {
         MovementInput movementInput = mc.thePlayer.movementInput;
         return movementInput.moveForward > 0.8F || movementInput.moveForward < -0.8F ||
                 movementInput.moveStrafe > 0.8F || movementInput.moveStrafe < -0.8F;
     }
+
     public static boolean canSprint(boolean omni) {
         final EntityPlayerSP player = mc.thePlayer;
         return (omni ? isMovingEnoughForSprint() : player.movementInput.moveForward >= 0.8F) &&
@@ -30,7 +50,7 @@ public class MovementUtils extends Util {
                         player.capabilities.allowFlying) &&
                 !player.isSneaking() &&
                 !player.isUsingItem() &&
-                !player.isPotionActive(Potion.moveSlowdown.id);
+                !player.isPotionActive(moveSlowdown.id);
     }
 
     public static boolean isMoving() {
@@ -99,6 +119,15 @@ public class MovementUtils extends Util {
 
     public static double predictedMotion(final double motion) {
         return (motion - 0.08) * 0.98F;
+    }
+
+    public static double getJumpBoostModifier(double baseJumpHeight) {
+        if (mc.thePlayer.isPotionActive(Potion.jump)) {
+            int amplifier = mc.thePlayer.getActivePotionEffect(Potion.jump).getAmplifier();
+            baseJumpHeight += (float) (amplifier + 1) * 0.1F;
+        }
+
+        return baseJumpHeight;
     }
 
     public void strafe(MotionEvent event) {
@@ -184,6 +213,7 @@ public class MovementUtils extends Util {
         event.setForward(closestForward);
         event.setStrafe(closestStrafe);
     }
+
     public static double direction() {
         float rotationYaw = mc.thePlayer.movementYaw;
 
@@ -261,6 +291,7 @@ public class MovementUtils extends Util {
 
         return Math.toRadians(rotationYaw);
     }
+
     public static double direction(float rotationYaw, final double moveForward, final double moveStrafing) {
         if (moveForward < 0F) rotationYaw += 180F;
 
@@ -274,6 +305,7 @@ public class MovementUtils extends Util {
 
         return Math.toRadians(rotationYaw);
     }
+
     public static void stop() {
         mc.thePlayer.motionX = 0;
         mc.thePlayer.motionZ = 0;
