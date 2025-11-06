@@ -8,7 +8,9 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -32,7 +34,6 @@ public class ClickInterface extends GuiScreen {
     private static final Color ACCENT_COLOR = new Color(150, 150, 255);
     private static final Color TEXT_COLOR = new Color(200, 200, 200);
     private static final Color HOVER_COLOR = new Color(35, 35, 35);
-    private static final Color DISABLED_COLOR = new Color(100, 100, 100);
 
     private static final int PANEL_WIDTH = 110;
     private static final int PANEL_SPACING = 10;
@@ -53,6 +54,8 @@ public class ClickInterface extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
+
+        RenderUtils.drawImage(new ResourceLocation("simp/images/anime.png"), width - 216, (float) height / 2, 216, 289);
 
         // Update dragging slider if active
         if (draggingSlider != null) {
