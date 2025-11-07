@@ -56,11 +56,8 @@ public final class NotificationsModule extends Module {
     private void renderNotifications() {
         ScaledResolution sr = new ScaledResolution(mc);
         CustomFontRenderer fr =  customFont.getValue() ? FontProcess.getCurrentFont() : FontProcess.getFont("mc");
-        initializePosition(sr);
 
         NotificationManager.setToggleTime(2f);
-
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("Notifications");
 
         float yOffset = 0;
         int maxWidth = MIN_NOTIFICATION_WIDTH;
@@ -71,19 +68,6 @@ public final class NotificationsModule extends Module {
             int iconWidth = FontProcess.getFont("icon").getStringWidth(notification.getNotificationType().getIcon());
             int notificationWidth = Math.max(titleWidth, descWidth) + iconWidth + 15;
             maxWidth = Math.max(maxWidth, notificationWidth);
-        }
-
-        draggableComponent.setWidth(maxWidth);
-        draggableComponent.setHeight(NOTIFICATION_HEIGHT);
-
-        boolean showPlaceholder = mc.currentScreen instanceof GuiChat && NotificationManager.getNotifications().isEmpty();
-
-        if (showPlaceholder) {
-            float slideOffset = (maxWidth - MIN_NOTIFICATION_WIDTH) * (1 - 1.0f);
-            float x = (float) (draggableComponent.getX() + slideOffset);
-            float y = (float) (draggableComponent.getY() - yOffset - NOTIFICATION_HEIGHT);
-            new Notification(cc.simp.api.notifications.NotificationType.INFO, "Notification", "Preview").draw(x, y, maxWidth, NOTIFICATION_HEIGHT);
-            return;
         }
 
         for (Notification notification : NotificationManager.getNotifications()) {
@@ -105,8 +89,8 @@ public final class NotificationsModule extends Module {
             int notificationWidth = Math.max(titleWidth, descWidth) + iconWidth + 15;
 
             float slideOffset = (maxWidth - notificationWidth) * (1 - animation.getOutput().floatValue());
-            float x = (float) (draggableComponent.getX() + slideOffset);
-            float y = (float) (draggableComponent.getY() - yOffset - NOTIFICATION_HEIGHT);
+            float x = (float) (sr.getScaledWidth() - notificationWidth - 2 + slideOffset);
+            float y = (float) (sr.getScaledHeight() - yOffset - NOTIFICATION_HEIGHT - 2);
 
             notification.draw(x, y, notificationWidth, NOTIFICATION_HEIGHT);
             yOffset += (NOTIFICATION_HEIGHT + NOTIFICATION_SPACING) * animation.getOutput().floatValue();

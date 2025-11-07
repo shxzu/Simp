@@ -2,6 +2,7 @@ package cc.simp.modules.impl.player;
 
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
+import cc.simp.api.events.impl.player.TeleportEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
@@ -20,12 +21,13 @@ import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
+import net.minecraft.util.Vector3d;
 import org.lwjgl.util.vector.Vector2f;
 
 import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Bed Nuker", category = ModuleCategory.PLAYER)
-public final class BedNukerModule extends Module {
+public final class  BedNukerModule extends Module {
 
     private final NumberProperty breakRange = new NumberProperty("Break Range", 4.5, 1.0, 6.0, 0.1);
     private final Property<Boolean> whitelistOwnBed = new Property<>("Whitelist Own Bed", true);
@@ -35,7 +37,7 @@ public final class BedNukerModule extends Module {
     private boolean rotate = false;
     private int breakTicks;
     private int delayTicks;
-    private Vec3 home;
+    private Vector3d home;
 
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
@@ -58,8 +60,17 @@ public final class BedNukerModule extends Module {
             }
     };
 
+    @EventLink
+    public final Listener<TeleportEvent> onTeleport = event -> {
+        final double distance = mc.thePlayer.getDistance(event.getPosX(), event.getPosY(), event.getPosZ());
+
+        if (distance > 40) {
+            home = new Vector3d(event.getPosX(), event.getPosY(), event.getPosZ());
+        }
+    };
+
     private void getBedPos() {
-        if (home != null && mc.thePlayer.getDistanceSq(home.xCoord, home.yCoord, home.zCoord) < 35 * 35 && whitelistOwnBed.getValue()) {
+        if (home != null && mc.thePlayer.getDistanceSq(home.getX(), home.getY(), home.getZ()) < 35 * 35 && whitelistOwnBed.getValue()) {
             return;
         }
         bedPos = null;

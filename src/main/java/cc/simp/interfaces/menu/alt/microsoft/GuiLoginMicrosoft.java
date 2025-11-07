@@ -163,16 +163,6 @@ public class GuiLoginMicrosoft extends GuiScreen {
         didTheThing = true;
     }
 
-    private void handleOAuthLogin() {
-        Session auth = createMsSession();
-        if (auth == null) {
-            didTheThing = false;
-            return;
-        }
-        mc.setSession(auth);
-        didTheThing = true;
-    }
-
     private boolean isMouseOverButton(int mouseX, int mouseY, int buttonX, int buttonY, int buttonWidth, int buttonHeight) {
         return mouseX >= buttonX && mouseX <= buttonX + buttonWidth && mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
     }
@@ -189,12 +179,66 @@ public class GuiLoginMicrosoft extends GuiScreen {
         this.password.updateCursorCounter();
     }
 
+    private void handleOAuthLogin() {
+        statusString = "Awaiting for response for Microsoft login...";
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        MicrosoftOAuthTranslation.getRefreshToken(refreshToken -> {
+            if (refreshToken != null) {
+                MicrosoftOAuthTranslation.LoginData login = MicrosoftOAuthTranslation.login(refreshToken);
+                if (login.isGood()) {
+                    mc.setSession(new Session(login.username, login.uuid, login.mcToken, "microsoft"));
+                    saveOAuthAltToFile(login.username, login.newRefreshToken);
+                    didTheThing = true;
+                } else {
+                    statusString = "Failed to login with Microsoft OAuth";
+                    didTheThing = false;
+                }
+                future.complete(null);
+            } else {
+                statusString = "Failed to get refresh token";
+                didTheThing = false;
+                future.complete(null);
+            }
+        });
+
+        try {
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void saveAltToFile(String email, String password, String sessionUsername) {
         File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
         File file = new File(dir, "alts.txt");
 
         try (FileWriter fw = new FileWriter(file, true); PrintWriter out = new PrintWriter(fw)) {
             out.println("microsoft|" + sessionUsername + "|" + email + "|" + password);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveOAuthAltToFile(String username, String refreshToken) {
+        // Save to alts.txt
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File altsFile = new File(dir, "alts.txt");
+
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        try (FileWriter fw = new FileWriter(altsFile, true); PrintWriter out = new PrintWriter(fw)) {
+            out.println("microsoftOAuth|" + username);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Save refresh token to tokens.txt
+        File tokensFile = new File(dir, "tokens.txt");
+        try (FileWriter fw = new FileWriter(tokensFile, true); PrintWriter out = new PrintWriter(fw)) {
+            out.println(username + "|" + refreshToken);
         } catch (IOException e) {
             e.printStackTrace();
         }

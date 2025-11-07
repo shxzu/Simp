@@ -98,6 +98,10 @@ public class TargetSelectionProcess {
                 break;
 
             case Mode.Switch:
+                if (targetIndex >= targetList.size()) {
+                    targetIndex = 0;
+                }
+
                 if (switchTimer.hasTimeElapsed(switchTime * 100)) {
                     targetIndex = (targetIndex + 1) % targetList.size();
                     switchTimer.reset();

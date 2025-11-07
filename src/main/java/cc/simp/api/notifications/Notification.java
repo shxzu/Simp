@@ -39,7 +39,7 @@ public class Notification extends Util {
     }
 
     public void draw(float x, float y, float width, float height) {
-        CustomFontRenderer fr = NotificationsModule.customFont.getValue() ? FontProcess.getCurrentFont() : FontProcess.getFont("mc");
+        CustomFontRenderer fr = NotificationsModule.customFont.getValue() ? FontProcess.getFont("simp") : FontProcess.getFont("mc");
         boolean lowerAlpha = Simp.INSTANCE.getModuleManager().getModule(PostProcessingModule.class).isEnabled();
         RenderUtils.drawRect(x, y, width, height, new Color(0.1F, 0.1F, 0.1F, lowerAlpha ? 0.4F : .75f));
         float percentage = Math.min((timerUtil.getTime() / getTime()), 1);

@@ -4,6 +4,7 @@ import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.player.MoveEvent;
+import cc.simp.api.events.impl.player.MovePlayerEvent;
 import cc.simp.api.events.impl.player.SprintEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
@@ -53,8 +54,12 @@ public final class SpeedModule extends Module {
         }
     }
 
-    double moveSpeed;
-    boolean nigger = false;
+    double speedV;
+    float timer;
+    int offGroundTicks;
+    int onGroundTicks;
+    boolean prevOnGround;
+    private int stage;
 
     @EventLink
     public final Listener<MotionEvent> motionEventListener = e -> {
@@ -119,14 +124,53 @@ public final class SpeedModule extends Module {
                 break;
             case NCP:
                 if (MovementUtils.isMoving()) {
-                    if (MovementUtils.isOnGround()) {
-                        mc.thePlayer.jump();
-                        MovementUtils.strafe(MovementUtils.getSpeed() * 1.15);
+                    if (mc.thePlayer.fallDistance > 1.0) {
+                        mc.timer.timerSpeed = 0.8f;
                     } else {
-                        MovementUtils.strafe();
+                        mc.timer.timerSpeed = 1.9f;
+                    }
+                    if (mc.thePlayer.onGround) {
+                        mc.thePlayer.motionY = 0.42f;
+                        float speed = 0.0310f;
+                        if (mc.thePlayer.speedInAir < speed) {
+                            if (mc.thePlayer.speedInAir < 0.025) {
+                                mc.thePlayer.speedInAir = (float) (0.025f + (Math.random() / 100));
+                            }
+                            mc.thePlayer.speedInAir += 0.0091f;
+                        } else {
+                            mc.thePlayer.speedInAir = speed;
+                        }
+                        if (mc.thePlayer.jumpMovementFactor > 0.022) {
+                            mc.thePlayer.jumpMovementFactor -= 0.002f;
+                        }
+                    } else {
+                        mc.thePlayer.motionY *= 1.00;
+                        mc.thePlayer.motionX *= 0.982f;
+                        mc.thePlayer.motionZ *= 0.982f;
+                        mc.thePlayer.speedInAir -= 0.00019f;
+                        if (mc.thePlayer.fallDistance > 0.4 && mc.thePlayer.fallDistance < 0.41) {
+                            mc.thePlayer.motionY -= 0.1f;
+                        }
+                        if (mc.thePlayer.hurtTime > 4) {
+                            mc.thePlayer.speedInAir += 0.006f;
+                        }
                     }
                 }
                 break;
+        }
+    };
+
+    @EventLink
+    public final Listener<MovePlayerEvent> movePlayerEventListener = e -> {
+        if (mode.getValue() == Mode.NCP) {
+            if (mc.thePlayer.onGround) {
+                e.setY(mc.thePlayer.motionY = 0.42F);
+                if (speedV < 0.2805) {
+                    speedV = 0.2805;
+                }
+                speedV *= 1.949;
+                stage = 0;
+            }
         }
     };
 
@@ -141,6 +185,7 @@ public final class SpeedModule extends Module {
     public void onDisable() {
         if (mode.getValue() == Mode.UpdatedNCP || mode.getValue() == Mode.NCP) {
             mc.timer.timerSpeed = 1.0f;
+            mc.thePlayer.speedInAir = 0.02F;
         }
         if (mode.getValue() == Mode.Jump && mc.gameSettings.keyBindJump.isPressed())
             mc.gameSettings.keyBindJump.setPressed(false);

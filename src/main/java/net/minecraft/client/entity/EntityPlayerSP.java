@@ -5,6 +5,7 @@ import cc.simp.api.commands.CommandHandler;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.ItemSlowdownEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
+import cc.simp.api.events.impl.player.MovePlayerEvent;
 import cc.simp.api.events.impl.player.SprintEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MovingSoundMinecartRiding;
@@ -811,6 +812,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
             this.capabilities.isFlying = false;
             this.sendPlayerAbilities();
         }
+    }
+
+    @Override
+    public void moveEntity(double x, double y, double z) {
+        final MovePlayerEvent moveEvent = new MovePlayerEvent(x, y, z);
+        Simp.INSTANCE.getEventBus().post(moveEvent);
+
+        if (moveEvent.isCancelled()) return;
+
+        super.moveEntity(moveEvent.getX(), moveEvent.getY(), moveEvent.getZ());
     }
 
     public Vector2f getPreviousRotation() {

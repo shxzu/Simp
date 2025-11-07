@@ -5,11 +5,10 @@ import cc.simp.api.events.impl.game.MinMotionEvent;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.packet.PacketReceiveEvent;
 import cc.simp.api.events.impl.packet.PacketSendEvent;
-import cc.simp.api.events.impl.player.HitSlowDownEvent;
 import cc.simp.api.events.impl.player.StrafeEvent;
-import cc.simp.api.events.impl.render.Render2DEvent;
+import cc.simp.api.events.impl.player.TeleportEvent;
 import cc.simp.api.events.impl.world.BlockCollisionEvent;
-import cc.simp.modules.impl.client.ClickInterfaceModule;
+import cc.simp.api.events.impl.world.WorldLoadEvent;
 import cc.simp.utils.client.Logger;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.mc.PacketUtils;
@@ -29,7 +28,6 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
-import net.minecraft.network.play.server.S18PacketEntityTeleport;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -44,7 +42,9 @@ public class BackgroundProcess {
 
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
+
         if (this.cfgTimer.hasTimeElapsed(30000, true)) Simp.INSTANCE.getConfigManager().saveConfig("default");
+
         DraggingProcess.update();
 
         // Bounds Fix
@@ -55,21 +55,21 @@ public class BackgroundProcess {
         }
 
         // Lag Fix
-        if (ViaLoadingBase.getInstance().getTargetVersion().newerThan(ProtocolVersion.v1_8)) {
+        if (ViaLoadingBase.getInstance().getTargetVersion().newerThan(ProtocolVersion.v1_8) && mc.theWorld != null) {
             LagProcess.spoof(1, true, true, false, true);
         }
 
     };
 
     @EventLink
-    public final Listener<PacketReceiveEvent> packetReceiveEventListener = event -> {
+    public final Listener<TeleportEvent> teleportEventListener = event -> {
         // Lag Fix Continues
         if (!event.isCancelled() && ViaLoadingBase.getInstance()
-                .getTargetVersion().newerThan(ProtocolVersion.v1_8) && event.getPacket() instanceof S08PacketPlayerPosLook) {
-                if (ViaLoadingBase.getInstance().getTargetVersion().newerThan(ProtocolVersion.v1_8)) {
-                    LagProcess.dispatch();
-                    Logger.chatPrint("Dispatched lag packets due to teleport.");
-                }
+                .getTargetVersion().newerThan(ProtocolVersion.v1_8)) {
+            if (ViaLoadingBase.getInstance().getTargetVersion().newerThan(ProtocolVersion.v1_8) && mc.theWorld != null) {
+                LagProcess.dispatch();
+                Logger.chatPrint("Dispatched lag packets due to teleport.");
+            }
         }
     };
 

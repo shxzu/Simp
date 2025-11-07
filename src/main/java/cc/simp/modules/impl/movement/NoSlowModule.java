@@ -3,7 +3,7 @@ package cc.simp.modules.impl.movement;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.packet.PacketSendEvent;
 import cc.simp.api.events.impl.player.ItemSlowdownEvent;
-import cc.simp.api.events.impl.player.MotionEvent;
+import cc.simp.api.events.impl.player.TeleportEvent;
 import cc.simp.api.events.impl.world.WorldLoadEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
@@ -11,6 +11,7 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.BadPacketsProcess;
 import cc.simp.processes.LagProcess;
 import cc.simp.utils.client.Logger;
 import cc.simp.utils.mc.MovementUtils;
@@ -24,8 +25,7 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.network.play.client.C09PacketHeldItemChange;
 
 import static cc.simp.utils.Util.mc;
 
@@ -33,7 +33,7 @@ import static cc.simp.utils.Util.mc;
 public final class NoSlowModule extends Module {
 
     private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Vanilla);
-    private final NumberProperty amount = new NumberProperty("Amount", 2, () -> mode.getValue() == Mode.Prediction, 2, 5, 1);
+    private final NumberProperty amount = new NumberProperty("Amount", 2, () -> mode.getValue() == Mode.Ticks, 2, 5, 1);
     public final Property<Boolean> food = new Property<>("Food", true, () -> mode.getValue() != Mode.Blink);
     public final Property<Boolean> potion = new Property<>("Potion", true, () -> mode.getValue() != Mode.Blink);
     public final Property<Boolean> sword = new Property<>("Sword", true, () -> mode.getValue() != Mode.Blink);
@@ -41,8 +41,10 @@ public final class NoSlowModule extends Module {
 
     private enum Mode {
         Vanilla("Vanilla"),
+        UpdatedNCP("Updated NCP"),
         Blink("Blink"),
-        Prediction("Prediction");
+        Switch("Switch"),
+        Ticks("Ticks");
 
         public final String name;
 
@@ -58,13 +60,17 @@ public final class NoSlowModule extends Module {
 
     public static boolean isUsing;
     public static boolean blinked;
+    private int disable;
 
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
         setSuffix(mode.getValue().toString());
 
+        this.disable++;
+
         if (mode.getValue() == Mode.Blink) {
-            if (!mc.thePlayer.isUsingItem() || !(mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemFood)) return;
+            if (!mc.thePlayer.isUsingItem() || !(mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemFood))
+                return;
 
             LagProcess.blink();
 
@@ -97,11 +103,12 @@ public final class NoSlowModule extends Module {
         if (mc.thePlayer == null || !mc.thePlayer.isUsingItem() || mc.thePlayer.inventory.getCurrentItem() == null) {
             isUsing = false;
             return;
+        } else {
+            isUsing = true;
         }
 
         switch (mode.getValue()) {
             case Vanilla:
-                isUsing = true;
                 if (food.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemFood) {
                     e.setCancelled();
                 }
@@ -120,7 +127,7 @@ public final class NoSlowModule extends Module {
                     e.setCancelled();
                 }
                 break;
-            case Prediction:
+            case Ticks:
                 if (mc.thePlayer.onGroundTicks % amount.getValue() != 0 && MovementUtils.isOnGround()) {
                     if (food.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemFood) {
                         e.setCancelled();
@@ -136,12 +143,83 @@ public final class NoSlowModule extends Module {
                     }
                 }
                 break;
+            case Switch:
+                if (food.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemFood) {
+                    e.setCancelled();
+                    if (!BadPacketsProcess.bad(false, true, true, false, false)) {
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                    }
+                }
+                if (potion.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemPotion) {
+                    e.setCancelled();
+                    if (!BadPacketsProcess.bad(false, true, true, false, false)) {
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                    }
+                }
+                if (sword.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
+                    e.setCancelled();
+                    if (!BadPacketsProcess.bad(false, true, true, false, false)) {
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                    }
+                }
+                if (bow.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemBow) {
+                    e.setCancelled();
+                    if (!BadPacketsProcess.bad(false, true, true, false, false)) {
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                    }
+                }
+                break;
+            case UpdatedNCP:
+                if (food.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemFood) {
+                    e.setCancelled();
+                    if (this.disable > 10 && !BadPacketsProcess.bad(false, true, true, false, false)) {
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                        PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                    }
+                }
+                if (potion.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemPotion) {
+                    e.setCancelled();
+                    if (this.disable > 10 && !BadPacketsProcess.bad(false, true, true, false, false)) {
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                        PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                    }
+                }
+                if (sword.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
+                    e.setCancelled();
+                    if (this.disable > 10 && !BadPacketsProcess.bad(false, true, true, false, false)) {
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                        PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                    }
+                }
+                if (bow.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemBow) {
+                    e.setCancelled();
+                    if (this.disable > 10 && !BadPacketsProcess.bad(false, true, true, false, false)) {
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                        PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                    }
+                }
+                break;
         }
     };
 
     @EventLink
     public final Listener<WorldLoadEvent> worldLoadEventListener = e -> {
         isUsing = false;
+        disable = 0;
+    };
+
+    @EventLink
+    public final Listener<TeleportEvent> teleportEventListener = e -> {
+        isUsing = false;
+        disable = 0;
     };
 
     @Override

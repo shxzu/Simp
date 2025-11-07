@@ -70,6 +70,7 @@ public class Vector2f extends Vector implements Serializable, ReadableVector2f, 
         set(x, y);
     }
 
+
     /* (non-Javadoc)
      * @see org.lwjgl.util.vector.WritableVector2f#set(float, float)
      */

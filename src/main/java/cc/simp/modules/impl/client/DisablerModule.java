@@ -21,11 +21,10 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Disabler", category = ModuleCategory.CLIENT)
 public final class DisablerModule extends Module {
 
-    private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.GrimAimModulo360);
+    private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.VerusCombat);
 
     private enum Mode {
         VerusCombat("Verus Combat"),
-        GrimAimModulo360("Grim AimModulo360"),
         VulcanReach("Vulcan Reach");
 
         public String name;
@@ -99,25 +98,7 @@ public final class DisablerModule extends Module {
 
     @EventLink
     private final Listener<PreUpdateEvent> preUpdateEventListener = event -> {
-
         setSuffix(mode.getValue().toString());
-
-        // thank u @scoliosissy
-
-        if (mode.getValue() == Mode.GrimAimModulo360) {
-            if (RotationProcess.isActive()) {
-                RotationProcess.rotations.x = applyWrap360(RotationProcess.rotations.getX(), RotationProcess.targetRotations.getX());
-            }
-        }
     };
-
-    public static float applyWrap360(float currentYaw, float targetYaw) {
-        float delta = targetYaw - currentYaw;
-
-        while (delta <= -180) delta += 360;
-        while (delta > 180) delta -= 360;
-
-        return currentYaw + delta;
-    }
 
 }

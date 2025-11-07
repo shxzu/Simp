@@ -7,6 +7,7 @@ import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
+import cc.simp.modules.impl.client.ClientSettingsModule;
 import cc.simp.processes.FontProcess;
 import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.gui.GuiScreen;
@@ -55,8 +56,35 @@ public class ClickInterface extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
 
-        RenderUtils.drawImage(new ResourceLocation("simp/images/anime.png"), width - 216, (float) height / 2, 216, 289);
-
+            switch (ClientSettingsModule.anime.getValue()) {
+                case Onikata:
+                    RenderUtils.drawImage(new ResourceLocation("simp/images/onikata.png"), width - 216, (float) height / 2, 216, 289);
+                    break;
+                case Takanashi:
+                    RenderUtils.drawImage(new ResourceLocation("simp/images/takanashi.png"), width - 216, (float) height / 2, 216, 289);
+                    break;
+                case Io:
+                    RenderUtils.drawImage(new ResourceLocation("simp/images/io.png"), width - 216, (float) height / 2, 216, 289);
+                    break;
+                case ZeroTwo:
+                    RenderUtils.drawImage(new ResourceLocation("simp/images/zerotwo.png"), width - 216, (float) height / 2, 216, 289);
+                    break;
+                case Astolfo:
+                    RenderUtils.drawImage(new ResourceLocation("simp/images/astolfo.png"), width - 216, (float) height / 2, 216, 289);
+                    break;
+                case Felix:
+                    RenderUtils.drawImage(new ResourceLocation("simp/images/felix.png"), width - 216, (float) height / 2, 216, 289);
+                    break;
+                case Rem:
+                    RenderUtils.drawImage(new ResourceLocation("simp/images/rem.png"), width - 216, (float) height / 2, 216, 289);
+                    break;
+                case Ram:
+                    RenderUtils.drawImage(new ResourceLocation("simp/images/ram.png"), width - 216, (float) height / 2, 216, 289);
+                    break;
+                case None:
+                    // No background
+                    break;
+            }
         // Update dragging slider if active
         if (draggingSlider != null) {
             draggingSlider.updateDrag(mouseX);

@@ -45,8 +45,6 @@ public class ViaMCP {
                 getAsyncVersionSlider().setVersion(protocolVersion.getVersion());
             }
         }).build();
-
-        // Add this line if you implement the transaction fixes into the game code
         // fixTransactions();
     }
 

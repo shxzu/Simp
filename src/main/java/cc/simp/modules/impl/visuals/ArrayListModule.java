@@ -11,7 +11,7 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.modules.impl.client.ClickInterfaceModule;
+import cc.simp.modules.impl.client.ClientSettingsModule;
 import cc.simp.processes.ColorProcess;
 import cc.simp.processes.FontProcess;
 import cc.simp.utils.render.RenderUtils;
@@ -357,11 +357,11 @@ public final class ArrayListModule extends Module {
     private int getColorForModule(int visibleModuleIndex) {
         int offset = colorMode.getValue() == ColorMode.Fade ? visibleModuleIndex : 0;
 
-        if (ClickInterfaceModule.color.getValue() == ClickInterfaceModule.Color.Astolfo) {
+        if (ClientSettingsModule.color.getValue() == ClientSettingsModule.Color.Astolfo) {
             return RenderUtils.astolfoColors(offset / 2, offset).getRGB();
         }
 
-        if (ClickInterfaceModule.color.getValue() == ClickInterfaceModule.Color.Rainbow) {
+        if (ClientSettingsModule.color.getValue() == ClientSettingsModule.Color.Rainbow) {
             return RenderUtils.rainbowColors(offset / 2, offset).getRGB();
         }
 

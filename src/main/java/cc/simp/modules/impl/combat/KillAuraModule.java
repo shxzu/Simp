@@ -1,6 +1,7 @@
 package cc.simp.modules.impl.combat;
 
 import cc.simp.api.events.impl.game.PreUpdateEvent;
+import cc.simp.api.events.impl.packet.PacketSendEvent;
 import cc.simp.api.events.impl.player.HitSlowDownEvent;
 import cc.simp.api.events.impl.world.TickEvent;
 import cc.simp.api.events.impl.world.WorldLoadEvent;
@@ -33,6 +34,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
+import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
@@ -62,7 +64,7 @@ public final class KillAuraModule extends Module {
     public static NumberProperty killRange = new NumberProperty("Kill Range", 3, 3, 6, 0.1);
     public static NumberProperty blockingRange = new NumberProperty("Blocking Range", 4.2, 3, 6, 0.1);
     public static final Property<Boolean> newCombat = new Property<>("New Combat Delays", false);
-    private static final NumberProperty min = new NumberProperty("Min CPS", 9.0, () -> !newCombat.getValue(),0.0, 20.0, 0.5);
+    private static final NumberProperty min = new NumberProperty("Min CPS", 9.0, () -> !newCombat.getValue(), 0.0, 20.0, 0.5);
     private static final NumberProperty max = new NumberProperty("Max CPS", 13.0, () -> !newCombat.getValue(), 0.0, 20.0, 0.5);
     public static ModeProperty<AutoBlock> ab = new ModeProperty<>("Auto Block", AutoBlock.Fake);
     private final NumberProperty legitBlockInterval = new NumberProperty("Legit Block Interval", 4, () -> ab.getValue() == AutoBlock.Legit, 2, 10, 1);
@@ -89,6 +91,7 @@ public final class KillAuraModule extends Module {
         Switch,
         Legit,
         Predictive,
+        NCP,
         Vanilla
     }
 
@@ -155,6 +158,27 @@ public final class KillAuraModule extends Module {
         elapsedTicks++;
     };
 
+    @EventLink
+    public final Listener<PacketSendEvent> packetSendEventListener = event -> {
+        if (ab.getValue() == AutoBlock.NCP && autoBlocking) {
+            if (event.getPacket() instanceof C07PacketPlayerDigging) {
+                C07PacketPlayerDigging packet = (C07PacketPlayerDigging) event.getPacket();
+
+                if (packet.getStatus().equals(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM)) {
+                    event.setCancelled(true);
+                }
+            }
+
+            if (event.getPacket() instanceof C08PacketPlayerBlockPlacement) {
+                C08PacketPlayerBlockPlacement packet = (C08PacketPlayerBlockPlacement) event.getPacket();
+
+                if (packet.getPlacedBlockDirection() == 255) {
+                    event.setCancelled(true);
+                }
+            }
+        }
+    };
+
     private void calculateRotations() {
         if (target == null || rotations.getValue() == Rotations.None) return;
 
@@ -202,21 +226,41 @@ public final class KillAuraModule extends Module {
                     interval = Math.max(2, interval);
                 }
                 if (mc.thePlayer.ticksExisted % interval == 0) {
-                    mc.gameSettings.keyBindUseItem.setPressed(true);
-                    autoBlocking = true;
+                    if (!autoBlocking) {
+                        mc.gameSettings.keyBindUseItem.setPressed(true);
+                        autoBlocking = true;
+                    }
                     canAttack = false;
                 } else {
-                    unblock();
+                    if (autoBlocking) {
+                        unblock();
+                    }
                 }
                 break;
             case Predictive:
                 if (shouldBlockPredictive()) {
-                    mc.gameSettings.keyBindUseItem.setPressed(true);
-                    autoBlocking = true;
+                    if (!autoBlocking) {
+                        mc.gameSettings.keyBindUseItem.setPressed(true);
+                        autoBlocking = true;
+                    }
                     canAttack = false;
                 } else {
-                    unblock();
+                    if (autoBlocking) {
+                        unblock();
+                    }
                 }
+                break;
+            case NCP:
+                if (mc.objectMouseOver.entityHit != null) {
+                    PacketUtils.sendPacket(new C02PacketUseEntity(mc.objectMouseOver.entityHit, C02PacketUseEntity.Action.INTERACT));
+
+                } else if (interactable(mc.theWorld.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock())) {
+                    mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(),
+                            mc.objectMouseOver.getBlockPos(), Block.getFacingDirection(mc.objectMouseOver.getBlockPos()), mc.objectMouseOver.hitVec);
+                }
+
+                PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                autoBlocking = true;
                 break;
             case Vanilla:
                 PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
@@ -308,7 +352,7 @@ public final class KillAuraModule extends Module {
 
     private static boolean hitTimerDone() {
         boolean returnVal = false;
-        if(!newCombat.getValue()) {
+        if (!newCombat.getValue()) {
             if (attackTimer.hasTimeElapsed(delay, false)) {
                 returnVal = true;
                 attackTimer.reset();
@@ -378,6 +422,12 @@ public final class KillAuraModule extends Module {
 
         // If angle is < 60 degrees (cos > 0.5), target is looking at us
         return dotProduct > 0.5 && target.swingProgress > 0;
+    }
+
+
+    private boolean interactable(Block block) {
+        return block == Blocks.chest || block == Blocks.trapped_chest || block == Blocks.crafting_table
+                || block == Blocks.furnace || block == Blocks.ender_chest || block == Blocks.enchanting_table;
     }
 
     @Override

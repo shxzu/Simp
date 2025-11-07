@@ -65,10 +65,12 @@ public final class ModuleManager {
                 new InvMoveModule(),
                 new LegitScaffoldModule(),
                 new BedNukerModule(),
+                new NoFireballModule(),
 
                 // Client
-                new ClickInterfaceModule(),
+                new ClientSettingsModule(),
                 new DiscordRPCModule(),
+                new SpotifyIntegrationModule(),
                 new AntiBotModule(),
                 new DisablerModule(),
                 new FakeLagModule(),

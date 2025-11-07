@@ -9,7 +9,7 @@ import cc.simp.api.events.impl.game.KeyPressEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.interfaces.click.ClickInterface;
 import cc.simp.modules.ModuleManager;
-import cc.simp.modules.impl.client.ClickInterfaceModule;
+import cc.simp.modules.impl.client.ClientSettingsModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.processes.*;
@@ -117,10 +117,10 @@ public class Simp {
 
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = e -> {
-        if(!Simp.INSTANCE.getModuleManager().getModule(ClickInterfaceModule.class).isEnabled()) Simp.INSTANCE.getModuleManager().getModule(ClickInterfaceModule.class).setEnabled(true);
+        if(!Simp.INSTANCE.getModuleManager().getModule(ClientSettingsModule.class).isEnabled()) Simp.INSTANCE.getModuleManager().getModule(ClientSettingsModule.class).setEnabled(true);
 
         String currentFont = FontProcess.getCurrentFont().getNameFontTTF().toLowerCase();
-        String desiredFont = ClickInterfaceModule.font.getValue().toString().toLowerCase();
+        String desiredFont = ClientSettingsModule.font.getValue().toString().toLowerCase();
 
         if (!currentFont.equals(desiredFont)) {
             FontProcess.setCurrentFont(desiredFont);

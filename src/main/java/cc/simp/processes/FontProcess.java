@@ -1,11 +1,6 @@
 package cc.simp.processes;
 
-import cc.simp.Simp;
-import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.font.CustomFontRenderer;
-import cc.simp.modules.impl.client.ClickInterfaceModule;
-import io.github.nevalackin.homoBus.Listener;
-import io.github.nevalackin.homoBus.annotations.EventLink;
 
 import java.awt.*;
 import java.util.HashMap;

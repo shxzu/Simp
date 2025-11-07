@@ -9,7 +9,6 @@ import cc.simp.api.events.impl.player.StrafeEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
 import cc.simp.api.events.impl.render.ShaderEvent;
-import cc.simp.api.notifications.Notification;
 import cc.simp.api.notifications.NotificationManager;
 import cc.simp.api.notifications.NotificationType;
 import cc.simp.api.properties.Property;
@@ -61,7 +60,7 @@ public final class ScaffoldModule extends Module {
     private static final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Normal);
     private static final ModeProperty<SearchAlgorithm> searchAlgorithm = new ModeProperty<>("Search Algorithm", SearchAlgorithm.Normal);
     private final NumberProperty rotationSpeed = new NumberProperty("Rotation Speed", 5, 0, 10, 1);
-    public final NumberProperty placeDelay = new NumberProperty("Place Delay", 2, 0, 5, 1);
+    public final NumberProperty placeDelay = new NumberProperty("Place CPS", 10, 1, 20, 1);
     public static Property<Boolean> swing = new Property<>("Swing", false);
     public static Property<Boolean> sprint = new Property<>("Sprint", false);
     public static Property<Boolean> moveFix = new Property<>("Move Fix", true);
@@ -106,6 +105,7 @@ public final class ScaffoldModule extends Module {
         Extra
     }
 
+    private long lastPlaceTime = 0;
     private Vec3 targetBlock;
     private EnumFacingOffset enumFacing;
     public Vec3i offset = new Vec3i(0, 0, 0);
@@ -136,11 +136,18 @@ public final class ScaffoldModule extends Module {
 
         resetBinds(false, false, true, true, false, false);
 
-        if(safeWalk.getValue()) {
+        if (safeWalk.getValue()) {
             mc.thePlayer.safeWalk = true;
         }
 
         for (recursion = 0; recursion <= recursions; recursion++) {
+
+            // Calculate interval based on CPS (1000ms / CPS = ms between clicks)
+            long currentTime = System.currentTimeMillis();
+            long requiredInterval = (long) (1000.0 / placeDelay.getValue());
+
+            // Add randomization to make it more human-like (±10% variation)
+            long randomizedInterval = (long) (requiredInterval * (0.9 + Math.random() * 0.2));
 
             if (!overrided) {
                 this.rotSpeed = (float) MathUtils.getRandom(this.rotationSpeed.getValue(), this.rotationSpeed.getValue() * Math.random());
@@ -163,7 +170,7 @@ public final class ScaffoldModule extends Module {
             final boolean sameY = ((keepY.getValue() || Simp.INSTANCE.getModuleManager().getModule(SpeedModule.class).isEnabled()) && !mc.gameSettings.keyBindJump.isKeyDown()) && MovementUtils.isMoving();
 
             if (InventoryUtils.findBlock() == -1) {
-                Logger.chatPrint("No blocks in hotbar, disabling!");
+                NotificationManager.post(NotificationType.DISABLE, "Scaffold", "No blocks found, disabling Scaffold.");
                 this.toggle();
                 return;
             }
@@ -181,7 +188,7 @@ public final class ScaffoldModule extends Module {
             }
 
             canPlace = mc.thePlayer.inventory.currentItem == InventoryUtils.findBlock() &&
-                    ticksOnAir > placeDelay.getValue() * Math.random();
+                    ticksOnAir > 0 && (currentTime - lastPlaceTime) >= randomizedInterval;
 
             // Gets block to place
             targetBlock = PlayerUtils.getPlacePossibility(offset.getX(), offset.getY(), offset.getZ(), sameY ? (int) Math.floor(startY) : null);
@@ -325,7 +332,7 @@ public final class ScaffoldModule extends Module {
         anim = new DecelerateAnimation(250, 1);
         if (mc.thePlayer != null) {
             mc.thePlayer.safeWalk = false;
-            if(blinked) {
+            if (blinked) {
                 LagProcess.disable();
                 LagProcess.dispatch();
             }
@@ -470,24 +477,29 @@ public final class ScaffoldModule extends Module {
             case SlowTelly:
                 if (recursion == 0) {
                     if (mc.thePlayer.offGroundTicks <= 9 && mc.thePlayer.offGroundTicks > 3) {
-                        if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, rayCast.getValue().equals(RayCast.Strict))) {
-                            getBaseRotations();
+                        mc.entityRenderer.getMouseOver(1);
+
+                        if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
+                            if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
+                                getBaseRotations();
+                            }
                         }
-                        overrided = true;
-                        this.rotSpeed = 10;
                     } else {
                         targetPitch = mc.thePlayer.rotationPitch;
                         targetYaw = mc.thePlayer.rotationYaw;
                         canPlace = false;
-                        overrided = false;
                     }
                 }
                 break;
             case FastTelly:
                 if (recursion == 0) {
                     if (mc.thePlayer.offGroundTicks < 11) {
-                        if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, rayCast.getValue().equals(RayCast.Strict))) {
-                            getBaseRotations();
+                        mc.entityRenderer.getMouseOver(1);
+
+                        if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
+                            if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
+                                getBaseRotations();
+                            }
                         }
                     } else {
                         targetPitch = mc.thePlayer.rotationPitch;
@@ -498,12 +510,19 @@ public final class ScaffoldModule extends Module {
                 break;
             case Hypixel:
                 if (recursion == 0) {
-                   if (MovementUtils.isOnGround() && !mc.thePlayer.isSprinting() && MovementUtils.isMoving()) {
-                        targetYaw = mc.thePlayer.rotationYaw;
-                        canPlace = false;
-                    }
-                    if (!RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, rayCast.getValue().equals(RayCast.Strict)) && canPlace) {
-                        getBaseRotations();
+                    if (MovementUtils.isOnGround()) {
+                        if (MovementUtils.isMoving()) {
+                            targetYaw = mc.thePlayer.rotationYaw;
+                            canPlace = false;
+                        }
+                    } else {
+                        mc.entityRenderer.getMouseOver(1);
+
+                        if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
+                            if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
+                                getBaseRotations();
+                            }
+                        }
                     }
                 }
                 break;
@@ -712,6 +731,7 @@ public final class ScaffoldModule extends Module {
             if (swing.getValue()) mc.thePlayer.swingItem();
             else PacketUtils.sendPacket(new C0APacketAnimation());
         }
+        lastPlaceTime = System.currentTimeMillis();
     }
 
     public void jump() {

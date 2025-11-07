@@ -133,7 +133,9 @@ public class RotationProcess {
         final Vector2f rotations = new Vector2f(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
         final Vector2f fixedRotations = RotationUtils.resetRotation(RotationUtils.applySensitivityPatch(rotations, lastRotations));
 
-        mc.thePlayer.rotationYaw = fixedRotations.x;
+        // Normalize the yaw difference to avoid large deltas
+        float yawDelta = MathHelper.wrapAngleTo180_float(fixedRotations.x - mc.thePlayer.rotationYaw);
+        mc.thePlayer.rotationYaw = mc.thePlayer.rotationYaw + yawDelta;
         mc.thePlayer.rotationPitch = fixedRotations.y;
     }
 
@@ -176,6 +178,9 @@ public class RotationProcess {
                     targetPitch = (float) (targetRotations.y + Math.random() * 2);
                 }
             }
+
+            // Normalize target yaw to prevent 360-degree jumps
+            targetYaw = lastRotations.x + MathHelper.wrapAngleTo180_float(targetYaw - lastRotations.x);
 
             rotations = RotationUtils.smooth(new Vector2f(targetYaw, targetPitch),
                     rotationSpeed + Math.random());

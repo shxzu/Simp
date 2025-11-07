@@ -1,8 +1,7 @@
 package cc.simp.processes;
 
 import cc.simp.api.events.impl.render.Render2DEvent;
-import cc.simp.interfaces.click.ClickInterface;
-import cc.simp.modules.impl.client.ClickInterfaceModule;
+import cc.simp.modules.impl.client.ClientSettingsModule;
 import cc.simp.utils.misc.Pair;
 import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
@@ -21,7 +20,7 @@ public class ColorProcess {
     public Listener<Render2DEvent> render2DEventListener = e -> {
         Color first = new Color(255, 255, 255);
         Color second = new Color(255, 255, 255);
-        switch (ClickInterfaceModule.color.getValue()) {
+        switch (ClientSettingsModule.color.getValue()) {
             case Rainbow -> {
                 colors = Pair.of(RenderUtils.rainbowColors(15, 75), RenderUtils.rainbowColors(15, 75));
                 color = RenderUtils.rainbowColors(15, 75);
