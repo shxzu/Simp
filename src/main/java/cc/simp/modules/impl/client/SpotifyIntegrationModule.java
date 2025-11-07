@@ -8,6 +8,7 @@ import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.ColorProcess;
 import cc.simp.processes.DraggingProcess;
+import cc.simp.utils.client.Logger;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.gui.Gui;
@@ -30,13 +31,13 @@ public class SpotifyIntegrationModule extends Module {
 
     public String song = "Loading...";
     public String artist = "Loading...";
-    public String auth_token = "";
-    public String client_id = "";
-    public String client_secret = "";
+    public String auth_token;
+    public String client_id;
+    public String client_secret;
     public String progress = "1:43";
     public String length = "2:56";
-    public int duration_ms = 176000;
-    public int progress_ms = 103000;
+    public int duration_ms = 1;
+    public int progress_ms = 1;
     public int ticks = 0;
 
     public static boolean updatedInfo = false;
@@ -84,7 +85,6 @@ public class SpotifyIntegrationModule extends Module {
         } else {
             progress += (int)(progress_ms / 1000 % 60);
         }
-
         length = (duration_ms / 1000 / 60) + ":";
         if ((duration_ms / 1000 % 60) < 10) {
             length += "0" + (duration_ms / 1000 % 60);
@@ -145,21 +145,28 @@ public class SpotifyIntegrationModule extends Module {
                 String response = s.hasNext() ? s.next() : "";
                 JSONObject obj = new JSONObject(response);
                 auth_token = obj.getString("access_token");
+                Logger.chatPrint("Logged in");
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.chatPrint("Spotify auth error");
             }
         }).start();
     }
 
     public void getSpotifyInfo() {
         try {
+            System.out.println("Bearer " + auth_token);
             if (!updatedInfo) {
                 updatedInfo = true;
                 URL url = new URL("https://api.spotify.com/v1/me/player?market=US");
                 HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
                 httpConn.setRequestMethod("GET");
 
+                httpConn.setRequestProperty("authority", "api.spotify.com");
+                httpConn.setRequestProperty("accept", "*/*");
+                httpConn.setRequestProperty("accept-language", "en-US,en;q=0.9");
                 httpConn.setRequestProperty("authorization", "Bearer " + auth_token);
+                httpConn.setRequestProperty("origin", "https://developer.spotify.com");
+                httpConn.setRequestProperty("referer", "https://developer.spotify.com/");
 
                 InputStream responseStream = httpConn.getResponseCode() / 100 == 2
                         ? httpConn.getInputStream()
@@ -167,26 +174,20 @@ public class SpotifyIntegrationModule extends Module {
                 Scanner s = new Scanner(responseStream).useDelimiter("\\A");
                 String response = s.hasNext() ? s.next() : "";
                 JSONObject obj = new JSONObject(response);
-
                 progress_ms = obj.getInt("progress_ms");
                 JSONObject item = obj.getJSONObject("item");
+                JSONObject album = item.getJSONObject("album");
                 duration_ms = item.getInt("duration_ms");
-
-                song = Normalizer.normalize(item.getString("name"), Normalizer.Form.NFKD).replaceAll("[^\\p{ASCII}]", "");
+                JSONArray arists = album.getJSONArray("artists");
+                song = Normalizer.normalize(item.getString("name"),Normalizer.Form.NFKD).replaceAll("[^\\p{ASCII}]", "");
                 if (song.length() > 20) {
                     song = song.substring(0, 20);
                 }
-
-                JSONArray artists = item.getJSONArray("artists");
-                JSONObject author = new JSONObject(artists.get(0).toString());
+                JSONObject author = new JSONObject(arists.get(0).toString());
                 artist = Normalizer.normalize(author.getString("name"), Normalizer.Form.NFKD).replaceAll("[^\\p{ASCII}]", "");
-
                 updatedInfo = false;
             }
         } catch (Exception e) {
-            if (!client_id.isEmpty() && !client_secret.isEmpty()) {
-                auth();
-            }
             updatedInfo = false;
         }
     }
@@ -198,7 +199,6 @@ public class SpotifyIntegrationModule extends Module {
                 updatedInfo = false;
                 getSpotifyInfo();
             }
-
             if (ticks % 20 == 0 && this.isEnabled()) {
                 if ((progress_ms + 1000) > duration_ms) {
                     getSpotifyInfo();

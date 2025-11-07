@@ -76,6 +76,7 @@ public class Simp {
         commandHandler.commands.addAll(Arrays.asList(
                 new BindCommand(),
                 new ClientNameCommand(),
+                new SpotifyCommand(),
                 new BindsCommand(),
                 new ToggleCommand(),
                 new ConfigCommand(),
