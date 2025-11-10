@@ -55,6 +55,8 @@ public final class BackTrackModule extends Module {
     @EventLink
     public final Listener<MotionEvent> motionEventListener = e -> {
 
+        if(e.isPre()) return;
+
         setSuffix(ping + " ms");
 
         if (mc.thePlayer.isDead) {
@@ -121,7 +123,7 @@ public final class BackTrackModule extends Module {
 
     @EventLink
     public final Listener<Render3DEvent> render3DEventListener = e -> {
-        if (target != null && shouldActive(target) && mc.thePlayer.getDistanceToEntity(target) <= deactivateDist.getValue()) {
+        if (target != null && shouldActive(target) && mc.thePlayer.getDistanceToEntity(target) <= deactivateDist.getValue() && mc.thePlayer.isSwingInProgress) {
             double x = realPosition.xCoord - mc.getRenderManager().viewerPosX;
             double y = realPosition.yCoord - mc.getRenderManager().viewerPosY;
             double z = realPosition.zCoord - mc.getRenderManager().viewerPosZ;
