@@ -1,6 +1,5 @@
 package cc.simp.modules.impl.combat;
 
-import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.packet.PacketSendEvent;
 import cc.simp.api.events.impl.player.AttackEvent;
 import cc.simp.api.properties.impl.ModeProperty;
@@ -10,7 +9,6 @@ import cc.simp.modules.ModuleInfo;
 import cc.simp.utils.mc.PacketUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.potion.Potion;
 
@@ -22,6 +20,7 @@ public final class CriticalsModule extends Module {
     public static ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Edit);
 
     private enum Mode {
+        Visual,
         Edit,
         NCP
     }
@@ -38,13 +37,19 @@ public final class CriticalsModule extends Module {
 
     @EventLink
     public final Listener<AttackEvent> attackEventListener = e -> {
-        boolean willCritLegit = mc.thePlayer.fallDistance > 0.0F && !mc.thePlayer.onGround && !mc.thePlayer.isOnLadder() && !mc.thePlayer.isInWater() && !mc.thePlayer.isPotionActive(Potion.blindness) && !mc.thePlayer.isRiding();
+        if (mode.getValue() == Mode.NCP) {
+            boolean willCritLegit = mc.thePlayer.fallDistance > 0.0F && !mc.thePlayer.onGround && !mc.thePlayer.isOnLadder() && !mc.thePlayer.isInWater() && !mc.thePlayer.isPotionActive(Potion.blindness) && !mc.thePlayer.isRiding();
 
-        if (willCritLegit) {
-            return;
+            if (willCritLegit) {
+                return;
+            }
+
+            PacketUtils.sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.000000271875, mc.thePlayer.posZ, false));
+            PacketUtils.sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0., mc.thePlayer.posZ, false));
         }
 
-        PacketUtils.sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.000000271875, mc.thePlayer.posZ, false));
-        PacketUtils.sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0., mc.thePlayer.posZ, false));
+        if(mode.getValue() == Mode.Visual) {
+            mc.thePlayer.onCriticalHit(e.target);
+        }
     };
 }
