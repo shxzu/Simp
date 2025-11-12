@@ -6,6 +6,7 @@ import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.events.impl.player.MovePlayerEvent;
 import cc.simp.api.events.impl.player.SprintEvent;
+import cc.simp.api.events.impl.world.TickEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
@@ -54,13 +55,7 @@ public final class SpeedModule extends Module {
         }
     }
 
-    double speedV;
-    float timer;
-    int offGroundTicks;
-    int onGroundTicks;
-    boolean prevOnGround;
-    private int stage;
-
+    private double speedV;
     @EventLink
     public final Listener<MotionEvent> motionEventListener = e -> {
         setSuffix(mode.getValue().toString());
@@ -169,7 +164,6 @@ public final class SpeedModule extends Module {
                     speedV = 0.2805;
                 }
                 speedV *= 1.949;
-                stage = 0;
             }
         }
     };

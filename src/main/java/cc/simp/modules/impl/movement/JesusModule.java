@@ -55,5 +55,4 @@ public final class JesusModule extends Module {
             event.setCancelled();
         }
     };
-
 }

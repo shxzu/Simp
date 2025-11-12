@@ -55,80 +55,75 @@ public final class BackTrackModule extends Module {
     @EventLink
     public final Listener<MotionEvent> motionEventListener = e -> {
 
+        if(e.isPre()) return;
+
         setSuffix(ping + " ms");
 
-            if (mc.thePlayer.isDead) {
-                LagProcess.disable();
-                LagProcess.dispatch();
-                return;
-            }
+        if (mc.thePlayer.isDead) {
+            LagProcess.disable();
+            LagProcess.dispatch();
+            return;
+        }
 
-            if (!(TargetSelectionProcess.getTarget() instanceof EntityPlayer)) {
-                LagProcess.disable();
-                LagProcess.dispatch();
-                return;
-            }
+        if (!(TargetSelectionProcess.getTarget() instanceof EntityPlayer)) {
+            LagProcess.disable();
+            LagProcess.dispatch();
+            return;
+        }
 
-            target = (EntityPlayer) TargetSelectionProcess.getTarget();
+        target = (EntityPlayer) TargetSelectionProcess.getTarget();
 
 
         if (swingCheckProperty.getValue() && !mc.thePlayer.isSwingInProgress)
-                return;
+            return;
 
+        double realDistance = realPosition.distanceTo(mc.thePlayer);
+        double clientDistance = target.getDistanceToEntity(mc.thePlayer);
 
-            double realDistance = realPosition.distanceTo(mc.thePlayer);
-            double clientDistance = target.getDistanceToEntity(mc.thePlayer);
+        boolean on = realDistance > clientDistance && realDistance >= activateDist.getValue() && realDistance <= deactivateDist.getValue() && shouldActive(target) && (!releaseOnDamageProperty.getValue() || mc.thePlayer.hurtTime == 0);
 
-            boolean on = realDistance > clientDistance && realDistance >= activateDist.getValue() && realDistance <= deactivateDist.getValue() && shouldActive(target) && (!releaseOnDamageProperty.getValue() || mc.thePlayer.hurtTime == 0);
-
-            if (on) {
-                if (shouldActive(target)) {
-                    ping = (int) MathUtils.getRandom(minDelayProperty.getValue().intValue(), maxDelayProperty.getValue().intValue());
-                    LagProcess.spoof(ping, true, true, true, true, cancelClientPacketsProperty.getValue(), cancelClientPacketsProperty.getValue());
-                } else {
-                    LagProcess.disable();
-                    LagProcess.dispatch();
-                }
+        if (on) {
+            if (shouldActive(target)) {
+                ping = (int) MathUtils.getRandom(minDelayProperty.getValue().intValue(), maxDelayProperty.getValue().intValue());
+                LagProcess.spoof(ping, true, true, true, true, cancelClientPacketsProperty.getValue(), cancelClientPacketsProperty.getValue());
             } else {
                 LagProcess.disable();
                 LagProcess.dispatch();
             }
+        } else {
+            LagProcess.disable();
+            LagProcess.dispatch();
+        }
     };
 
-    @EventLink
-    public final Listener<PacketReceiveEvent> packetReceiveEventListener = e -> {
-        final Packet<?> packet = e.getPacket();
+    @EventLink()
+    public final Listener<PacketReceiveEvent> onPacketReceiveEvent = event -> {
+        final Packet<?> packet = event.getPacket();
 
         if (target == null) {
             return;
         }
 
-        double realDistance = realPosition.distanceTo(mc.thePlayer);
-        double clientDistance = target.getDistanceToEntity(mc.thePlayer);
+        if (packet instanceof S14PacketEntity) {
+            S14PacketEntity s14PacketEntity = ((S14PacketEntity) packet);
 
-        boolean on = realDistance > clientDistance && realDistance >= activateDist.getValue() && realDistance <= deactivateDist.getValue();
-
-        if (on) {
-            if (packet instanceof S14PacketEntity) {
-                S14PacketEntity s14PacketEntity = (S14PacketEntity) e.getPacket();
-                if (s14PacketEntity.entityId == target.getEntityId()) {
-                    realPosition = realPosition.addVector(s14PacketEntity.func_149062_c() / 32.0D, s14PacketEntity.func_149061_d() / 32.0D,
-                            s14PacketEntity.func_149064_e() / 32.0D);
-                }
-            } else if (packet instanceof S18PacketEntityTeleport) {
-                S18PacketEntityTeleport s18PacketEntityTeleport = (S18PacketEntityTeleport) e.getPacket();
-                if (s18PacketEntityTeleport.getEntityId() == target.getEntityId()) {
-                    realPosition = new Vec3(s18PacketEntityTeleport.getX() / 32D, s18PacketEntityTeleport.getY() / 32D, s18PacketEntityTeleport.getZ() / 32D);
-                }
+            if (s14PacketEntity.entityId == target.getEntityId()) {
+                realPosition.xCoord += s14PacketEntity.getPosX() / 32D;
+                realPosition.yCoord += s14PacketEntity.getPosY() / 32D;
+                realPosition.zCoord += s14PacketEntity.getPosZ() / 32D;
             }
-        } else {
-            realPosition = target.getPositionVector();
+        } else if (packet instanceof S18PacketEntityTeleport) {
+            S18PacketEntityTeleport s18PacketEntityTeleport = ((S18PacketEntityTeleport) packet);
+
+            if (s18PacketEntityTeleport.getEntityId() == target.getEntityId()) {
+                realPosition = new Vec3(s18PacketEntityTeleport.getX() / 32D, s18PacketEntityTeleport.getY() / 32D, s18PacketEntityTeleport.getZ() / 32D);
+            }
         }
     };
 
     @EventLink
     public final Listener<Render3DEvent> render3DEventListener = e -> {
-        if (target != null && shouldActive(target)) {
+        if (target != null && shouldActive(target) && mc.thePlayer.getDistanceToEntity(target) <= deactivateDist.getValue() && mc.thePlayer.isSwingInProgress) {
             double x = realPosition.xCoord - mc.getRenderManager().viewerPosX;
             double y = realPosition.yCoord - mc.getRenderManager().viewerPosY;
             double z = realPosition.zCoord - mc.getRenderManager().viewerPosZ;

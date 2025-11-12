@@ -2,6 +2,7 @@ package cc.simp.modules.impl.combat;
 
 
 import cc.simp.api.events.impl.game.PreUpdateEvent;
+import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.events.impl.world.WorldLoadEvent;
 import cc.simp.api.font.CustomFontRenderer;
@@ -47,7 +48,8 @@ public final class LagRangeModule extends Module {
     };
 
     @EventLink
-    public Listener<PreUpdateEvent> onPreUpdate = event -> {
+    public Listener<MotionEvent> motionEventListener = event -> {
+        if(event.isPre()) return;
         setSuffix(modeProperty.getValue() == Mode.Range ? String.valueOf(rangeToUnblinkProperty.getValue().intValue()) : String.valueOf(timer.getTime()));
 
         if(modeProperty.getValue() == Mode.Time) {
