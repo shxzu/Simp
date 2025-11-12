@@ -17,7 +17,6 @@ public class DiscordRPCModule extends Module {
 
     public DiscordRPCModule() {
         super();
-        this.toggle();
         DiscordEventHandlers handlers = new DiscordEventHandlers.Builder()
                 .setReadyEventHandler(user -> System.out.println("[Discord RPC] Logged in as: " + user.username + " " + user.userId))
                 .build();
