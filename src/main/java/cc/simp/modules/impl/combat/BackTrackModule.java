@@ -13,7 +13,7 @@ import cc.simp.processes.LagProcess;
 import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.client.MathUtils;
 import cc.simp.utils.render.RenderUtils;
-import cc.simp.utils.render.animations.ContinualAnimation;
+import cc.simp.utils.render.animations.impl.ContinualAnimation;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.entity.player.EntityPlayer;
