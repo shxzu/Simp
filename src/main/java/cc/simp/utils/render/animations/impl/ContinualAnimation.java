@@ -1,6 +1,7 @@
-package cc.simp.utils.render.animations;
+package cc.simp.utils.render.animations.impl;
 
-import cc.simp.utils.render.animations.impl.SmoothStepAnimation;
+import cc.simp.utils.render.animations.Animation;
+import cc.simp.utils.render.animations.Direction;
 import lombok.Getter;
 
 public class ContinualAnimation {

@@ -59,14 +59,15 @@ public final class ScaffoldModule extends Module {
 
     private static final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Normal);
     private static final ModeProperty<SearchAlgorithm> searchAlgorithm = new ModeProperty<>("Search Algorithm", SearchAlgorithm.Normal);
-    private final NumberProperty rotationSpeed = new NumberProperty("Rotation Speed", 5, 0, 10, 1);
-    public final NumberProperty placeDelay = new NumberProperty("Place CPS", 10, 1, 20, 1);
+    private final NumberProperty rotationSpeed = new NumberProperty("Rotation Speed", 8, 0, 10, 1);
+    public final NumberProperty placeDelay = new NumberProperty("Place CPS", 15, 1, 40, 1);
     public static Property<Boolean> swing = new Property<>("Swing", false);
     public static Property<Boolean> sprint = new Property<>("Sprint", false);
     public static Property<Boolean> moveFix = new Property<>("Move Fix", true);
     private final ModeProperty<RayCast> rayCast = new ModeProperty<>("Ray Cast", RayCast.Normal);
     public static Property<Boolean> jump = new Property<>("Auto Jump", false, () -> mode.getValue() != Mode.SlowTelly && mode.getValue() != Mode.FastTelly && mode.getValue() != Mode.Hypixel);
-    public static Property<Boolean> edge = new Property<>("Jump Only On Edge", false);
+    public static Property<Boolean> edge = new Property<>("Jump Only On Edge", false, () -> mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.Hypixel || jump.getValue());
+    private final NumberProperty jumpDelayTicks = new NumberProperty("Jump Delay Ticks", 0, () -> mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.Hypixel || jump.getValue(), 0, 5, 1);
     public static Property<Boolean> keepY = new Property<>("Keep Y", false);
     private static final Property<Boolean> safeWalk = new Property<>("Safe Walk", false);
     private final NumberProperty expand = new NumberProperty("Expand", 0, 0, 4, 1);
@@ -493,23 +494,6 @@ public final class ScaffoldModule extends Module {
                 break;
             case FastTelly:
                 if (recursion == 0) {
-                    if (mc.thePlayer.offGroundTicks < 11) {
-                        mc.entityRenderer.getMouseOver(1);
-
-                        if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
-                            if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
-                                getBaseRotations();
-                            }
-                        }
-                    } else {
-                        targetPitch = mc.thePlayer.rotationPitch;
-                        targetYaw = mc.thePlayer.rotationYaw;
-                        canPlace = false;
-                    }
-                }
-                break;
-            case Hypixel:
-                if (recursion == 0) {
                     if (MovementUtils.isOnGround()) {
                         if (MovementUtils.isMoving()) {
                             targetYaw = mc.thePlayer.rotationYaw;
@@ -523,6 +507,23 @@ public final class ScaffoldModule extends Module {
                                 getBaseRotations();
                             }
                         }
+                    }
+                }
+                break;
+            case Hypixel:
+                if (recursion == 0) {
+                    if (mc.thePlayer.offGroundTicks >= 4 && !mc.thePlayer.onGround) {
+                        mc.entityRenderer.getMouseOver(1);
+
+                        if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
+                            if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
+                                getBaseRotations();
+                            }
+                        }
+                    } else {
+                        targetPitch = mc.thePlayer.rotationPitch;
+                        targetYaw = mc.thePlayer.rotationYaw;
+                        canPlace = false;
                     }
                 }
                 break;
@@ -736,6 +737,9 @@ public final class ScaffoldModule extends Module {
 
     public void jump() {
         if (mc.gameSettings.keyBindJump.isPressed()) return;
+
+        if (mc.thePlayer.onGroundTicks < jumpDelayTicks.getValue().intValue()) return;
+
         if (jump.getValue()) {
             if (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel) {
                 jump.setValue(false);
