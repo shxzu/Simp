@@ -69,8 +69,16 @@ public final class KillAuraModule extends Module {
     public static ModeProperty<AutoBlock> ab = new ModeProperty<>("Auto Block", AutoBlock.Fake);
     private final NumberProperty legitBlockInterval = new NumberProperty("Legit Block Interval", 4, () -> ab.getValue() == AutoBlock.Legit, 2, 10, 1);
     private final Property<Boolean> legitRandomize = new Property<>("Legit Randomize", true, () -> ab.getValue() == AutoBlock.Legit);
+
+    private final Property<Boolean> advanced = new Property<>("Advanced", false);
+    private final Property<Boolean> missChance = new Property<>("Miss Chance", true, advanced::getValue);
+    private final NumberProperty missRate = new NumberProperty("Miss Rate", 5, () -> advanced.getValue() && missChance.getValue(), 0, 20, 1);
+    private final Property<Boolean> variableRotationSpeed = new Property<>("Variable Rotation Speed", true, advanced::getValue);
+    private final NumberProperty minRotSpeed = new NumberProperty("Min Rotation Speed", 3, () -> advanced.getValue() && variableRotationSpeed.getValue(), 0, 10, 0.5);
+    private final NumberProperty maxRotSpeed = new NumberProperty("Max Rotation Speed", 7, () -> advanced.getValue() && variableRotationSpeed.getValue(), 0, 10, 0.5);
+
     public static ModeProperty<Rotations> rotations = new ModeProperty<>("Rotations", Rotations.Regular);
-    private final NumberProperty speed = new NumberProperty("Rotation Speed", 5, 0, 10, 1);
+    private final NumberProperty speed = new NumberProperty("Rotation Speed", 5, () -> !advanced.getValue() && !variableRotationSpeed.getValue(), 0, 10, 1);
     public static final Property<Boolean> jitter = new Property<>("Jitter Rotations", false);
     public static final Property<Boolean> fix = new Property<>("Move Fix", true);
     public static final Property<Boolean> sprint = new Property<>("Keep Sprint", false);
@@ -103,6 +111,9 @@ public final class KillAuraModule extends Module {
     int blockTicks = 0;
     static long delay = 0;
     static int elapsedTicks = 0;
+    private boolean shouldMiss = false;
+    private boolean wasBlocking = false;
+    private int blockCooldown = 0;
 
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
@@ -194,10 +205,14 @@ public final class KillAuraModule extends Module {
 
         switch (rotations.getValue()) {
             case Regular:
-                /* Smoothing rotations */
-                final double minRotationSpeed = this.speed.getValue();
-                final double maxRotationSpeed = this.speed.getValue() * Math.random();
-                float rotSpeed = (float) MathUtils.getRandom(minRotationSpeed, maxRotationSpeed);
+                float rotSpeed;
+                if (advanced.getValue() && variableRotationSpeed.getValue()) {
+                    rotSpeed = (float) MathUtils.getRandom(minRotSpeed.getValue(), maxRotSpeed.getValue());
+                } else {
+                    final double minRotationSpeed = this.speed.getValue();
+                    final double maxRotationSpeed = this.speed.getValue() * Math.random();
+                    rotSpeed = (float) MathUtils.getRandom(minRotationSpeed, maxRotationSpeed);
+                }
                 RotationProcess.setRotations(new Vector2f(targetYaw, targetPitch), rotSpeed, fix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
                 break;
 
@@ -219,53 +234,73 @@ public final class KillAuraModule extends Module {
             case Fake:
                 autoBlocking = true;
                 break;
+
             case Legit:
                 int interval = legitBlockInterval.getValue().intValue();
                 if (legitRandomize.getValue()) {
                     interval += (mc.thePlayer.ticksExisted % 3) - 1;
                     interval = Math.max(2, interval);
                 }
+
+                // Only change blocking state when crossing interval boundary
                 if (mc.thePlayer.ticksExisted % interval == 0) {
-                    if (!autoBlocking) {
+                    if (!wasBlocking && blockCooldown == 0) {
                         mc.gameSettings.keyBindUseItem.setPressed(true);
                         autoBlocking = true;
+                        wasBlocking = true;
+                        blockCooldown = 2; // Prevent rapid toggling
                     }
                     canAttack = false;
                 } else {
-                    if (autoBlocking) {
+                    if (wasBlocking && blockCooldown == 0) {
                         unblock();
+                        wasBlocking = false;
+                        blockCooldown = 2; // Prevent rapid toggling
                     }
                 }
+
+                if (blockCooldown > 0) blockCooldown--;
                 break;
+
             case Predictive:
-                if (shouldBlockPredictive()) {
-                    if (!autoBlocking) {
-                        mc.gameSettings.keyBindUseItem.setPressed(true);
-                        autoBlocking = true;
-                    }
+                boolean shouldBlock = shouldBlockPredictive();
+
+                // Only toggle blocking state when it actually changes
+                if (shouldBlock && !wasBlocking && blockCooldown == 0) {
+                    mc.gameSettings.keyBindUseItem.setPressed(true);
+                    autoBlocking = true;
+                    wasBlocking = true;
                     canAttack = false;
-                } else {
-                    if (autoBlocking) {
-                        unblock();
-                    }
+                    blockCooldown = 3; // Cooldown to prevent rapid toggling
+                } else if (!shouldBlock && wasBlocking && blockCooldown == 0) {
+                    unblock();
+                    wasBlocking = false;
+                    blockCooldown = 3; // Cooldown to prevent rapid toggling
+                }
+
+                if (blockCooldown > 0) blockCooldown--;
+
+                if (shouldBlock) {
+                    canAttack = false;
                 }
                 break;
+
             case NCP:
                 if (mc.objectMouseOver.entityHit != null) {
                     PacketUtils.sendPacket(new C02PacketUseEntity(mc.objectMouseOver.entityHit, C02PacketUseEntity.Action.INTERACT));
-
                 } else if (interactable(mc.theWorld.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock())) {
                     mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(),
                             mc.objectMouseOver.getBlockPos(), Block.getFacingDirection(mc.objectMouseOver.getBlockPos()), mc.objectMouseOver.hitVec);
                 }
-
                 PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                 autoBlocking = true;
                 break;
+
             case Vanilla:
                 PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                 autoBlocking = true;
                 break;
+
             case Blink:
                 if (mc.playerController.curBlockDamageMP != 0 && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                     blockTicks = 0;
@@ -285,6 +320,7 @@ public final class KillAuraModule extends Module {
                         break;
                 }
                 break;
+
             case Switch:
                 if (mc.playerController.curBlockDamageMP != 0 && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                     blockTicks = 0;
@@ -309,26 +345,40 @@ public final class KillAuraModule extends Module {
 
     private void unblock() {
         if (!autoBlocking) return;
+
         if (ab.getValue() == AutoBlock.Fake) {
             autoBlocking = false;
             return;
         }
-        if (ab.getValue() == AutoBlock.Legit || ab.getValue() == AutoBlock.Predictive) {
+
+        if ((ab.getValue() == AutoBlock.Legit || ab.getValue() == AutoBlock.Predictive) && wasBlocking) {
             mc.gameSettings.keyBindUseItem.setPressed(false);
             canAttack = true;
+            autoBlocking = false;
+            wasBlocking = false;
+            return;
         }
-        if (ab.getValue() != AutoBlock.Legit && ab.getValue() != AutoBlock.Predictive && InventoryUtils.isHoldingSword()) {
+
+        if (InventoryUtils.isHoldingSword()) {
             PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
         }
         autoBlocking = false;
     }
 
     private void attack() {
-        if (target == null || !canAttack) return;
+        if (target == null || !canAttack || shouldMiss) return;
 
         if (!hitTimerDone()) return;
 
         if (mc.thePlayer.getDistanceToEntity(target) > killRange.getValue()) return;
+
+        if (advanced.getValue() && missChance.getValue()) {
+            if (Math.random() * 100 < missRate.getValue()) {
+                shouldMiss = true;
+                return;
+            }
+        }
+        shouldMiss = false;
 
         if (raycast.getValue()) {
             MovingObjectPosition mop = RayCastUtils.rayCast(RotationProcess.rotations, killRange.getValue());
@@ -336,6 +386,7 @@ public final class KillAuraModule extends Module {
         }
 
         if (target.getDistanceToEntity(mc.thePlayer) > killRange.getValue()) return;
+
         if (!legit.getValue()) {
             if (!canAttack) return;
             if (ViaLoadingBase.getInstance().getTargetVersion().newerThan(ProtocolVersion.v1_8)) {
@@ -349,6 +400,7 @@ public final class KillAuraModule extends Module {
             mc.clickMouse();
         }
     }
+
 
     private static boolean hitTimerDone() {
         boolean returnVal = false;
@@ -391,21 +443,17 @@ public final class KillAuraModule extends Module {
     private boolean shouldBlockPredictive() {
         if (target == null) return false;
 
-        // Check if target is within attack range and looking at us
         double distance = mc.thePlayer.getDistanceToEntity(target);
         if (distance > 6.0) return false;
 
-        // Get target's eye position and rotation
         double targetX = target.posX;
         double targetY = target.posY + target.getEyeHeight();
         double targetZ = target.posZ;
 
-        // Calculate vector from target to player
         double deltaX = mc.thePlayer.posX - targetX;
         double deltaY = (mc.thePlayer.posY + mc.thePlayer.getEyeHeight()) - targetY;
         double deltaZ = mc.thePlayer.posZ - targetZ;
 
-        // Calculate target's look vector
         float yaw = (float) Math.toRadians(target.rotationYaw);
         float pitch = (float) Math.toRadians(target.rotationPitch);
 
@@ -413,17 +461,13 @@ public final class KillAuraModule extends Module {
         double targetLookY = -Math.sin(pitch);
         double targetLookZ = Math.cos(yaw) * Math.cos(pitch);
 
-        // Normalize vectors
         double deltaMag = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
         double lookMag = Math.sqrt(targetLookX * targetLookX + targetLookY * targetLookY + targetLookZ * targetLookZ);
 
-        // Calculate dot product (cosine of angle)
         double dotProduct = (deltaX * targetLookX + deltaY * targetLookY + deltaZ * targetLookZ) / (deltaMag * lookMag);
 
-        // If angle is < 60 degrees (cos > 0.5), target is looking at us
         return dotProduct > 0.5 && target.swingProgress > 0;
     }
-
 
     private boolean interactable(Block block) {
         return block == Blocks.chest || block == Blocks.trapped_chest || block == Blocks.crafting_table
@@ -436,11 +480,13 @@ public final class KillAuraModule extends Module {
         super.onEnable();
     }
 
-    @Override
     public void onDisable() {
         canAttack = true;
         target = null;
+        shouldMiss = false;
         targetList.clear();
+        wasBlocking = false;
+        blockCooldown = 0;
         unblock();
         super.onDisable();
     }

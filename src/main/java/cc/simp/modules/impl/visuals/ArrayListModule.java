@@ -156,13 +156,13 @@ public final class ArrayListModule extends Module {
                                 moduleWidth + 2,
                                 12,
                                 roundRadius.getValue(),
-                                new Color(getColorForBG()));
+                                getColorForBG());
                     } else {
                         Gui.drawRect(translateX - 1,
                                 translateY - 2,
                                 screenX,
                                 translateY + 10,
-                                getColorForBG());
+                                getColorForBG().getRGB());
                     }
                 }
 
@@ -343,14 +343,14 @@ public final class ArrayListModule extends Module {
         }
     }
 
-    private int getColorForBG() {
+    private Color getColorForBG() {
         int alpha = bgAlpha.getValue().intValue();
 
         return switch (bgColor.getValue()) {
-            case Normal -> new Color(0, 0, 0, alpha).getRGB();
+            case Normal -> new Color(0, 0, 0, alpha);
             case Theme ->
-                    new Color(ColorProcess.getColor().getRed(), ColorProcess.getColor().getGreen(), ColorProcess.getColor().getBlue(), alpha).getRGB();
-            case White -> new Color(255, 255, 255, alpha).getRGB();
+                    new Color(ColorProcess.getColor().getRed(), ColorProcess.getColor().getGreen(), ColorProcess.getColor().getBlue(), alpha);
+            case White -> new Color(255, 255, 255, alpha);
         };
     }
 

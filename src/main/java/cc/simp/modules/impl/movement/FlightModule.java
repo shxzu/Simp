@@ -10,11 +10,13 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.utils.mc.MovementUtils;
+import cc.simp.utils.mc.PacketUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -26,12 +28,16 @@ public final class FlightModule extends Module {
 
     private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Motion);
     private final NumberProperty motionSpeed = new NumberProperty("Motion Speed", 0.9, () -> mode.getValue() == Mode.Motion, 0.1, 2.0, 0.1);
+    private final NumberProperty teleportDelay = new NumberProperty("Teleport Delay", 5, () -> mode.getValue() == Mode.Packet, 1, 20, 1);
+    private final NumberProperty teleportLength = new NumberProperty("Teleport Length", 5, () -> mode.getValue() == Mode.Packet, 1, 20, 1);
+    private final NumberProperty timerAmount = new NumberProperty("Timer Amount", 1, 0.1, 3, 0.1);
     private final Property<Boolean> fullStop = new Property<>("Stop on Disable", true);
 
     private enum Mode {
         Motion("Motion"),
         Verus("Verus"),
-        Collide("Collide");
+        Collide("Collide"),
+        Packet("Packet");
 
         public final String name;
 
@@ -50,6 +56,8 @@ public final class FlightModule extends Module {
         setSuffix(mode.getValue().toString());
         if (!e.isPre()) return;
 
+        mc.timer.timerSpeed = timerAmount.getValue().floatValue();
+
         switch (mode.getValue()) {
             case Motion:
                 MovementUtils.setSpeed(motionSpeed.getValue());
@@ -66,6 +74,15 @@ public final class FlightModule extends Module {
                 mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(
                         new BlockPos(mc.thePlayer.prevPosX, mc.thePlayer.posY - 1, mc.thePlayer.prevPosZ),
                         1, new ItemStack(Blocks.stone), 1, 1, 1));
+                break;
+            case Packet:
+                    mc.thePlayer.motionY = 0;
+                    if(MovementUtils.isMoving() && mc.thePlayer.ticksExisted % teleportDelay.getValue().intValue() == 0) {
+                        final double x = e.getPosX() + -Math.sin(Math.toRadians(mc.thePlayer.rotationYaw)) * teleportLength.getValue().intValue();
+                        final double z = e.getPosZ() + Math.cos(Math.toRadians(mc.thePlayer.rotationYaw)) * teleportLength.getValue().intValue();
+                        PacketUtils.sendSilentPacket(new C03PacketPlayer.C04PacketPlayerPosition(x, mc.thePlayer.posY, z, false));
+                        mc.thePlayer.setPosition(x, mc.thePlayer.posY, z);
+                    }
                 break;
         }
     };

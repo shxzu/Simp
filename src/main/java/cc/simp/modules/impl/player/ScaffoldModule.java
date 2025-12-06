@@ -512,7 +512,7 @@ public final class ScaffoldModule extends Module {
                 break;
             case Hypixel:
                 if (recursion == 0) {
-                    if (mc.thePlayer.offGroundTicks >= 4 && !mc.thePlayer.onGround) {
+                    if (!mc.thePlayer.onGround) {
                         mc.entityRenderer.getMouseOver(1);
 
                         if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
@@ -521,8 +521,12 @@ public final class ScaffoldModule extends Module {
                             }
                         }
                     } else {
-                        targetPitch = mc.thePlayer.rotationPitch;
-                        targetYaw = mc.thePlayer.rotationYaw;
+                        float candidatePos = 60f;
+                        float candidateNeg = -60f;
+                        float playerYaw = mc.thePlayer.rotationYaw;
+                        float diffPos = Math.abs(MathHelper.wrapAngleTo180_float(candidatePos - playerYaw));
+                        float diffNeg = Math.abs(MathHelper.wrapAngleTo180_float(candidateNeg - playerYaw));
+                        targetYaw = (diffPos <= diffNeg) ? candidatePos : candidateNeg;
                         canPlace = false;
                     }
                 }
