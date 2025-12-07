@@ -57,13 +57,6 @@ public class RotationProcess {
         if (active) {
             smooth();
         }
-
-        if (correctMovement == MovementFix.BACKWARDS_SPRINT && active) {
-            if (Math.abs(rotations.x % 360 - Math.toDegrees(MovementUtils.direction()) % 360) > 45) {
-                mc.gameSettings.keyBindSprint.setPressed(false);
-                mc.thePlayer.setSprinting(false);
-            }
-        }
     };
 
     @EventLink(value = Priorities.LOW)
@@ -93,7 +86,7 @@ public class RotationProcess {
 
     @EventLink(value = Priorities.VERY_LOW)
     public final Listener<JumpEvent> onJump = event -> {
-        if (active && (correctMovement == MovementFix.NORMAL || correctMovement == MovementFix.TRADITIONAL || correctMovement == MovementFix.BACKWARDS_SPRINT) && rotations != null) {
+        if (active && (correctMovement == MovementFix.NORMAL || correctMovement == MovementFix.TRADITIONAL) && rotations != null) {
             event.setYaw(rotations.x);
         }
     };

@@ -27,7 +27,7 @@ import java.util.Arrays;
 public class Simp {
     public static final Simp INSTANCE = new Simp();
     public static final String NAME = "Simp";
-    public static final String BUILD = BuildType.ALPHA.getName();
+    public static final String BUILD = BuildType.RELEASE.getName();
     public static final String VERSION = "1.0 " + BUILD;
     public static final String FULL = NAME + " " + VERSION;
 
@@ -54,7 +54,7 @@ public class Simp {
 
     @EventLink
     public final Listener<ClientStartupEvent> onClientStart = e -> {
-        this.startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         moduleManager = new ModuleManager();
         moduleManager.postInit();
         configManager = new ConfigManager();
