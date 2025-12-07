@@ -1,6 +1,6 @@
 # Simp Client
 
-***CURRENTLY IN RECODE PHASE! COME BACK LATER FOR SOMETHING THAT ACTUALLY RESEMBLES A REAL CLIENT SINCE THE RECODE ISN'T FINISHED YET!!***
+***The Release is slightly buggy due to loss of time being able to fix things! Just be careful when using the client right now!***
 
 [![Download](https://img.shields.io/github/v/release/shxzu/Simp?style=for-the-badge)](https://github.com/shxzu/Simp/releases)
 [![License](https://img.shields.io/github/license/shxzu/Simp?style=for-the-badge)](LICENSE)
