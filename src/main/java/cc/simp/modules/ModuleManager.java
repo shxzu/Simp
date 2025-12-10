@@ -70,7 +70,6 @@ public final class ModuleManager {
                 // Client
                 new ClientSettingsModule(),
                 new DiscordRPCModule(),
-                new SpotifyIntegrationModule(),
                 new AntiBotModule(),
                 new DisablerModule(),
                 new FakeLagModule(),
@@ -95,6 +94,7 @@ public final class ModuleManager {
                 new NoHurtCamModule(),
                 new TargetInterfaceModule(),
                 new PostProcessingModule(),
+                new ScoreboardModule(),
                 new NickHiderModule(),
                 new NameTagsModule(),
                 new StorageESPModule(),

@@ -141,19 +141,6 @@ public final class ScaffoldModule extends Module {
             mc.thePlayer.safeWalk = true;
         }
 
-        if (mode.getValue() == Mode.Hypixel) {
-            boolean diagonal = MovementUtils.direction() % 90.0F > 10.0F &&
-                    MovementUtils.direction() % 90.0F < 80.0F;
-
-            if ((mc.thePlayer.offGroundTicks == 1 || mc.thePlayer.offGroundTicks == 2) &&
-                    mc.gameSettings.keyBindJump.isKeyDown() && diagonal) {
-                mc.thePlayer.movementInput.moveForward = 0.0F;
-                mc.thePlayer.movementInput.moveStrafe = 0.0F;
-            }
-
-            canPlace = mc.thePlayer.offGroundTicks >= 2;
-        }
-
         for (recursion = 0; recursion <= recursions; recursion++) {
 
             // Calculate interval based on CPS (1000ms / CPS = ms between clicks)
@@ -525,16 +512,22 @@ public final class ScaffoldModule extends Module {
                 break;
             case Hypixel:
                 if (recursion == 0) {
+
+                    canPlace = mc.thePlayer.offGroundTicks >= 6;
+
                     if (MovementUtils.isOnGround()) {
                         if (MovementUtils.isMoving()) {
                             targetYaw = mc.thePlayer.rotationYaw;
                             canPlace = false;
+                            overrided = false;
                         }
                     } else {
                         mc.entityRenderer.getMouseOver(1);
 
-                        if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
+                        if (!mc.gameSettings.keyBindPickBlock.isKeyDown() && canPlace) {
                             if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
+                                overrided = true;
+                                rotSpeed = 4;
                                 getBaseRotations();
                             }
                         }
