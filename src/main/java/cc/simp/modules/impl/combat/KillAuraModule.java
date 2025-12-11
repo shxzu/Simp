@@ -364,19 +364,22 @@ public final class KillAuraModule extends Module {
     }
 
     private void attack() {
-        if (target == null || !canAttack || shouldMiss) return;
+        if (target == null || !canAttack) return;
 
         if (!hitTimerDone()) return;
 
         if (mc.thePlayer.getDistanceToEntity(target) > killRange.getValue()) return;
 
         if (advanced.getValue() && missChance.getValue()) {
+            if (shouldMiss) {
+                shouldMiss = false; // Reset the miss flag
+                return;
+            }
             if (Math.random() * 100 < missRate.getValue()) {
                 shouldMiss = true;
                 return;
             }
         }
-        shouldMiss = false;
 
         if (raycast.getValue()) {
             MovingObjectPosition mop = RayCastUtils.rayCast(RotationProcess.rotations, killRange.getValue());
@@ -398,7 +401,6 @@ public final class KillAuraModule extends Module {
             mc.clickMouse();
         }
     }
-
 
     private static boolean hitTimerDone() {
         boolean returnVal = false;

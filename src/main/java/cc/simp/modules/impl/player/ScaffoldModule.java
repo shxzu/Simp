@@ -233,10 +233,6 @@ public final class ScaffoldModule extends Module {
 
                     ticksOnAir = 0;
 
-                } else if (Math.random() > 0.3 && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK &&
-                        mc.objectMouseOver.getBlockPos().equals(blockFace) && mc.objectMouseOver.sideHit ==
-                        EnumFacing.UP && rayCast.getValue() == RayCast.Strict && !(PlayerUtils.blockRelativeToPlayer(0, -1, 0) instanceof BlockAir)) {
-                    mc.rightClickMouse();
                 }
             }
 
@@ -513,23 +509,21 @@ public final class ScaffoldModule extends Module {
             case Hypixel:
                 if (recursion == 0) {
 
-                    canPlace = mc.thePlayer.offGroundTicks >= 6;
+                    canPlace = mc.thePlayer.offGroundTicks <= 9 && mc.thePlayer.offGroundTicks > 0;
 
-                    if (MovementUtils.isOnGround()) {
+                    mc.entityRenderer.getMouseOver(1);
+
+                    if (mc.thePlayer.offGroundTicks >= 3 && mc.thePlayer.offGroundTicks <= (keepY.getValue() ? 7 : 10)) {
+                        if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
+                            overrided = true;
+                            rotSpeed = 4;
+                            getBaseRotations();
+                        }
+                    } else {
                         if (MovementUtils.isMoving()) {
                             targetYaw = mc.thePlayer.rotationYaw;
                             canPlace = false;
                             overrided = false;
-                        }
-                    } else {
-                        mc.entityRenderer.getMouseOver(1);
-
-                        if (!mc.gameSettings.keyBindPickBlock.isKeyDown() && canPlace) {
-                            if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
-                                overrided = true;
-                                rotSpeed = 4;
-                                getBaseRotations();
-                            }
                         }
                     }
                 }

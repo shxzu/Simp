@@ -68,13 +68,6 @@ public final class AimAssistModule extends Module {
             angleCalled = false;
     };
 
-    private boolean isOnSameTeam(EntityPlayer player) {
-        if (mc.thePlayer.getTeam() != null && player.getTeam() != null) {
-            return mc.thePlayer.getTeam().isSameTeam(player.getTeam());
-        }
-        return false;
-    }
-
     private float[] getRotationsToEntity(EntityLivingBase entity) {
         double x = entity.posX - mc.thePlayer.posX;
         double y = entity.posY + entity.getEyeHeight() - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());

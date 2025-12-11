@@ -16,7 +16,7 @@ import java.util.Objects;
 
 public class PacketUtils extends Util {
     public static void correctBlockCount(PacketReceiveEvent event) {
-        if (mc.thePlayer.isDead || true) return;
+        if (mc.thePlayer == null) return;
 
         final Packet<?> packet = event.getPacket();
 

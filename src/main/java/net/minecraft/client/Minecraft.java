@@ -47,6 +47,7 @@ import javax.imageio.ImageIO;
 
 import de.florianmichael.viamcp.fixes.AttackOrder;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
