@@ -2,10 +2,7 @@ package cc.simp.modules.impl.movement;
 
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
-import cc.simp.api.events.impl.player.MotionEvent;
-import cc.simp.api.events.impl.player.MoveEvent;
-import cc.simp.api.events.impl.player.MovePlayerEvent;
-import cc.simp.api.events.impl.player.SprintEvent;
+import cc.simp.api.events.impl.player.*;
 import cc.simp.api.events.impl.world.TickEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
@@ -19,9 +16,13 @@ import cc.simp.utils.mc.PacketUtils;
 import cc.simp.utils.mc.PlayerUtils;
 import cc.simp.utils.misc.MovementFix;
 import io.github.nevalackin.homoBus.Listener;
+import io.github.nevalackin.homoBus.Priorities;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.block.BlockStairs;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
@@ -37,11 +38,14 @@ public final class SpeedModule extends Module {
     private enum Mode {
         Jump("Jump"),
         RotateExploit("Rotate Exploit"),
+        CollideExploit("Collide Exploit"),
+        UndetectedTimer("Undetected Timer"),
         VerusGround("Verus Ground"),
         VerusLowHop("Verus Low Hop"),
         UpdatedNCP("Updated NCP"),
         Strafe("Strafe"),
         GroundStrafe("Ground Strafe"),
+        Intave("Intave"),
         NCP("NCP");
 
         public String name;
@@ -59,27 +63,37 @@ public final class SpeedModule extends Module {
     @EventLink
     public final Listener<MotionEvent> motionEventListener = e -> {
         setSuffix(mode.getValue().toString());
-        if (mc.gameSettings.keyBindJump.isKeyDown() && mode.getValue() != Mode.Jump && mode.getValue() != Mode.RotateExploit)
+        if (mc.gameSettings.keyBindJump.isKeyDown() && mode.getValue() != Mode.Jump && mode.getValue() != Mode.RotateExploit && mode.getValue() != Mode.UndetectedTimer && mode.getValue() != Mode.CollideExploit)
             mc.gameSettings.keyBindJump.setPressed(false);
         if (!e.isPre()) return;
         switch (mode.getValue()) {
             case VerusGround:
+                if (mc.gameSettings.keyBindJump.isKeyDown()) return;
+
+                PacketUtils.sendSilentPacket(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 255, new ItemStack(Items.water_bucket), 0, 0.5f, 0));
+
                 if (MovementUtils.isMoving()) {
-                    if (mc.thePlayer.ticksExisted % 9 == 0 && MovementUtils.isOnGround()) {
-                        mc.thePlayer.jump();
+                    if (mc.thePlayer.onGround) {
+                        mc.thePlayer.motionY = 0.00001f;
                     }
-                    MovementUtils.setSpeed(0.32);
+                } else {
+                    mc.thePlayer.motionX = mc.thePlayer.motionZ = 0;
+                }
+
+                MovementUtils.strafe(MovementUtils.getVerusLimit(true));
+
+                if (mc.thePlayer.fallDistance > 0.2) {
+                    mc.thePlayer.motionY = -0.1f;
                 }
                 break;
             case VerusLowHop:
-                if (MovementUtils.isMoving()) {
-                    if (MovementUtils.isOnGround()) {
-                        mc.thePlayer.jump();
-                    }
-                    if (mc.thePlayer.ticksExisted % 7 == 0 && !MovementUtils.isOnGround()) {
-                        mc.thePlayer.motionY = -0.44;
-                    }
-                    MovementUtils.setSpeed(0.32);
+                PacketUtils.sendSilentPacket(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 255, new ItemStack(Items.water_bucket), 0, 0.5f, 0));
+                if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
+                    mc.thePlayer.motionY = 0.42;
+                    MovementUtils.strafe(0.48f, 0.52f, 0.6f);
+                }
+                if (mc.thePlayer.offGroundTicks == 1) {
+                    mc.thePlayer.motionY = -0.15233518685055714;
                 }
                 break;
             case Strafe:
@@ -115,7 +129,39 @@ public final class SpeedModule extends Module {
                 break;
             case Jump:
             case RotateExploit:
+            case CollideExploit:
                 mc.gameSettings.keyBindJump.setPressed(MovementUtils.isMoving() && MovementUtils.isOnGround());
+                break;
+            case UndetectedTimer:
+                mc.gameSettings.keyBindJump.setPressed(MovementUtils.isMoving() && MovementUtils.isOnGround());
+                mc.timer.timerSpeed = 1.0075f;
+                break;
+            case Intave:
+                if (MovementUtils.isOnGround() && MovementUtils.isMoving()) {
+                    mc.thePlayer.jump();
+                }
+
+                switch (mc.thePlayer.offGroundTicks) {
+                    case 1:
+                        mc.thePlayer.motionX *= 1.005;
+                        mc.thePlayer.motionZ *= 1.005;
+                        break;
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                        mc.thePlayer.motionX *= 1.011;
+                        mc.thePlayer.motionZ *= 1.011;
+                        break;
+                }
+
+                if (mc.thePlayer.onGroundTicks == 1) {
+                    mc.thePlayer.motionX *= 1.0045;
+                    mc.thePlayer.motionZ *= 1.0045;
+                }
+
+                mc.timer.timerSpeed = 1.0075f;
                 break;
             case NCP:
                 if (MovementUtils.isMoving()) {
@@ -175,15 +221,30 @@ public final class SpeedModule extends Module {
         }
     };
 
+    @EventLink(value = Priorities.VERY_HIGH)
+    public final Listener<StrafeEvent> strafe = event -> {
+        if (mode.getValue() == Mode.CollideExploit) {
+            mc.theWorld.playerEntities.stream()
+                    .filter(entityPlayer -> entityPlayer != mc.thePlayer &&
+                            mc.thePlayer.getEntityBoundingBox().expand(1, 1, 1)
+                                    .intersectsWith(entityPlayer.getEntityBoundingBox()))
+                    .forEach(entityPlayer -> MovementUtils.moveFlying(0.08));
+        }
+    };
+
     @Override
     public void onDisable() {
+        mc.timer.timerSpeed = 1.0f;
         if (mode.getValue() == Mode.UpdatedNCP || mode.getValue() == Mode.NCP) {
-            mc.timer.timerSpeed = 1.0f;
             mc.thePlayer.speedInAir = 0.02F;
         }
         if (mode.getValue() == Mode.Jump && mc.gameSettings.keyBindJump.isPressed())
             mc.gameSettings.keyBindJump.setPressed(false);
         if (mode.getValue() == Mode.RotateExploit && mc.gameSettings.keyBindJump.isPressed())
+            mc.gameSettings.keyBindJump.setPressed(false);
+        if (mode.getValue() == Mode.UndetectedTimer && mc.gameSettings.keyBindJump.isPressed())
+            mc.gameSettings.keyBindJump.setPressed(false);
+        if (mode.getValue() == Mode.CollideExploit && mc.gameSettings.keyBindJump.isPressed())
             mc.gameSettings.keyBindJump.setPressed(false);
     }
 }

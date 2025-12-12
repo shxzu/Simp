@@ -36,6 +36,7 @@ public final class ArrayListModule extends Module {
     private final Property<Boolean> outline = new Property<>("Outline", true);
     private final ModeProperty<LineMode> line = new ModeProperty<>("Line", LineMode.Off, () -> !outline.getValue());
     private final Property<Boolean> hideVisuals = new Property<>("Hide Visuals", false);
+    private final Property<Boolean> noSpaces = new Property<>("No Spaces", false);
     private final Property<Boolean> showSuffix = new Property<>("Show Suffix", true);
     private final Property<Boolean> lowercase = new Property<>("Lowercase", true);
     private final ModeProperty<ColorMode> colorMode = new ModeProperty<>("Color Mode", ColorMode.Fade);
@@ -371,6 +372,13 @@ public final class ArrayListModule extends Module {
     private String getDisplayLabel(Module m) {
         String label = m.getLabel();
         String suffix = m.getSuffix();
+
+        if (noSpaces.getValue()) {
+            label = label.replace(" ", "");
+            if (suffix != null) {
+                suffix = suffix.replace(" ", "");
+            }
+        }
 
         if (lowercase.getValue()) {
             label = label.toLowerCase();

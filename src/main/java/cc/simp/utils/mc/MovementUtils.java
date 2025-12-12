@@ -8,6 +8,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovementInput;
 
@@ -128,6 +129,47 @@ public class MovementUtils extends Util {
         }
 
         return baseJumpHeight;
+    }
+
+    public static void strafe(float v, float v1, float v2) {
+        float speedValue = 0;
+
+        if(mc.thePlayer.isPotionActive(Potion.moveSpeed)){
+            if (mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() == 0) {
+                speedValue = v1;
+            } else {
+                speedValue = v2;
+            }
+        }else{
+            speedValue = v;
+        }
+        strafe(speedValue);
+    }
+
+
+    public static double getVerusLimit(boolean dif) {
+
+        //  SKIDDED :p
+
+        if (dif && mc.thePlayer.fallDistance > 0.2) {
+            return MovementUtils.getBaseMoveSpeed();
+        }
+
+        if (mc.thePlayer.fallDistance < 0.2) {
+            if (mc.thePlayer.isSprinting()) {
+                if (mc.thePlayer.isPotionActive(Potion.moveSpeed)) {
+                    for (PotionEffect effect : mc.thePlayer.getActivePotionEffects()) {
+                        if (effect.getPotionID() == 1) {
+                            return mc.thePlayer.onGround ? (effect.getAmplifier() == 1 ? 0.7f : 0.62f) : (effect.getAmplifier() == 1 ? 0.81f : 0.62f);
+                        }
+                    }
+                }
+                return mc.thePlayer.onGround ? 0.54f : 0.46f;
+            }
+            return MovementUtils.getBaseMoveSpeed() * 1.02f;
+        }
+
+        return 0;
     }
 
     public void strafe(MotionEvent event) {

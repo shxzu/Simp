@@ -77,6 +77,7 @@ public final class KillAuraModule extends Module {
 
     public enum Rotations {
         Regular,
+        Puhfy,
         Snap,
         Player,
         None
@@ -185,6 +186,10 @@ public final class KillAuraModule extends Module {
 
         Vector2f rotation = RotationUtils.calculate(target, mode.getValue() == TargetSelectionProcess.Mode.Adaptive, seekRange.getValue());
 
+        if (rotations.getValue() == Rotations.Puhfy) {
+            rotation = RotationUtils.puhfyRotations(target);
+        }
+
         if (jitter.getValue()) {
             rotation.x += (float) ((Math.random() - 0.5) * 2);
             rotation.y += (float) ((Math.random() - 0.5) * 2);
@@ -195,6 +200,7 @@ public final class KillAuraModule extends Module {
 
         switch (rotations.getValue()) {
             case Regular:
+            case Puhfy:
                 float rotSpeed;
                 if (advanced.getValue() && variableRotationSpeed.getValue()) {
                     rotSpeed = (float) MathUtils.getRandom(minRotSpeed.getValue(), maxRotSpeed.getValue());
@@ -205,7 +211,6 @@ public final class KillAuraModule extends Module {
                 }
                 RotationProcess.setRotations(new Vector2f(targetYaw, targetPitch), rotSpeed, fix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
                 break;
-
             case Snap:
                 if (hitTimerDone()) {
                     RotationProcess.setRotations(new Vector2f(targetYaw, targetPitch), 10, fix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);

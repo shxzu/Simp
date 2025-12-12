@@ -24,8 +24,7 @@ public final class JesusModule extends Module {
 
     private enum Mode {
         Vanilla,
-        NCP,
-        Dolphin
+        NCP
     }
 
     @EventLink

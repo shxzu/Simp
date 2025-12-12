@@ -15,6 +15,7 @@ import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
@@ -66,14 +67,15 @@ public final class FlightModule extends Module {
                 break;
 
             case Verus:
+                if (mc.gameSettings.keyBindJump.isKeyDown()) return;
+
+                PacketUtils.sendSilentPacket(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 255, new ItemStack(Items.water_bucket), 0, 0.5f, 0));
+                MovementUtils.strafe(MovementUtils.getVerusLimit(true));
                 mc.thePlayer.onGround = true;
                 MovementUtils.setSpeed(0.32);
                 e.setOnGround(mc.thePlayer.ticksExisted % 2 == 0);
                 mc.thePlayer.motionY = 0;
                 e.setPosY(Math.round(mc.thePlayer.posY));
-                mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(
-                        new BlockPos(mc.thePlayer.prevPosX, mc.thePlayer.posY - 1, mc.thePlayer.prevPosZ),
-                        1, new ItemStack(Blocks.stone), 1, 1, 1));
                 break;
             case Packet:
                     mc.thePlayer.motionY = 0;

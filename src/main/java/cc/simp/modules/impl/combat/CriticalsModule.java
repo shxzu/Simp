@@ -11,6 +11,7 @@ import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.EnumParticleTypes;
 
 import static cc.simp.utils.Util.mc;
 
@@ -20,6 +21,8 @@ public final class CriticalsModule extends Module {
     public static ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Edit);
 
     private enum Mode {
+        Vanilla,
+        Legit,
         Visual,
         Edit,
         NCP
@@ -48,8 +51,18 @@ public final class CriticalsModule extends Module {
             PacketUtils.sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0., mc.thePlayer.posZ, false));
         }
 
-        if(mode.getValue() == Mode.Visual) {
+        if (mode.getValue() == Mode.Vanilla) {
             mc.thePlayer.onCriticalHit(e.target);
+        }
+
+        if (mode.getValue() == Mode.Legit) {
+            if (mc.thePlayer.onGround && !mc.thePlayer.isOnLadder() && !mc.thePlayer.isInWater() && !mc.thePlayer.isRiding()) {
+                mc.thePlayer.jump();
+            }
+        }
+
+        if (mode.getValue() == Mode.Visual) {
+            mc.effectRenderer.emitParticleAtEntity(e.target, EnumParticleTypes.CRIT);
         }
     };
 }

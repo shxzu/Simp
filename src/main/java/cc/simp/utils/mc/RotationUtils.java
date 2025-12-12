@@ -77,6 +77,50 @@ public class RotationUtils extends Util {
         return calculate(new Vector3d(x, y, z));
     }
 
+    public static Vector2f puhfyRotations(final Entity entity) {
+
+        Vec3 eyePos = new Vec3(mc.thePlayer.posX, mc.thePlayer.posY + mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ);
+        AxisAlignedBB box = entity.getEntityBoundingBox();
+
+        // Basically the 3 parts of the human entity.
+        Vec3[] points = new Vec3[]{
+                new Vec3((box.minX + box.maxX) / 2.0, box.minY, (box.minZ + box.maxZ) / 2.0),
+                new Vec3((box.minX + box.maxX) / 2.0, (box.minY + box.maxY) / 2.0, (box.minZ + box.maxZ) / 2.0),
+                new Vec3((box.minX + box.maxX) / 2.0, box.maxY - 0.1, (box.minZ + box.maxZ) / 2.0)
+        };
+
+        Vec3 bestPoint = null;
+        double closestDist = Double.MAX_VALUE;
+
+        for (Vec3 point : points) {
+            double dist = eyePos.distanceTo(point);
+            if (dist < closestDist) {
+                closestDist = dist;
+                bestPoint = point;
+            }
+        }
+
+        if (bestPoint == null) return null;
+
+        final float[] rotations = getRotationsTo(eyePos, bestPoint);
+        final float targetYaw = rotations[0];
+        final float targetPitch = rotations[1];
+
+        return new Vector2f(targetYaw, targetPitch);
+    }
+
+    public static float[] getRotationsTo(Vec3 from, Vec3 to) {
+        double dx = to.xCoord - from.xCoord;
+        double dy = to.yCoord - from.yCoord;
+        double dz = to.zCoord - from.zCoord;
+        double distHorizontal = MathHelper.sqrt_double(dx * dx + dz * dz);
+        float yaw = (float) (Math.toDegrees(Math.atan2(dz, dx)) - 90.0F);
+        float pitch = (float) -Math.toDegrees(Math.atan2(dy, distHorizontal));
+        yaw = mc.thePlayer.rotationYaw + MathHelper.wrapAngleTo180_float(yaw - mc.thePlayer.rotationYaw);
+        pitch = mc.thePlayer.rotationPitch + MathHelper.wrapAngleTo180_float(pitch - mc.thePlayer.rotationPitch);
+        return new float[]{yaw, pitch};
+    }
+
     public static Vector2f move(final Vector2f targetRotation, final double speed) {
         return move(RotationProcess.lastRotations, targetRotation, speed);
     }
