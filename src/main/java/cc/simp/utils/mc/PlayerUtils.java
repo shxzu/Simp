@@ -4,9 +4,8 @@ import cc.simp.processes.RotationProcess;
 import cc.simp.utils.Util;
 import cc.simp.utils.client.EnumFacingOffset;
 import cc.simp.utils.client.MathUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockAir;
-import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.*;
@@ -31,6 +30,9 @@ public class PlayerUtils extends Util {
         put(3, 11); // Haste
         put(13, 12); // Water Breathing
     }};
+
+    
+
     public static Block block(final double x, final double y, final double z) {
         return mc.theWorld.getBlockState(new BlockPos(x, y, z)).getBlock();
     }
@@ -234,5 +236,65 @@ public class PlayerUtils extends Util {
         }
         return false;
     }
+
+    public static boolean isReplaceable(BlockPos blockPos) {
+        return isReplaceable(mc.theWorld.getBlockState(blockPos).getBlock());
+    }
+
+    public static boolean isReplaceable(Block block) {
+        if (!block.getMaterial().isReplaceable()) return false;
+        if (!(block instanceof BlockSnow)) return true;
+        return !(block.getBlockBoundsMaxY() > 0.125);
+    }
+
+    public static boolean isInteractable(BlockPos blockPos) {
+        return isInteractable(mc.theWorld.getBlockState(blockPos).getBlock());
+    }
+
+    public static boolean isInteractable(Block block) {
+        if (block instanceof BlockContainer) return true;
+        if (block instanceof BlockWorkbench) return true;
+        if (block instanceof BlockAnvil) return true;
+        if (block instanceof BlockBed) return true;
+        if (block instanceof BlockDoor) {
+            if (block.getMaterial() != Material.iron) return true;
+        }
+        if (block instanceof BlockTrapDoor) return true;
+        if (block instanceof BlockFenceGate) return true;
+        if (block instanceof BlockFence) return true;
+        if (block instanceof BlockButton) return true;
+        if (block instanceof BlockLever) return true;
+        return block instanceof BlockJukebox;
+    }
+
+    public static boolean isSolid(Block block) {
+        if (block instanceof BlockStairs) return false;
+        if (block instanceof BlockSlab) return false;
+        if (block instanceof BlockEndPortalFrame) return false;
+        if (block instanceof BlockEndPortal) return false;
+        if (block instanceof BlockVine) return false;
+        if (block instanceof BlockPumpkin) return false;
+        if (block instanceof BlockCactus) return false;
+        if (block instanceof BlockBush) return false;
+        if (block instanceof BlockFalling) return false;
+        if (block instanceof BlockWeb) return false;
+        if (block instanceof BlockPane) return false;
+        if (block instanceof BlockCarpet) return false;
+        if (block instanceof BlockSnow) return false;
+        if (block instanceof BlockFence) return false;
+        if (block instanceof BlockFenceGate) return false;
+        if (block instanceof BlockWall) return false;
+        if (block instanceof BlockLadder) return false;
+        if (block instanceof BlockTorch) return false;
+        if (block instanceof BlockRedstoneWire) return false;
+        if (block instanceof BlockRedstoneDiode) return false;
+        if (block instanceof BlockBasePressurePlate) return false;
+        if (block instanceof BlockTripWire) return false;
+        if (block instanceof BlockTripWireHook) return false;
+        if (block instanceof BlockRailBase) return false;
+        if (block instanceof BlockSlime) return false;
+        return !(block instanceof BlockTNT);
+    }
+
 
 }

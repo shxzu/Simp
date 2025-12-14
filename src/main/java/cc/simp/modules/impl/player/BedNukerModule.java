@@ -1,7 +1,6 @@
 package cc.simp.modules.impl.player;
 
 import cc.simp.api.events.impl.game.PreUpdateEvent;
-import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.player.TeleportEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.NumberProperty;
@@ -12,7 +11,6 @@ import cc.simp.processes.RotationProcess;
 import cc.simp.utils.misc.MovementFix;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.state.IBlockState;
@@ -33,7 +31,7 @@ public final class  BedNukerModule extends Module {
     private final Property<Boolean> whitelistOwnBed = new Property<>("Whitelist Own Bed", true);
     private final Property<Boolean> moveFix = new Property<>("Movement Fix", true);
 
-    private BlockPos bedPos;
+    public static BlockPos bedPos;
     private boolean rotate = false;
     private int breakTicks;
     private int delayTicks;

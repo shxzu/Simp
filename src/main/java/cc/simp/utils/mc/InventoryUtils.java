@@ -672,4 +672,20 @@ public class InventoryUtils extends Util {
         return (stack = mc.thePlayer.getCurrentEquippedItem()) != null && stack.getItem() instanceof ItemSword;
     }
 
+    public static boolean isContainerBlock(ItemBlock itemBlock) {
+        Block block = itemBlock.getBlock();
+        if (PlayerUtils.isInteractable(block)) return false;
+        return PlayerUtils.isSolid(block);
+    }
+
+    public static boolean isBlock(ItemStack itemStack) {
+        if (itemStack == null || itemStack.stackSize < 1) {
+            return false;
+        }
+        Item item = itemStack.getItem();
+        if (item instanceof ItemBlock) {
+            return isContainerBlock((ItemBlock) item);
+        }
+        return false;
+    }
 }
