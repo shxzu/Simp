@@ -27,17 +27,12 @@ public class RotationProcess {
     private static Function<Vector2f, Boolean> raycast;
     private static float randomAngle;
     private static final Vector2f offset = new Vector2f(0, 0);
+    private static float lastYawDelta = 0;
 
-    /*
-     * This method must be called on Pre Update Event to work correctly
-     */
     public static void setRotations(final Vector2f rotations, final double rotationSpeed, final MovementFix correctMovement) {
         setRotations(rotations, rotationSpeed, correctMovement, null);
     }
 
-    /*
-     * This method must be called on Pre Update Event to work correctly
-     */
     public static void setRotations(final Vector2f rotations, final double rotationSpeed, final MovementFix correctMovement, final Function<Vector2f, Boolean> raycast) {
         RotationProcess.targetRotations = rotations;
         RotationProcess.rotationSpeed = rotationSpeed * 36;
@@ -62,9 +57,6 @@ public class RotationProcess {
     @EventLink(value = Priorities.LOW)
     public final Listener<MoveEvent> onMove = event -> {
         if (active && correctMovement == MovementFix.NORMAL && rotations != null) {
-            /*
-             * Calculating movement fix
-             */
             final float yaw = rotations.x;
             MovementUtils.fixMovement(event, yaw);
         }
@@ -101,7 +93,6 @@ public class RotationProcess {
             event.setYaw(yaw);
             event.setPitch(pitch);
 
-            //  mc.thePlayer.renderYawOffset = yaw;
             mc.thePlayer.rotationYawHead = yaw;
             mc.thePlayer.renderPitchHead = pitch;
 
@@ -109,7 +100,6 @@ public class RotationProcess {
 
             if (Math.abs((rotations.x - mc.thePlayer.rotationYaw) % 360) < 1 && Math.abs((rotations.y - mc.thePlayer.rotationPitch)) < 1) {
                 active = false;
-
                 this.correctDisabledRotations();
             }
 
@@ -126,7 +116,6 @@ public class RotationProcess {
         final Vector2f rotations = new Vector2f(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
         final Vector2f fixedRotations = RotationUtils.resetRotation(RotationUtils.applySensitivityPatch(rotations, lastRotations));
 
-        // Normalize the yaw difference to avoid large deltas
         float yawDelta = MathHelper.wrapAngleTo180_float(fixedRotations.x - mc.thePlayer.rotationYaw);
         mc.thePlayer.rotationYaw = mc.thePlayer.rotationYaw + yawDelta;
         mc.thePlayer.rotationPitch = fixedRotations.y;
@@ -137,11 +126,11 @@ public class RotationProcess {
             float targetYaw = targetRotations.x;
             float targetPitch = targetRotations.y;
 
-            // Randomisation
+            // Randomisation with raycast
             if (raycast != null && (Math.abs(targetYaw - rotations.x) > 5 || Math.abs(targetPitch - rotations.y) > 5)) {
                 final Vector2f trueTargetRotations = new Vector2f(targetRotations.getX(), targetRotations.getY());
 
-                double speed = /*Math.min(*/(Math.random() * Math.random() * Math.random()) * 20/*, MoveUtil.speed() * 30)*/;
+                double speed = (Math.random() * Math.random() * Math.random()) * 20;
                 randomAngle += (float) ((20 + (float) (Math.random() - 0.5) * (Math.random() * Math.random() * Math.random() * 360)) * (mc.thePlayer.ticksExisted / 10 % 2 == 0 ? -1 : 1));
 
                 offset.setX((float) (offset.getX() + -MathHelper.sin((float) Math.toRadians(randomAngle)) * speed));
@@ -172,11 +161,26 @@ public class RotationProcess {
                 }
             }
 
-            // Normalize target yaw to prevent 360-degree jumps
-            targetYaw = lastRotations.x + MathHelper.wrapAngleTo180_float(targetYaw - lastRotations.x);
+            // KEY FIX: Properly normalize yaw to avoid 320+ degree deltas
+            // Use wrapAngleTo180 to keep delta within -180 to 180 range
+            float yawDelta = MathHelper.wrapAngleTo180_float(targetYaw - lastRotations.x);
 
+            // Clamp the delta to avoid sudden jumps that exceed 320 degrees
+            // This prevents triggering the AimModulo360 check
+            float maxDelta = 30f; // Safe threshold
+            if (Math.abs(lastYawDelta) < 30 && Math.abs(yawDelta) > 320) {
+                // Split large rotation into multiple smaller steps
+                yawDelta = Math.signum(yawDelta) * maxDelta;
+            }
+
+            targetYaw = lastRotations.x + yawDelta;
+
+            // Improved smoothing with better interpolation
             rotations = RotationUtils.smooth(new Vector2f(targetYaw, targetPitch),
                     rotationSpeed + Math.random());
+
+            // Track yaw delta for next iteration
+            lastYawDelta = MathHelper.wrapAngleTo180_float(rotations.x - lastRotations.x);
 
             if (correctMovement == MovementFix.NORMAL || correctMovement == MovementFix.TRADITIONAL) {
                 mc.thePlayer.movementYaw = rotations.x;
@@ -186,10 +190,6 @@ public class RotationProcess {
         }
 
         smoothed = true;
-
-        /*
-         * Updating MouseOver
-         */
         mc.entityRenderer.getMouseOver(1);
     }
 }

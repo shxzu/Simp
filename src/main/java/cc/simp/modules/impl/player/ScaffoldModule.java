@@ -751,7 +751,7 @@ public final class ScaffoldModule extends Module {
                 mc.thePlayer.jump();
             }
         }
-        if (jump.getValue() || (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel) && !keepY.getValue() && (!edge.getValue() || isNearEdge())) {
+        if (jump.getValue() && !keepY.getValue()  || (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel) && !keepY.getValue() && (!edge.getValue() || isNearEdge())) {
             if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
                 mc.thePlayer.jump();
             }
