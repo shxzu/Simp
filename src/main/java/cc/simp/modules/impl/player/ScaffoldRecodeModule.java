@@ -2,6 +2,7 @@ package cc.simp.modules.impl.player;
 
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
+import cc.simp.api.events.impl.player.StrafeEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
 import cc.simp.api.events.impl.render.ShaderEvent;
@@ -220,9 +221,6 @@ public final class ScaffoldRecodeModule extends Module {
             }
         }
 
-        // Jumping Logic
-        this.jump();
-
         // Sprinting Logic
         this.sprint();
 
@@ -234,6 +232,12 @@ public final class ScaffoldRecodeModule extends Module {
             if (!safeWalkOnAir.getValue() && !mc.thePlayer.onGround) mc.thePlayer.safeWalk = false;
             mc.thePlayer.safeWalk = true;
         }
+    };
+
+    @EventLink
+    public final Listener<StrafeEvent> strafeEventListener = event -> {
+        // Jumping Logic
+        this.jump();
     };
 
     @EventLink

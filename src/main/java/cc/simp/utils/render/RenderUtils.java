@@ -108,6 +108,9 @@ public class RenderUtils extends Util {
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 
+    public static void drawGradientRect(double v, double v1, double v2, double v3, boolean b, int rgb, int rgb1) {
+    }
+
     public enum ArrowDirection {
         UP, DOWN, LEFT, RIGHT
     }

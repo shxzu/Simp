@@ -8,6 +8,7 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.impl.client.ClientSettingsModule;
+import cc.simp.processes.ColorProcess;
 import cc.simp.processes.FontProcess;
 import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.gui.GuiScreen;
@@ -29,22 +30,21 @@ public class ClickInterface extends GuiScreen {
     private Module listeningModule = null;
     private SettingComponent draggingSlider = null;
 
-    // GameSense color scheme
-    private static final Color BG_COLOR = new Color(20, 20, 20, 200);
-    private static final Color PANEL_BG = new Color(25, 25, 25, 220);
-    private static final Color ACCENT_COLOR = new Color(150, 150, 255);
-    private static final Color TEXT_COLOR = new Color(200, 200, 200);
-    private static final Color HOVER_COLOR = new Color(35, 35, 35);
+    // Visual theme
+    private static final Color BG_COLOR = new Color(22, 22, 22, 220);
+    private static final Color PANEL_BG = new Color(28, 28, 28, 230);
+    private static Color ACCENT_COLOR = new Color(120, 145, 255);
+    private static final Color TEXT_COLOR = new Color(210, 210, 210);
+    private static final Color HOVER_COLOR = new Color(45, 45, 45);
 
-    private static final int PANEL_WIDTH = 110;
-    private static final int PANEL_SPACING = 10;
-    private static final int TOP_MARGIN = 50;
+    private static final int PANEL_WIDTH = 120;
+    private static final int PANEL_SPACING = 12;
+    private static final int TOP_MARGIN = 48;
 
     @Override
     public void initGui() {
         panels.clear();
         int x = 20;
-
         for (ModuleCategory category : ModuleCategory.values()) {
             CategoryPanel panel = new CategoryPanel(category, x, TOP_MARGIN);
             panels.add(panel);
@@ -56,48 +56,55 @@ public class ClickInterface extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
 
-            switch (ClientSettingsModule.anime.getValue()) {
-                case Onikata:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/onikata.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case Takanashi:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/takanashi.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case Io:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/io.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case ZeroTwo:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/zerotwo.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case Astolfo:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/astolfo.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case Felix:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/felix.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case Rem:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/rem.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case Ram:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/ram.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case None:
-                    // No background
-                    break;
-            }
+        ACCENT_COLOR = ColorProcess.getColor();
+
+        // optional background anime
+        switch (ClientSettingsModule.anime.getValue()) {
+            case Onikata:
+                RenderUtils.drawImage(new ResourceLocation("simp/images/onikata.png"), width - 216, (float) height / 2, 216, 289);
+                break;
+            case Takanashi:
+                RenderUtils.drawImage(new ResourceLocation("simp/images/takanashi.png"), width - 216, (float) height / 2, 216, 289);
+                break;
+            case Io:
+                RenderUtils.drawImage(new ResourceLocation("simp/images/io.png"), width - 216, (float) height / 2, 216, 289);
+                break;
+            case ZeroTwo:
+                RenderUtils.drawImage(new ResourceLocation("simp/images/zerotwo.png"), width - 216, (float) height / 2, 216, 289);
+                break;
+            case Astolfo:
+                RenderUtils.drawImage(new ResourceLocation("simp/images/astolfo.png"), width - 216, (float) height / 2, 216, 289);
+                break;
+            case Felix:
+                RenderUtils.drawImage(new ResourceLocation("simp/images/felix.png"), width - 216, (float) height / 2, 216, 289);
+                break;
+            case Rem:
+                RenderUtils.drawImage(new ResourceLocation("simp/images/rem.png"), width - 216, (float) height / 2, 216, 289);
+                break;
+            case Ram:
+                RenderUtils.drawImage(new ResourceLocation("simp/images/ram.png"), width - 216, (float) height / 2, 216, 289);
+                break;
+            case None:
+                // none
+                break;
+        }
+
         // Update dragging slider if active
         if (draggingSlider != null) {
             draggingSlider.updateDrag(mouseX);
         }
 
+        // Render panels and allow them to update interactive drag states
         for (CategoryPanel panel : panels) {
             panel.render(mouseX, mouseY);
+            panel.updateDrag(mouseX, mouseY);
         }
     }
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         for (CategoryPanel panel : panels) {
+            // if a panel handled the click, stop propagation
             if (panel.mouseClicked(mouseX, mouseY, mouseButton)) {
                 return;
             }
@@ -107,9 +114,9 @@ public class ClickInterface extends GuiScreen {
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
         draggingSlider = null;
-
         for (CategoryPanel panel : panels) {
             panel.mouseReleased(mouseX, mouseY, state);
+            panel.clampToScreen();
         }
     }
 
@@ -117,26 +124,22 @@ public class ClickInterface extends GuiScreen {
     public void handleMouseInput() throws IOException {
         super.handleMouseInput();
         int wheel = Mouse.getEventDWheel();
-
         if (wheel != 0) {
             int mouseX = Mouse.getEventX() * width / mc.displayWidth;
             int mouseY = height - Mouse.getEventY() * height / mc.displayHeight - 1;
 
             boolean handledByPanel = false;
-
-            // Check if mouse is over any panel content area for scrolling
             for (CategoryPanel panel : panels) {
                 if (mouseX >= panel.x && mouseX <= panel.x + panel.width &&
-                        mouseY >= panel.y + panel.headerHeight) {
+                        mouseY >= panel.y + panel.headerHeight && mouseY <= panel.y + height) {
                     panel.handleScroll(mouseX, mouseY, wheel);
                     handledByPanel = true;
                     break;
                 }
             }
 
-            // If not over panel content, move panels horizontally
-            if (!handledByPanel && wheel != 0) {
-                int scrollAmount = wheel > 0 ? 15 : -15;
+            if (!handledByPanel) {
+                int scrollAmount = wheel > 0 ? 18 : -18;
                 for (CategoryPanel panel : panels) {
                     panel.x += scrollAmount;
                 }
@@ -162,11 +165,18 @@ public class ClickInterface extends GuiScreen {
         private final ModuleCategory category;
         private int x, y;
         private int width = PANEL_WIDTH;
-        private int headerHeight = 16;
+        private int headerHeight = 18;
         private boolean dragging = false;
         private int dragX, dragY;
-        private float scrollOffset = 0;
-        private float targetScroll = 0;
+
+        // scrolling
+        private float scrollOffset = 0f;
+        private float targetScroll = 0f;
+
+        // scrollbar drag
+        private boolean draggingScrollbar = false;
+        private float scrollbarDragStartY;
+        private float scrollbarStartScroll;
 
         private final List<ModuleButton> modules = new ArrayList<>();
 
@@ -181,76 +191,74 @@ public class ClickInterface extends GuiScreen {
         }
 
         public void render(int mouseX, int mouseY) {
-            // Handle dragging
+            // handle header dragging
             if (dragging) {
                 x = mouseX - dragX;
                 y = mouseY - dragY;
             }
 
-            // Smooth scroll interpolation
-            scrollOffset += (targetScroll - scrollOffset) * 0.2f;
+            // smooth scroll
+            scrollOffset += (targetScroll - scrollOffset) * 0.18f;
 
-            // Calculate total height and max scroll
+            // total content height
             int totalHeight = 0;
-            for (ModuleButton moduleButton : modules) {
-                totalHeight += moduleButton.getTotalHeight();
-            }
+            for (ModuleButton mb : modules) totalHeight += mb.getTotalHeight();
 
             int maxVisibleHeight = height - y - headerHeight - 20;
-            int maxScroll = Math.max(0, totalHeight - maxVisibleHeight);
+            int maxScroll = Math.max(0, totalHeight - Math.max(0, maxVisibleHeight));
             targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+            scrollOffset = Math.max(0, Math.min(scrollOffset, maxScroll));
 
-            // Header background
+            // header
             drawRect(x, y, x + width, y + headerHeight, PANEL_BG.getRGB());
+            // subtle border
+            drawRect(x, y + headerHeight - 1, x + width, y + headerHeight, new Color(40, 40, 40).getRGB());
+            // category name centered-ish
+            font.drawString(category.name(), x + 6, y + 4, TEXT_COLOR.getRGB());
 
-            // Category name
-            font.drawString(category.name(), x + 4, y + 5, TEXT_COLOR.getRGB());
-
-            // Panel body background
+            // body
             int bodyHeight = Math.min(totalHeight, maxVisibleHeight);
             drawRect(x, y + headerHeight, x + width, y + headerHeight + bodyHeight, BG_COLOR.getRGB());
 
-            // Render modules
-            int moduleY = y + headerHeight - (int)scrollOffset;
-
-            for (ModuleButton moduleButton : modules) {
-                int buttonHeight = moduleButton.getTotalHeight();
-
-                // Only render if visible in viewport
-                if (moduleY + buttonHeight > y + headerHeight &&
-                        moduleY < y + headerHeight + bodyHeight) {
-                    moduleButton.render(x, moduleY, width, mouseX, mouseY);
+            // render modules within viewport
+            int moduleY = y + headerHeight - (int) scrollOffset;
+            for (ModuleButton mb : modules) {
+                int buttonHeight = mb.getTotalHeight();
+                if (moduleY + buttonHeight > y + headerHeight && moduleY < y + headerHeight + bodyHeight) {
+                    mb.render(x, moduleY, width, mouseX, mouseY);
                 }
-
                 moduleY += buttonHeight;
             }
 
-            // Draw scrollbar if needed
+            // draw scrollbar
             if (totalHeight > maxVisibleHeight) {
                 drawScrollbar(y + headerHeight, bodyHeight, totalHeight, maxScroll);
             }
         }
 
         private void drawScrollbar(int startY, int visibleHeight, int totalHeight, int maxScroll) {
-            int scrollbarX = x + width - 2;
-            int scrollbarWidth = 2;
+            int scrollbarX = x + width - 6;
+            int scrollbarWidth = 6;
 
-            // Background track
-            drawRect(scrollbarX, startY, scrollbarX + scrollbarWidth,
-                    startY + visibleHeight, new Color(40, 40, 40, 180).getRGB());
+            // track
+            drawRect(scrollbarX, startY, scrollbarX + scrollbarWidth, startY + visibleHeight, new Color(30, 30, 30, 180).getRGB());
 
-            // Calculate thumb size and position
-            float thumbSize = Math.max(20, (float)visibleHeight / totalHeight * visibleHeight);
-            float thumbPos = maxScroll > 0 ? (scrollOffset / maxScroll) * (visibleHeight - thumbSize) : 0;
+            float thumbSize = Math.max(24f, (float) visibleHeight / (float) totalHeight * visibleHeight);
+            float thumbPos = maxScroll > 0 ? (scrollOffset / maxScroll) * (visibleHeight - thumbSize) : 0f;
 
-            // Thumb
-            drawRect(scrollbarX, (int)(startY + thumbPos),
-                    scrollbarX + scrollbarWidth, (int)(startY + thumbPos + thumbSize),
-                    ACCENT_COLOR.getRGB());
+            int y1 = (int) (startY + thumbPos);
+            int y2 = (int) (startY + thumbPos + thumbSize);
+
+            // thumb
+            drawRect(scrollbarX + 1, y1, scrollbarX + scrollbarWidth - 1, y2, ACCENT_COLOR.getRGB());
+
+            // border
+            drawRect(scrollbarX, y1, scrollbarX + 1, y2, new Color(0, 0, 0, 120).getRGB());
+            drawRect(scrollbarX + scrollbarWidth - 1, y1, scrollbarX + scrollbarWidth, y2, new Color(0, 0, 0, 120).getRGB());
         }
 
         public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
-            // Header dragging
+            // header dragging
             if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + headerHeight) {
                 if (mouseButton == 0) {
                     dragging = true;
@@ -260,18 +268,39 @@ public class ClickInterface extends GuiScreen {
                 }
             }
 
-            // Module clicks
-            int moduleY = y + headerHeight - (int)scrollOffset;
-            int maxY = y + headerHeight + (height - y - headerHeight - 20);
+            // check scrollbar click
+            int totalHeight = 0;
+            for (ModuleButton mb : modules) totalHeight += mb.getTotalHeight();
+            int maxVisibleHeight = height - y - headerHeight - 20;
+            int maxScroll = Math.max(0, totalHeight - Math.max(0, maxVisibleHeight));
+            if (totalHeight > maxVisibleHeight) {
+                int scrollbarX = x + width - 6;
+                int scrollbarWidth = 6;
+                float thumbSize = Math.max(24f, (float) maxVisibleHeight / (float) totalHeight * maxVisibleHeight);
+                float thumbPos = maxScroll > 0 ? (scrollOffset / maxScroll) * (maxVisibleHeight - thumbSize) : 0f;
+                int y1 = (int) (y + headerHeight + thumbPos);
+                int y2 = (int) (y + headerHeight + thumbPos + thumbSize);
 
-            for (ModuleButton moduleButton : modules) {
-                // Only process clicks for visible modules
-                if (moduleY + 16 > y + headerHeight && moduleY < maxY) {
-                    if (moduleButton.mouseClicked(x, moduleY, width, mouseX, mouseY, mouseButton)) {
+                if (mouseX >= scrollbarX && mouseX <= scrollbarX + scrollbarWidth && mouseY >= y1 && mouseY <= y2) {
+                    if (mouseButton == 0) {
+                        draggingScrollbar = true;
+                        scrollbarDragStartY = mouseY;
+                        scrollbarStartScroll = scrollOffset;
                         return true;
                     }
                 }
-                moduleY += moduleButton.getTotalHeight();
+            }
+
+            // module clicks
+            int moduleY = y + headerHeight - (int) scrollOffset;
+            int maxY = y + headerHeight + (height - y - headerHeight - 20);
+            for (ModuleButton mb : modules) {
+                if (moduleY + 16 > y + headerHeight && moduleY < maxY) {
+                    if (mb.mouseClicked(x, moduleY, width, mouseX, mouseY, mouseButton)) {
+                        return true;
+                    }
+                }
+                moduleY += mb.getTotalHeight();
             }
 
             return false;
@@ -279,17 +308,39 @@ public class ClickInterface extends GuiScreen {
 
         public void mouseReleased(int mouseX, int mouseY, int state) {
             dragging = false;
-
-            int moduleY = y + headerHeight - (int)scrollOffset;
-            for (ModuleButton moduleButton : modules) {
-                moduleButton.mouseReleased(mouseX, mouseY, state);
-                moduleY += moduleButton.getTotalHeight();
+            draggingScrollbar = false;
+            for (ModuleButton mb : modules) {
+                mb.mouseReleased(mouseX, mouseY, state);
             }
         }
 
         public void handleScroll(int mouseX, int mouseY, int wheel) {
-            int scrollAmount = wheel > 0 ? 15 : -15;
-            targetScroll -= scrollAmount;
+            targetScroll -= wheel / 120f * 22f;
+            // clamp later in render
+        }
+
+        public void updateDrag(int mouseX, int mouseY) {
+            if (draggingScrollbar) {
+                int totalHeight = 0;
+                for (ModuleButton mb : modules) totalHeight += mb.getTotalHeight();
+                int maxVisibleHeight = height - y - headerHeight - 20;
+                int maxScroll = Math.max(0, totalHeight - Math.max(0, maxVisibleHeight));
+                if (maxScroll > 0) {
+                    float thumbTrack = maxVisibleHeight - Math.max(24f, (float) maxVisibleHeight / (float) totalHeight * maxVisibleHeight);
+                    if (thumbTrack <= 0) return;
+                    float dy = mouseY - scrollbarDragStartY;
+                    float scrollDelta = dy / thumbTrack * maxScroll;
+                    targetScroll = Math.max(0f, Math.min(maxScroll, scrollbarStartScroll + scrollDelta));
+                }
+            }
+        }
+
+        public void clampToScreen() {
+            // keep panels at least partially visible
+            int minX = -width + 30;
+            int maxX = ClickInterface.this.width - 30;
+            if (x < minX) x = minX;
+            if (x > maxX) x = maxX;
         }
     }
 
@@ -302,59 +353,52 @@ public class ClickInterface extends GuiScreen {
         public ModuleButton(Module module, CategoryPanel parent) {
             this.module = module;
             this.parent = parent;
-
             for (Property<?> property : module.getElements()) {
                 settings.add(new SettingComponent(property));
             }
         }
 
         public int getTotalHeight() {
-            int height = 16;
+            int h = 16;
             if (expanded) {
-                for (SettingComponent setting : settings) {
-                    if (setting.property.isAvailable()) {
-                        height += setting.getHeight();
-                    }
+                for (SettingComponent s : settings) {
+                    if (s.property.isAvailable()) h += s.getHeight();
                 }
             }
-            return height;
+            return h;
         }
 
         public void render(int x, int y, int width, int mouseX, int mouseY) {
             boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + 16;
 
-            // Module button background
-            Color bgColor = module.isEnabled() ? ACCENT_COLOR : (hovered ? HOVER_COLOR : BG_COLOR);
+            Color bgColor = module.isEnabled() ? ACCENT_COLOR.darker() : (hovered ? HOVER_COLOR : BG_COLOR);
             drawRect(x, y, x + width, y + 16, bgColor.getRGB());
 
-            // Module name
+            // name
             String name = module == listeningModule ? "Listening..." : module.getLabel();
             Color textColor = module.isEnabled() ? Color.WHITE : TEXT_COLOR;
-            font.drawString(name, x + 4, y + 5, textColor.getRGB());
+            font.drawString(name, x + 4, y + 4, textColor.getRGB());
 
-            // Keybind indicator
+            // keybind
             if (module.getKey() != 0 && module != listeningModule) {
                 String keyName = Keyboard.getKeyName(module.getKey());
                 int keyWidth = font.getStringWidth(keyName);
-                int textX = x + width - keyWidth - (settings.isEmpty() ? 4 : 14);
-                font.drawString(keyName, textX, y + 5,
-                        new Color(150, 150, 150, 180).getRGB());
+                int textX = x + width - keyWidth - (settings.isEmpty() ? 6 : 18);
+                font.drawString(keyName, textX, y + 4, new Color(160, 160, 160, 200).getRGB());
             }
 
-            // Expand indicator
+            // expand arrow
             if (!settings.isEmpty()) {
                 String arrow = expanded ? "▼" : "▶";
-                font.drawString(arrow, x + width - 10, y + 5,
-                        new Color(150, 150, 150).getRGB());
+                font.drawString(arrow, x + width - 10, y + 4, new Color(160, 160, 160).getRGB());
             }
 
-            // Settings
             if (expanded) {
                 int settingY = y + 16;
-                for (SettingComponent setting : settings) {
-                    if (setting.property.isAvailable()) {
-                        setting.render(x, settingY, width, mouseX, mouseY);
-                        settingY += setting.getHeight();
+                for (SettingComponent s : settings) {
+                    if (s.property.isAvailable()) {
+                        s.render(x, settingY, width, mouseX, mouseY);
+                        settingY += s.getHeight();
                     }
                 }
             }
@@ -362,14 +406,11 @@ public class ClickInterface extends GuiScreen {
 
         public boolean mouseClicked(int x, int y, int width, int mouseX, int mouseY, int mouseButton) {
             boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + 16;
-
             if (hovered) {
                 if (mouseButton == 0) {
                     module.toggle();
                 } else if (mouseButton == 1) {
-                    if (!settings.isEmpty()) {
-                        expanded = !expanded;
-                    }
+                    if (!settings.isEmpty()) expanded = !expanded;
                 } else if (mouseButton == 2) {
                     listeningModule = module;
                 }
@@ -378,24 +419,21 @@ public class ClickInterface extends GuiScreen {
 
             if (expanded) {
                 int settingY = y + 16;
-                for (SettingComponent setting : settings) {
-                    if (setting.property.isAvailable()) {
-                        if (setting.mouseClicked(x, settingY, width, mouseX, mouseY, mouseButton)) {
+                for (SettingComponent s : settings) {
+                    if (s.property.isAvailable()) {
+                        if (s.mouseClicked(x, settingY, width, mouseX, mouseY, mouseButton)) {
                             return true;
                         }
-                        settingY += setting.getHeight();
+                        settingY += s.getHeight();
                     }
                 }
             }
-
             return false;
         }
 
         public void mouseReleased(int mouseX, int mouseY, int state) {
             if (expanded) {
-                for (SettingComponent setting : settings) {
-                    setting.mouseReleased(mouseX, mouseY);
-                }
+                for (SettingComponent s : settings) s.mouseReleased(mouseX, mouseY);
             }
         }
     }
@@ -419,17 +457,14 @@ public class ClickInterface extends GuiScreen {
         }
 
         public void render(int x, int y, int width, int mouseX, int mouseY) {
-            boolean hovered = mouseX >= x && mouseX <= x + width &&
-                    mouseY >= y && mouseY <= y + 16;
-
-            // Background
-            Color bgColor = hovered ? new Color(30, 30, 30, 220) : PANEL_BG;
+            boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + 16;
+            Color bgColor = hovered ? new Color(36, 36, 36, 230) : PANEL_BG;
             drawRect(x, y, x + width, y + 16, bgColor.getRGB());
 
             if (property.getType() == Boolean.class) {
                 renderBooleanSetting(x, y, width);
             } else if (property instanceof NumberProperty) {
-                renderNumberSetting(x, y, width, mouseX);
+                renderNumberSetting(x, y, width, mouseX, mouseY);
             } else if (property instanceof ModeProperty) {
                 renderModeSetting(x, y, width, mouseX, mouseY);
             }
@@ -437,104 +472,75 @@ public class ClickInterface extends GuiScreen {
 
         private void renderBooleanSetting(int x, int y, int width) {
             boolean value = (Boolean) property.getValue();
-
-            // Toggle switch
             int switchWidth = 18;
             int switchHeight = 8;
-            int switchX = x + width - switchWidth - 4;
+            int switchX = x + width - switchWidth - 6;
             int switchY = y + 4;
 
-            // Background with smooth color transition
-            Color bgColor = value ? ACCENT_COLOR.darker() : new Color(60, 60, 60);
-            drawRect(switchX, switchY, switchX + switchWidth, switchY + switchHeight,
-                    bgColor.getRGB());
+            Color bgColor = value ? ACCENT_COLOR.darker() : new Color(70, 70, 70);
+            drawRect(switchX, switchY, switchX + switchWidth, switchY + switchHeight, bgColor.getRGB());
 
-            // Knob
             int knobSize = 6;
             int knobX = value ? switchX + switchWidth - knobSize - 1 : switchX + 1;
-            Color knobColor = value ? ACCENT_COLOR.brighter() : new Color(120, 120, 120);
-            drawRect(knobX, switchY + 1, knobX + knobSize, switchY + switchHeight - 1,
-                    knobColor.getRGB());
+            Color knobColor = value ? ACCENT_COLOR.brighter() : new Color(140, 140, 140);
+            drawRect(knobX, switchY + 1, knobX + knobSize, switchY + switchHeight - 1, knobColor.getRGB());
 
-            // Label
-            font.drawString(property.getLabel(), x + 4, y + 4, TEXT_COLOR.getRGB());
+            font.drawString(property.getLabel(), x + 4, y + 3, TEXT_COLOR.getRGB());
         }
 
-        private void renderNumberSetting(int x, int y, int width, int mouseX) {
+        private void renderNumberSetting(int x, int y, int width, int mouseX, int mouseY) {
             NumberProperty numProp = (NumberProperty) property;
             double value = numProp.getValue();
             double min = numProp.getMin();
             double max = numProp.getMax();
-            double percent = (value - min) / (max - min);
+            double percent = (max - min) > 0 ? (value - min) / (max - min) : 0;
 
-            // Format value cleanly
             String valueStr = formatNumber(value);
-
-            // Label
-            font.drawString(property.getLabel(), x + 4, y + 4, TEXT_COLOR.getRGB());
-
-            // Value display
+            font.drawString(property.getLabel(), x + 4, y + 2, TEXT_COLOR.getRGB());
             int valueWidth = font.getStringWidth(valueStr);
-            font.drawString(valueStr, x + width - valueWidth - 4, y + 4,
-                    ACCENT_COLOR.getRGB());
+            font.drawString(valueStr, x + width - valueWidth - 6, y + 2, ACCENT_COLOR.getRGB());
 
-            // Slider area
-            int sliderY = y + 13;
-            int sliderHeight = 2;
-            int sliderPadding = 4;
+            // slider
+            int sliderY = y + 12;
+            int sliderHeight = 3;
+            int sliderPadding = 6;
+            int sliderLeft = x + sliderPadding;
+            int sliderRight = x + width - sliderPadding;
 
-            // Check if hovering over slider
-            boolean sliderHovered = mouseX >= x + sliderPadding &&
-                    mouseX <= x + width - sliderPadding &&
-                    mouseX >= x && mouseX <= x + width;
+            // hover detection for slider requires both X and Y
+            boolean sliderHovered = mouseX >= sliderLeft && mouseX <= sliderRight && mouseY >= sliderY - 3 && mouseY <= sliderY + sliderHeight + 3;
 
-            // Slider background track
-            drawRect(x + sliderPadding, sliderY, x + width - sliderPadding, sliderY + sliderHeight,
-                    new Color(60, 60, 60).getRGB());
+            drawRect(sliderLeft, sliderY, sliderRight, sliderY + sliderHeight, new Color(60, 60, 60).getRGB());
 
-            // Slider filled portion
-            int filledWidth = (int)((width - sliderPadding * 2) * percent);
-            drawRect(x + sliderPadding, sliderY, x + sliderPadding + filledWidth, sliderY + sliderHeight,
-                    ACCENT_COLOR.getRGB());
+            int filledWidth = (int) ((sliderRight - sliderLeft) * percent);
+            drawRect(sliderLeft, sliderY, sliderLeft + filledWidth, sliderY + sliderHeight, ACCENT_COLOR.getRGB());
 
-            // Slider thumb
             if (draggingSlider == this || sliderHovered) {
-                int thumbX = x + sliderPadding + filledWidth;
-                int thumbSize = 4;
+                int thumbX = sliderLeft + filledWidth;
+                int thumbSize = 6;
                 Color thumbColor = draggingSlider == this ? ACCENT_COLOR.brighter() : ACCENT_COLOR;
-                drawRect(thumbX - thumbSize / 2, sliderY - 2,
-                        thumbX + thumbSize / 2, sliderY + sliderHeight + 2,
-                        thumbColor.getRGB());
+                drawRect(thumbX - thumbSize / 2, sliderY - 3, thumbX + thumbSize / 2, sliderY + sliderHeight + 3, thumbColor.getRGB());
             }
         }
 
         private void renderModeSetting(int x, int y, int width, int mouseX, int mouseY) {
             ModeProperty<?> modeProp = (ModeProperty<?>) property;
-
-            // Label with current value
             String displayText = property.getLabel() + ": " + modeProp.getValue();
-            font.drawString(displayText, x + 4, y + 4, TEXT_COLOR.getRGB());
+            font.drawString(displayText, x + 4, y + 3, TEXT_COLOR.getRGB());
 
-            // Dropdown arrow
             String arrow = dropdownOpen ? "▲" : "▼";
-            font.drawString(arrow, x + width - 10, y + 4, new Color(150, 150, 150).getRGB());
+            font.drawString(arrow, x + width - 10, y + 3, new Color(160, 160, 160).getRGB());
 
-            // Dropdown options
             if (dropdownOpen) {
                 int optionY = y + 16;
                 for (Object value : modeProp.getValues()) {
                     boolean selected = value.equals(modeProp.getValue());
-                    boolean hovered = mouseX >= x + 2 && mouseX <= x + width - 2 &&
-                            mouseY >= optionY && mouseY <= optionY + 12;
+                    boolean hovered = mouseX >= x + 2 && mouseX <= x + width - 2 && mouseY >= optionY && mouseY <= optionY + 12;
 
                     Color color;
-                    if (selected) {
-                        color = ACCENT_COLOR;
-                    } else if (hovered) {
-                        color = HOVER_COLOR.brighter();
-                    } else {
-                        color = new Color(30, 30, 30, 220);
-                    }
+                    if (selected) color = ACCENT_COLOR;
+                    else if (hovered) color = HOVER_COLOR.brighter();
+                    else color = new Color(34, 34, 34, 220);
 
                     drawRect(x + 2, optionY, x + width - 2, optionY + 12, color.getRGB());
                     font.drawString(value.toString(), x + 6, optionY + 2, TEXT_COLOR.getRGB());
@@ -556,9 +562,13 @@ public class ClickInterface extends GuiScreen {
                     return true;
                 }
             } else if (property instanceof NumberProperty) {
-                int sliderY = y + 11;
-                if (mouseX >= x + 4 && mouseX <= x + width - 4 &&
-                        mouseY >= sliderY && mouseY <= sliderY + 6) {
+                int sliderY = y + 12;
+                int sliderPadding = 6;
+                int sliderLeft = x + sliderPadding;
+                int sliderRight = x + width - sliderPadding;
+                int sliderTop = sliderY - 4;
+                int sliderBottom = sliderY + 7;
+                if (mouseX >= sliderLeft && mouseX <= sliderRight && mouseY >= sliderTop && mouseY <= sliderBottom) {
                     draggingSlider = this;
                     dragStartX = mouseX;
                     componentX = x;
@@ -567,12 +577,11 @@ public class ClickInterface extends GuiScreen {
                     return true;
                 }
             } else if (property instanceof ModeProperty) {
+                ModeProperty<?> modeProp = (ModeProperty<?>) property;
                 if (dropdownOpen) {
-                    ModeProperty<?> modeProp = (ModeProperty<?>) property;
                     int optionY = y + 16;
                     for (Object value : modeProp.getValues()) {
-                        if (mouseX >= x + 2 && mouseX <= x + width - 2 &&
-                                mouseY >= optionY && mouseY <= optionY + 12) {
+                        if (mouseX >= x + 2 && mouseX <= x + width - 2 && mouseY >= optionY && mouseY <= optionY + 12) {
                             modeProp.setValueObj(value);
                             dropdownOpen = false;
                             return true;
@@ -580,18 +589,16 @@ public class ClickInterface extends GuiScreen {
                         optionY += 12;
                     }
                 }
-
                 if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + 16) {
                     dropdownOpen = !dropdownOpen;
                     return true;
                 }
             }
-
             return false;
         }
 
         public void mouseReleased(int mouseX, int mouseY) {
-            // Slider dragging is handled globally in ClickInterface
+            // handled globally
         }
 
         public void updateDrag(int mouseX) {
@@ -603,18 +610,12 @@ public class ClickInterface extends GuiScreen {
         private void updateSlider(int x, int width, int mouseX) {
             if (property instanceof NumberProperty) {
                 NumberProperty numProp = (NumberProperty) property;
-                double percent = Math.max(0, Math.min(1, (mouseX - x - 4.0) / (width - 8.0)));
-
+                int sliderPadding = 6;
+                double percent = Math.max(0, Math.min(1, (mouseX - (x + sliderPadding)) / (double) (width - sliderPadding * 2)));
                 double range = numProp.getMax() - numProp.getMin();
                 double rawValue = numProp.getMin() + range * percent;
-
-                // Apply increment steps
                 double increment = numProp.getIncrement();
-                if (increment > 0) {
-                    rawValue = Math.round(rawValue / increment) * increment;
-                }
-
-                // Clamp to bounds
+                if (increment > 0) rawValue = Math.round(rawValue / increment) * increment;
                 double finalValue = Math.max(numProp.getMin(), Math.min(numProp.getMax(), rawValue));
                 numProp.setValue(finalValue);
             }
