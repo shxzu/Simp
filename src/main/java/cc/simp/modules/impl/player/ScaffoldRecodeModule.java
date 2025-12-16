@@ -28,6 +28,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
@@ -511,52 +512,63 @@ public final class ScaffoldRecodeModule extends Module {
 
     private BlockData getBlockData() {
         int startY = MathHelper.floor_double(mc.thePlayer.posY);
+
+        //Set initial targetPos
         BlockPos targetPos = new BlockPos(
                 MathHelper.floor_double(mc.thePlayer.posX),
                 (this.stage != 0 && !this.shouldSameY ? Math.min(startY, this.placeY) : startY) - 1,
                 MathHelper.floor_double(mc.thePlayer.posZ)
         );
-        if (!PlayerUtils.isReplaceable(targetPos)) {
-            return null;
-        } else {
-            ArrayList<BlockPos> positions = new ArrayList<>();
-            for (int x = -4; x <= 4; x++) {
-                for (int y = -4; y <= 0; y++) {
-                    for (int z = -4; z <= 4; z++) {
-                        BlockPos pos = targetPos.add(x, y, z);
-                        if (!PlayerUtils.isReplaceable(pos)
-                                && !PlayerUtils.isInteractable(pos)
-                                && !(
-                                mc.thePlayer.getDistance((double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5)
-                                        > (double) mc.playerController.getBlockReachDistance()
-                        )
-                                && (this.stage == 0 || this.shouldSameY || pos.getY() < this.placeY)) {
-                            for (EnumFacing facing : EnumFacing.VALUES) {
-                                if (facing != EnumFacing.DOWN) {
-                                    BlockPos blockPos = pos.offset(facing);
-                                    if (PlayerUtils.isReplaceable(blockPos)) {
-                                        positions.add(pos);
-                                    }
+
+        ArrayList<BlockPos> positions = new ArrayList<>();
+
+        //Find an adjacent blockPos for scaffold
+        for (int x = -4; x <= 4; x++) {
+            for (int y = -4; y <= 0; y++) {
+                for (int z = -4; z <= 4; z++) {
+                    BlockPos pos = targetPos.add(x, y, z);
+
+                    if (!PlayerUtils.isReplaceable(pos)
+                            && !PlayerUtils.isInteractable(pos)
+                            && mc.thePlayer.getDistance(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)
+                            <= mc.playerController.getBlockReachDistance()
+                            && (this.stage == 0 || this.shouldSameY || pos.getY() < this.placeY)) {
+
+                        for (EnumFacing facing : EnumFacing.VALUES) {
+                            if (facing != EnumFacing.DOWN) {
+                                BlockPos offset = pos.offset(facing);
+                                if (PlayerUtils.isReplaceable(offset)) {
+                                    positions.add(pos);
                                 }
                             }
                         }
                     }
                 }
             }
-            if (positions.isEmpty()) {
-                return null;
-            } else {
-                positions.sort(
-                        Comparator.comparingDouble(
-                                o -> o.distanceSqToCenter((double) targetPos.getX() + 0.5, (double) targetPos.getY() + 0.5, (double) targetPos.getZ() + 0.5)
-                        )
-                );
-                BlockPos blockPos = positions.get(0);
-                EnumFacing facing = this.getBestFacing(blockPos, targetPos);
-                return facing == null ? null : new BlockData(blockPos, facing);
-            }
         }
+
+        //Fix the rot flick issue by keeping a fallback block? and making sure its not air so the rest of the logic works
+        if (mc.theWorld.getBlockState(targetPos).getBlock() != Blocks.air && !positions.contains(belowPlayer)) {
+            positions.add(targetPos);
+        }
+
+        //Sorting logic
+        if (positions.isEmpty()) {
+            return null;
+        }
+
+        positions.sort(Comparator.comparingDouble(
+                o -> o.distanceSqToCenter(belowPlayer.getX() + 0.5, belowPlayer.getY() + 0.5, belowPlayer.getZ() + 0.5)
+        ));
+
+        BlockPos blockPos = positions.get(0);
+        EnumFacing facing = this.getBestFacing(blockPos, belowPlayer);
+
+        //Return the block position :exploding_head:
+        return new BlockData(blockPos, facing != null ? facing : EnumFacing.UP);
     }
+
+
 
     public Vec3 getHitVec() {
 
