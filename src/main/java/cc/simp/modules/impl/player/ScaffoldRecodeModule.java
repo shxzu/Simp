@@ -2,26 +2,42 @@ package cc.simp.modules.impl.player;
 
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
+import cc.simp.api.events.impl.render.Render2DEvent;
+import cc.simp.api.events.impl.render.Render3DEvent;
+import cc.simp.api.events.impl.render.ShaderEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.ColorProcess;
+import cc.simp.processes.FontProcess;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.client.MathUtils;
+import cc.simp.utils.client.Timer;
 import cc.simp.utils.mc.*;
 import cc.simp.utils.misc.MovementFix;
+import cc.simp.utils.render.RenderUtils;
+import cc.simp.utils.render.animations.Animation;
+import cc.simp.utils.render.animations.Direction;
+import cc.simp.utils.render.animations.impl.DecelerateAnimation;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.*;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -36,17 +52,16 @@ public final class ScaffoldRecodeModule extends Module {
     // Rotation Settings
     private static final ModeProperty<Rotations> rotations = new ModeProperty<>("Rotations", Rotations.Normal);
     private final NumberProperty minRotationSpeed = new NumberProperty("Min Rotation Speed", 5, 0, 10, 1);
-    private final NumberProperty maxRotationSpeed = new NumberProperty("Max Rotation Speed", 8, 0, 20, 1);
+    private final NumberProperty maxRotationSpeed = new NumberProperty("Max Rotation Speed", 8, 0, 10, 1);
     private final ModeProperty<RayCast> rayCast = new ModeProperty<>("Ray Cast", RayCast.Normal);
-    public Property<Boolean> snapRotations = new Property<>("Snap Rotations", false);
     public static Property<Boolean> limitRotations = new Property<>("Limit Rotations", false);
-    private NumberProperty rotationLimiterYawMax = new NumberProperty("Yaw Max", 0f, limitRotations::getValue, 30f, 180f, 1f);
-    private NumberProperty rotationLimiterYawMin = new NumberProperty("Yaw Min", 0f, limitRotations::getValue, 30f, 180f, 1f);
-    private NumberProperty rotationLimiterPitchMax = new NumberProperty("Pitch Max", 0f, limitRotations::getValue, 20f, 90f, 1f);
-    private NumberProperty rotationLimiterPitchMin = new NumberProperty("Pitch Min", 0f, limitRotations::getValue, 20f, 90f, 1f);
+    private final NumberProperty rotationLimiterYawMax = new NumberProperty("Yaw Max", 30, limitRotations::getValue, 30, 180, 1);
+    private final NumberProperty rotationLimiterYawMin = new NumberProperty("Yaw Min", 30, limitRotations::getValue, 30, 180, 1);
+    private final NumberProperty rotationLimiterPitchMax = new NumberProperty("Pitch Max", 30, limitRotations::getValue, 20, 90, 1);
+    private final NumberProperty rotationLimiterPitchMin = new NumberProperty("Pitch Min", 30, limitRotations::getValue, 20, 90, 1);
 
     // Placing Settings
-    private NumberProperty placeDelay = new NumberProperty("Place Delay", 0, 0, 5, 1);
+    private final NumberProperty placeDelay = new NumberProperty("Place Delay", 0, 0, 10, 1);
     private static final ModeProperty<SlotMode> slotMode = new ModeProperty<>("Slot Mode", SlotMode.Switch);
     public Property<Boolean> packetPlace = new Property<>("Packet Place", false);
     public Property<Boolean> packetSwing = new Property<>("Packet Swing", false);
@@ -54,15 +69,17 @@ public final class ScaffoldRecodeModule extends Module {
     // Movement Settings
     private static final ModeProperty<SprintMode> sprintMode = new ModeProperty<>("Sprint Mode", SprintMode.None);
     private static final ModeProperty<TowerMode> towerMode = new ModeProperty<>("Tower Mode", TowerMode.None);
+    private static final Property<Boolean> towerMove = new Property<>("Tower Move", true, () -> towerMode.getValue() != TowerMode.None);
     public static Property<Boolean> jump = new Property<>("Auto Jump", false);
     private final NumberProperty jumpDelayTicks = new NumberProperty("Auto Jump Delay", 0, jump::getValue, 0, 5, 1);
     public Property<Boolean> sameY = new Property<>("Same Y", false);
     public static Property<Boolean> moveFix = new Property<>("Move Fix", false);
     private static final Property<Boolean> safeWalk = new Property<>("Safe Walk", false);
+    private static final Property<Boolean> safeWalkOnAir = new Property<>("Safe Walk On Air", false, safeWalk::getValue);
 
     // Render Settings
-    private final Property<Boolean> render = new Property<>("Render Selection", true);
-    private final Property<Boolean> counter = new Property<>("Block Counter", true);
+    private static final ModeProperty<BlockCounter> blockCounter = new ModeProperty<>("Block Counter", BlockCounter.None);
+    private final Property<Boolean> render = new Property<>("Render Block Selection", true);
 
     private enum Mode {
         Normal,
@@ -71,7 +88,7 @@ public final class ScaffoldRecodeModule extends Module {
 
     private enum Rotations {
         Normal("Normal"),
-        Direct("Direct"),
+        Radium("Direct"),
         GodBridge("God Bridge");
 
         public String name;
@@ -105,10 +122,17 @@ public final class ScaffoldRecodeModule extends Module {
     private enum TowerMode {
         Vanilla,
         Watchdog,
-        Verus,
+        NCP,
         None
     }
 
+    private enum BlockCounter {
+        Tenacity,
+        None
+    }
+
+    private Animation anim = new DecelerateAnimation(250, 1);
+    private final Timer delayTimer = new Timer();
     private int lastSlot = -1;
     private int blockCount = -1;
     private float yaw = -180.0F;
@@ -118,19 +142,16 @@ public final class ScaffoldRecodeModule extends Module {
     private boolean shouldSameY = false;
     private boolean towering = false;
     private float rotSpeed;
-    private boolean overrided;
 
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = event -> {
 
         // Setting Variables
-        if (this.checkedModulesNotEnabled()) {
+        if (!this.checkedModulesNotEnabled()) {
             return;
         }
 
-        if (!overrided) {
-            this.rotSpeed = (float) MathUtils.getRandom(this.minRotationSpeed.getValue(), this.maxRotationSpeed.getValue());
-        }
+        this.rotSpeed = (float) MathUtils.getRandom(this.minRotationSpeed.getValue(), this.maxRotationSpeed.getValue());
 
         if (mc.thePlayer.onGround) {
             if (this.stage > 0) {
@@ -175,7 +196,7 @@ public final class ScaffoldRecodeModule extends Module {
         }
 
         // Null Check
-        if (getBlockData() == null || getBlockData().blockPos() == null || getHitVec() == null || getBlockData().facing() == null) {
+        if (getBlockData() == null || getHitVec() == null) {
             return;
         }
 
@@ -197,48 +218,144 @@ public final class ScaffoldRecodeModule extends Module {
                 this.place(getBlockData().blockPos(), getBlockData().facing(), getHitVec());
             }
         }
+
+        // Jumping Logic
+        this.jump();
+
+        // Sprinting Logic
+        this.sprint();
+
+        // Tower Logic
+        this.tower();
+
+        // Safe Walk Logic
+        if (safeWalk.getValue()) {
+            if (!safeWalkOnAir.getValue() && !mc.thePlayer.onGround) mc.thePlayer.safeWalk = false;
+            mc.thePlayer.safeWalk = true;
+        }
     };
+
+    @EventLink
+    public final Listener<Render3DEvent> render3DEventListener = event -> {
+        if (render.getValue()) {
+            GL11.glEnable(3042);
+            GL11.glBlendFunc(770, 771);
+            GL11.glEnable(2848);
+            GL11.glDisable(2929);
+            GL11.glDisable(3553);
+            GlStateManager.disableCull();
+            GL11.glDepthMask(false);
+            final float red = ColorProcess.getColor().getRed();
+            final float green = ColorProcess.getColor().getGreen();
+            final float blue = ColorProcess.getColor().getBlue();
+            float lineWidth = 0.0f;
+            if (this.getBlockData() != null && this.getBlockData().blockPos() != null) {
+                if (mc.thePlayer.getDistance(this.getBlockData().blockPos().getX(), this.getBlockData().blockPos().getY(), this.getBlockData().blockPos().getZ()) > 1.0) {
+                    double d0 = 1.0 - mc.thePlayer.getDistance(this.getBlockData().blockPos().getX(), this.getBlockData().blockPos().getY(), this.getBlockData().blockPos().getZ()) / 20.0;
+                    if (d0 < 0.3) {
+                        d0 = 0.3;
+                    }
+                    lineWidth *= (float) d0;
+                }
+                RenderUtils.drawBlockESP(this.getBlockData().blockPos(), red, green, blue, 0.3137255f, 1.0f, lineWidth);
+            }
+            GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            GL11.glDepthMask(true);
+            GlStateManager.enableCull();
+            GL11.glEnable(3553);
+            GL11.glEnable(2929);
+            GL11.glDisable(3042);
+            GL11.glBlendFunc(770, 771);
+            GL11.glDisable(2848);
+        }
+    };
+
+    @EventLink
+    public final Listener<Render2DEvent> render2DEventListener = event -> renderBlockCounter();
+
+    @EventLink
+    public final Listener<ShaderEvent> shaderEventListener = event -> renderBlockCounter();
+
+
+    private void sprint() {
+        switch (sprintMode.getValue()) {
+            case Vanilla:
+                mc.thePlayer.setSprinting(MovementUtils.isMoving());
+                break;
+            case Legit:
+                // Handled in RotationProcess
+                break;
+            case None:
+                mc.gameSettings.keyBindSprint.setPressed(false);
+                mc.thePlayer.setSprinting(false);
+                break;
+        }
+    }
+
+    private void jump() {
+        if (mc.gameSettings.keyBindJump.isPressed()) return;
+
+        if (mc.thePlayer.onGroundTicks < jumpDelayTicks.getValue().intValue()) return;
+
+        if (jump.getValue()) {
+            if (mode.getValue() == Mode.Telly) {
+                jump.setValue(false);
+            }
+        }
+        if (sameY.getValue() && jump.getValue() || (mode.getValue() == Mode.Telly && sameY.getValue())) {
+            if (mc.thePlayer.onGround && MovementUtils.isMoving() && mc.thePlayer.posY == placeY) {
+                mc.thePlayer.jump();
+            }
+        }
+        if (jump.getValue() && !sameY.getValue() || (mode.getValue() == Mode.Telly) && !sameY.getValue()) {
+            if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
+                mc.thePlayer.jump();
+            }
+        }
+    }
+
+    private void tower() {
+        if (towerMode.getValue() == TowerMode.None) {
+            this.towering = false;
+            return;
+        }
+
+        if (!mc.gameSettings.keyBindJump.isPressed()) {
+            this.towering = false;
+            return;
+        }
+
+        if (!towerMove.getValue() || MovementUtils.isMoving()) {
+            switch (towerMode.getValue()) {
+                case Vanilla:
+                    mc.thePlayer.motionY = 0.42;
+                    break;
+                case Watchdog:
+                    // TODO: Implement Watchdog Tower
+                    break;
+                case NCP:
+                    PacketUtils.sendSilentPacket(new C08PacketPlayerBlockPlacement(null));
+                    if (mc.thePlayer.posY % 1 <= 0.00153598) {
+                        mc.thePlayer.setPosition(mc.thePlayer.posX, Math.floor(mc.thePlayer.posY), mc.thePlayer.posZ);
+                        mc.thePlayer.motionY = 0.42F;
+                    } else if (mc.thePlayer.posY % 1 < 0.1 && mc.thePlayer.offGroundTicks != 0) {
+                        mc.thePlayer.motionY = 0;
+                        mc.thePlayer.setPosition(mc.thePlayer.posX, Math.floor(mc.thePlayer.posY), mc.thePlayer.posZ);
+                    }
+                    break;
+            }
+            this.towering = true;
+        }
+    }
 
     private void getRotations() {
         float currentYaw = mc.thePlayer.rotationYaw;
-        if (getBlockData() == null || getHitVec() == null) {
-            yaw = currentYaw - 180.0f;
-            pitch = 82.5f;
-            return;
-        }
+
         switch (rotations.getValue()) {
             case Normal:
-                EntityPlayer player = mc.thePlayer;
-                double difference = player.posY + player.getEyeHeight() - getHitVec().yCoord -
-                        0.5 - (Math.random() - 0.5) * 0.1;
-
-                MovingObjectPosition movingObjectPosition = null;
-
-                for (int offset = -180; offset <= 180; offset += 45) {
-                    player.setPosition(player.posX, player.posY - difference, player.posZ);
-                    movingObjectPosition = RayCastUtils.rayCast(new Vector2f((float) (player.rotationYaw + (offset * 3)), 0), 4.5);
-                    player.setPosition(player.posX, player.posY + difference, player.posZ);
-
-                    if (movingObjectPosition == null || movingObjectPosition.hitVec == null) return;
-
-                    Vector2f rotations = RotationUtils.calculate(movingObjectPosition.hitVec);
-
-                    if (RayCastUtils.overBlock(rotations, getBlockData().blockPos(), getBlockData().facing())) {
-                        yaw = rotations.x;
-                        pitch = rotations.y;
-                        return;
-                    }
-                }
-
-                final Vector2f rotations = RotationUtils.calculate(
-                        new Vector3d(getBlockData().blockPos().getX(), getBlockData().blockPos().getY(), getBlockData().blockPos().getZ()), getBlockData().facing());
-
-                if (!RayCastUtils.overBlock(new Vector2f(yaw, pitch), getBlockData().blockPos(), getBlockData().facing())) {
-                    yaw = rotations.x;
-                    pitch = rotations.y;
-                }
+                getBaseRotations();
                 break;
-            case Direct:
+            case Radium:
                 final Vec3 hitVec = getHitVec();
 
                 final double xDif = hitVec.xCoord - mc.thePlayer.posX;
@@ -250,37 +367,125 @@ public final class ScaffoldRecodeModule extends Module {
                 pitch = (float) (-(StrictMath.atan2(yDif, xzDist) * 180.0D / StrictMath.PI));
                 break;
             case GodBridge:
-                float optimalPitch = 82.5f;
-                if (!RayCastUtils.overBlock(new Vector2f(yaw, pitch), getBlockData().blockPos(), getBlockData().facing())) {
-                    optimalPitch = RotationUtils.calculate(new Vector3d(getBlockData().blockPos().getX(), getBlockData().blockPos().getY(), getBlockData().blockPos().getZ()), getBlockData().facing()).getX();
-                }
-                pitch = optimalPitch;
+                getBaseRotations();
                 yaw = currentYaw - 165.0f;
                 break;
         }
 
-        if (mode.getValue() == Mode.Telly) {
+        if (mode.getValue() == Mode.Telly && !towering) {
             if (!(mc.thePlayer.offGroundTicks >= 3 && mc.thePlayer.offGroundTicks <= (sameY.getValue() ? 7 : 10))) {
                 yaw = mc.thePlayer.rotationYaw;
             }
         }
 
-        RotationProcess.setRotations(new Vector2f(yaw, pitch), rotSpeed, moveFix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
+        Vector2f limitedRotations = applyRotationLimits(yaw, pitch);
+        yaw = limitedRotations.x;
+        pitch = limitedRotations.y;
+        if (getBlockData() != null || getHitVec() != null) {
+            RotationProcess.setRotations(new Vector2f(yaw, pitch), rotSpeed, moveFix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
+        }
+    }
+
+    private void getBaseRotations() {
+        EntityPlayer player = mc.thePlayer;
+        double difference = player.posY + player.getEyeHeight() - getHitVec().yCoord -
+                0.5 - (Math.random() - 0.5) * 0.1;
+
+        MovingObjectPosition movingObjectPosition = null;
+
+        for (int offset = -180; offset <= 180; offset += 45) {
+            player.setPosition(player.posX, player.posY - difference, player.posZ);
+            movingObjectPosition = RayCastUtils.rayCast(new Vector2f((float) (player.rotationYaw + (offset * 3)), 0), 4.5);
+            player.setPosition(player.posX, player.posY + difference, player.posZ);
+
+            if (movingObjectPosition == null || movingObjectPosition.hitVec == null) return;
+
+            Vector2f rotations = RotationUtils.calculate(movingObjectPosition.hitVec);
+
+            if (RayCastUtils.overBlock(rotations, getBlockData().blockPos(), getBlockData().facing())) {
+                yaw = rotations.x;
+                pitch = rotations.y;
+                return;
+            }
+        }
+
+        final Vector2f rotations = RotationUtils.calculate(
+                new Vector3d(getBlockData().blockPos().getX(), getBlockData().blockPos().getY(), getBlockData().blockPos().getZ()), getBlockData().facing());
+
+        if (!RayCastUtils.overBlock(new Vector2f(yaw, pitch), getBlockData().blockPos(), getBlockData().facing())) {
+            yaw = rotations.x;
+            pitch = rotations.y;
+        }
     }
 
     private void place(BlockPos blockPos, EnumFacing enumFacing, Vec3 vec3) {
-        if (mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock && this.blockCount > 0) {
-            if (!packetPlace.getValue()) {
-                mc.rightClickMouse();
-            } else if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.inventory.getCurrentItem(), blockPos, enumFacing, vec3)) {
-                if (packetSwing.getValue()) {
-                    mc.thePlayer.swingItem();
-                } else {
-                    PacketUtils.sendPacket(new C0APacketAnimation());
+        if (delayTimer.hasTimeElapsed(placeDelay.getValue() * 20)) {
+            ItemStack itemStack = mc.thePlayer.inventory.getCurrentItem();
+
+            if (slotMode.getValue() == SlotMode.Spoof) {
+                for (int i = 0; i < 9; i++) {
+                    ItemStack candidate = mc.thePlayer.inventory.getStackInSlot(i);
+                    if (InventoryUtils.isBlock(candidate)) {
+                        itemStack = candidate;
+                        break;
+                    }
                 }
+            }
+
+            if (itemStack != null && itemStack.getItem() instanceof ItemBlock && this.blockCount > 0) {
+                if (!packetPlace.getValue()) {
+                    mc.rightClickMouse();
+                } else if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, blockPos, enumFacing, vec3)) {
+                    if (!packetSwing.getValue()) {
+                        mc.thePlayer.swingItem();
+                    } else {
+                        PacketUtils.sendPacket(new C0APacketAnimation());
+                    }
+                }
+                delayTimer.reset();
             }
         }
     }
+
+    private Vector2f applyRotationLimits(float targetYaw, float targetPitch) {
+        if (!limitRotations.getValue()) {
+            return new Vector2f(targetYaw, targetPitch);
+        }
+
+        float currentYaw = mc.thePlayer.rotationYaw;
+        float currentPitch = mc.thePlayer.rotationPitch;
+
+        // Calculate yaw difference
+        float yawDiff = MathHelper.wrapAngleTo180_float(targetYaw - currentYaw);
+        float maxYaw = rotationLimiterYawMax.getValue().floatValue();
+        float minYaw = rotationLimiterYawMin.getValue().floatValue();
+
+        // Clamp yaw difference
+        if (Math.abs(yawDiff) > maxYaw) {
+            yawDiff = yawDiff > 0 ? maxYaw : -maxYaw;
+        } else if (Math.abs(yawDiff) < minYaw) {
+            yawDiff = yawDiff > 0 ? minYaw : -minYaw;
+        }
+
+        float limitedYaw = currentYaw + yawDiff;
+
+        // Calculate pitch difference
+        float pitchDiff = targetPitch - currentPitch;
+        float maxPitch = rotationLimiterPitchMax.getValue().floatValue();
+        float minPitch = rotationLimiterPitchMin.getValue().floatValue();
+
+        // Clamp pitch difference
+        if (Math.abs(pitchDiff) > maxPitch) {
+            pitchDiff = pitchDiff > 0 ? maxPitch : -maxPitch;
+        } else if (Math.abs(pitchDiff) < minPitch) {
+            pitchDiff = pitchDiff > 0 ? minPitch : -minPitch;
+        }
+
+        float limitedPitch = MathHelper.clamp_float(currentPitch + pitchDiff, -90.0f, 90.0f);
+
+        return new Vector2f(limitedYaw, limitedPitch);
+    }
+
 
     private boolean checkedModulesNotEnabled() {
         return !Simp.INSTANCE.getModuleManager().getModule(BedNukerModule.class).isEnabled() || BedNukerModule.bedPos == null;
@@ -398,33 +603,39 @@ public final class ScaffoldRecodeModule extends Module {
         return hitVec;
     }
 
-    private double getRandomOffset() {
-        return 0.2155 - MathUtils.getRandom(1.0E-4, 9.0E-4);
-    }
+    private void renderBlockCounter() {
+        if (blockCounter.getValue() == BlockCounter.None) return;
+        switch (blockCounter.getValue()) {
+            case Tenacity -> {
+                anim.setDirection(this.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
+                if (!this.isEnabled() && anim.isDone()) return;
+                ScaledResolution sr = new ScaledResolution(mc);
+                float output = anim.getOutput().floatValue();
+                float x, y;
+                if (mc.thePlayer.inventory.getCurrentItem() != null && mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock)
+                    blockCount = mc.thePlayer.inventory.getCurrentItem().stackSize;
+                float blockWH = mc.thePlayer.inventory.getCurrentItem() != null ? 15 : -2;
+                int spacing = 3;
+                String text = "§l" + blockCount + "§r block" + (blockCount != 1 ? "s" : "");
+                float textWidth = FontProcess.getFont("bold").getStringWidth(text);
 
-    private EnumFacing yawToFacing(float yaw) {
-        if (yaw < -135.0F || yaw > 135.0F) {
-            return EnumFacing.NORTH;
-        } else if (yaw < -45.0F) {
-            return EnumFacing.EAST;
-        } else {
-            return yaw < 45.0F ? EnumFacing.SOUTH : EnumFacing.WEST;
+                float totalWidth = ((textWidth + blockWH + spacing) + 6) * output;
+                x = sr.getScaledWidth() / 2f - (totalWidth / 2f);
+                y = sr.getScaledHeight() - (sr.getScaledHeight() / 2f - 20);
+                float height = 20;
+                RenderUtils.startScissor(x - 1.5f, y - 1.5f, totalWidth + 3, height + 3);
+
+                RenderUtils.drawRoundedRect(x, y, totalWidth, height, 5, new Color(ColorProcess.getColor().darker().getRed(), ColorProcess.getColor().darker().getGreen(), ColorProcess.getColor().darker().getBlue(), 130));
+
+                FontProcess.getFont("bold").drawString(text, x + 3 + blockWH + spacing, y + height / 2f - FontProcess.getFont("bold").getHeight() / 2f + .5f, -1);
+                RenderHelper.enableGUIStandardItemLighting();
+                mc.getRenderItem().renderItemAndEffectIntoGUI(mc.thePlayer.inventory.getCurrentItem(), (int) x + 3, (int) (y + 10 - (blockWH / 2)));
+                RenderHelper.disableStandardItemLighting();
+                RenderUtils.endScissor();
+            }
         }
     }
 
-    private double distanceToEdge(EnumFacing enumFacing) {
-        switch (enumFacing) {
-            case NORTH:
-                return mc.thePlayer.posZ - Math.floor(mc.thePlayer.posZ);
-            case EAST:
-                return Math.ceil(mc.thePlayer.posX) - mc.thePlayer.posX;
-            case SOUTH:
-                return Math.ceil(mc.thePlayer.posZ) - mc.thePlayer.posZ;
-            case WEST:
-            default:
-                return mc.thePlayer.posX - Math.floor(mc.thePlayer.posX);
-        }
-    }
 
     public static class BlockData {
         private final BlockPos blockPos;
@@ -442,6 +653,33 @@ public final class ScaffoldRecodeModule extends Module {
         public EnumFacing facing() {
             return this.facing;
         }
+    }
+
+    @Override
+    public void onEnable() {
+        if (mc.thePlayer != null) {
+            anim = new DecelerateAnimation(250, 1);
+            lastSlot = mc.thePlayer.inventory.currentItem;
+            yaw = mc.thePlayer.rotationYaw - 180;
+            pitch = 90;
+        }
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        if (mc.thePlayer != null) {
+            anim = new DecelerateAnimation(250, 1);
+            mc.thePlayer.safeWalk = false;
+            this.towering = false;
+            if (slotMode.getValue() == SlotMode.Spoof && lastSlot != -1) {
+                PacketUtils.sendPacket(new C09PacketHeldItemChange(lastSlot));
+            }
+            if (slotMode.getValue() == SlotMode.Switch && lastSlot != -1) {
+                mc.thePlayer.inventory.currentItem = lastSlot;
+            }
+        }
+        super.onDisable();
     }
 
 }

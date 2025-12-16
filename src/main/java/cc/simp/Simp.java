@@ -12,6 +12,7 @@ import cc.simp.modules.ModuleManager;
 import cc.simp.modules.impl.client.ClientSettingsModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.player.ScaffoldModule;
+import cc.simp.modules.impl.player.ScaffoldRecodeModule;
 import cc.simp.processes.*;
 import cc.simp.utils.client.BuildType;
 import de.florianmichael.viamcp.ViaMCP;
@@ -92,6 +93,10 @@ public class Simp {
 
         if (moduleManager.getModule(ScaffoldModule.class).isEnabled()) {
             moduleManager.getModule(ScaffoldModule.class).setEnabled(false);
+        }
+
+        if (moduleManager.getModule(ScaffoldRecodeModule.class).isEnabled()) {
+            moduleManager.getModule(ScaffoldRecodeModule.class).setEnabled(false);
         }
 
         // ViaMCP!!!

@@ -52,6 +52,7 @@ public final class ModuleManager {
 
                 // Player
                 new ScaffoldModule(),
+                new ScaffoldRecodeModule(),
                 new NoFallModule(),
                 new AntiVoidModule(),
                 new AutoToolModule(),
