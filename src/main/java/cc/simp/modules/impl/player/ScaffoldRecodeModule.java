@@ -548,7 +548,7 @@ public final class ScaffoldRecodeModule extends Module {
         }
 
         //Fix the rot flick issue by keeping a fallback block? and making sure its not air so the rest of the logic works
-        if (mc.theWorld.getBlockState(targetPos).getBlock() != Blocks.air && !positions.contains(belowPlayer)) {
+        if (mc.theWorld.getBlockState(targetPos).getBlock() != Blocks.air && !positions.contains(targetPos)) {
             positions.add(targetPos);
         }
 
@@ -558,11 +558,11 @@ public final class ScaffoldRecodeModule extends Module {
         }
 
         positions.sort(Comparator.comparingDouble(
-                o -> o.distanceSqToCenter(belowPlayer.getX() + 0.5, belowPlayer.getY() + 0.5, belowPlayer.getZ() + 0.5)
+                o -> o.distanceSqToCenter(targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5)
         ));
 
         BlockPos blockPos = positions.get(0);
-        EnumFacing facing = this.getBestFacing(blockPos, belowPlayer);
+        EnumFacing facing = this.getBestFacing(blockPos, targetPos);
 
         //Return the block position :exploding_head:
         return new BlockData(blockPos, facing != null ? facing : EnumFacing.UP);
