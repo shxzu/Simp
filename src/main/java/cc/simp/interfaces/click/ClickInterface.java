@@ -288,7 +288,8 @@ public class ClickInterface extends GuiScreen {
         }
 
         public void handleScroll(int mouseX, int mouseY, int wheel) {
-            targetScroll -= wheel / 120f * 20;
+            int scrollAmount = wheel > 0 ? 15 : -15;
+            targetScroll -= scrollAmount;
         }
     }
 
