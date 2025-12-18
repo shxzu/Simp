@@ -235,7 +235,6 @@ public class ClickInterface extends GuiScreen {
         }
 
 
-
         private void drawScrollbar(int startY, int visibleHeight, int totalHeight, int maxScroll) {
             int scrollbarX = x + width - 6;
             int scrollbarWidth = 6;
@@ -295,7 +294,9 @@ public class ClickInterface extends GuiScreen {
             int moduleY = y + headerHeight - (int) scrollOffset;
             int maxY = y + headerHeight + (height - y - headerHeight - 20);
             for (ModuleButton mb : modules) {
-                if (moduleY + 16 > y + headerHeight && moduleY < maxY) {
+                int moduleHeight = mb.getTotalHeight();
+
+                if (moduleY + moduleHeight > y + headerHeight && moduleY < y + headerHeight + (height - y - headerHeight - 20)) {
                     if (mb.mouseClicked(x, moduleY, width, mouseX, mouseY, mouseButton)) {
                         return true;
                     }
