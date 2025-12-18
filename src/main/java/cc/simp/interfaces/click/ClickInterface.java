@@ -191,16 +191,14 @@ public class ClickInterface extends GuiScreen {
         }
 
         public void render(int mouseX, int mouseY) {
-            // handle header dragging
             if (dragging) {
                 x = mouseX - dragX;
                 y = mouseY - dragY;
             }
 
-            // smooth scroll
-            scrollOffset += (targetScroll - scrollOffset) * 0.18f;
+            //Scroll easing
+            scrollOffset = RenderUtils.lerp(scrollOffset, targetScroll, 0.18f);
 
-            // total content height
             int totalHeight = 0;
             for (ModuleButton mb : modules) totalHeight += mb.getTotalHeight();
 
@@ -209,32 +207,34 @@ public class ClickInterface extends GuiScreen {
             targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
             scrollOffset = Math.max(0, Math.min(scrollOffset, maxScroll));
 
-            // header
             drawRect(x, y, x + width, y + headerHeight, PANEL_BG.getRGB());
-            // subtle border
             drawRect(x, y + headerHeight - 1, x + width, y + headerHeight, new Color(40, 40, 40).getRGB());
-            // category name centered-ish
             font.drawString(category.name(), x + 6, y + 4, TEXT_COLOR.getRGB());
 
-            // body
             int bodyHeight = Math.min(totalHeight, maxVisibleHeight);
             drawRect(x, y + headerHeight, x + width, y + headerHeight + bodyHeight, BG_COLOR.getRGB());
 
-            // render modules within viewport
+            RenderUtils.startScissor(
+                    x,
+                    y + headerHeight,
+                    width,
+                    bodyHeight
+            );
+
             int moduleY = y + headerHeight - (int) scrollOffset;
             for (ModuleButton mb : modules) {
-                int buttonHeight = mb.getTotalHeight();
-                if (moduleY + buttonHeight > y + headerHeight && moduleY < y + headerHeight + bodyHeight) {
-                    mb.render(x, moduleY, width, mouseX, mouseY);
-                }
-                moduleY += buttonHeight;
+                mb.render(x, moduleY, width, mouseX, mouseY);
+                moduleY += mb.getTotalHeight();
             }
 
-            // draw scrollbar
+            RenderUtils.endScissor();
+
             if (totalHeight > maxVisibleHeight) {
                 drawScrollbar(y + headerHeight, bodyHeight, totalHeight, maxScroll);
             }
         }
+
+
 
         private void drawScrollbar(int startY, int visibleHeight, int totalHeight, int maxScroll) {
             int scrollbarX = x + width - 6;
@@ -315,7 +315,8 @@ public class ClickInterface extends GuiScreen {
         }
 
         public void handleScroll(int mouseX, int mouseY, int wheel) {
-            targetScroll -= wheel / 120f * 22f;
+            int scrollAmount = wheel > 0 ? 15 : -15;
+            targetScroll -= scrollAmount;
             // clamp later in render
         }
 
