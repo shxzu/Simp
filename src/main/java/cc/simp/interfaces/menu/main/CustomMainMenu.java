@@ -5,6 +5,9 @@ import cc.simp.interfaces.menu.alt.AltManagerGui;
 import cc.simp.processes.ColorProcess;
 import cc.simp.processes.FontProcess;
 import cc.simp.utils.render.RenderUtils;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -12,8 +15,13 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.net.URI;
 
 import java.awt.*;
 import java.io.IOException;
@@ -35,12 +43,7 @@ public class CustomMainMenu extends GuiScreen {
     private final int buttonsYOffset = 60;
 
     private final long startTime;
-    private final String[] changelogEntries = {
-            "- more modules",
-            "- even more modules",
-            "- bug fixes",
-            "- performance improvements",
-    };
+    ArrayList<String> changelogEntries;
 
     public CustomMainMenu() {
         backgroundImage = new ResourceLocation("simp/images/mainmenu.jpg");
@@ -53,6 +56,26 @@ public class CustomMainMenu extends GuiScreen {
 
     @Override
     public void initGui() {
+
+        try {
+            changelogEntries = new ArrayList<>(
+                    fetchLatestCommitMessages("shxzu", "Simp", 4)
+            );
+        } catch (IOException e) {
+
+            changelogEntries = new ArrayList<>();
+
+            if ("HTTP_403".equals(e.getMessage())) {
+                changelogEntries.add("403: Github Ratelimited");
+            } else {
+                changelogEntries.add("Failed to load");
+            }
+
+        } catch (Exception e) {
+            changelogEntries = new ArrayList<>();
+            changelogEntries.add("unexpected error");
+        }
+
         super.initGui();
     }
 
@@ -126,11 +149,11 @@ public class CustomMainMenu extends GuiScreen {
         changelogFont.drawStringWithShadow("changelog", changelogX + 8, changelogY + 6, titleColor.getRGB());
 
         int entryY = changelogY + changelogFont.getHeight() + 14;
-        for (int i = 0; i < changelogEntries.length; i++) {
+        for (int i = 0; i < changelogEntries.size(); i++) {
             float entryHue = ((time + i * 500) % 3000) / 3000.0f;
             Color entryColor = Color.getHSBColor(entryHue, 0.5f, 0.95f);
 
-            changelogFont.drawStringWithShadow(changelogEntries[i], changelogX + 8, entryY, entryColor.getRGB());
+            changelogFont.drawStringWithShadow(changelogEntries.get(i).toLowerCase(), changelogX + 8, entryY, entryColor.getRGB());
             entryY += changelogFont.getHeight() + 4;
         }
 
@@ -167,6 +190,48 @@ public class CustomMainMenu extends GuiScreen {
                 mc.displayGuiScreen(new AltManagerGui());
             }
         }
+    }
+
+    public static ArrayList<String> fetchLatestCommitMessages(
+            String owner,
+            String repo,
+            int limit
+    ) throws Exception {
+
+        String url = "https://api.github.com/repos/"
+                + owner + "/" + repo + "/commits?per_page=" + limit;
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(java.time.Duration.ofSeconds(3))
+                .header("Accept", "application/vnd.github+json")
+                .header("User-Agent", "Java-GitHub-Client")
+                .GET()
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        int status = response.statusCode();
+
+        if (status != 200) {
+            throw new IOException("HTTP_" + status);
+        }
+
+        JsonArray commits =
+                JsonParser.parseString(response.body()).getAsJsonArray();
+
+        ArrayList<String> messages = new ArrayList<>(commits.size());
+
+        for (int i = 0; i < commits.size(); i++) {
+            JsonObject commitObj = commits.get(i).getAsJsonObject();
+            JsonObject commit = commitObj.getAsJsonObject("commit");
+
+            messages.add(commit.get("message").getAsString());
+        }
+
+        return messages;
     }
 
     private boolean isMouseOverButton(int mouseX, int mouseY, int buttonX, int buttonY, int buttonWidth, int buttonHeight) {
