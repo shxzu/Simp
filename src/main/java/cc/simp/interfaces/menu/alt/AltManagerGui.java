@@ -126,7 +126,7 @@ public class AltManagerGui extends GuiScreen {
         // Draw copy button
         int copyBtnX = BOX_X + BOX_WIDTH - 65;
         int copyBtnY = BOX_Y + 10;
-        drawCustomButton(copyBtnX, copyBtnY, 60, 20, "copy", mouseX, mouseY);
+        drawHoverButton(copyBtnX, copyBtnY, "copy", mouseX, mouseY);
 
         int listX = BOX_X + 5;
         int listY = BOX_Y + TOP_BOX_HEIGHT + 5;
@@ -180,21 +180,23 @@ public class AltManagerGui extends GuiScreen {
 
     private void drawActionButtons(int mouseX, int mouseY) {
         int centerX = this.width / 2;
-        int startY = this.height - 100;
+        int startY = this.height / 2;
 
         int totalWidth = (buttonWidth * 3) + (buttonSpacing * 2);
-        int startX = centerX - totalWidth / 2;
+        int startX = centerX;
 
         drawCustomButton(startX, startY, buttonWidth, buttonHeight, "cracked", mouseX, mouseY);
-        drawCustomButton(startX + buttonWidth + buttonSpacing, startY, buttonWidth, buttonHeight, "microsoft", mouseX, mouseY);
-        drawCustomButton(startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight, "back", mouseX, mouseY);
+        drawCustomButton(startX, startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight, "microsoft", mouseX, mouseY);
+        drawCustomButton(startX, startY + (buttonHeight + buttonSpacing) * 2, buttonWidth, buttonHeight, "back", mouseX, mouseY);
     }
 
     private void drawCustomButton(int x, int y, int width, int height, String text, int mouseX, int mouseY) {
         boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
 
         Color bgColor = hovered ? new Color(60, 60, 60, 200) : new Color(40, 40, 40, 180);
-        RenderUtils.drawRoundedRect(x, y, width, height, 6, true, bgColor);
+
+        RenderUtils.drawRect(x, y - 1, width, 1, ColorProcess.getColor());
+        RenderUtils.drawRect(x, y, width, height, bgColor);
 
         int textX = x + (width - buttonFont.getStringWidth(text)) / 2;
         int textY = y + (height - buttonFont.getHeight()) / 2;
@@ -245,21 +247,21 @@ public class AltManagerGui extends GuiScreen {
 
         // Action buttons
         int centerX = this.width / 2;
-        int startY = this.height - 100;
+        int startY = this.height / 2;
         int totalWidth = (buttonWidth * 3) + (buttonSpacing * 2);
-        int startX = centerX - totalWidth / 2;
+        int startX = centerX;
 
         if (isMouseOverButton(mouseX, mouseY, startX, startY, buttonWidth, buttonHeight)) {
             mc.displayGuiScreen(new GuiLogin());
             return;
         }
 
-        if (isMouseOverButton(mouseX, mouseY, startX + buttonWidth + buttonSpacing, startY, buttonWidth, buttonHeight)) {
+        if (isMouseOverButton(mouseX, mouseY, startX, startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight)) {
             mc.displayGuiScreen(new GuiLoginMicrosoft());
             return;
         }
 
-        if (isMouseOverButton(mouseX, mouseY, startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight)) {
+        if (isMouseOverButton(mouseX, mouseY, startX, startY + (buttonHeight + buttonSpacing) * 2, buttonWidth, buttonHeight)) {
             mc.displayGuiScreen(new GuiMainMenu());
             return;
         }

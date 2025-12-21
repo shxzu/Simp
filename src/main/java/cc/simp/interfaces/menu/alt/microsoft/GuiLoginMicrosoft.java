@@ -81,7 +81,9 @@ public class GuiLoginMicrosoft extends GuiScreen {
         boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
 
         Color bgColor = hovered ? new Color(60, 60, 60, 200) : new Color(40, 40, 40, 180);
-        RenderUtils.drawRoundedRect(x, y, width, height, 6, true, bgColor);
+
+        RenderUtils.drawRect(x, y - 1, width, 1, ColorProcess.getColor());
+        RenderUtils.drawRect(x, y, width, height, bgColor);
 
         int textX = x + (width - buttonFont.getStringWidth(text)) / 2;
         int textY = y + (height - buttonFont.getHeight()) / 2;
