@@ -37,9 +37,6 @@ public class CustomMainMenu extends GuiScreen {
     private final int buttonWidth = 120;
     private final int buttonHeight = 30;
     private final int buttonSpacing = 8;
-    private final int altButtonWidth = 120;
-    private final int altButtonHeight = 25;
-
     private final int buttonsYOffset = 60;
 
     private final long startTime;
@@ -120,9 +117,7 @@ public class CustomMainMenu extends GuiScreen {
 
         drawButton(startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight, "quit", mouseX, mouseY);
 
-        int altButtonX = startX + buttonWidth + buttonSpacing + (buttonWidth - altButtonWidth) / 2;
-        int altButtonY = startY + buttonHeight + buttonSpacing;
-        drawButton(altButtonX, altButtonY, altButtonWidth, altButtonHeight, "alts", mouseX, mouseY);
+        drawButton(startX + (buttonWidth + buttonSpacing), startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight, "alts", mouseX, mouseY);
     }
 
     private void drawButton(int x, int y, int width, int height, String text, int mouseX, int mouseY) {
@@ -184,9 +179,7 @@ public class CustomMainMenu extends GuiScreen {
                 mc.shutdown();
             }
 
-            int altButtonX = startX + buttonWidth + buttonSpacing + (buttonWidth - altButtonWidth) / 2;
-            int altButtonY = startY + buttonHeight + buttonSpacing;
-            if (isMouseOverButton(mouseX, mouseY, altButtonX, altButtonY, altButtonWidth, altButtonHeight)) {
+            if (isMouseOverButton(mouseX, mouseY, startX + (buttonWidth + buttonSpacing), startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight)) {
                 mc.displayGuiScreen(new AltManagerGui());
             }
         }
