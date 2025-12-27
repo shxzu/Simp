@@ -123,41 +123,72 @@ public class CustomMainMenu extends GuiScreen {
 
     private void drawButton(int x, int y, int width, int height, String text, int mouseX, int mouseY) {
         boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+        long time = System.currentTimeMillis() - startTime;
+        long weightX = 100L, weightY = 600L, speed = 3000L;
+        float normal = 3000f;
+        float hue = ((time + (x*weightX) + (y * weightY)) % speed) / normal;
 
         Color bgColor = hovered ? new Color(60, 60, 60, 200) : new Color(40, 40, 40, 180);
 
-        RenderUtils.drawRect(x, y - 1, width, 1, ColorProcess.getColor());
+        RenderUtils.drawRect(x, y - 1, width, 1, Color.getHSBColor(hue, 0.5f, 0.95f));
         RenderUtils.drawRect(x, y, width, height, bgColor);
 
         int textX = x + (width - buttonFont.getStringWidth(text)) / 2;
         int textY = y + (height - buttonFont.getHeight()) / 2;
-        buttonFont.drawString(text, textX, textY, hovered ? ColorProcess.getColor().getRGB() : 0xFFFFFF);
+        buttonFont.drawString(text, textX, textY, 0xFFFFFF);
 
     }
 
     private void drawChangelog() {
-        int changelogWidth = 170;
-        int changelogX = 20;
-        int changelogY = 20;
+        int x = 20;
+        int y = 20;
+        int width = 170;
 
         long time = System.currentTimeMillis() - startTime;
-        float hue = (time % 3000) / 3000.0f;
-        Color titleColor = Color.getHSBColor(hue, 0.8f, 1.0f);
+        float baseHue = (time % 3000) / 3000.0f;
 
-        changelogFont.drawStringWithShadow("changelog", changelogX + 8, changelogY + 6, titleColor.getRGB());
+        int fontHeight = changelogFont.getHeight();
+        int titleOffset = fontHeight + 14;
+        int entrySpacing = fontHeight + 4;
 
-        int entryY = changelogY + changelogFont.getHeight() + 14;
+        int totalHeight = titleOffset + changelogEntries.size() * entrySpacing + 2;
+
+        RenderUtils.drawRoundedRect(
+                x,
+                y,
+                width,
+                totalHeight,
+                8,
+                true,
+                new Color(20, 25, 30, 120)
+        );
+
+        changelogFont.drawStringWithShadow(
+                "changelog",
+                x + 8,
+                y + 6,
+                Color.getHSBColor(baseHue, 0.8f, 1.0f).getRGB()
+        );
+
+        int entryY = y + titleOffset;
+
         for (int i = 0; i < changelogEntries.size(); i++) {
+            String text = changelogEntries.get(i).toLowerCase();
+            if (text.length() > 20) text = text.substring(0, 20);
+
             float entryHue = ((time + i * 500) % 3000) / 3000.0f;
-            Color entryColor = Color.getHSBColor(entryHue, 0.5f, 0.95f);
 
-            changelogFont.drawStringWithShadow(changelogEntries.get(i).toLowerCase(), changelogX + 8, entryY, entryColor.getRGB());
-            entryY += changelogFont.getHeight() + 4;
+            changelogFont.drawStringWithShadow(
+                    text,
+                    x + 8,
+                    entryY,
+                    Color.getHSBColor(entryHue, 0.5f, 0.95f).getRGB()
+            );
+
+            entryY += entrySpacing;
         }
-
-        int bgHeight = entryY - changelogY + 6;
-        RenderUtils.drawRoundedRect(changelogX, changelogY, changelogWidth, bgHeight, 8, true, new Color(20, 25, 30, 120));
     }
+
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
