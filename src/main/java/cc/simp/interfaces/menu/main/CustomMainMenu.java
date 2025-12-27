@@ -52,30 +52,50 @@ public class CustomMainMenu extends GuiScreen {
         timeFont = FontProcess.getFont("big");
     }
 
+    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
+    private static ArrayList<String> commitBuffer = new ArrayList<>();
+    private static long commitBufferLife = 0L;
+    private static final long commitBufferTTL = 5 * 60 * 1000L;
+
+
     @Override
     public void initGui() {
+        long now = System.currentTimeMillis();
 
-        try {
-            changelogEntries = new ArrayList<>(
-                    fetchLatestCommitMessages("shxzu", "Simp", 4)
-            );
-        } catch (IOException e) {
-
-            changelogEntries = new ArrayList<>();
-
-            if ("HTTP_403".equals(e.getMessage())) {
-                changelogEntries.add("403: Github Ratelimited");
-            } else {
-                changelogEntries.add("Failed to load");
-            }
-
-        } catch (Exception e) {
-            changelogEntries = new ArrayList<>();
-            changelogEntries.add("unexpected error");
+        if (!commitBuffer.isEmpty() && now - commitBufferLife < commitBufferTTL) {
+            changelogEntries = new ArrayList<>(commitBuffer);
+            super.initGui();
+            return;
         }
+
+        changelogEntries = new ArrayList<>();
+        changelogEntries.add("loading...");
+
+        new Thread(() -> {
+            try {
+                ArrayList<String> entries = fetchLatestCommitMessages("shxzu", "Simp", 4);
+                commitBuffer = new ArrayList<>(entries);
+                commitBufferLife = System.currentTimeMillis();
+                mc.addScheduledTask(() -> changelogEntries = entries);
+            } catch (IOException e) {
+                ArrayList<String> fallback = new ArrayList<>();
+                if ("HTTP_403".equals(e.getMessage())) {
+                    fallback.add("403: github ratelimited");
+                } else {
+                    fallback.add("failed to load");
+                }
+                mc.addScheduledTask(() -> changelogEntries = fallback);
+            } catch (Exception e) {
+                ArrayList<String> fallback = new ArrayList<>();
+                fallback.add("unexpected error");
+                mc.addScheduledTask(() -> changelogEntries = fallback);
+            }
+        }).start();
 
         super.initGui();
     }
+
+
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -116,9 +136,11 @@ public class CustomMainMenu extends GuiScreen {
 
         drawButton(startX + buttonWidth + buttonSpacing, startY, buttonWidth, buttonHeight, "multiplayer", mouseX, mouseY);
 
-        drawButton(startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight, "quit", mouseX, mouseY);
+        drawButton(startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight, "alts", mouseX, mouseY);
 
-        drawButton(startX + (buttonWidth + buttonSpacing), startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight, "alts", mouseX, mouseY);
+        drawButton(startX, startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight, "options", mouseX, mouseY);
+
+        drawButton(startX + (buttonWidth + buttonSpacing), startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight, "quit", mouseX, mouseY);
     }
 
     private void drawButton(int x, int y, int width, int height, String text, int mouseX, int mouseY) {
@@ -209,12 +231,16 @@ public class CustomMainMenu extends GuiScreen {
                 mc.displayGuiScreen(new GuiMultiplayer(this));
             }
 
-            if (isMouseOverButton(mouseX, mouseY, startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight)) {
+            if (isMouseOverButton(mouseX, mouseY, startX + (buttonWidth + buttonSpacing), startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight)) {
                 mc.shutdown();
             }
 
-            if (isMouseOverButton(mouseX, mouseY, startX + (buttonWidth + buttonSpacing), startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight)) {
+            if (isMouseOverButton(mouseX, mouseY, startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight)) {
                 mc.displayGuiScreen(new AltManagerGui());
+            }
+
+            if (isMouseOverButton(mouseX, mouseY, startX, startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight)) {
+                mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings));
             }
         }
     }
@@ -236,14 +262,11 @@ public class CustomMainMenu extends GuiScreen {
                 .GET()
                 .build();
 
-        HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response =
-                client.send(request, HttpResponse.BodyHandlers.ofString());
+                HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
-        int status = response.statusCode();
-
-        if (status != 200) {
-            throw new IOException("HTTP_" + status);
+        if (response.statusCode() != 200) {
+            throw new IOException("HTTP_" + response.statusCode());
         }
 
         JsonArray commits =
@@ -254,12 +277,13 @@ public class CustomMainMenu extends GuiScreen {
         for (int i = 0; i < commits.size(); i++) {
             JsonObject commitObj = commits.get(i).getAsJsonObject();
             JsonObject commit = commitObj.getAsJsonObject("commit");
-
             messages.add(commit.get("message").getAsString());
         }
 
         return messages;
     }
+
+
 
     private boolean isMouseOverButton(int mouseX, int mouseY, int buttonX, int buttonY, int buttonWidth, int buttonHeight) {
         return mouseX >= buttonX && mouseX <= buttonX + buttonWidth && mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
