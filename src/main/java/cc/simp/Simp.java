@@ -12,7 +12,6 @@ import cc.simp.modules.ModuleManager;
 import cc.simp.modules.impl.client.ClientSettingsModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.player.ScaffoldModule;
-import cc.simp.modules.impl.player.ScaffoldRecodeModule;
 import cc.simp.processes.*;
 import cc.simp.utils.client.BuildType;
 import de.florianmichael.viamcp.ViaMCP;
