@@ -377,6 +377,7 @@ public final class ScaffoldModule extends Module {
             }
             mc.thePlayer.safeWalk = false;
             mc.timer.timerSpeed = 1.0f;
+            overrided = false;
         }
         resetBinds();
         super.onDisable();
@@ -528,14 +529,16 @@ public final class ScaffoldModule extends Module {
                 break;
             case FastTelly:
                 if (recursion == 0) {
-                    if (MovementUtils.isOnGround()) {
-                        if (MovementUtils.isMoving()) {
-                            targetYaw = mc.thePlayer.rotationYaw;
-                            canPlace = false;
-                        }
-                    } else {
-                        mc.entityRenderer.getMouseOver(1);
 
+                    mc.entityRenderer.getMouseOver(1);
+
+                    if (mc.thePlayer.hurtTime == 0 && mc.thePlayer.onGround) {
+                        targetYaw = (float) Math.toDegrees(MovementUtils.direction());
+                    }
+
+                    if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
+                        this.targetYaw = mc.thePlayer.rotationYaw;
+                    } else {
                         if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
                             if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
                                 getBaseRotations();
@@ -547,21 +550,21 @@ public final class ScaffoldModule extends Module {
             case Hypixel:
                 if (recursion == 0) {
 
-                    canPlace = mc.thePlayer.offGroundTicks <= 9 && mc.thePlayer.offGroundTicks > 0;
+                    rotSpeed = (mc.thePlayer.onGround ? 10 : (mc.thePlayer.offGroundTicks < 2 ? 6 : 2));
 
                     mc.entityRenderer.getMouseOver(1);
 
-                    if (mc.thePlayer.offGroundTicks >= 3 && mc.thePlayer.offGroundTicks <= (keepY.getValue() ? 7 : 10)) {
-                        if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
-                            overrided = true;
-                            rotSpeed = 4;
-                            getBaseRotations();
-                        }
+                    if (mc.thePlayer.hurtTime == 0 && mc.thePlayer.onGround) {
+                        targetYaw = (float) Math.toDegrees(MovementUtils.direction());
+                    }
+
+                    if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
+                        this.targetYaw = mc.thePlayer.rotationYaw;
                     } else {
-                        if (MovementUtils.isMoving()) {
-                            targetYaw = mc.thePlayer.rotationYaw;
-                            canPlace = false;
-                            overrided = false;
+                        if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
+                            if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
+                                getBaseRotations();
+                            }
                         }
                     }
                 }
@@ -805,6 +808,7 @@ public final class ScaffoldModule extends Module {
         return hitVec;
     }
 
+
     private void place() {
         Vec3 hitVec = this.getHitVec();
         if (!packetPlace.getValue()) {
@@ -875,7 +879,7 @@ public final class ScaffoldModule extends Module {
         if (towerMode.getValue() == TowerMode.None || !mc.gameSettings.keyBindJump.isKeyDown()) {
             return;
         }
-        
+
         if (!towerMove.getValue() && !MovementUtils.isMoving()) {
             return;
         }

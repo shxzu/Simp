@@ -54,6 +54,7 @@ public final class ModuleManager {
                 new ScaffoldModule(),
                 new NoFallModule(),
                 new AntiVoidModule(),
+                new ClutchModule(),
                 new AutoToolModule(),
                 new FastBreakModule(),
                 new FastUseModule(),

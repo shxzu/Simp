@@ -84,7 +84,7 @@ public class PlayerUtils extends Util {
         return GOOD_POTIONS.containsKey(id);
     }
 
-    public Vec3 getPlacePossibility(double offsetX, double offsetY, double offsetZ) {
+    public static Vec3 getPlacePossibility(double offsetX, double offsetY, double offsetZ) {
         return getPlacePossibility(offsetX, offsetY, offsetZ, null);
     }
 
@@ -137,7 +137,7 @@ public class PlayerUtils extends Util {
         return getPlacePossibility(0, 0, 0);
     }
 
-    public EnumFacingOffset getEnumFacing(final Vec3 position) {
+    public static EnumFacingOffset getEnumFacing(final Vec3 position) {
         return getEnumFacing(position, false);
     }
 
