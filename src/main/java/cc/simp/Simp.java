@@ -94,10 +94,6 @@ public class Simp {
             moduleManager.getModule(ScaffoldModule.class).setEnabled(false);
         }
 
-        if (moduleManager.getModule(ScaffoldRecodeModule.class).isEnabled()) {
-            moduleManager.getModule(ScaffoldRecodeModule.class).setEnabled(false);
-        }
-
         // ViaMCP!!!
 
         try {

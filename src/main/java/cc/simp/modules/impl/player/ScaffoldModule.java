@@ -143,9 +143,9 @@ public final class ScaffoldModule extends Module {
 
     private enum JumpMode {
         None,
-        Motion,
-        Instant,
-        Legit
+        Normal,
+        Legit,
+        Motion
     }
 
     private enum BlockCounter {
@@ -182,6 +182,10 @@ public final class ScaffoldModule extends Module {
         this.setSuffix(mode.getValue().toString());
 
         resetBinds(false, false, true, true, false, false);
+
+        if (autoJump.getValue() == JumpMode.Legit && towerMode.getValue() != TowerMode.None) {
+            towerMode.setValue(TowerMode.None);
+        }
 
         if (safeWalk.getValue()) {
             if (!safeWalkOnAir.getValue() && !mc.thePlayer.onGround) mc.thePlayer.safeWalk = false;
@@ -347,6 +351,9 @@ public final class ScaffoldModule extends Module {
     public void onEnable() {
         anim = new DecelerateAnimation(250, 1);
         if (mc.thePlayer != null) {
+            if (autoJump.getValue() == JumpMode.Legit && towerMode.getValue() != TowerMode.None) {
+                NotificationManager.post(NotificationType.INFO, "Scaffold", "When using legit jump, tower mode is disabled.");
+            }
             targetYaw = mc.thePlayer.rotationYaw - 180;
             targetPitch = 90;
 
@@ -839,7 +846,7 @@ public final class ScaffoldModule extends Module {
         if (autoJump.getValue() == JumpMode.Motion) {
             mc.thePlayer.motionY = 0.42F;
         }
-        if (autoJump.getValue() == JumpMode.Instant) {
+        if (autoJump.getValue() == JumpMode.Normal) {
             mc.thePlayer.jump();
         }
         if (autoJump.getValue() == JumpMode.Legit) {
