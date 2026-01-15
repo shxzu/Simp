@@ -28,6 +28,7 @@ public final class ModuleManager {
                 new TargetStrafeModule(),
                 new CriticalsModule(),
                 new TickBaseModule(),
+                new BlinkRangeModule(),
                 new LagRangeModule(),
                 new VelocityModule(),
                 new BackTrackModule(),
@@ -47,7 +48,7 @@ public final class ModuleManager {
                 new NoSlowModule(),
                 new StepModule(),
                 new JesusModule(),
-                new JumpDelayModule(),
+                new NoJumpDelayModule(),
                 new PhaseModule(),
 
                 // Player

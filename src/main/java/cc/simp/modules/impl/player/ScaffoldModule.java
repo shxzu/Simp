@@ -4,6 +4,7 @@ import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.packet.PacketReceiveEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
+import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.events.impl.player.StrafeEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
@@ -55,6 +56,7 @@ import static cc.simp.utils.Util.mc;
 public final class ScaffoldModule extends Module {
 
     private static final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Normal);
+    public Property<Boolean> hypixelSkywars = new Property<>("Hypixel Skywars Mode", false, () -> mode.getValue() == Mode.Hypixel);
     private static final ModeProperty<Rotations> rotations = new ModeProperty<>("Rotations", Rotations.Normal, () -> mode.getValue() != Mode.SlowTelly && mode.getValue() != Mode.FastTelly && mode.getValue() != Mode.Hypixel);
     private static final ModeProperty<SearchAlgorithm> searchAlgorithm = new ModeProperty<>("Search Algorithm", SearchAlgorithm.Normal);
     private final NumberProperty minRotationSpeed = new NumberProperty("Min Rotation Speed", 5, 0, 10, 1);
@@ -170,6 +172,7 @@ public final class ScaffoldModule extends Module {
     private float rotSpeed;
     private boolean overrided;
     public int recursions, recursion;
+    private boolean stop;
 
     @EventLink
     public final Listener<MotionEvent> motionEventListener = event -> {
@@ -304,6 +307,15 @@ public final class ScaffoldModule extends Module {
     };
 
     @EventLink
+    public final Listener<MoveEvent> moveEventListener = event -> {
+        if (stop) {
+            event.setForward(0);
+            event.setStrafe(0);
+            event.setJump(false);
+        }
+    };
+
+    @EventLink
     public final Listener<PacketReceiveEvent> onPacketReceiveEvent = PacketUtils::correctBlockCount;
 
     @EventLink
@@ -378,6 +390,7 @@ public final class ScaffoldModule extends Module {
             mc.thePlayer.safeWalk = false;
             mc.timer.timerSpeed = 1.0f;
             overrided = false;
+            stop = false;
         }
         resetBinds();
         super.onDisable();
@@ -549,18 +562,20 @@ public final class ScaffoldModule extends Module {
                 break;
             case Hypixel:
                 if (recursion == 0) {
-
-                    rotSpeed = (mc.thePlayer.onGround ? 10 : (mc.thePlayer.offGroundTicks < 2 ? 6 : 2));
-
                     mc.entityRenderer.getMouseOver(1);
 
-                    if (mc.thePlayer.hurtTime == 0 && mc.thePlayer.onGround) {
-                        targetYaw = (float) Math.toDegrees(MovementUtils.direction());
-                    }
+                    // This is fucking stupid but whatever, hypixel is weird to bypass. Also, did I mention that this is really fucking stupid and slow? But hey, it's a telly!! -shxzu, 1/14/2026
+
+                    int jumpTicks = hypixelSkywars.getValue() ? 1 : 2;
+
+                    mc.gameSettings.keyBindSneak.setPressed(mc.thePlayer.offGroundTicks > jumpTicks && mc.thePlayer.offGroundTicks <= 5);
 
                     if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
                         this.targetYaw = mc.thePlayer.rotationYaw;
-                    } else {
+                        overrided = true;
+                        rotSpeed = 3.5f;
+                    } else if (mc.thePlayer.offGroundTicks > 5) {
+                        overrided = false;
                         if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
                             if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
                                 getBaseRotations();
@@ -727,6 +742,7 @@ public final class ScaffoldModule extends Module {
             }
         }
     }
+
 
     private Vector2f applyRotationLimits(float targetYaw, float targetPitch) {
         if (!limitRotations.getValue()) {
