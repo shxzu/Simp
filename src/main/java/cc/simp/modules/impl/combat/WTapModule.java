@@ -1,9 +1,7 @@
 package cc.simp.modules.impl.combat;
 
 import cc.simp.Simp;
-import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.MoveEvent;
-import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
@@ -35,6 +33,7 @@ public class WTapModule extends Module {
 
     private boolean shouldWTap;
     private int wtapTicks;
+    private boolean hasAttacked;
 
     @EventLink
     public Listener<MoveEvent> moveEventListener = event -> {
@@ -45,10 +44,9 @@ public class WTapModule extends Module {
         if (mode.getValue() == Mode.Legit) {
             if (shouldWTap && wtapTicks > 0) {
                 if (wtapTicks == 2) {
-                    if (!mc.gameSettings.keyBindForward.isPressed()) return;
                     mc.gameSettings.keyBindForward.setPressed(false);
                 } else if (wtapTicks == 1) {
-                    mc.gameSettings.keyBindForward.setPressed(true);
+                    mc.gameSettings.keyBindForward.setPressed(mc.gameSettings.keyBindForward.isKeyDown());
                     shouldWTap = false;
                 }
                 wtapTicks--;
@@ -58,7 +56,6 @@ public class WTapModule extends Module {
         if (mode.getValue() == Mode.Packet) {
             if (shouldWTap && wtapTicks > 0) {
                 if (wtapTicks == 2) {
-                    if (!mc.gameSettings.keyBindForward.isPressed()) return;
                     PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
                 } else if (wtapTicks == 1) {
                     PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
@@ -71,7 +68,6 @@ public class WTapModule extends Module {
         if (mode.getValue() == Mode.Silent) {
             if (shouldWTap && wtapTicks > 0) {
                 if (wtapTicks == 2) {
-                    if (!mc.gameSettings.keyBindForward.isPressed()) return;
                     mc.thePlayer.setSprinting(false);
                 } else if (wtapTicks == 1) {
                     mc.getNetHandler().addToSendQueue(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
@@ -83,7 +79,8 @@ public class WTapModule extends Module {
             }
         }
 
-        if (mc.thePlayer.isSwingInProgress && mc.objectMouseOver != null &&
+        // Only trigger WTap once per attack
+        if (mc.thePlayer.isSwingInProgress && !hasAttacked && mc.objectMouseOver != null &&
                 mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
 
             Entity target = mc.objectMouseOver.entityHit;
@@ -93,9 +90,12 @@ public class WTapModule extends Module {
                 if (mc.theWorld.rand.nextInt(100) < chance) {
                     if (!onlyWithKillaura.getValue() || isKillauraActive()) {
                         triggerWTap();
+                        hasAttacked = true;
                     }
                 }
             }
+        } else if (!mc.thePlayer.isSwingInProgress) {
+            hasAttacked = false;
         }
     };
 
@@ -113,6 +113,7 @@ public class WTapModule extends Module {
     public void onEnable() {
         shouldWTap = false;
         wtapTicks = 0;
+        hasAttacked = false;
         super.onEnable();
     }
 
@@ -120,6 +121,7 @@ public class WTapModule extends Module {
     public void onDisable() {
         shouldWTap = false;
         wtapTicks = 0;
+        hasAttacked = false;
         super.onDisable();
     }
 }
