@@ -45,7 +45,7 @@
       "name": "com.paulscode:librarylwjglopenal:20100824"
     },
     {
-      "name": "com.paulscode:soundsystem:20120107"
+      "name": "com.github.Danixd12:Paulscode-SoundSystem-LWJGL3:master-6425226945-1"
     },
     {
       "name": "io.netty:netty-all:4.0.23.Final"
