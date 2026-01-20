@@ -6,6 +6,7 @@ import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.utils.mc.InventoryUtils;
 import cc.simp.utils.mc.PacketUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -27,7 +28,7 @@ public class InvMoveModule extends Module {
 
     private enum Mode {
         Normal,
-        Silent
+        Hypixel
     }
 
     private boolean sentFirstOpen = false;
@@ -48,25 +49,22 @@ public class InvMoveModule extends Module {
                 KeyBinding.setKeyBindState(bind.getKeyCode(), Keyboard.isKeyDown((int)bind.getKeyCode()));
                 ++n2;
             }
-            if (mode.getValue() == Mode.Silent) {
-                this.failedClientStatus = false;
-                this.failedCloseWindow = false;
-                if (mc.currentScreen instanceof GuiInventory) {
-                    if (!this.sentFirstOpen) {
-                        PacketUtils.sendSilentPacket(new C0DPacketCloseWindow());
-                        this.sentFirstOpen = true;
-                    }
-                    final int safePacketTick = mc.thePlayer.isPotionActive(Potion.moveSpeed) ? 3 : 4;
-                    if (mc.thePlayer.ticksExisted % safePacketTick == 0) {
-                        PacketUtils.sendSilentPacket(new C0DPacketCloseWindow());
-                    }
-                    else if (mc.thePlayer.ticksExisted % safePacketTick == 1) {
-                        PacketUtils.sendSilentPacket(new C16PacketClientStatus(C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
-                    }
+
+            if (mode.getValue() == Mode.Hypixel && (mc.currentScreen instanceof GuiInventory || InventoryUtils.isInventoryOpen)) {
+                if (!sentFirstOpen) {
+                    PacketUtils.sendSilentPacket(new C0DPacketCloseWindow());
+                    sentFirstOpen = true;
                 }
-                else {
-                    this.sentFirstOpen = false;
+
+                int safePacketTick = mc.thePlayer.isPotionActive(Potion.moveSpeed) ? 3 : 4;
+
+                if (mc.thePlayer.ticksExisted % safePacketTick == 0) {
+                    PacketUtils.sendSilentPacket(new C0DPacketCloseWindow());
+                } else if (mc.thePlayer.ticksExisted % safePacketTick == 1) {
+                    PacketUtils.sendSilentPacket(new C16PacketClientStatus(C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
                 }
+            } else {
+                sentFirstOpen = false;
             }
         }
     };
@@ -74,7 +72,7 @@ public class InvMoveModule extends Module {
 
     @EventLink
     private final Listener<PacketReceiveEvent> packetReceiveEventListener = event -> {
-        if (mode.getValue() == Mode.Silent) {
+        if (mode.getValue() == Mode.Hypixel) {
             if (event.getPacket() instanceof C16PacketClientStatus) {
                 if (this.failedClientStatus) {
                     event.setCancelled();
