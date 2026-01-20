@@ -31,10 +31,10 @@ public final class NoSlowModule extends Module {
 
     private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Vanilla);
     private final NumberProperty amount = new NumberProperty("Amount", 2, () -> mode.getValue() == Mode.Ticks, 2, 5, 1);
-    public final Property<Boolean> food = new Property<>("Food", true, () -> mode.getValue() != Mode.Blink);
-    public final Property<Boolean> potion = new Property<>("Potion", true, () -> mode.getValue() != Mode.Blink);
-    public final Property<Boolean> sword = new Property<>("Sword", true, () -> mode.getValue() != Mode.Blink);
-    public final Property<Boolean> bow = new Property<>("Bow", true, () -> mode.getValue() != Mode.Blink);
+    public final Property<Boolean> food = new Property<>("Food", true, () -> mode.getValue() != Mode.Blink && mode.getValue() != Mode.HypixelSword);
+    public final Property<Boolean> potion = new Property<>("Potion", true, () -> mode.getValue() != Mode.Blink && mode.getValue() != Mode.HypixelSword);
+    public final Property<Boolean> sword = new Property<>("Sword", true, () -> mode.getValue() != Mode.Blink && mode.getValue() != Mode.HypixelSword);
+    public final Property<Boolean> bow = new Property<>("Bow", true, () -> mode.getValue() != Mode.Blink && mode.getValue() != Mode.HypixelSword);
 
     private enum Mode {
         Vanilla("Vanilla"),
