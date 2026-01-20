@@ -1,31 +1,24 @@
 package cc.simp.interfaces.menu.alt;
 
-import java.awt.Color;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-
 import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.interfaces.menu.alt.microsoft.GuiLoginMicrosoft;
 import cc.simp.interfaces.menu.alt.microsoft.MicrosoftOAuthTranslation;
 import cc.simp.processes.ColorProcess;
 import cc.simp.processes.FontProcess;
 import cc.simp.utils.render.RenderUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.Session;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ScaledResolution;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.io.*;
+import java.util.ArrayList;
 
 public class AltManagerGui extends GuiScreen {
 
@@ -72,7 +65,7 @@ public class AltManagerGui extends GuiScreen {
     }
 
     private void loadAltsFromFile() {
-        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "Simp");
         File file = new File(dir, "alts.txt");
         if (!dir.exists()) {
             dir.mkdirs();
@@ -100,7 +93,7 @@ public class AltManagerGui extends GuiScreen {
     }
 
     private void saveAltsToFile() {
-        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "Simp");
         File file = new File(dir, "alts.txt");
 
         try (PrintWriter out = new PrintWriter(file)) {
@@ -340,7 +333,7 @@ public class AltManagerGui extends GuiScreen {
 
 
     private String loadRefreshToken(String username) {
-        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "Simp");
         File file = new File(dir, "tokens.txt");
 
         if (!file.exists()) return null;

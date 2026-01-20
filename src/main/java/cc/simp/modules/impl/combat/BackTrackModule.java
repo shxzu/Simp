@@ -53,10 +53,8 @@ public final class BackTrackModule extends Module {
     private int ping;
 
     @EventLink
-    public final Listener<MotionEvent> motionEventListener = e -> {
-
-        if(e.isPre()) return;
-
+    public Listener<MotionEvent> motionEventListener = event -> {
+        if (event.isPre()) return;
         setSuffix(ping + " ms");
 
         if (mc.thePlayer.isDead) {

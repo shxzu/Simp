@@ -2,7 +2,6 @@ package cc.simp.modules.impl.movement;
 
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.world.BlockCollisionEvent;
-import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -20,6 +19,7 @@ import static cc.simp.utils.Util.mc;
 public final class PhaseModule extends Module {
 
     private boolean phasing;
+
     @EventLink
     public final Listener<MotionEvent> motionEventListener = event -> {
         if(!event.isPre()) return;

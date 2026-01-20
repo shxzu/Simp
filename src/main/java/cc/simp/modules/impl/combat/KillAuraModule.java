@@ -17,7 +17,10 @@ import cc.simp.processes.RotationProcess;
 import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.client.MathUtils;
 import cc.simp.utils.client.Timer;
-import cc.simp.utils.mc.*;
+import cc.simp.utils.mc.InventoryUtils;
+import cc.simp.utils.mc.PacketUtils;
+import cc.simp.utils.mc.RayCastUtils;
+import cc.simp.utils.mc.RotationUtils;
 import cc.simp.utils.misc.MovementFix;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.vialoadingbase.ViaLoadingBase;
@@ -27,13 +30,17 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.*;
+import net.minecraft.item.ItemAxe;
+import net.minecraft.item.ItemPickaxe;
+import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTool;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -55,8 +62,8 @@ public final class KillAuraModule extends Module {
     private static final NumberProperty min = new NumberProperty("Min CPS", 9.0, () -> !newCombat.getValue(), 0.0, 20.0, 0.5);
     private static final NumberProperty max = new NumberProperty("Max CPS", 13.0, () -> !newCombat.getValue(), 0.0, 20.0, 0.5);
     public static ModeProperty<AutoBlock> ab = new ModeProperty<>("Auto Block", AutoBlock.Fake);
-    // private final NumberProperty legitBlockInterval = new NumberProperty("Legit Block Interval", 4, () -> ab.getValue() == AutoBlock.Legit, 2, 10, 1);
-    // private final Property<Boolean> legitRandomize = new Property<>("Legit Randomize", true, () -> ab.getValue() == AutoBlock.Legit);
+    private final NumberProperty legitBlockInterval = new NumberProperty("Legit Block Interval", 4, () -> ab.getValue() == AutoBlock.Legit, 2, 10, 1);
+    private final Property<Boolean> legitRandomize = new Property<>("Legit Randomize", true, () -> ab.getValue() == AutoBlock.Legit);
 
     private final Property<Boolean> advanced = new Property<>("Advanced", false);
     private final Property<Boolean> missChance = new Property<>("Miss Chance", true, advanced::getValue);
@@ -77,7 +84,7 @@ public final class KillAuraModule extends Module {
 
     public enum Rotations {
         Regular,
-        Puhfy,
+        Puhfy, // omg i did it @puhfy! r u proud?
         Snap,
         Player,
         None
@@ -88,8 +95,8 @@ public final class KillAuraModule extends Module {
         Fake,
         Blink,
         Switch,
-        // Legit,
-        // Predictive,
+        Legit,
+        Predictive,
         NCP,
         Vanilla
     }
@@ -103,8 +110,8 @@ public final class KillAuraModule extends Module {
     static long delay = 0;
     static int elapsedTicks = 0;
     private boolean shouldMiss = false;
-    // private boolean wasBlocking = false;
-    // private int blockCooldown = 0;
+    private boolean wasBlocking = false;
+    private int blockCooldown = 0;
 
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
@@ -162,6 +169,7 @@ public final class KillAuraModule extends Module {
 
     @EventLink
     public final Listener<PacketSendEvent> packetSendEventListener = event -> {
+        // Pasted from Novoline. Why cancel packets tho? It works I ain't gonna question it.
         if (ab.getValue() == AutoBlock.NCP && autoBlocking) {
             if (event.getPacket() instanceof C07PacketPlayerDigging) {
                 C07PacketPlayerDigging packet = (C07PacketPlayerDigging) event.getPacket();
@@ -197,11 +205,11 @@ public final class KillAuraModule extends Module {
 
         float targetYaw = rotation.x;
         float targetPitch = rotation.y;
+        float rotSpeed;
 
         switch (rotations.getValue()) {
             case Regular:
             case Puhfy:
-                float rotSpeed;
                 if (advanced.getValue() && variableRotationSpeed.getValue()) {
                     rotSpeed = (float) MathUtils.getRandom(minRotSpeed.getValue(), maxRotSpeed.getValue());
                 } else {
@@ -212,15 +220,26 @@ public final class KillAuraModule extends Module {
                 RotationProcess.setRotations(new Vector2f(targetYaw, targetPitch), rotSpeed, fix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
                 break;
             case Snap:
-                if (hitTimerDone()) {
+                if (!hitTimerDone()) {
                     RotationProcess.setRotations(new Vector2f(targetYaw, targetPitch), 10, fix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
                 }
                 break;
-
             case Player:
-                // TODO: Implement speed control for player rotations.
-                mc.thePlayer.rotationYaw = targetYaw;
-                mc.thePlayer.rotationPitch = targetPitch;
+                if (advanced.getValue() && variableRotationSpeed.getValue()) {
+                    rotSpeed = (float) MathUtils.getRandom(minRotSpeed.getValue(), maxRotSpeed.getValue());
+                } else {
+                    rotSpeed = speed.getValue().floatValue();
+                }
+
+                float yawDiff = MathHelper.wrapAngleTo180_float(targetYaw - mc.thePlayer.rotationYaw);
+                float pitchDiff = targetPitch - mc.thePlayer.rotationPitch;
+
+                float maxRotationStep = rotSpeed * 18.0f;
+                yawDiff = MathHelper.clamp_float(yawDiff, -maxRotationStep, maxRotationStep);
+                pitchDiff = MathHelper.clamp_float(pitchDiff, -maxRotationStep, maxRotationStep);
+
+                mc.thePlayer.rotationYaw += yawDiff;
+                mc.thePlayer.rotationPitch = MathHelper.clamp_float(mc.thePlayer.rotationPitch + pitchDiff, -90.0f, 90.0f);
                 break;
         }
     }
@@ -238,7 +257,7 @@ public final class KillAuraModule extends Module {
                 autoBlocking = true;
                 break;
 
-/*            case Legit:
+           case Legit:
                 int interval = legitBlockInterval.getValue().intValue();
                 if (legitRandomize.getValue()) {
                     interval += (mc.thePlayer.ticksExisted % 3) - 1;
@@ -282,11 +301,7 @@ public final class KillAuraModule extends Module {
                 }
 
                 if (blockCooldown > 0) blockCooldown--;
-
-                if (shouldBlock) {
-                    canAttack = false;
-                }
-                break;*/
+                break;
 
             case NCP:
                 if (mc.objectMouseOver.entityHit != null) {
@@ -354,13 +369,13 @@ public final class KillAuraModule extends Module {
             return;
         }
 
-/*        if ((ab.getValue() == AutoBlock.Legit || ab.getValue() == AutoBlock.Predictive) && wasBlocking) {
+        if ((ab.getValue() == AutoBlock.Legit || ab.getValue() == AutoBlock.Predictive) && wasBlocking) {
             mc.gameSettings.keyBindUseItem.setPressed(false);
             canAttack = true;
             autoBlocking = false;
             wasBlocking = false;
             return;
-        }*/
+        }
 
         if (InventoryUtils.isHoldingSword()) {
             PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
@@ -377,11 +392,13 @@ public final class KillAuraModule extends Module {
 
         if (advanced.getValue() && missChance.getValue()) {
             if (shouldMiss) {
-                shouldMiss = false; // Reset the miss flag
+                shouldMiss = false;
+                attackTimer.reset();
                 return;
             }
             if (Math.random() * 100 < missRate.getValue()) {
                 shouldMiss = true;
+                attackTimer.reset();
                 return;
             }
         }
@@ -406,6 +423,7 @@ public final class KillAuraModule extends Module {
             mc.clickMouse();
         }
     }
+
 
     private static boolean hitTimerDone() {
         boolean returnVal = false;
@@ -445,7 +463,6 @@ public final class KillAuraModule extends Module {
         return toolDelay;
     }
 
-/*
     private boolean shouldBlockPredictive() {
         if (target == null) return false;
 
@@ -474,7 +491,7 @@ public final class KillAuraModule extends Module {
 
         return dotProduct > 0.5 && target.swingProgress > 0;
     }
-*/
+
 
     private boolean interactable(Block block) {
         return block == Blocks.chest || block == Blocks.trapped_chest || block == Blocks.crafting_table
@@ -492,8 +509,8 @@ public final class KillAuraModule extends Module {
         target = null;
         shouldMiss = false;
         targetList.clear();
-        // wasBlocking = false;
-        // blockCooldown = 0;
+        wasBlocking = false;
+        blockCooldown = 0;
         unblock();
         super.onDisable();
     }

@@ -171,7 +171,7 @@ public class GuiLogin extends GuiScreen {
     }
 
     private void saveAltToFile(String sessionUsername) {
-        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "Simp");
         File file = new File(dir, "alts.txt");
 
         try (FileWriter fw = new FileWriter(file, true); PrintWriter out = new PrintWriter(fw)) {

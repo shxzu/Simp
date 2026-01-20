@@ -1,8 +1,8 @@
 package cc.simp.modules.impl.visuals;
 
-import cc.simp.api.properties.Property;
 import cc.simp.api.events.impl.packet.PacketReceiveEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
+import cc.simp.api.properties.Property;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -15,15 +15,14 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 
-import java.lang.reflect.Field;
-import java.util.Collection;
-
 import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Nick Hider", category = ModuleCategory.VISUALS)
 public class NickHiderModule extends Module {
 
-    private final String fakeName = EnumChatFormatting.RED + "" + EnumChatFormatting.BOLD + "You";
+    private final Property<String> fakeNameProp = new Property<>("Fake Name", "shxzu");
+
+    private String fakeName = " ";
 
     @EventLink
     public Listener<PacketReceiveEvent> onPacketReceive = event -> {
@@ -50,6 +49,8 @@ public class NickHiderModule extends Module {
     @EventLink
     public Listener<Render2DEvent> onRender2D = event -> {
         if (mc.thePlayer == null || mc.theWorld == null) return;
+
+        fakeName = EnumChatFormatting.RED + "" + EnumChatFormatting.BOLD + fakeNameProp.getValue();
 
         for (final NetworkPlayerInfo player : mc.getNetHandler().getPlayerInfoMap()) {
             if (player.getGameProfile().getName().length() < 3 || player.getDisplayName() == null) continue;

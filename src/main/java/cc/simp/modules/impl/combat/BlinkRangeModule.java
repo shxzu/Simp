@@ -1,6 +1,7 @@
 package cc.simp.modules.impl.combat;
 
 
+import cc.simp.Simp;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.events.impl.world.WorldLoadEvent;
@@ -30,6 +31,7 @@ public final class BlinkRangeModule extends Module {
     public static ModeProperty<Mode> modeProperty = new ModeProperty<>("Mode", Mode.Range);
     public static NumberProperty rangeToUnblinkProperty = new NumberProperty("Range To Reset Blink", 2, () -> modeProperty.getValue() == Mode.Range, 0.1, 6, 0.05);
     public static final Property<Boolean> displayProperty = new Property<>("Display", true);
+    public static final Property<Boolean> onlyWithKillaura = new Property<>("Only With Killaura", true);
     private Timer timer = new Timer();
     private boolean blinked = false;
 
@@ -49,6 +51,12 @@ public final class BlinkRangeModule extends Module {
     @EventLink
     public Listener<MotionEvent> motionEventListener = event -> {
         if (event.isPre()) return;
+
+        if (onlyWithKillaura.getValue() && !Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && KillAuraModule.target == null) {
+            if (blinked) blinkToggle(false);
+            return;
+        }
+
         setSuffix(modeProperty.getValue() == Mode.Range ? String.valueOf(rangeToUnblinkProperty.getValue().intValue()) : String.valueOf(timer.getTime()));
 
         if (modeProperty.getValue() == Mode.Time) {

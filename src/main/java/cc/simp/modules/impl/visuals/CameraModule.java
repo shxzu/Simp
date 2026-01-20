@@ -15,14 +15,18 @@ public final class CameraModule extends Module {
     public static NumberProperty y = new NumberProperty("Y", 0.0F, -2.0F, 2.0F, 0.05f);
     public static NumberProperty z = new NumberProperty("Z", 0.0F, -2.0F, 2.0F, 0.05f);
     public static NumberProperty scale = new NumberProperty("Scale", 1, 0.1, 2, 0.1);
-    public static NumberProperty swingSpeed = new NumberProperty("Swing Speed", 1, -200, 50, 1);
-    public static Property<Boolean> equipProgress = new Property<>("Equip Progress", false);
+    public static NumberProperty slowdown = new NumberProperty("Slowdown", 1, 1, 15, 1);
+    public static Property<Boolean> fluxSwing = new Property<>("Flux Swing", false);
+    public static Property<Boolean> swingEating = new Property<>("Swing While Eating", false);
+    public static Property<Boolean> noSneakCamera = new Property<>("No Sneak Camera", false);
+    public static Property<Boolean> noFireOverlay = new Property<>("No Fire Overlay", true);
+    public static Property<Boolean> noBlindness = new Property<>("No Blindness", true);
 
     public CameraModule() {
         this.toggle();
     }
 
-    public static enum AnimationMode {
+    public enum AnimationMode {
         Slide,
         Old,
         Exhibition,

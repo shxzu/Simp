@@ -56,7 +56,6 @@ import static cc.simp.utils.Util.mc;
 public final class ScaffoldModule extends Module {
 
     private static final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Normal);
-    public Property<Boolean> hypixelSkywars = new Property<>("Hypixel Skywars Mode", false, () -> mode.getValue() == Mode.Hypixel);
     private static final ModeProperty<Rotations> rotations = new ModeProperty<>("Rotations", Rotations.Normal, () -> mode.getValue() != Mode.SlowTelly && mode.getValue() != Mode.FastTelly && mode.getValue() != Mode.Hypixel);
     private static final ModeProperty<SearchAlgorithm> searchAlgorithm = new ModeProperty<>("Search Algorithm", SearchAlgorithm.Normal);
     private final NumberProperty minRotationSpeed = new NumberProperty("Min Rotation Speed", 5, 0, 10, 1);
@@ -126,7 +125,7 @@ public final class ScaffoldModule extends Module {
 
     private enum TowerMode {
         Vanilla,
-        Watchdog,
+        Dev,
         NCP,
         None
     }
@@ -139,15 +138,14 @@ public final class ScaffoldModule extends Module {
 
     private enum SearchAlgorithm {
         Normal,
-        Best,
-        Extra
+        Secondary,
+        Simple
     }
 
     private enum JumpMode {
         None,
         Normal,
-        Legit,
-        Motion
+        Dev
     }
 
     private enum BlockCounter {
@@ -185,10 +183,6 @@ public final class ScaffoldModule extends Module {
         this.setSuffix(mode.getValue().toString());
 
         resetBinds(false, false, true, true, false, false);
-
-        if (autoJump.getValue() == JumpMode.Legit && towerMode.getValue() != TowerMode.None) {
-            towerMode.setValue(TowerMode.None);
-        }
 
         if (safeWalk.getValue()) {
             if (!safeWalkOnAir.getValue() && !mc.thePlayer.onGround) mc.thePlayer.safeWalk = false;
@@ -363,9 +357,6 @@ public final class ScaffoldModule extends Module {
     public void onEnable() {
         anim = new DecelerateAnimation(250, 1);
         if (mc.thePlayer != null) {
-            if (autoJump.getValue() == JumpMode.Legit && towerMode.getValue() != TowerMode.None) {
-                NotificationManager.post(NotificationType.INFO, "Scaffold", "When using legit jump, tower mode is disabled.");
-            }
             targetYaw = mc.thePlayer.rotationYaw - 180;
             targetPitch = 90;
 
@@ -384,9 +375,6 @@ public final class ScaffoldModule extends Module {
     public void onDisable() {
         anim = new DecelerateAnimation(250, 1);
         if (mc.thePlayer != null) {
-            if (autoJump.getValue() == JumpMode.Legit) {
-                mc.gameSettings.keyBindJump.setPressed(false);
-            }
             mc.thePlayer.safeWalk = false;
             mc.timer.timerSpeed = 1.0f;
             overrided = false;
@@ -561,24 +549,20 @@ public final class ScaffoldModule extends Module {
                 }
                 break;
             case Hypixel:
+                overrided = true;
+                boolean diagonal = RotationUtils.getMovementYaw() % 90.0f > 10.0f && RotationUtils.getMovementYaw() % 90.0f < 80.0f;
                 if (recursion == 0) {
                     mc.entityRenderer.getMouseOver(1);
-
-                    // This is fucking stupid but whatever, hypixel is weird to bypass. Also, did I mention that this is really fucking stupid and slow? But hey, it's a telly!! -shxzu, 1/14/2026
-
-                    int jumpTicks = hypixelSkywars.getValue() ? 1 : 2;
-
-                    mc.gameSettings.keyBindSneak.setPressed(mc.thePlayer.offGroundTicks > jumpTicks && mc.thePlayer.offGroundTicks <= 5);
-
-                    if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
+                    if (mc.thePlayer.onGround && MovementUtils.isMoving() && !diagonal) {
+                        rotSpeed = 5f;
                         this.targetYaw = mc.thePlayer.rotationYaw;
-                        overrided = true;
-                        rotSpeed = 3.5f;
-                    } else if (mc.thePlayer.offGroundTicks > 5) {
-                        overrided = false;
+                        canPlace = false;
+                    } else {
                         if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
                             if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
+                                rotSpeed = 0.8f;
                                 getBaseRotations();
+                                canPlace = true;
                             }
                         }
                     }
@@ -635,6 +619,7 @@ public final class ScaffoldModule extends Module {
     }
 
     public void getBaseRotations() {
+
         switch (searchAlgorithm.getValue()) {
             case Normal -> {
                 EntityPlayer player = mc.thePlayer;
@@ -668,7 +653,7 @@ public final class ScaffoldModule extends Module {
                     targetPitch = rotations.y;
                 }
             }
-            case Best -> {
+            case Secondary -> {
                 EntityPlayer player = mc.thePlayer;
 
                 // Calculate the optimal pitch based on distance and height difference
@@ -727,7 +712,7 @@ public final class ScaffoldModule extends Module {
                     targetPitch = rotations.y;
                 }
             }
-            case Extra -> {
+            case Simple -> {
                 if (RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, true)) {
                     return;
                 }
@@ -743,6 +728,22 @@ public final class ScaffoldModule extends Module {
         }
     }
 
+    private float getHypixelYaw() {
+            final float snappedBase = Math.round(mc.thePlayer.rotationYaw / 45.0f) * 45.0f;
+            float lowerOffset;
+            float upperOffset;
+            if (Math.abs(snappedBase % 90.0f) < 0.001f) {
+                lowerOffset = 111.0f;
+                upperOffset = 111.0f;
+            }
+            else {
+                lowerOffset = 137.0f;
+                upperOffset = 137.0f;
+            }
+            final float lowerCandidate = snappedBase - lowerOffset;
+            final float upperCandidate = snappedBase + upperOffset;
+            return (Math.abs(mc.thePlayer.rotationYaw - lowerCandidate) <= Math.abs(upperCandidate - mc.thePlayer.rotationYaw)) ? lowerCandidate : upperCandidate;
+    }
 
     private Vector2f applyRotationLimits(float targetYaw, float targetPitch) {
         if (!limitRotations.getValue()) {
@@ -841,12 +842,10 @@ public final class ScaffoldModule extends Module {
 
 
     public void jump() {
-        if (mc.gameSettings.keyBindJump.isPressed() && autoJump.getValue() != JumpMode.Legit) return;
-
         if (mc.thePlayer.onGroundTicks < jumpDelayTicks.getValue().intValue()) return;
 
         if (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel) {
-            if (autoJump.getValue() == JumpMode.None) autoJump.setValue(JumpMode.Legit);
+            if (autoJump.getValue() == JumpMode.None) autoJump.setValue(JumpMode.Normal);
         }
 
         if (keepY.getValue() && autoJump.getValue() != JumpMode.None) {
@@ -863,14 +862,16 @@ public final class ScaffoldModule extends Module {
     }
 
     private void handleJump() {
-        if (autoJump.getValue() == JumpMode.Motion) {
+
+        if (mode.getValue() == Mode.Hypixel && !(MovementUtils.getSpeed() <= 0.02) && mc.thePlayer.offGroundTicks >= 9) {
+            return;
+        }
+
+        if (autoJump.getValue() == JumpMode.Dev) {
             mc.thePlayer.motionY = 0.42F;
         }
         if (autoJump.getValue() == JumpMode.Normal) {
             mc.thePlayer.jump();
-        }
-        if (autoJump.getValue() == JumpMode.Legit) {
-            mc.gameSettings.keyBindJump.setPressed(true);
         }
     }
 
@@ -912,7 +913,7 @@ public final class ScaffoldModule extends Module {
             case Vanilla:
                 mc.thePlayer.motionY = 0.42;
                 break;
-            case Watchdog:
+            case Dev:
                 switch (mc.thePlayer.offGroundTicks) {
                     case 3:
                         mc.timer.timerSpeed = 1.25f;

@@ -13,16 +13,30 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Auto Register", category = ModuleCategory.CLIENT)
 public class AutoRegisterModule extends Module {
 
+    private static final String[] REGISTER_KEYWORDS = {
+            "/register",    // English
+            "/registrar",   // Spanish/Portuguese
+            "/reg",         // Short form
+            "/зарег",       // Russian (zareg)
+            "/rejestracja", // Polish
+            "/cadastrar",   // Portuguese
+            "/kayit",       // Turkish
+            "/enregistrer"  // French
+    };
+
     @EventLink
     public final Listener<PacketReceiveEvent> PacketReceiveEvent = event -> {
         if (mc.thePlayer == null || !(event.getPacket() instanceof S02PacketChat))
             return;
 
         S02PacketChat packetChat = (S02PacketChat) event.getPacket();
-        String chatComponent = packetChat.getChatComponent().getUnformattedText();
+        String chatComponent = packetChat.getChatComponent().getUnformattedText().toLowerCase();
 
-        if (chatComponent.contains("/register")) {
-            mc.thePlayer.sendChatMessage("/register amogus123 amogus123");
+        for (String keyword : REGISTER_KEYWORDS) {
+            if (chatComponent.contains(keyword.toLowerCase())) {
+                mc.thePlayer.sendChatMessage(keyword + " amogus123 amogus123");
+                break;
+            }
         }
     };
 }

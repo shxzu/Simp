@@ -36,6 +36,7 @@ public final class StealerModule extends Module {
     private final Property<Boolean> stealTrashItemsProperty = new Property<>("Steal Trash Items", false);
     private final Property<Boolean> autoCloseProperty = new Property<>("Auto Close", true);
     private final Property<Boolean> chestNameProperty = new Property<>("Check Chest Name", false);
+    private final Property<Boolean> grabMouseProperty = new Property<>("Grab Mouse", false);
     private int decidedTimer = 0;
     private boolean gotItems;
     private int ticksInChest;
@@ -49,7 +50,7 @@ public final class StealerModule extends Module {
         if (mc.thePlayer.ticksExisted <= 60) {
             return;
         }
-        if (mc.currentScreen instanceof GuiChest && Display.isActive() && (!this.chestNameProperty.getValue() || ((GuiChest)mc.currentScreen).lowerChestInventory.getDisplayName().getUnformattedText().contains("chest"))) {
+        if (this.grabMouseProperty.getValue() && mc.currentScreen instanceof GuiChest && Display.isActive() && (!this.chestNameProperty.getValue() || ((GuiChest)mc.currentScreen).lowerChestInventory.getDisplayName().getUnformattedText().contains("chest"))) {
             mc.mouseHelper.mouseXYChange();
             mc.mouseHelper.ungrabMouseCursor();
             mc.mouseHelper.grabMouseCursor();

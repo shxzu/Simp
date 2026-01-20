@@ -1,9 +1,7 @@
 package cc.simp.processes;
 
-import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.AttackEvent;
-import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.impl.client.AntiBotModule;
 import cc.simp.utils.client.Timer;
 import io.github.nevalackin.homoBus.Listener;
@@ -27,6 +25,8 @@ import java.util.stream.Collectors;
 import static cc.simp.utils.Util.mc;
 
 public class TargetSelectionProcess {
+
+    // made by yours truly -shxzu
 
     @Getter
     @Setter

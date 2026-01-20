@@ -123,7 +123,16 @@ public final class TargetInterfaceModule extends Module {
         int healthWidth = (int) (52 * healthPercentage);
         Gui.drawRect(37, 26, 37 + healthWidth, 32, color.getRGB());
 
+        RenderUtils.resetColor();
+        GlStateManager.pushMatrix();
+        GlStateManager.enableBlend();
+        GlStateManager.enableAlpha();
+
         GuiInventory.drawEntityOnScreen(15, 32, 16, -target.rotationYaw, target.rotationPitch, target);
+
+        GlStateManager.disableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.popMatrix();
 
         mc.fontRendererObj.drawString(target.getName(), 38, 2, -1, true);
 
@@ -166,7 +175,9 @@ public final class TargetInterfaceModule extends Module {
         Gui.drawRect(37, 26, 89, 32, new Color(0, 0, 0, 255).getRGB());
 
         int healthWidth = (int) (52 * healthPercentage);
-        Gui.drawRect(37, 26, 37 + healthWidth, 32, color.getRGB());
+        Gui.drawRect(37, 26, 37 + healthWidth, 32, ColorProcess.getColor().getRGB());
+
+        RenderUtils.resetColor();
 
         if (target instanceof EntityPlayer) {
             renderPlayerSkin(target, 2, 2);

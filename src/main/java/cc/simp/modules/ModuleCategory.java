@@ -10,6 +10,7 @@ public enum ModuleCategory {
     MOVEMENT("Movement"),
     PLAYER("Player"),
     CLIENT("Client"),
-    VISUALS("Visuals");
+    VISUALS("Visuals"),
+    CONFIGS("Configs");
     private final String name;
 }

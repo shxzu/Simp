@@ -1,18 +1,23 @@
 package cc.simp.utils.render;
 
 import cc.simp.utils.Util;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
+
+import java.awt.*;
+import java.nio.FloatBuffer;
 
 public class ESPUtils extends Util {
+
+    public static final FloatBuffer windPos = GLAllocation.createDirectFloatBuffer(4);
+
     public static void draw3DRect(final float x1, final float y1, final float x2, final float y2) {
         GL11.glBegin(7);
         GL11.glVertex2d(x2, y1);
@@ -97,6 +102,91 @@ public class ESPUtils extends Util {
         draw3DRect(-width, -height + 0.4f, -width + 0.4f, height + 0.4f);
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
         GlStateManager.popMatrix();
+    }
+
+    public static void render2DESP(AxisAlignedBB axisAlignedBB, Color color, float lineWidth) {
+        ScaledResolution scaledResolution = new ScaledResolution(mc);
+
+        double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE;
+        double maxX = Double.MIN_VALUE, maxY = Double.MIN_VALUE;
+
+        ESPUtils.windPos.clear();
+
+        for (int x = 0; x < 2; x++) {
+            for (int z = 0; z < 2; z++) {
+                for (int y = 0; y < 2; y++) {
+                    if (GLU.gluProject((float) (x == 1 ? axisAlignedBB.minX : axisAlignedBB.maxX),
+                            (float) (y == 1 ? axisAlignedBB.minY : axisAlignedBB.maxY),
+                            (float) (z == 1 ? axisAlignedBB.minZ : axisAlignedBB.maxZ),
+                            ActiveRenderInfo.MODELVIEW,
+                            ActiveRenderInfo.PROJECTION,
+                            ActiveRenderInfo.VIEWPORT,
+                            ESPUtils.windPos)) {
+                        if (ESPUtils.windPos.get(2) > 1) {
+                            continue;
+                        }
+
+                        double screenX = (ESPUtils.windPos.get(0) / scaledResolution.getScaleFactor());
+                        double screenY = (ESPUtils.windPos.get(1) / scaledResolution.getScaleFactor());
+
+                        minX = Math.min(screenX, minX);
+                        minY = Math.min(screenY, minY);
+                        maxX = Math.max(screenX, maxX);
+                        maxY = Math.max(screenY, maxY);
+                    }
+                }
+            }
+        }
+
+        if (minX != Double.MAX_VALUE) {
+            minX = Math.max(0, minX);
+            minY = Math.max(0, minY);
+            maxX = Math.min(scaledResolution.getScaledWidth(), maxX);
+            maxY = Math.min(scaledResolution.getScaledHeight(), maxY);
+
+            double margin = 3; // Adjust margin as needed
+            minX -= margin;
+            minY -= margin;
+            maxX += margin;
+            maxY += margin;
+
+            minY = scaledResolution.getScaledHeight() - minY;
+            maxY = scaledResolution.getScaledHeight() - maxY;
+
+            GL11.glPushMatrix();
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
+
+            // Draw the filled rectangle with shading
+            GL11.glColor4d(0, 0, 0, 0.2); // Dark color with transparency
+            GL11.glBegin(GL11.GL_QUADS);
+            GL11.glVertex2d(minX, minY);
+            GL11.glVertex2d(maxX, minY);
+            GL11.glVertex2d(maxX, maxY);
+            GL11.glVertex2d(minX, maxY);
+            GL11.glEnd();
+
+            // Draw the rectangle outline
+            GL11.glColor4d(color.getRed() / 255d, color.getGreen() / 255d, color.getBlue() / 255d,
+                    color.getAlpha() / 255d);
+            GL11.glLineWidth(lineWidth);
+            GL11.glBegin(GL11.GL_LINE_LOOP);
+            GL11.glVertex2d(minX, minY);
+            GL11.glVertex2d(minX, maxY);
+            GL11.glVertex2d(maxX, maxY);
+            GL11.glVertex2d(maxX, minY);
+            GL11.glEnd();
+
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            GL11.glDisable(GL11.GL_BLEND);
+            GL11.glPopMatrix();
+        }
+    }
+
+
+    public static double interpolate(double lastPos, double pos) {
+        return lastPos + (pos - lastPos) * mc.timer.renderPartialTicks;
     }
 
     public static void otherDrawOutlinedBoundingBox(final Entity entity, final float x, final float y, final float z, double width, final double height) {

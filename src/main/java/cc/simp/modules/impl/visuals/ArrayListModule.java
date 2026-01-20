@@ -36,6 +36,7 @@ public final class ArrayListModule extends Module {
     private final Property<Boolean> outline = new Property<>("Outline", true);
     private final ModeProperty<LineMode> line = new ModeProperty<>("Line", LineMode.Off, () -> !outline.getValue());
     private final Property<Boolean> hideVisuals = new Property<>("Hide Visuals", false);
+    private static final Property<Boolean> useMcFont = new Property<>("Use MC Font", false);
     private final Property<Boolean> noSpaces = new Property<>("No Spaces", false);
     private final Property<Boolean> showSuffix = new Property<>("Show Suffix", true);
     private final Property<Boolean> lowercase = new Property<>("Lowercase", true);
@@ -96,6 +97,8 @@ public final class ArrayListModule extends Module {
     private void renderArrayList() {
         CustomFontRenderer fr = FontProcess.getCurrentFont();
         ScaledResolution sr = new ScaledResolution(mc);
+
+        if (useMcFont.getValue()) fr = FontProcess.getFont("mc");
 
         float screenX = sr.getScaledWidth() - offsetX.getValue().floatValue();
         float startY = 2 + offsetY.getValue().floatValue();
@@ -170,7 +173,7 @@ public final class ArrayListModule extends Module {
                 fr.drawStringWithShadow(
                         name,
                         (float) translateX,
-                        (float) translateY - (FontProcess.getCurrentFont() == FontProcess.getFont("mc") ? 0 : 1),
+                        (float) translateY - (fr == FontProcess.getFont("mc") || useMcFont.getValue() ? 0 : 1),
                         aColor);
 
                 if (outline.getValue() && !roundedBg.getValue()) {
@@ -396,6 +399,7 @@ public final class ArrayListModule extends Module {
 
     private void updateModulePositions(ScaledResolution scaledResolution) {
         CustomFontRenderer fr = FontProcess.getCurrentFont();
+        if (useMcFont.getValue()) fr = FontProcess.getFont("mc");
         if (moduleCache == null)
             moduleCache = new ArrayList<>(Simp.INSTANCE.getModuleManager().getModules());
 
@@ -438,6 +442,7 @@ public final class ArrayListModule extends Module {
         @Override
         public int compare(Module o1, Module o2) {
             CustomFontRenderer fr = FontProcess.getCurrentFont();
+            if (useMcFont.getValue()) fr = FontProcess.getFont("mc");
             return Float.compare(
                     fr.getStringWidth(displayLabelCache.get(o2)),
                     fr.getStringWidth(displayLabelCache.get(o1)));

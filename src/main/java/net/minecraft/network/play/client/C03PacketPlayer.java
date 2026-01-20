@@ -1,17 +1,18 @@
 package net.minecraft.network.play.client;
 
-import java.io.IOException;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
+
+import java.io.IOException;
 
 public class C03PacketPlayer implements Packet<INetHandlerPlayServer>
 {
     protected double x;
     protected double y;
     protected double z;
-    protected float yaw;
-    protected float pitch;
+    public float yaw;
+    public float pitch;
     public boolean onGround;
     protected boolean moving;
     protected boolean rotating;

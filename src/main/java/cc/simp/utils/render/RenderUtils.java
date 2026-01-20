@@ -19,7 +19,9 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -40,6 +42,16 @@ public class RenderUtils extends Util {
         GlStateManager.color(1, 1, 1, 1);
         mc.getTextureManager().bindTexture(resourceLocation);
         Gui.drawModalRectWithCustomSizedTexture(x, y, 0, 0, imgWidth, imgHeight, imgWidth, imgHeight);
+    }
+
+    public static int[] getImageDimensions(ResourceLocation resource) {
+        try {
+            BufferedImage image = ImageIO.read(mc.getResourceManager().getResource(resource).getInputStream());
+            return new int[]{image.getWidth(), image.getHeight()};
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new int[]{200, 200}; // fallback dimensions
+        }
     }
 
     public static void drawRoundedRect(float x, float y, float width, float height, float radius, Color color) {

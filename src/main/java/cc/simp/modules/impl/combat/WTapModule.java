@@ -34,6 +34,7 @@ public class WTapModule extends Module {
     private boolean shouldWTap;
     private int wtapTicks;
     private boolean hasAttacked;
+    private boolean wasPressingForward;
 
     @EventLink
     public Listener<MoveEvent> moveEventListener = event -> {
@@ -44,9 +45,10 @@ public class WTapModule extends Module {
         if (mode.getValue() == Mode.Legit) {
             if (shouldWTap && wtapTicks > 0) {
                 if (wtapTicks == 2) {
+                    wasPressingForward = mc.gameSettings.keyBindForward.isKeyDown();
                     mc.gameSettings.keyBindForward.setPressed(false);
                 } else if (wtapTicks == 1) {
-                    mc.gameSettings.keyBindForward.setPressed(mc.gameSettings.keyBindForward.isKeyDown());
+                    mc.gameSettings.keyBindForward.setPressed(wasPressingForward);
                     shouldWTap = false;
                 }
                 wtapTicks--;
@@ -114,6 +116,7 @@ public class WTapModule extends Module {
         shouldWTap = false;
         wtapTicks = 0;
         hasAttacked = false;
+        wasPressingForward = false;
         super.onEnable();
     }
 
@@ -122,6 +125,7 @@ public class WTapModule extends Module {
         shouldWTap = false;
         wtapTicks = 0;
         hasAttacked = false;
+        wasPressingForward = false;
         super.onDisable();
     }
 }

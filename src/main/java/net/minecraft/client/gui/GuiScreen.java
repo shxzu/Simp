@@ -1,24 +1,9 @@
 package net.minecraft.client.gui;
 
-import cc.simp.interfaces.menu.main.CustomMainMenu;
 import cc.simp.modules.impl.client.ClientSettingsModule;
-import cc.simp.utils.render.RenderUtils;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import java.awt.Toolkit;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -43,7 +28,6 @@ import net.minecraft.stats.StatList;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
-import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,7 +35,17 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import tv.twitch.chat.ChatUserInfo;
 
-import static cc.simp.utils.Util.mc;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public abstract class GuiScreen extends Gui implements GuiYesNoCallback
 {
@@ -75,35 +69,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         if (ClientSettingsModule.showInInventory.getValue() && (mc.currentScreen instanceof GuiInventory || mc.currentScreen instanceof GuiContainerCreative)) {
-            switch (ClientSettingsModule.anime.getValue()) {
-                case Onikata:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/onikata.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case Takanashi:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/takanashi.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case Io:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/io.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case ZeroTwo:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/zerotwo.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case Astolfo:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/astolfo.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case Felix:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/felix.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case Rem:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/rem.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case Ram:
-                    RenderUtils.drawImage(new ResourceLocation("simp/images/ram.png"), width - 216, (float) height / 2, 216, 289);
-                    break;
-                case None:
-                    // No background
-                    break;
-            }
+            ClientSettingsModule.renderAnimeImage(width, height);
         }
         for (int i = 0; i < this.buttonList.size(); ++i)
         {

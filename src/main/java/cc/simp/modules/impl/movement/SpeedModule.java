@@ -1,31 +1,22 @@
 package cc.simp.modules.impl.movement;
 
-import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.*;
-import cc.simp.api.events.impl.world.TickEvent;
-import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.mc.MovementUtils;
 import cc.simp.utils.mc.PacketUtils;
-import cc.simp.utils.mc.PlayerUtils;
 import cc.simp.utils.misc.MovementFix;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.Priorities;
 import io.github.nevalackin.homoBus.annotations.EventLink;
-import net.minecraft.block.BlockStairs;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
-import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
 import org.lwjgl.util.vector.Vector2f;
 
 import static cc.simp.utils.Util.mc;
@@ -33,20 +24,20 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Speed", category = ModuleCategory.MOVEMENT)
 public final class SpeedModule extends Module {
 
-    private static final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.RotateExploit);
+    private static final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.LegitRotate);
 
     private enum Mode {
-        Jump("Jump"),
-        RotateExploit("Rotate Exploit"),
-        CollideExploit("Collide Exploit"),
-        UndetectedTimer("Undetected Timer"),
+        Legit("Legit"),
+        LegitRotate("Legit Rotate"),
+        LegitTimerExploit("Legit Timer Exploit"),
         VerusGround("Verus Ground"),
         VerusLowHop("Verus Low Hop"),
         UpdatedNCP("Updated NCP"),
+        NCP("NCP"),
         Strafe("Strafe"),
         GroundStrafe("Ground Strafe"),
         Intave("Intave"),
-        NCP("NCP");
+        CollisionExploit("Collision Exploit");
 
         public String name;
 
@@ -63,7 +54,7 @@ public final class SpeedModule extends Module {
     @EventLink
     public final Listener<MotionEvent> motionEventListener = e -> {
         setSuffix(mode.getValue().toString());
-        if (mc.gameSettings.keyBindJump.isKeyDown() && mode.getValue() != Mode.Jump && mode.getValue() != Mode.RotateExploit && mode.getValue() != Mode.UndetectedTimer && mode.getValue() != Mode.CollideExploit)
+        if (mc.gameSettings.keyBindJump.isKeyDown() && mode.getValue() != Mode.Legit && mode.getValue() != Mode.LegitRotate && mode.getValue() != Mode.LegitTimerExploit && mode.getValue() != Mode.CollisionExploit)
             mc.gameSettings.keyBindJump.setPressed(false);
         if (!e.isPre()) return;
         switch (mode.getValue()) {
@@ -127,12 +118,12 @@ public final class SpeedModule extends Module {
                     mc.timer.timerSpeed = 1.0f;
                 }
                 break;
-            case Jump:
-            case RotateExploit:
-            case CollideExploit:
+            case Legit:
+            case LegitRotate:
+            case CollisionExploit:
                 mc.gameSettings.keyBindJump.setPressed(MovementUtils.isMoving() && MovementUtils.isOnGround());
                 break;
-            case UndetectedTimer:
+            case LegitTimerExploit:
                 mc.gameSettings.keyBindJump.setPressed(MovementUtils.isMoving() && MovementUtils.isOnGround());
                 mc.timer.timerSpeed = 1.0075f;
                 break;
@@ -216,14 +207,14 @@ public final class SpeedModule extends Module {
 
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
-        if (!MovementUtils.isOnGround() && mode.getValue() == Mode.RotateExploit) {
+        if (!MovementUtils.isOnGround() && mode.getValue() == Mode.LegitRotate) {
             RotationProcess.setRotations(new Vector2f(mc.thePlayer.rotationYaw + 45, mc.thePlayer.rotationPitch), 10, MovementFix.NORMAL);
         }
     };
 
     @EventLink(value = Priorities.VERY_HIGH)
     public final Listener<StrafeEvent> strafe = event -> {
-        if (mode.getValue() == Mode.CollideExploit) {
+        if (mode.getValue() == Mode.CollisionExploit) {
             mc.theWorld.playerEntities.stream()
                     .filter(entityPlayer -> entityPlayer != mc.thePlayer &&
                             mc.thePlayer.getEntityBoundingBox().expand(1, 1, 1)
@@ -238,13 +229,13 @@ public final class SpeedModule extends Module {
         if (mode.getValue() == Mode.UpdatedNCP || mode.getValue() == Mode.NCP) {
             mc.thePlayer.speedInAir = 0.02F;
         }
-        if (mode.getValue() == Mode.Jump && mc.gameSettings.keyBindJump.isPressed())
+        if (mode.getValue() == Mode.Legit && mc.gameSettings.keyBindJump.isPressed())
             mc.gameSettings.keyBindJump.setPressed(false);
-        if (mode.getValue() == Mode.RotateExploit && mc.gameSettings.keyBindJump.isPressed())
+        if (mode.getValue() == Mode.LegitRotate && mc.gameSettings.keyBindJump.isPressed())
             mc.gameSettings.keyBindJump.setPressed(false);
-        if (mode.getValue() == Mode.UndetectedTimer && mc.gameSettings.keyBindJump.isPressed())
+        if (mode.getValue() == Mode.LegitTimerExploit && mc.gameSettings.keyBindJump.isPressed())
             mc.gameSettings.keyBindJump.setPressed(false);
-        if (mode.getValue() == Mode.CollideExploit && mc.gameSettings.keyBindJump.isPressed())
+        if (mode.getValue() == Mode.CollisionExploit && mc.gameSettings.keyBindJump.isPressed())
             mc.gameSettings.keyBindJump.setPressed(false);
     }
 }

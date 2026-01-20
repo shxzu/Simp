@@ -1,14 +1,11 @@
 package cc.simp.modules.impl.client;
 
-import cc.simp.Simp;
 import cc.simp.api.events.impl.packet.PacketReceiveEvent;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.modules.impl.combat.KillAuraModule;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
-import net.minecraft.entity.Entity;
 import net.minecraft.network.play.server.S02PacketChat;
 import org.apache.commons.lang3.RandomUtils;
 
@@ -18,6 +15,8 @@ import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Insults", category = ModuleCategory.CLIENT)
 public class InsultsModule extends Module {
+
+    // These are so fucking cursed. :sob: -shxzu
 
     private final String[] deathMessages = {"killed by", "void by", "slain by", "void while escaping", "was killed with magic while fighting",
             "couldn't fly while escaping", "fell to their death while escaping"};
@@ -33,7 +32,15 @@ public class InsultsModule extends Module {
             "i bet u love receiving backshots from KotlinProject",
             "shxzu is the best client dev of all time. get simp @github/shxzu/Simp",
             "i paste them astolfo scripts like its ur moms first taste of my dih.",
-            "rawr xD x3 nuzzles u UwU", "womp womp", "sniped by ducky $$ get my client @github/shxzu/Simp", "polar pop bypass $$"};
+            "rawr xD x3 nuzzles u UwU",
+            "womp womp",
+            "sniped by ducky $$ get my client @github/shxzu/Simp",
+            "polar pop bypass $$",
+            "go back to 2022 skid #famous",
+            "it's my b-day. b nice 2 me :<",
+            "bombies is my little $1utt",
+            "\"i'm not a furry but i do like to be called daddy uwu\"",
+            "i knew some1 tht said he would let bombies stack donuts on it.. i agree."};
 
     @EventLink
     public final Listener<PacketReceiveEvent> PacketReceiveEvent = event -> {

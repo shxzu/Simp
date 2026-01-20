@@ -29,7 +29,7 @@ public class NoFallModule extends Module {
 
     private enum Mode {
         Vanilla,
-        Modify,
+        Vulcan,
         Clutch,
         Edit,
         Edit2,
@@ -115,7 +115,7 @@ public class NoFallModule extends Module {
 
     @EventLink
     private final Listener<PacketSendEvent> packetSendEventListener = e -> {
-        if (mode.getValue() == Mode.Modify) {
+        if (mode.getValue() == Mode.Vulcan) {
             if (e.getPacket() instanceof C03PacketPlayer && mc.thePlayer.fallDistance > 3) {
                 C03PacketPlayer packet = (C03PacketPlayer) e.getPacket();
                 packet.onGround = true;

@@ -30,6 +30,7 @@ public final class NameTagsModule extends Module {
     private final Property<Boolean> throughWalls = new Property<>("Through Walls", true);
     private final NumberProperty scale = new NumberProperty("Scale", 1.0, 0.5, 2.0, 0.1);
     private final Property<Boolean> distance = new Property<>("Show Distance", false);
+    private final Property<Boolean> rawName = new Property<>("Raw Name", false);
 
     @EventLink
     public final Listener<Render3DEvent> render3DEventListener = e -> {
@@ -42,9 +43,11 @@ public final class NameTagsModule extends Module {
     };
 
     private void renderNameTag(EntityPlayer player) {
-        double x = player.posX - mc.getRenderManager().renderPosX;
-        double y = player.posY - mc.getRenderManager().renderPosY;
-        double z = player.posZ - mc.getRenderManager().renderPosZ;
+        float partialTicks = mc.timer.renderPartialTicks;
+
+        double x = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks - mc.getRenderManager().renderPosX;
+        double y = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks - mc.getRenderManager().renderPosY;
+        double z = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks - mc.getRenderManager().renderPosZ;
 
         y += player.height + 0.5;
 
@@ -60,7 +63,8 @@ public final class NameTagsModule extends Module {
             GL11.glDisable(GL11.GL_DEPTH_TEST);
         }
 
-        String name = player.getDisplayName().getFormattedText();
+        String name = player.getName();
+        if (rawName.getValue()) name = player.getDisplayName().getFormattedText();
         float health = player.getHealth();
         int armorValue = player.getTotalArmorValue();
         double distanceToPlayer = mc.thePlayer.getDistanceToEntity(player);
@@ -109,6 +113,7 @@ public final class NameTagsModule extends Module {
 
         GlStateManager.popMatrix();
     }
+
 
     private void drawArmor(EntityPlayer player, float x, float y, float width) {
         ItemStack[] armorInventory = player.inventory.armorInventory;

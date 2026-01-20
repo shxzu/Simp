@@ -32,7 +32,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.MapData;
 import net.optifine.DynamicLights;
-import net.optifine.reflect.Reflector;
 import net.optifine.shaders.Shaders;
 import org.lwjgl.opengl.GL11;
 
@@ -189,6 +188,14 @@ public class ItemRenderer {
         }
     }
 
+    public void swing() {
+        if (mc.thePlayer.getItemInUseCount() > 0) {
+            if (mc.objectMouseOver != null) {
+                mc.thePlayer.swingItemClient();
+            }
+        }
+    }
+
     private void renderPlayerArm(AbstractClientPlayer clientPlayer, float equipProgress, float swingProgress) {
         float f = -0.3F * MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float) Math.PI);
         float f1 = 0.4F * MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float) Math.PI * 2.0F);
@@ -322,6 +329,9 @@ public class ItemRenderer {
                             break;
                         case EAT:
                         case DRINK:
+                            if (CameraModule.swingEating.getValue() && Simp.INSTANCE.getModuleManager().getModule(CameraModule.class).isEnabled()) {
+                                this.swing();
+                            }
                             this.performDrinking(abstractclientplayer, partialTicks);
                             this.transformFirstPersonItem(f, 0.0F);
                             GlStateManager.scale(CameraModule.scale.getValue(), CameraModule.scale.getValue(), CameraModule.scale.getValue());
@@ -417,8 +427,12 @@ public class ItemRenderer {
                 }
                 else
                 {
-                    this.doItemUsedTransformations(f1);
-                    this.transformFirstPersonItem(f, f1);
+                    if (Simp.INSTANCE.getModuleManager().getModule(CameraModule.class).isEnabled() && CameraModule.fluxSwing.getValue()) {
+                        this.transformFirstPersonItem(f, f1);
+                    } else {
+                        this.doItemUsedTransformations(f1);
+                        this.transformFirstPersonItem(f, f1);
+                    }
                     GlStateManager.scale(CameraModule.scale.getValue(), CameraModule.scale.getValue(), CameraModule.scale.getValue());
                 }
 
@@ -467,6 +481,7 @@ public class ItemRenderer {
             }
 
             if (this.mc.thePlayer.isBurning()) {
+                if (Simp.INSTANCE.getModuleManager().getModule(CameraModule.class).isEnabled() && CameraModule.noFireOverlay.getValue()) return;
                 this.renderFireInFirstPerson(partialTicks);
             }
         }
@@ -599,7 +614,6 @@ public class ItemRenderer {
     }
 
     public void resetEquippedProgress() {
-        if (Simp.INSTANCE.getModuleManager().getModule(CameraModule.class).isEnabled() && CameraModule.equipProgress.getValue() == false) return;
         this.equippedProgress = 0.0F;
     }
 }

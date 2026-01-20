@@ -212,7 +212,7 @@ public class GuiLoginMicrosoft extends GuiScreen {
     }
 
     private void saveAltToFile(String email, String password, String sessionUsername) {
-        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "Simp");
         File file = new File(dir, "alts.txt");
 
         try (FileWriter fw = new FileWriter(file, true); PrintWriter out = new PrintWriter(fw)) {
@@ -224,7 +224,7 @@ public class GuiLoginMicrosoft extends GuiScreen {
 
     private void saveOAuthAltToFile(String username, String refreshToken) {
         // Save to alts.txt
-        File dir = new File(Minecraft.getMinecraft().mcDataDir, "simp");
+        File dir = new File(Minecraft.getMinecraft().mcDataDir, "Simp");
         File altsFile = new File(dir, "alts.txt");
 
         if (!dir.exists()) {

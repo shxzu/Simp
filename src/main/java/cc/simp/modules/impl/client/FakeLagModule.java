@@ -1,6 +1,6 @@
 package cc.simp.modules.impl.client;
 
-import cc.simp.api.events.impl.game.PreUpdateEvent;
+import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
@@ -19,7 +19,9 @@ public class FakeLagModule extends Module {
     private final Property<Boolean> entities = new Property<>("Delay Entity Movements", false);
 
     @EventLink
-    public final Listener<PreUpdateEvent> onPreUpdate = event ->
-            LagProcess.spoof(delay.getValue().intValue(), true, velocity.getValue(),
-                    teleports.getValue(), entities.getValue());
+    public Listener<MotionEvent> motionEventListener = event -> {
+        if (event.isPre()) return;
+        LagProcess.spoof(delay.getValue().intValue(), true, velocity.getValue(),
+                teleports.getValue(), entities.getValue());
+    };
 }

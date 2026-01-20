@@ -2,6 +2,7 @@ package cc.simp.modules.impl.combat;
 
 import cc.simp.api.events.impl.packet.PacketSendEvent;
 import cc.simp.api.events.impl.player.AttackEvent;
+import cc.simp.api.events.impl.player.StrafeEvent;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
@@ -28,12 +29,24 @@ public final class CriticalsModule extends Module {
         NCP
     }
 
+    private boolean activateJump;
+
     @EventLink
     public final Listener<PacketSendEvent> packetSendEventListener = e -> {
         setSuffix(mode.getValue().toString());
         if (mode.getValue() == Mode.Edit) {
             if (e.getPacket() instanceof C03PacketPlayer packet) {
                 packet.onGround = false;
+            }
+        }
+    };
+
+    @EventLink
+    public final Listener<StrafeEvent> strafeEventListener = e -> {
+        if (mode.getValue() == Mode.Legit) {
+            if (activateJump) {
+                mc.thePlayer.jump();
+                activateJump = false;
             }
         }
     };
@@ -57,7 +70,7 @@ public final class CriticalsModule extends Module {
 
         if (mode.getValue() == Mode.Legit) {
             if (mc.thePlayer.onGround && !mc.thePlayer.isOnLadder() && !mc.thePlayer.isInWater() && !mc.thePlayer.isRiding()) {
-                mc.thePlayer.jump();
+                activateJump = true;
             }
         }
 
@@ -65,4 +78,10 @@ public final class CriticalsModule extends Module {
             mc.effectRenderer.emitParticleAtEntity(e.target, EnumParticleTypes.CRIT);
         }
     };
+
+    @Override
+    public void onDisable() {
+        activateJump = false;
+        super.onDisable();
+    }
 }

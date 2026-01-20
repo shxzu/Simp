@@ -1,14 +1,12 @@
 package cc.simp.utils.mc;
 
-import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.Util;
-import cc.simp.utils.client.EnumFacingOffset;
 import cc.simp.utils.client.MathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.*;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -232,4 +230,37 @@ public class RotationUtils extends Util {
 
         return new Vector2f(yaw, pitch);
     }
+
+    public static float getMovementYaw() {
+        float yaw = 180.0f;
+        KeyBinding forward = RotationUtils.mc.gameSettings.keyBindForward;
+        KeyBinding back = RotationUtils.mc.gameSettings.keyBindBack;
+        KeyBinding right = RotationUtils.mc.gameSettings.keyBindRight;
+        KeyBinding left = RotationUtils.mc.gameSettings.keyBindLeft;
+        if (back.isKeyDown()) {
+            yaw -= 180.0f;
+            if (right.isKeyDown()) {
+                yaw -= 45.0f;
+            }
+            if (left.isKeyDown()) {
+                yaw += 45.0f;
+            }
+        } else if (forward.isKeyDown()) {
+            if (right.isKeyDown()) {
+                yaw += 45.0f;
+            }
+            if (left.isKeyDown()) {
+                yaw -= 45.0f;
+            }
+        } else {
+            if (right.isKeyDown()) {
+                yaw += 90.0f;
+            }
+            if (left.isKeyDown()) {
+                yaw -= 90.0f;
+            }
+        }
+        return (MathHelper.wrapAngleTo180_float(RotationUtils.mc.thePlayer.rotationYaw) + yaw % 360.0f + 360.0f) % 360.0f;
+    }
+
 }

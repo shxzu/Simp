@@ -10,9 +10,10 @@ import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.impl.client.ClientSettingsModule;
 import cc.simp.processes.ColorProcess;
 import cc.simp.processes.FontProcess;
+import cc.simp.utils.misc.GitHubConfigFetcher;
 import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ChatAllowedCharacters;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -29,6 +30,8 @@ public class ClickInterface extends GuiScreen {
     private final CustomFontRenderer font = FontProcess.getFont("simp");
     private Module listeningModule = null;
     private SettingComponent draggingSlider = null;
+    private SettingComponent editingString = null;
+    private String editingBuffer = "";
 
     // Visual theme
     private static final Color BG_COLOR = new Color(22, 22, 22, 220);
@@ -58,36 +61,7 @@ public class ClickInterface extends GuiScreen {
 
         ACCENT_COLOR = ColorProcess.getColor();
 
-        // optional background anime
-        switch (ClientSettingsModule.anime.getValue()) {
-            case Onikata:
-                RenderUtils.drawImage(new ResourceLocation("simp/images/onikata.png"), width - 216, (float) height / 2, 216, 289);
-                break;
-            case Takanashi:
-                RenderUtils.drawImage(new ResourceLocation("simp/images/takanashi.png"), width - 216, (float) height / 2, 216, 289);
-                break;
-            case Io:
-                RenderUtils.drawImage(new ResourceLocation("simp/images/io.png"), width - 216, (float) height / 2, 216, 289);
-                break;
-            case ZeroTwo:
-                RenderUtils.drawImage(new ResourceLocation("simp/images/zerotwo.png"), width - 216, (float) height / 2, 216, 289);
-                break;
-            case Astolfo:
-                RenderUtils.drawImage(new ResourceLocation("simp/images/astolfo.png"), width - 216, (float) height / 2, 216, 289);
-                break;
-            case Felix:
-                RenderUtils.drawImage(new ResourceLocation("simp/images/felix.png"), width - 216, (float) height / 2, 216, 289);
-                break;
-            case Rem:
-                RenderUtils.drawImage(new ResourceLocation("simp/images/rem.png"), width - 216, (float) height / 2, 216, 289);
-                break;
-            case Ram:
-                RenderUtils.drawImage(new ResourceLocation("simp/images/ram.png"), width - 216, (float) height / 2, 216, 289);
-                break;
-            case None:
-                // none
-                break;
-        }
+        ClientSettingsModule.renderAnimeImage(width, height);
 
         // Update dragging slider if active
         if (draggingSlider != null) {
@@ -149,6 +123,43 @@ public class ClickInterface extends GuiScreen {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        if (editingString != null) {
+            if (keyCode == Keyboard.KEY_ESCAPE) {
+                editingString = null;
+                editingBuffer = "";
+            } else if (keyCode == Keyboard.KEY_RETURN) {
+                (editingString.property).setValueObj(editingBuffer);
+                editingString = null;
+                editingBuffer = "";
+            } else if (keyCode == Keyboard.KEY_BACK) {
+                if (!editingBuffer.isEmpty()) {
+                    editingBuffer = editingBuffer.substring(0, editingBuffer.length() - 1);
+                }
+            } else if (isCtrlKeyDown()) {
+                // Handle Ctrl+V (paste)
+                if (keyCode == Keyboard.KEY_V) {
+                    String clipboard = GuiScreen.getClipboardString();
+                    if (clipboard != null && !clipboard.isEmpty()) {
+                        for (char c : clipboard.toCharArray()) {
+                            if (ChatAllowedCharacters.isAllowedCharacter(c)) {
+                                editingBuffer += c;
+                            }
+                        }
+                    }
+                }
+                // Handle Ctrl+A (select all / clear for replacement)
+                else if (keyCode == Keyboard.KEY_A) {
+                    // In this context, we can clear the buffer so next input replaces it
+                    editingBuffer = "";
+                } else if (keyCode == Keyboard.KEY_C) {
+                    GuiScreen.setClipboardString(editingBuffer);
+                }
+            } else if (ChatAllowedCharacters.isAllowedCharacter(typedChar)) {
+                editingBuffer += typedChar;
+            }
+            return;
+        }
+
         if (listeningModule != null) {
             if (keyCode == Keyboard.KEY_ESCAPE || keyCode == Keyboard.KEY_DELETE) {
                 listeningModule.setKey(Keyboard.KEY_NONE);
@@ -168,25 +179,31 @@ public class ClickInterface extends GuiScreen {
         private int headerHeight = 18;
         private boolean dragging = false;
         private int dragX, dragY;
-
-        // scrolling
         private float scrollOffset = 0f;
         private float targetScroll = 0f;
-
-        // scrollbar drag
         private boolean draggingScrollbar = false;
         private float scrollbarDragStartY;
         private float scrollbarStartScroll;
 
         private final List<ModuleButton> modules = new ArrayList<>();
+        private final List<ConfigButton> configs = new ArrayList<>();
 
         public CategoryPanel(ModuleCategory category, int x, int y) {
             this.category = category;
             this.x = x;
             this.y = y;
 
-            for (Module module : Simp.INSTANCE.getModuleManager().getModulesForCategory(category)) {
-                modules.add(new ModuleButton(module, this));
+            if (category == ModuleCategory.CONFIGS) {
+                new Thread(() -> {
+                    List<String> configList = GitHubConfigFetcher.fetchConfigList();
+                    for (String configName : configList) {
+                        configs.add(new ConfigButton(configName, this));
+                    }
+                }).start();
+            } else {
+                for (Module module : Simp.INSTANCE.getModuleManager().getModulesForCategory(category)) {
+                    modules.add(new ModuleButton(module, this));
+                }
             }
         }
 
@@ -196,11 +213,14 @@ public class ClickInterface extends GuiScreen {
                 y = mouseY - dragY;
             }
 
-            //Scroll easing
             scrollOffset = RenderUtils.lerp(scrollOffset, targetScroll, 0.18f);
 
             int totalHeight = 0;
-            for (ModuleButton mb : modules) totalHeight += mb.getTotalHeight();
+            if (category == ModuleCategory.CONFIGS) {
+                totalHeight = configs.size() * 16;
+            } else {
+                for (ModuleButton mb : modules) totalHeight += mb.getTotalHeight();
+            }
 
             int maxVisibleHeight = height - y - headerHeight - 20;
             int maxScroll = Math.max(0, totalHeight - Math.max(0, maxVisibleHeight));
@@ -214,17 +234,20 @@ public class ClickInterface extends GuiScreen {
             int bodyHeight = Math.min(totalHeight, maxVisibleHeight);
             drawRect(x, y + headerHeight, x + width, y + headerHeight + bodyHeight, BG_COLOR.getRGB());
 
-            RenderUtils.startScissor(
-                    x,
-                    y + headerHeight,
-                    width,
-                    bodyHeight
-            );
+            RenderUtils.startScissor(x, y + headerHeight, width, bodyHeight);
 
-            int moduleY = y + headerHeight - (int) scrollOffset;
-            for (ModuleButton mb : modules) {
-                mb.render(x, moduleY, width, mouseX, mouseY);
-                moduleY += mb.getTotalHeight();
+            if (category == ModuleCategory.CONFIGS) {
+                int configY = y + headerHeight - (int) scrollOffset;
+                for (ConfigButton cb : configs) {
+                    cb.render(x, configY, width, mouseX, mouseY);
+                    configY += cb.getTotalHeight();
+                }
+            } else {
+                int moduleY = y + headerHeight - (int) scrollOffset;
+                for (ModuleButton mb : modules) {
+                    mb.render(x, moduleY, width, mouseX, mouseY);
+                    moduleY += mb.getTotalHeight();
+                }
             }
 
             RenderUtils.endScissor();
@@ -234,12 +257,10 @@ public class ClickInterface extends GuiScreen {
             }
         }
 
-
         private void drawScrollbar(int startY, int visibleHeight, int totalHeight, int maxScroll) {
             int scrollbarX = x + width - 6;
             int scrollbarWidth = 6;
 
-            // track
             drawRect(scrollbarX, startY, scrollbarX + scrollbarWidth, startY + visibleHeight, new Color(30, 30, 30, 180).getRGB());
 
             float thumbSize = Math.max(24f, (float) visibleHeight / (float) totalHeight * visibleHeight);
@@ -248,16 +269,13 @@ public class ClickInterface extends GuiScreen {
             int y1 = (int) (startY + thumbPos);
             int y2 = (int) (startY + thumbPos + thumbSize);
 
-            // thumb
             drawRect(scrollbarX + 1, y1, scrollbarX + scrollbarWidth - 1, y2, ACCENT_COLOR.getRGB());
 
-            // border
             drawRect(scrollbarX, y1, scrollbarX + 1, y2, new Color(0, 0, 0, 120).getRGB());
             drawRect(scrollbarX + scrollbarWidth - 1, y1, scrollbarX + scrollbarWidth, y2, new Color(0, 0, 0, 120).getRGB());
         }
 
         public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
-            // header dragging
             if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + headerHeight) {
                 if (mouseButton == 0) {
                     dragging = true;
@@ -267,11 +285,16 @@ public class ClickInterface extends GuiScreen {
                 }
             }
 
-            // check scrollbar click
             int totalHeight = 0;
-            for (ModuleButton mb : modules) totalHeight += mb.getTotalHeight();
+            if (category == ModuleCategory.CONFIGS) {
+                totalHeight = configs.size() * 16;
+            } else {
+                for (ModuleButton mb : modules) totalHeight += mb.getTotalHeight();
+            }
+
             int maxVisibleHeight = height - y - headerHeight - 20;
             int maxScroll = Math.max(0, totalHeight - Math.max(0, maxVisibleHeight));
+
             if (totalHeight > maxVisibleHeight) {
                 int scrollbarX = x + width - 6;
                 int scrollbarWidth = 6;
@@ -290,18 +313,26 @@ public class ClickInterface extends GuiScreen {
                 }
             }
 
-            // module clicks
-            int moduleY = y + headerHeight - (int) scrollOffset;
-            int maxY = y + headerHeight + (height - y - headerHeight - 20);
-            for (ModuleButton mb : modules) {
-                int moduleHeight = mb.getTotalHeight();
-
-                if (moduleY + moduleHeight > y + headerHeight && moduleY < y + headerHeight + (height - y - headerHeight - 20)) {
-                    if (mb.mouseClicked(x, moduleY, width, mouseX, mouseY, mouseButton)) {
+            if (category == ModuleCategory.CONFIGS) {
+                int configY = y + headerHeight - (int) scrollOffset;
+                for (ConfigButton cb : configs) {
+                    if (cb.mouseClicked(x, configY, width, mouseX, mouseY, mouseButton)) {
                         return true;
                     }
+                    configY += cb.getTotalHeight();
                 }
-                moduleY += mb.getTotalHeight();
+            } else {
+                int moduleY = y + headerHeight - (int) scrollOffset;
+                int maxY = y + headerHeight + (height - y - headerHeight - 20);
+                for (ModuleButton mb : modules) {
+                    int moduleHeight = mb.getTotalHeight();
+                    if (moduleY + moduleHeight > y + headerHeight && moduleY < maxY) {
+                        if (mb.mouseClicked(x, moduleY, width, mouseX, mouseY, mouseButton)) {
+                            return true;
+                        }
+                    }
+                    moduleY += moduleHeight;
+                }
             }
 
             return false;
@@ -318,15 +349,20 @@ public class ClickInterface extends GuiScreen {
         public void handleScroll(int mouseX, int mouseY, int wheel) {
             int scrollAmount = wheel > 0 ? 15 : -15;
             targetScroll -= scrollAmount;
-            // clamp later in render
         }
 
         public void updateDrag(int mouseX, int mouseY) {
             if (draggingScrollbar) {
                 int totalHeight = 0;
-                for (ModuleButton mb : modules) totalHeight += mb.getTotalHeight();
+                if (category == ModuleCategory.CONFIGS) {
+                    totalHeight = configs.size() * 16;
+                } else {
+                    for (ModuleButton mb : modules) totalHeight += mb.getTotalHeight();
+                }
+
                 int maxVisibleHeight = height - y - headerHeight - 20;
                 int maxScroll = Math.max(0, totalHeight - Math.max(0, maxVisibleHeight));
+
                 if (maxScroll > 0) {
                     float thumbTrack = maxVisibleHeight - Math.max(24f, (float) maxVisibleHeight / (float) totalHeight * maxVisibleHeight);
                     if (thumbTrack <= 0) return;
@@ -338,13 +374,13 @@ public class ClickInterface extends GuiScreen {
         }
 
         public void clampToScreen() {
-            // keep panels at least partially visible
             int minX = -width + 30;
             int maxX = ClickInterface.this.width - 30;
             if (x < minX) x = minX;
             if (x > maxX) x = maxX;
         }
     }
+
 
     private class ModuleButton {
         private final Module module;
@@ -440,7 +476,7 @@ public class ClickInterface extends GuiScreen {
         }
     }
 
-    private class SettingComponent {
+    public class SettingComponent {
         private final Property<?> property;
         private boolean dropdownOpen = false;
         private int dragStartX = 0;
@@ -469,7 +505,32 @@ public class ClickInterface extends GuiScreen {
                 renderNumberSetting(x, y, width, mouseX, mouseY);
             } else if (property instanceof ModeProperty) {
                 renderModeSetting(x, y, width, mouseX, mouseY);
+            } else if (property.getType() == String.class) {
+                renderStringSetting(x, y, width, mouseX, mouseY);
             }
+        }
+
+        private void renderStringSetting(int x, int y, int width, int mouseX, int mouseY) {
+            font.drawString(property.getLabel(), x + 4, y + 2, TEXT_COLOR.getRGB());
+
+            String displayValue;
+            Color valueColor;
+
+            if (editingString == this) {
+                displayValue = editingBuffer + (System.currentTimeMillis() % 1000 < 500 ? "_" : "");
+                valueColor = ACCENT_COLOR.brighter();
+            } else {
+                String value = (String) property.getValue();
+                displayValue = value.isEmpty() ? "..." : value;
+                valueColor = ACCENT_COLOR;
+            }
+
+            int valueWidth = font.getStringWidth(displayValue);
+            font.drawString(displayValue, x + width - valueWidth - 6, y + 2, valueColor.getRGB());
+
+            int underlineY = y + 13;
+            Color underlineColor = editingString == this ? ACCENT_COLOR : new Color(80, 80, 80);
+            drawRect(x + 6, underlineY, x + width - 6, underlineY + 1, underlineColor.getRGB());
         }
 
         private void renderBooleanSetting(int x, int y, int width) {
@@ -563,6 +624,12 @@ public class ClickInterface extends GuiScreen {
                     property.setValueObj(!(Boolean) property.getValue());
                     return true;
                 }
+            } else if (property.getType() == String.class) {
+                if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + 16) {
+                    editingString = this;
+                    editingBuffer = (String) property.getValue();
+                    return true;
+                }
             } else if (property instanceof NumberProperty) {
                 int sliderY = y + 12;
                 int sliderPadding = 6;
@@ -621,6 +688,45 @@ public class ClickInterface extends GuiScreen {
                 double finalValue = Math.max(numProp.getMin(), Math.min(numProp.getMax(), rawValue));
                 numProp.setValue(finalValue);
             }
+        }
+    }
+
+    private class ConfigButton {
+        private final String configName;
+        private final CategoryPanel parent;
+
+        public ConfigButton(String configName, CategoryPanel parent) {
+            this.configName = configName;
+            this.parent = parent;
+        }
+
+        public int getTotalHeight() {
+            return 16;
+        }
+
+        public void render(int x, int y, int width, int mouseX, int mouseY) {
+            boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + 16;
+            Color bgColor = hovered ? HOVER_COLOR : BG_COLOR;
+            drawRect(x, y, x + width, y + 16, bgColor.getRGB());
+
+            font.drawString(configName, x + 4, y + 4, TEXT_COLOR.getRGB());
+            font.drawString("↓", x + width - 10, y + 4, ACCENT_COLOR.getRGB());
+        }
+
+        public boolean mouseClicked(int x, int y, int width, int mouseX, int mouseY, int mouseButton) {
+            boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + 16;
+            if (hovered && mouseButton == 0) {
+                new Thread(() -> {
+                    boolean success = GitHubConfigFetcher.downloadAndLoadConfig(configName);
+                    if (success) {
+                        cc.simp.utils.client.Logger.chatPrint("Config '" + configName + "' downloaded and loaded.");
+                    } else {
+                        cc.simp.utils.client.Logger.chatPrint("Failed to download config '" + configName + "'.");
+                    }
+                }).start();
+                return true;
+            }
+            return false;
         }
     }
 

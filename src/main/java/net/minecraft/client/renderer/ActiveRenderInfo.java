@@ -1,7 +1,5 @@
 package net.minecraft.client.renderer;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
@@ -14,12 +12,15 @@ import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
 public class ActiveRenderInfo
 {
-    private static final IntBuffer VIEWPORT = GLAllocation.createDirectIntBuffer(16);
-    private static final FloatBuffer MODELVIEW = GLAllocation.createDirectFloatBuffer(16);
-    private static final FloatBuffer PROJECTION = GLAllocation.createDirectFloatBuffer(16);
-    private static final FloatBuffer OBJECTCOORDS = GLAllocation.createDirectFloatBuffer(3);
+    public static final IntBuffer VIEWPORT = GLAllocation.createDirectIntBuffer(16);
+    public static final FloatBuffer MODELVIEW = GLAllocation.createDirectFloatBuffer(16);
+    public static final FloatBuffer PROJECTION = GLAllocation.createDirectFloatBuffer(16);
+    public static final FloatBuffer OBJECTCOORDS = GLAllocation.createDirectFloatBuffer(3);
     private static Vec3 position = new Vec3(0.0D, 0.0D, 0.0D);
     private static float rotationX;
     private static float rotationXZ;

@@ -10,7 +10,6 @@ import cc.simp.api.properties.impl.MultiModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.impl.visuals.NotificationsModule;
 import cc.simp.utils.misc.Manager;
-import cc.simp.utils.misc.StringUtils;
 import cc.simp.utils.render.Translate;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -21,7 +20,6 @@ import net.minecraft.client.Minecraft;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class Module extends Manager<Property<?>> implements Toggleable, Serializable {
 

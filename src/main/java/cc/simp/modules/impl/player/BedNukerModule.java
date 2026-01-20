@@ -3,7 +3,7 @@ package cc.simp.modules.impl.player;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.TeleportEvent;
 import cc.simp.api.properties.Property;
-import cc.simp.api.properties.impl.NumberProperty;
+import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -11,51 +11,60 @@ import cc.simp.processes.RotationProcess;
 import cc.simp.utils.misc.MovementFix;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockBed;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
-import net.minecraft.util.Vector3d;
+import net.minecraft.util.*;
 import org.lwjgl.util.vector.Vector2f;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Bed Nuker", category = ModuleCategory.PLAYER)
-public final class  BedNukerModule extends Module {
+public final class BedNukerModule extends Module {
 
-    private final NumberProperty breakRange = new NumberProperty("Break Range", 4.5, 1.0, 6.0, 0.1);
+    private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Normal);
+    private final Property<Boolean> keep = new Property<>("Keep Break Progress When Out Of Range", false);
+    private final Property<Boolean> throughWalls = new Property<>("Through Walls", false);
+    private final Property<Boolean> emptySurrounding = new Property<>("Empty Surrounding", true, () -> !throughWalls.getValue());
+    private final Property<Boolean> rotations = new Property<>("Rotate", true);
+    private final Property<Boolean> importantRotationsOnly = new Property<>("Only Rotate at Start and Stop", true);
     private final Property<Boolean> whitelistOwnBed = new Property<>("Whitelist Own Bed", true);
-    private final Property<Boolean> moveFix = new Property<>("Movement Fix", true);
+    private final Property<Boolean> slowDownInAir = new Property<>("Slow Down In Air", false);
+    private final Property<Boolean> movementCorrection = new Property<>("Movement Fix", true);
 
-    public static BlockPos bedPos;
-    private boolean rotate = false;
-    private int breakTicks;
-    private int delayTicks;
-    private Vector3d home;
+    private enum Mode {
+        Instant,
+        Normal
+    }
+
+    private Vector3d block, lastBlock, home;
+    private int delay;
+    private boolean down;
+    private float damage;
 
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
-            if (mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock) {
-                reset(true);
-                return;
+        delay--;
+        if (delay > 0) return;
+
+        if (block == null || mc.thePlayer.getDistance(block.getX(), block.getY(), block.getZ()) > 4 ||
+                getBlock(block.getX(), block.getY(), block.getZ()) instanceof BlockAir) {
+            updateBlock();
+
+            if (down) {
+                mc.gameSettings.keyBindAttack.setPressed(false);
+                down = false;
             }
 
-            getBedPos();
+            if (block == null) return;
+        }
 
-            if (bedPos != null) {
-                if (rotate) {
-                    float[] rot = getRotationToBlock(bedPos, getEnumFacing(bedPos));
-                    RotationProcess.setRotations(new Vector2f(rot[0], rot[1]), 7, moveFix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
-                    rotate = false;
-                }
-                mine(bedPos);
-            } else {
-                reset(true);
-            }
+        destroy();
     };
 
     @EventLink
@@ -67,130 +76,218 @@ public final class  BedNukerModule extends Module {
         }
     };
 
-    private void getBedPos() {
-        if (home != null && mc.thePlayer.getDistanceSq(home.getX(), home.getY(), home.getZ()) < 35 * 35 && whitelistOwnBed.getValue()) {
+    private void updateBlock() {
+        if (!(this.block == null || getBlock(this.block.x, this.block.y, this.block.z) instanceof BlockAir
+                || mc.thePlayer.getDistance(this.block.x, this.block.y - mc.thePlayer.getEyeHeight(), this.block.z) > 9)) {
             return;
         }
-        bedPos = null;
-        double range = breakRange.getValue();
-        for (double x = mc.thePlayer.posX - range; x <= mc.thePlayer.posX + range; x++) {
-            for (double y = mc.thePlayer.posY + mc.thePlayer.getEyeHeight() - range; y <= mc.thePlayer.posY + mc.thePlayer.getEyeHeight() + range; y++) {
-                for (double z = mc.thePlayer.posZ - range; z <= mc.thePlayer.posZ + range; z++) {
-                    BlockPos pos = new BlockPos((int) x, (int) y, (int) z);
+        if (this.lastBlock != null && !keep.getValue()) {
+            mc.playerController.curBlockDamageMP = 0;
+        }
 
-                    if (mc.theWorld.getBlockState(pos).getBlock() instanceof BlockBed && mc.theWorld.getBlockState(pos).getValue(BlockBed.PART) == BlockBed.EnumPartType.HEAD) {
-                        bedPos = pos;
-                        break;
+        lastBlock = block;
+        block = findBlock();
+    }
+
+    private Vector3d findBlock() {
+        if (home != null && mc.thePlayer.getDistanceSq(home.getX(), home.getY(), home.getZ()) < 35 * 35 && whitelistOwnBed.getValue()) {
+            return null;
+        }
+
+        int beds = 0;
+
+        for (int x = -5; x <= 5; x++) {
+            for (int y = -5; y <= 5; y++) {
+                for (int z = -5; z <= 5; z++) {
+                    final Block block = getBlockRelativeToPlayer(x, y, z);
+                    final Vector3d position = new Vector3d(mc.thePlayer.posX + x, mc.thePlayer.posY + y, mc.thePlayer.posZ + z);
+
+                    if (!(block instanceof BlockBed)) {
+                        continue;
                     }
+
+                    beds++;
+                    if (beds <= 1) continue;
+
+                    if (!throughWalls.getValue()) {
+                        Vector2f rot = calculateRotation(position);
+                        MovingObjectPosition mop = rayCast(rot, 4.5f);
+                        if (mop == null || mop.hitVec.distanceTo(new Vec3(mc.thePlayer.posX, mc.thePlayer.posY - mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ)) > 4.5) {
+                            continue;
+                        }
+                        BlockPos blockPos = mop.getBlockPos();
+                        if (!blockPos.equals(new BlockPos(position.getX(), position.getY(), position.getZ()))) {
+                            continue;
+                        }
+                    } else if (emptySurrounding.getValue()) {
+                        Vector3d addVec = position;
+                        double hardness = Double.MAX_VALUE;
+                        boolean empty = false;
+
+                        for (int addX = -4; addX <= 4; addX++) {
+                            for (int addY = 0; addY <= 1; addY++) {
+                                for (int addZ = -4; addZ <= 4; addZ++) {
+                                    Block possibleBlock = getBlock(position.getX() + addX, position.getY() + addY, position.getZ() + addZ);
+
+                                    if (possibleBlock instanceof BlockBed) {
+                                        continue;
+                                    }
+
+                                    if (empty || (mc.thePlayer.getDistance(position.getX() + addX, position.getY() + addY, position.getZ() + addZ)) > 4.5)
+                                        continue;
+
+                                    if (getNeighbours(position.add(new Vector3d(addX, addY, addZ))).stream()
+                                            .noneMatch(neighbour -> neighbour instanceof BlockBed)) {
+                                        continue;
+                                    }
+
+                                    if (possibleBlock instanceof BlockAir || possibleBlock instanceof BlockLiquid) {
+                                        empty = true;
+                                        continue;
+                                    }
+
+                                    if (mc.thePlayer.getDistance(position.getX() + addX, position.getY() + addY - mc.thePlayer.getEyeHeight(), position.getZ() + addZ) > 4.5) {
+                                        continue;
+                                    }
+
+                                    double possibleHardness = possibleBlock.getBlockHardness(mc.theWorld, new BlockPos(position.getX() + addX, position.getY() + addY, position.getZ() + addZ));
+
+                                    if (possibleHardness < hardness) {
+                                        hardness = possibleHardness;
+                                        addVec = position.add(new Vector3d(addX, addY, addZ));
+                                    }
+                                }
+                            }
+                        }
+
+                        if (!empty) {
+                            if (addVec.equals(position)) {
+                                return null;
+                            } else {
+                                return addVec;
+                            }
+                        }
+                    }
+
+                    return position;
                 }
             }
         }
+
+        return null;
     }
 
-    private void mine(BlockPos blockPos) {
-        if (delayTicks > 0) {
-            delayTicks--;
+    private List<Block> getNeighbours(Vector3d blockPos) {
+        List<Block> neighbours = new ArrayList<>();
+        for (EnumFacing enumFacing : EnumFacing.values()) {
+            if (enumFacing == EnumFacing.UP) continue;
+            Vector3d neighbourPos = blockPos.add(new Vector3d(enumFacing.getDirectionVec().getX(), enumFacing.getDirectionVec().getY(), enumFacing.getDirectionVec().getZ()));
+            neighbours.add(getBlock(neighbourPos));
+        }
+        return neighbours;
+    }
+
+    private void destroy() {
+        boolean slowDown = this.slowDownInAir.getValue();
+        boolean ground = mc.thePlayer.onGround;
+        if (!slowDown) mc.thePlayer.onGround = true;
+
+        BlockPos blockPos = new BlockPos(block.getX(), block.getY(), block.getZ());
+
+        switch (mode.getValue()) {
+            case Instant:
+                rotate();
+                damage = mc.playerController.curBlockDamageMP;
+
+                mc.thePlayer.swingItem();
+                mc.getNetHandler().addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK, blockPos, EnumFacing.UP));
+                mc.thePlayer.swingItem();
+                mc.getNetHandler().addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK, blockPos, EnumFacing.UP));
+                block = null;
+                delay = 20;
+
+                mc.playerController.onPlayerDestroyBlock(blockPos, EnumFacing.DOWN);
+                break;
+
+            case Normal:
+                damage = mc.playerController.curBlockDamageMP;
+                rotate();
+                mc.gameSettings.keyBindAttack.setPressed(true);
+                down = true;
+                break;
+        }
+
+        mc.thePlayer.onGround = ground;
+    }
+
+    private void rotate() {
+        BlockPos blockPos = new BlockPos(block.getX(), block.getY(), block.getZ());
+        float blockHardness = getBlock(blockPos).getPlayerRelativeBlockHardness(mc.thePlayer, mc.theWorld, blockPos);
+
+        if (importantRotationsOnly.getValue() && (mc.playerController.curBlockDamageMP != 0 && mc.playerController.curBlockDamageMP <= 1 - blockHardness - 0.001)) {
             return;
         }
 
-        IBlockState blockState = mc.theWorld.getBlockState(blockPos);
-
-        if (blockState.getBlock() instanceof BlockAir) {
-            return;
-        }
-
-        float totalBreakTicks = getBreakTicks(bedPos, mc.thePlayer.inventory.currentItem);
-        if (breakTicks == 0) {
-            rotate = true;
-            mc.thePlayer.swingItem();
-            mc.getNetHandler().addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK, bedPos, EnumFacing.UP));
-        } else if (breakTicks >= totalBreakTicks) {
-            rotate = true;
-            mc.thePlayer.swingItem();
-            mc.getNetHandler().addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK, bedPos, EnumFacing.UP));
-
-            mc.theWorld.sendBlockBreakProgress(mc.thePlayer.getEntityId(), blockPos, 1);
-
-            reset(false);
-            return;
-        } else {
-            rotate = true;
-            mc.thePlayer.swingItem();
-        }
-
-        breakTicks += 1;
-
-        int currentProgress = (int) (((double) breakTicks / totalBreakTicks) * 100);
-        mc.theWorld.sendBlockBreakProgress(mc.thePlayer.getEntityId(), bedPos, currentProgress / 10);
+        if (!this.rotations.getValue()) return;
+        RotationProcess.setRotations(getRotations(), 10, movementCorrection.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
     }
 
-    private void reset(boolean resetRotate) {
-        if (bedPos != null) {
-            mc.theWorld.sendBlockBreakProgress(mc.thePlayer.getEntityId(), bedPos, -1);
-            mc.getNetHandler().addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.ABORT_DESTROY_BLOCK, bedPos, EnumFacing.DOWN));
-        }
-
-        breakTicks = 0;
-        delayTicks = 5;
-        bedPos = null;
-        rotate = !resetRotate;
+    private Vector2f getRotations() {
+        return calculateRotation(new Vector3d(Math.floor(block.getX()) + 0.5 + (Math.random() - 0.5) / 4,
+                Math.floor(block.getY()) + 0.1,
+                Math.floor(block.getZ()) + 0.5 + (Math.random() - 0.5) / 4));
     }
 
-    private float[] getRotationToBlock(BlockPos pos, EnumFacing facing) {
-        double x = pos.getX() + 0.5 - mc.thePlayer.posX;
-        double y = pos.getY() + 0.5 - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
-        double z = pos.getZ() + 0.5 - mc.thePlayer.posZ;
+    private Vector2f calculateRotation(Vector3d target) {
+        double x = target.getX() - mc.thePlayer.posX;
+        double y = target.getY() - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
+        double z = target.getZ() - mc.thePlayer.posZ;
 
         double dist = Math.sqrt(x * x + z * z);
-        float yaw = (float)(Math.atan2(z, x) * 180.0 / Math.PI) - 90.0f;
-        float pitch = (float)(-(Math.atan2(y, dist) * 180.0 / Math.PI));
+        float yaw = (float) (Math.atan2(z, x) * 180.0 / Math.PI) - 90.0f;
+        float pitch = (float) (-(Math.atan2(y, dist) * 180.0 / Math.PI));
 
-        return new float[]{yaw, pitch};
+        return new Vector2f(yaw, pitch);
     }
 
-    private EnumFacing getEnumFacing(BlockPos pos) {
-        Vec3 eyesPos = new Vec3(mc.thePlayer.posX, mc.thePlayer.posY + mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ);
-
-        if (pos.getY() > eyesPos.yCoord) {
-            if (isReplaceable(pos.add(0, -1, 0))) {
-                return EnumFacing.DOWN;
-            } else {
-                return mc.thePlayer.getHorizontalFacing().getOpposite();
-            }
-        }
-
-        if (!isReplaceable(pos.add(0, 1, 0))) {
-            return mc.thePlayer.getHorizontalFacing().getOpposite();
-        }
-
-        return EnumFacing.UP;
+    private MovingObjectPosition rayCast(Vector2f rotation, float range) {
+        Vec3 eyes = mc.thePlayer.getPositionEyes(1);
+        Vec3 rotationVector = mc.thePlayer.getVectorForRotation(rotation.y, rotation.x);
+        Vec3 forward = eyes.addVector(rotationVector.xCoord * range, rotationVector.yCoord * range, rotationVector.zCoord * range);
+        return mc.theWorld.rayTraceBlocks(eyes, forward, false, false, true);
     }
 
-    private boolean isReplaceable(BlockPos pos) {
-        return mc.theWorld.getBlockState(pos).getBlock().isReplaceable(mc.theWorld, pos);
+    private Block getBlock(double x, double y, double z) {
+        return mc.theWorld.getBlockState(new BlockPos(x, y, z)).getBlock();
     }
 
-    private float getBreakTicks(BlockPos bp, int tool) {
-        int oldHeld = mc.thePlayer.inventory.currentItem;
+    private Block getBlock(Vector3d pos) {
+        return getBlock(pos.getX(), pos.getY(), pos.getZ());
+    }
 
-        mc.thePlayer.inventory.currentItem = tool;
-        IBlockState bs = mc.theWorld.getBlockState(bp);
-        float ticks = 1f / bs.getBlock().getPlayerRelativeBlockHardness(mc.thePlayer, mc.theWorld, bp);
+    private Block getBlock(BlockPos pos) {
+        return mc.theWorld.getBlockState(pos).getBlock();
+    }
 
-        mc.thePlayer.inventory.currentItem = oldHeld;
-        return ticks;
+    private Block getBlockRelativeToPlayer(int x, int y, int z) {
+        return getBlock(mc.thePlayer.posX + x, mc.thePlayer.posY + y, mc.thePlayer.posZ + z);
     }
 
     @Override
     public void onEnable() {
-        rotate = false;
-        bedPos = null;
-        breakTicks = 0;
-        delayTicks = 0;
+        block = null;
+        damage = 0;
+        delay = 0;
+        down = false;
     }
 
     @Override
     public void onDisable() {
-        reset(true);
+        block = null;
+
+        if (down) {
+            mc.gameSettings.keyBindAttack.setPressed(false);
+            down = false;
+        }
     }
 }

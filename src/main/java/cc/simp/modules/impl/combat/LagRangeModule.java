@@ -1,5 +1,6 @@
 package cc.simp.modules.impl.combat;
 
+import cc.simp.Simp;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.events.impl.world.WorldLoadEvent;
@@ -29,9 +30,10 @@ public final class LagRangeModule extends Module {
     public static NumberProperty minDelayProperty = new NumberProperty("Min Delay", 50.0, 0.0, 5000.0, 10.0);
     public static NumberProperty maxDelayProperty = new NumberProperty("Max Delay", 200.0, 0.0, 5000.0, 10.0);
     public static final Property<Boolean> displayProperty = new Property<>("Display", true);
+    public static final Property<Boolean> onlyWithKillaura = new Property<>("Only With Killaura", true);
 
     private boolean lagging = false;
-    private int lagAmount = 67;
+    private int lagAmount = 69;
 
     @EventLink
     public Listener<WorldLoadEvent> worldLoadEventListener = event -> {
@@ -44,9 +46,14 @@ public final class LagRangeModule extends Module {
     public Listener<MotionEvent> motionEventListener = event -> {
         if (event.isPre()) return;
 
-        lagAmount = (int) MathUtils.getRandom(minDelayProperty.getValue().intValue(), maxDelayProperty.getValue().intValue());
+        if (onlyWithKillaura.getValue() && !Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && KillAuraModule.target == null) {
+            if (lagging) disableLag();
+            return;
+        }
 
-        if (!lagging) lagAmount = 67;
+        if (lagging) lagAmount = (int) MathUtils.getRandom(minDelayProperty.getValue().intValue(), maxDelayProperty.getValue().intValue());
+
+        if (!lagging) lagAmount = 69;
 
         setSuffix(String.format("%.1f | %dms", rangeProperty.getValue(), lagAmount));
 

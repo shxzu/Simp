@@ -28,6 +28,7 @@ public final class ModuleManager {
                 new TargetStrafeModule(),
                 new CriticalsModule(),
                 new TickBaseModule(),
+                new TimerRangeModule(),
                 new BlinkRangeModule(),
                 new LagRangeModule(),
                 new VelocityModule(),
@@ -39,6 +40,8 @@ public final class ModuleManager {
                 new AimAssistModule(),
                 new AutoRodModule(),
                 new AutoPotModule(),
+                new AutoGappleModule(),
+                new AutoSoupModule(),
                 new NoHitDelayModule(),
 
                 // Movement
@@ -81,6 +84,7 @@ public final class ModuleManager {
                 new TimerModule(),
                 new BlinkModule(),
                 new NoRotateModule(),
+                new MurderDetectorModule(),
                 new InsultsModule(),
 
                 // Visuals
@@ -97,6 +101,7 @@ public final class ModuleManager {
                 new TargetInterfaceModule(),
                 new PostProcessingModule(),
                 new ScoreboardModule(),
+                new SessionInformationModule(),
                 new NickHiderModule(),
                 new NameTagsModule(),
                 new StorageESPModule(),

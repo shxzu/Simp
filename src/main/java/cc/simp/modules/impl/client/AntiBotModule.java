@@ -44,27 +44,26 @@ public class AntiBotModule extends Module {
 
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
-
         setSuffix(modeProperty.getValue().toString());
+
+        botList.clear();
 
         switch (modeProperty.getValue()) {
             case NPC:
                 mc.theWorld.playerEntities.forEach(player -> {
-                    if (player.moved) {
-                        botList.remove(player);
-                    } else {
+                    if (player != mc.thePlayer && !player.moved) {
                         botList.add(player);
                     }
                 });
                 break;
             case TabList:
+                List<String> tabList = getTablist();
                 mc.theWorld.playerEntities.forEach(player -> {
-                    if (!getTablist().contains(player.getDisplayName().toString())) {
+                    if (player != mc.thePlayer && !tabList.contains(player.getName())) {
                         botList.add(player);
                     }
                 });
                 break;
-
         }
     };
 
