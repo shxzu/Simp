@@ -36,9 +36,13 @@ Watch this [video](https://youtu.be/If5PMPH4jLk)
 Just HMCL. No help will be provided for any other launcher (because I can't be bothered!).
 As of release ``Simp 1.2``
 > HMCL: ✅
+> 
 > Vanilla Launcher: ✅
+> 
 > Prism Launcher: ✅ (with proper fixing)
+> 
 > MultiMC: ❓
+> 
 > Pojav Launcher: ❓
 
 ### 3. I have this error!
