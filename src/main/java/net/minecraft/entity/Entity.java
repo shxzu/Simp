@@ -98,7 +98,7 @@ public abstract class Entity implements ICommandSender
     protected Random rand;
     public int ticksExisted;
     public int fireResistance;
-    private int fire;
+    public int fire;
     protected boolean inWater;
     public int hurtResistantTime;
     protected boolean firstUpdate;

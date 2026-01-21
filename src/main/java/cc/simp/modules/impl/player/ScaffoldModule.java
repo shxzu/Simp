@@ -77,6 +77,8 @@ public final class ScaffoldModule extends Module {
     private final NumberProperty jumpDelayTicks = new NumberProperty("Auto Jump Delay", 0, () -> autoJump.getValue() != JumpMode.None, 0, 5, 1);
     public static Property<Boolean> edge = new Property<>("Jump Only On Edge", false, () -> autoJump.getValue() != JumpMode.None);
     public static Property<Boolean> keepY = new Property<>("Keep Y", false, () -> autoJump.getValue() != JumpMode.None);
+    private static final Property<Boolean> sneak = new Property<>("Sneak", false);
+    private final NumberProperty sneakEvery = new NumberProperty("Sneak Every", 1, sneak::getValue, 0, 10, 1);
     private static final Property<Boolean> safeWalk = new Property<>("Safe Walk", false);
     private static final Property<Boolean> safeWalkOnAir = new Property<>("Safe Walk On Air", false, safeWalk::getValue);
     private final NumberProperty expand = new NumberProperty("Expand", 0, 0, 4, 1);
@@ -171,6 +173,7 @@ public final class ScaffoldModule extends Module {
     private boolean overrided;
     public int recursions, recursion;
     private boolean stop;
+    private int blocksPlaced;
 
     @EventLink
     public final Listener<MotionEvent> motionEventListener = event -> {
@@ -185,11 +188,16 @@ public final class ScaffoldModule extends Module {
         resetBinds(false, false, true, true, false, false);
 
         if (safeWalk.getValue()) {
-            if (!safeWalkOnAir.getValue() && !mc.thePlayer.onGround) mc.thePlayer.safeWalk = false;
-            mc.thePlayer.safeWalk = true;
+            if (safeWalkOnAir.getValue()) {
+                mc.thePlayer.safeWalk = true;
+            } else {
+                mc.thePlayer.safeWalk = mc.thePlayer.onGround;
+            }
         }
 
         sprint();
+
+        sneak();
 
         tower();
 
@@ -297,7 +305,9 @@ public final class ScaffoldModule extends Module {
         if (!moveFix.getValue()) {
             MovementUtils.useDiagonalSpeed();
         }
-        this.jump();
+        if (!mc.gameSettings.keyBindJump.isPressed()) {
+            this.jump();
+        }
     };
 
     @EventLink
@@ -379,6 +389,7 @@ public final class ScaffoldModule extends Module {
             mc.timer.timerSpeed = 1.0f;
             overrided = false;
             stop = false;
+            blocksPlaced = 0;
         }
         resetBinds();
         super.onDisable();
@@ -553,7 +564,7 @@ public final class ScaffoldModule extends Module {
                 boolean diagonal = RotationUtils.getMovementYaw() % 90.0f > 10.0f && RotationUtils.getMovementYaw() % 90.0f < 80.0f;
                 if (recursion == 0) {
                     mc.entityRenderer.getMouseOver(1);
-                    if (mc.thePlayer.onGround && MovementUtils.isMoving() && !diagonal) {
+                    if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
                         rotSpeed = 5f;
                         this.targetYaw = mc.thePlayer.rotationYaw;
                         canPlace = false;
@@ -561,6 +572,9 @@ public final class ScaffoldModule extends Module {
                         if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
                             if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
                                 rotSpeed = 0.8f;
+                                if (diagonal) {
+                                    rotSpeed = 0.9f;
+                                }
                                 getBaseRotations();
                                 canPlace = true;
                             }
@@ -837,12 +851,15 @@ public final class ScaffoldModule extends Module {
                 PacketUtils.sendPacket(new C0APacketAnimation());
             }
         }
+        blocksPlaced++;
         delayTimer.reset();
     }
 
 
     public void jump() {
         if (mc.thePlayer.onGroundTicks < jumpDelayTicks.getValue().intValue()) return;
+
+        if (mc.gameSettings.keyBindJump.isKeyDown()) return;
 
         if (mode.getValue() == Mode.FastTelly || mode.getValue() == Mode.SlowTelly || mode.getValue() == Mode.Hypixel) {
             if (autoJump.getValue() == JumpMode.None) autoJump.setValue(JumpMode.Normal);
@@ -862,7 +879,6 @@ public final class ScaffoldModule extends Module {
     }
 
     private void handleJump() {
-
         if (mode.getValue() == Mode.Hypixel && !(MovementUtils.getSpeed() <= 0.02) && mc.thePlayer.offGroundTicks >= 9) {
             return;
         }
@@ -887,6 +903,17 @@ public final class ScaffoldModule extends Module {
                 mc.gameSettings.keyBindSprint.setPressed(false);
                 mc.thePlayer.setSprinting(false);
                 break;
+        }
+    }
+
+    private void sneak() {
+        if (sneak.getValue()) {
+            if (blocksPlaced >= sneakEvery.getValue().intValue() && !mc.gameSettings.keyBindSneak.isPressed()) {
+                mc.gameSettings.keyBindSneak.setPressed(true);
+                blocksPlaced = 0;
+            } else {
+                mc.gameSettings.keyBindSneak.setPressed(false);
+            }
         }
     }
 

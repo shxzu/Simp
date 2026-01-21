@@ -134,6 +134,8 @@ public final class SessionInformationModule extends Module {
 
         FontProcess.getFont("simp").drawString(playTimeText, 38, LABEL_HEIGHT + 23, color.getRGB());
 
+        RenderUtils.resetColor();
+
         GlStateManager.popMatrix();
     }
 
@@ -177,6 +179,8 @@ public final class SessionInformationModule extends Module {
         FontProcess.getFont("simp").drawString(playingOnText, 38, LABEL_HEIGHT + 13, new Color(180, 180, 180).getRGB());
 
         FontProcess.getFont("simp").drawString(playTimeText, 38, LABEL_HEIGHT + 23, new Color(180, 180, 180).getRGB());
+
+        RenderUtils.resetColor();
 
         GlStateManager.popMatrix();
     }

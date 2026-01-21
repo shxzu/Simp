@@ -1,21 +1,9 @@
 package cc.simp.interfaces.menu.alt;
 
 
-import java.awt.Color;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.net.URI;
-import java.net.URLConnection;
-import java.net.http.HttpClient;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.interfaces.menu.alt.microsoft.MicrosoftOAuthTranslation;
+import cc.simp.processes.BgProcess;
 import cc.simp.processes.ColorProcess;
 import cc.simp.processes.FontProcess;
 import cc.simp.utils.render.GlUtils;
@@ -33,6 +21,17 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URI;
+import java.net.URLConnection;
+import java.net.http.HttpClient;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AltManagerGui extends GuiScreen {
 
@@ -59,7 +58,6 @@ public class AltManagerGui extends GuiScreen {
     private CustomTextBox username, password;
     private ArrayList<String> alts = new ArrayList<>();
     private int scrollOffset = 0;
-    private int maxScroll;
     private boolean draggingScrollbar = false;
     private int dragStartY;
     private int scrollStart;
@@ -70,7 +68,6 @@ public class AltManagerGui extends GuiScreen {
     private final CustomFontRenderer buttonFont;
     private final CustomFontRenderer infoFont;
     private final CustomFontRenderer altFont;
-    private final ResourceLocation backgroundImage;
     private final long startTime;
 
     private int buttonWidth;
@@ -79,7 +76,6 @@ public class AltManagerGui extends GuiScreen {
 
     public AltManagerGui() {
         startTime = System.currentTimeMillis();
-        backgroundImage = new ResourceLocation("simp/images/mainmenu.jpg");
         titleFont = FontProcess.getFont("semi-big");
         buttonFont = FontProcess.getFont("simp");
         altFont = FontProcess.getFont("simp");
@@ -184,7 +180,7 @@ public class AltManagerGui extends GuiScreen {
         password.setWidth(LOGIN_WIDTH - PADDING * 2);
         password.setHeight(textFeildHeight);
 
-        RenderUtils.drawImage(backgroundImage, 0, 0, this.width, this.height);
+        RenderUtils.drawImage(BgProcess.getInstance().getCurrentBackground(), 0, 0, this.width, this.height);
         Gui.drawRect(0, 0, this.width, this.height, new Color(0, 0, 0, 130).getRGB());
 
         // Draw current user box

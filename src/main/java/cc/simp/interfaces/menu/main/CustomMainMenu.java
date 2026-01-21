@@ -2,33 +2,30 @@ package cc.simp.interfaces.menu.main;
 
 import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.interfaces.menu.alt.AltManagerGui;
-import cc.simp.processes.ColorProcess;
+import cc.simp.processes.BgProcess;
 import cc.simp.processes.FontProcess;
 import cc.simp.utils.render.RenderUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.GuiMultiplayer;
+import net.minecraft.client.gui.GuiOptions;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.net.URI;
-
-import java.awt.*;
-import java.io.IOException;
 
 public class CustomMainMenu extends GuiScreen {
-    private final ResourceLocation backgroundImage;
     private final ResourceLocation logoImage;
     private final CustomFontRenderer buttonFont;
     private final CustomFontRenderer changelogFont;
@@ -43,7 +40,6 @@ public class CustomMainMenu extends GuiScreen {
     ArrayList<String> changelogEntries;
 
     public CustomMainMenu() {
-        backgroundImage = new ResourceLocation("simp/images/mainmenu.jpg");
         logoImage = new ResourceLocation("simp/images/simp_light.png");
         startTime = System.currentTimeMillis();
         buttonFont = FontProcess.getFont("simp");
@@ -100,7 +96,7 @@ public class CustomMainMenu extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         GlStateManager.disableAlpha();
 
-        RenderUtils.drawImage(backgroundImage, 0, 0, this.width, this.height);
+        RenderUtils.drawImage(BgProcess.getInstance().getCurrentBackground(), 0, 0, this.width, this.height);
 
         GlStateManager.enableAlpha();
 
@@ -136,6 +132,8 @@ public class CustomMainMenu extends GuiScreen {
         drawButton(startX + buttonWidth + buttonSpacing, startY, buttonWidth, buttonHeight, "multiplayer", mouseX, mouseY);
 
         drawButton(startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight, "alts", mouseX, mouseY);
+
+        drawButton(startX + (buttonWidth + buttonSpacing) * 2, startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight, "change bg", mouseX, mouseY);
 
         drawButton(startX, startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight, "options", mouseX, mouseY);
 
@@ -236,6 +234,10 @@ public class CustomMainMenu extends GuiScreen {
 
             if (isMouseOverButton(mouseX, mouseY, startX + (buttonWidth + buttonSpacing) * 2, startY, buttonWidth, buttonHeight)) {
                 mc.displayGuiScreen(new AltManagerGui());
+            }
+
+            if (isMouseOverButton(mouseX, mouseY, startX + (buttonWidth + buttonSpacing) * 2, startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight)) {
+                BgProcess.getInstance().cycleBackground();
             }
 
             if (isMouseOverButton(mouseX, mouseY, startX, startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight)) {

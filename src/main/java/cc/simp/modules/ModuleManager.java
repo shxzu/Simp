@@ -74,6 +74,8 @@ public final class ModuleManager {
 
                 // Client
                 new ClientSettingsModule(),
+                new ToggleSoundsModule(),
+                new HitSoundsModule(),
                 new DiscordRPCModule(),
                 new AntiBotModule(),
                 new DisablerModule(),

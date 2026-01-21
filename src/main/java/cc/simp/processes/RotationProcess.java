@@ -38,8 +38,13 @@ public class RotationProcess {
         RotationProcess.rotationSpeed = rotationSpeed * 36;
         RotationProcess.correctMovement = correctMovement;
         RotationProcess.raycast = raycast;
-        active = true;
 
+        if (!active) {
+            lastRotations = new Vector2f(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
+            lastYawDelta = 0;
+        }
+
+        active = true;
         smooth();
     }
 
@@ -110,6 +115,7 @@ public class RotationProcess {
 
         targetRotations = new Vector2f(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
         smoothed = false;
+        lastYawDelta = 0; // Reset delta when rotations change state
     };
 
     private void correctDisabledRotations() {

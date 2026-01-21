@@ -1,6 +1,7 @@
 package net.minecraft.entity;
 
 import cc.simp.Simp;
+import cc.simp.api.events.impl.game.EntityHurtSoundEvent;
 import cc.simp.api.events.impl.game.MinMotionEvent;
 import cc.simp.api.events.impl.player.JumpEvent;
 import cc.simp.modules.impl.movement.SprintModule;
@@ -1162,7 +1163,10 @@ public abstract class EntityLivingBase extends Entity
 
             if (s != null)
             {
-                this.playSound(this.getHurtSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
+                EntityHurtSoundEvent event = new EntityHurtSoundEvent(this);
+                Simp.INSTANCE.getEventBus().post(event);
+                if(!event.isCancelled())
+                    this.playSound(this.getHurtSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
             }
 
             this.attackEntityFrom(DamageSource.generic, 0.0F);

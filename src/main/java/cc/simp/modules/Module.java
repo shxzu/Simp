@@ -8,7 +8,9 @@ import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.MultiModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
+import cc.simp.modules.impl.client.ToggleSoundsModule;
 import cc.simp.modules.impl.visuals.NotificationsModule;
+import cc.simp.utils.client.SoundUtils;
 import cc.simp.utils.misc.Manager;
 import cc.simp.utils.render.Translate;
 import com.google.gson.JsonArray;
@@ -117,17 +119,51 @@ public class Module extends Manager<Property<?>> implements Toggleable, Serializ
     public void toggle() {
         setEnabled(!enabled);
         if (Minecraft.getMinecraft().thePlayer != null) {
-            if(!Simp.INSTANCE.getModuleManager().getModule(NotificationsModule.class).isEnabled()) {
-                return;
-            }
-            String titleToggle = "Module toggled";
-            String descriptionToggleOn = this.getLabel() + " was " + "§aenabled!";
-            String descriptionToggleOff = this.getLabel() + " was " + "§cdisabled!";
+            if (Simp.INSTANCE.getModuleManager().getModule(NotificationsModule.class).isEnabled()) {
+                String titleToggle = "Module toggled";
+                String descriptionToggleOn = this.getLabel() + " was " + "§aenabled!";
+                String descriptionToggleOff = this.getLabel() + " was " + "§cdisabled!";
 
-            if (enabled) {
-                NotificationManager.post(NotificationType.SUCCESS, titleToggle, descriptionToggleOn);
-            } else {
-                NotificationManager.post(NotificationType.DISABLE, titleToggle, descriptionToggleOff);
+                if (enabled) {
+                    NotificationManager.post(NotificationType.SUCCESS, titleToggle, descriptionToggleOn);
+                } else {
+                    NotificationManager.post(NotificationType.DISABLE, titleToggle, descriptionToggleOff);
+                }
+            }
+            if (Simp.INSTANCE.getModuleManager().getModule(ToggleSoundsModule.class).isEnabled()) {
+                switch (ToggleSoundsModule.mode.getValue()) {
+                    case Simp:
+                        if (enabled) {
+                            SoundUtils.playSound("simp-enable.wav");
+                        } else {
+                            SoundUtils.playSound("simp-disable.wav");
+                        }
+                        break;
+                    case Augustus:
+                        if (enabled) {
+                            SoundUtils.playSound("augustus-enable.wav");
+                        } else {
+                            SoundUtils.playSound("augustus-disable.wav");
+                        }
+                        break;
+                    case Vanilla:
+                        SoundUtils.playSound("minecraft-toggle.wav");
+                        break;
+                    case Sigma5:
+                        if (enabled) {
+                            SoundUtils.playSound("sigma5-enable.wav");
+                        } else {
+                            SoundUtils.playSound("sigma5-disable.wav");
+                        }
+                        break;
+                    case Note:
+                        if (enabled) {
+                            SoundUtils.playSound("note-enable.wav");
+                        } else {
+                            SoundUtils.playSound("note-disable.wav");
+                        }
+                        break;
+                }
             }
         }
     }
