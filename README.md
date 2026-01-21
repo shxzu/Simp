@@ -42,7 +42,7 @@ As of release ``Simp 1.2``
 > Pojav Launcher: ❓
 
 ### 3. I have this error!
-No one is obliged to help you. Make an issue or join the (Discord)[https://discord.gg/RV6UN7b8T8].
+No one is obliged to help you. Make an issue or join the [Discord](https://discord.gg/RV6UN7b8T8).
 
 ### 4. Common errors:
 -# (if any more common errors are reported they will be added)
@@ -51,9 +51,9 @@ No one is obliged to help you. Make an issue or join the (Discord)[https://disco
 Make sure you're using **Java 22** if you're using a launcher like Prism or latest HMCL make sure you skip Java compatibility checks.
 
 ### 6. How do I get help with my error?
-Post your crash log in the (Discord)[https://discord.gg/RV6UN7b8T8] help channel. If you get ignored its because your issue is that you didn't follow steps correctly or that it can be found in the FAQ.
+Post your crash log in the [Discord](https://discord.gg/RV6UN7b8T8) help channel. If you get ignored its because your issue is that you didn't follow steps correctly or that it can be found in the FAQ.
 
--# This FAQ is incomplete if your problem is not on here use the (Discord)[https://discord.gg/RV6UN7b8T8].
+-# This FAQ is incomplete if your problem is not on here use the [Discord](https://discord.gg/RV6UN7b8T8).
 
 ## How to Build
 
