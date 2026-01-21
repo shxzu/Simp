@@ -48,8 +48,10 @@ public class FontProcess {
             STAR = "G";
 
     static {
+        registerFont("small", createFont("simp", 10));
         registerFont("simp", createFont("simp", 18));
         registerFont("bold", createFont("simp-bold", 18));
+        registerFont("semi-big", createFont("simp", 32));
         registerFont("big", createFont("simp-bold", 48));
         registerFont("noto", createFont("noto", 18));
         registerFont("arial", createFont("arial", 18));

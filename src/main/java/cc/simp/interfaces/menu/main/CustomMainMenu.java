@@ -28,7 +28,6 @@ import java.awt.*;
 import java.io.IOException;
 
 public class CustomMainMenu extends GuiScreen {
-
     private final ResourceLocation backgroundImage;
     private final ResourceLocation logoImage;
     private final CustomFontRenderer buttonFont;

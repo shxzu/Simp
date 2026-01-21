@@ -38,11 +38,8 @@ public class GlUtils {
         GlStateManager.disableBlend();
     }
 
-    public static void setup2DRendering(boolean blend) {
-        if (blend) {
-            startBlend();
-        }
-        GlStateManager.disableTexture2D();
+    public static void resetColor() {
+        GlStateManager.color(1, 1, 1, 1);
     }
 
     public static void color(int color) {
@@ -54,12 +51,11 @@ public class GlUtils {
     }
 
     public static void setup2DRendering() {
-        setup2DRendering(true);
+        GlStateManager.enableTexture2D();
     }
 
     public static void end2DRendering() {
-        GlStateManager.enableTexture2D();
-        endBlend();
+        GlStateManager.disableTexture2D();
     }
 
 }

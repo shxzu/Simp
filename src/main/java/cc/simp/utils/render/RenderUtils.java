@@ -133,7 +133,8 @@ public class RenderUtils extends Util {
         GlUtils.color(RenderUtils.interpolateColorsBackAndForth(15, 15 * 5, colors.getLeft(), colors.getRight(), false).getRGB());
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(GL_GREATER, (float) (0 * .01));
-        GlUtils.setup2DRendering(true);
+        GlUtils.startBlend();
+        GlUtils.end2DRendering();
 
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
@@ -145,7 +146,9 @@ public class RenderUtils extends Util {
         worldrenderer.pos(x + width, y, 0.0D).color(color.getRGB()).endVertex();
         tessellator.draw();
 
-        GlUtils.end2DRendering();
+        GlUtils.setup2DRendering();
+        GlUtils.endBlend();
+        GlUtils.resetColor();
     }
 
     public static void drawArrow(float x, float y, float size, ArrowDirection direction, int color) {
@@ -210,7 +213,8 @@ public class RenderUtils extends Util {
         glEnable(GL_LINE_SMOOTH);
         color(outlineColor);
 
-        GlUtils.setup2DRendering();
+        GlUtils.startBlend();
+        GlUtils.end2DRendering();
 
         glLineWidth(outlineThickness);
         float cornerValue = (float) (outlineThickness * .19);
@@ -234,7 +238,9 @@ public class RenderUtils extends Util {
         glVertex2d(bottom ? x + width : x, y + height);
         glEnd();
 
-        GlUtils.end2DRendering();
+        GlUtils.setup2DRendering();
+        GlUtils.endBlend();
+        GlUtils.resetColor();
 
         glDisable(GL_LINE_SMOOTH);
     }
@@ -299,7 +305,8 @@ public class RenderUtils extends Util {
     public static void renderBoundingBox(AxisAlignedBB aabb, Color color, int alpha) {
         AxisAlignedBB bb = aabb;
         GlStateManager.pushMatrix();
-        GlUtils.setup2DRendering();
+        GlUtils.startBlend();
+        GlUtils.end2DRendering();
         GlUtils.enableCaps(GL_BLEND, GL_POINT_SMOOTH, GL_POLYGON_SMOOTH, GL_LINE_SMOOTH);
 
         glLineWidth(5);
@@ -309,7 +316,8 @@ public class RenderUtils extends Util {
         RenderGlobal.drawOutlinedBoundingBox(bb, color.getRed(), color.getGreen(), color.getBlue(), alpha);
 
         GlUtils.disableCaps();
-        GlUtils.end2DRendering();
+        GlUtils.setup2DRendering();
+        GlUtils.endBlend();
 
         GlStateManager.popMatrix();
     }
