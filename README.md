@@ -48,8 +48,13 @@ As of release ``Simp 1.2``
 ### 3. I have this error!
 No one is obliged to help you. Make an issue or join the [Discord](https://discord.gg/RV6UN7b8T8).
 
-### 4. Common errors:
--# (if any more common errors are reported they will be added)
+### 4. Known bugs/errors:
+- No sound or crash on certain systems relating to SoundSystem.
+- Legit and Predictive auto block modes kicking in servers due to sending too many packets.
+- Latest HMCL not launching until skipping Java compatibility checks
+**THESS BUGS WILL BE FIXED IN FUTURE VERSIONS! WE CANNOT FIX THEM NOW DUE TO UNKNOWN CAUSES OR LOSS OF TIME/FOCUS!**
+
+(if any more common bugs/errors are reported they will be added)
 
 ### 5. I've done all the steps but it keeps crashing!
 Make sure you're using **Java 22** if you're using a launcher like Prism or latest HMCL make sure you skip Java compatibility checks.
@@ -57,7 +62,7 @@ Make sure you're using **Java 22** if you're using a launcher like Prism or late
 ### 6. How do I get help with my error?
 Post your crash log in the [Discord](https://discord.gg/RV6UN7b8T8) help channel. If you get ignored its because your issue is that you didn't follow steps correctly or that it can be found in the FAQ.
 
--# This FAQ is incomplete if your problem is not on here use the [Discord](https://discord.gg/RV6UN7b8T8).
+**This FAQ is incomplete if your problem is not on here use the [Discord](https://discord.gg/RV6UN7b8T8).**
 
 ## How to Build
 
