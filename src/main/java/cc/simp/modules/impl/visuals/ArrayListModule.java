@@ -39,6 +39,7 @@ public final class ArrayListModule extends Module {
     private static final Property<Boolean> useMcFont = new Property<>("Use MC Font", false);
     private final Property<Boolean> noSpaces = new Property<>("No Spaces", false);
     private final Property<Boolean> showSuffix = new Property<>("Show Suffix", true);
+    private final ModeProperty<SuffixMode> suffixMode = new ModeProperty<>("Suffix Mode", SuffixMode.Space, showSuffix::getValue);
     private final Property<Boolean> lowercase = new Property<>("Lowercase", true);
     private final ModeProperty<ColorMode> colorMode = new ModeProperty<>("Color Mode", ColorMode.Fade);
     private final NumberProperty offsetX = new NumberProperty("Offset X", 0, -100, 100, 1);
@@ -73,6 +74,24 @@ public final class ArrayListModule extends Module {
             this.name = name;
         }
 
+        public String toString() {
+            return name;
+        }
+    }
+
+    public enum SuffixMode {
+        Space("Space"),
+        Dash("Dash"),
+        Brackets("Brackets"),
+        Pipe("Pipe");
+
+        public String name;
+
+        SuffixMode(String name) {
+            this.name = name;
+        }
+
+        @Override
         public String toString() {
             return name;
         }
@@ -129,13 +148,14 @@ public final class ArrayListModule extends Module {
         int firstVisibleModuleIndex = -1;
         float spacing = roundedBg.getValue() ? roundedSpacing.getValue().floatValue() : 0;
 
+        int visibleModuleCount = 0;
+
         for (int i = 0; i < moduleCacheSize; i++) {
             final Module module = filteredModules.get(i);
             final Translate translate = module.getTranslate();
             final String name = displayLabelCache.get(module);
             final float moduleWidth = fr.getStringWidth(name);
             final boolean visible = module.isVisible();
-            int visibleModuleIndex = i * 20;
 
             if (visible) {
                 if (firstVisibleModuleIndex == -1)
@@ -150,6 +170,7 @@ public final class ArrayListModule extends Module {
             double translateY = translate.getY();
 
             if (visible || translateX < screenX) {
+                int visibleModuleIndex = visibleModuleCount;
                 int aColor = getColorForModule(visibleModuleIndex);
                 double top = translateY - 2;
 
@@ -343,6 +364,7 @@ public final class ArrayListModule extends Module {
                     }
                 }
                 previousModuleWidth = moduleWidth;
+                visibleModuleCount++;
             }
         }
     }
@@ -359,7 +381,7 @@ public final class ArrayListModule extends Module {
     }
 
     private int getColorForModule(int visibleModuleIndex) {
-        int offset = colorMode.getValue() == ColorMode.Fade ? visibleModuleIndex : 0;
+        int offset = colorMode.getValue() == ColorMode.Fade ? visibleModuleIndex * 75 : 75;
 
         if (ClientSettingsModule.color.getValue() == ClientSettingsModule.Color.Astolfo) {
             return RenderUtils.astolfoColors(offset / 2, offset).getRGB();
@@ -367,6 +389,17 @@ public final class ArrayListModule extends Module {
 
         if (ClientSettingsModule.color.getValue() == ClientSettingsModule.Color.Rainbow) {
             return RenderUtils.rainbowColors(offset / 2, offset).getRGB();
+        }
+
+        if (ClientSettingsModule.color.getValue() == ClientSettingsModule.Color.Exhibition) {
+            float hue = (System.currentTimeMillis() % 3000) / 3000f;
+            if (colorMode.getValue() == ColorMode.Fade) {
+                hue += visibleModuleIndex * 0.035f;
+            }
+            if (hue > 1.0f) {
+                hue %= 1.0f;
+            }
+            return Color.getHSBColor(hue, 0.55f, 0.9f).getRGB();
         }
 
         return RenderUtils.interpolateColorsBackAndForth(15, offset, ColorProcess.colors.getFirst(), ColorProcess.colors.getSecond(), false).getRGB();
@@ -391,11 +424,16 @@ public final class ArrayListModule extends Module {
         }
 
         if (suffix != null && showSuffix.getValue()) {
-            return label + " \2477" + suffix;
-        } else
+            return switch (suffixMode.getValue()) {
+                case Space -> label + " \2477" + suffix;
+                case Dash -> label + " \2477- " + suffix;
+                case Brackets -> label + " \2477[" + suffix + "]";
+                case Pipe -> label + " \2477| " + suffix;
+            };
+        } else {
             return label;
+        }
     }
-
 
     private void updateModulePositions(ScaledResolution scaledResolution) {
         CustomFontRenderer fr = FontProcess.getCurrentFont();

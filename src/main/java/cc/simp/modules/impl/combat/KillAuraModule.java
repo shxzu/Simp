@@ -16,6 +16,7 @@ import cc.simp.processes.LagProcess;
 import cc.simp.processes.RotationProcess;
 import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.client.MathUtils;
+import cc.simp.utils.client.Noise;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.mc.InventoryUtils;
 import cc.simp.utils.mc.PacketUtils;
@@ -34,7 +35,6 @@ import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
-import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
@@ -68,12 +68,11 @@ public final class KillAuraModule extends Module {
     private final Property<Boolean> advanced = new Property<>("Advanced", false);
     private final Property<Boolean> missChance = new Property<>("Miss Chance", true, advanced::getValue);
     private final NumberProperty missRate = new NumberProperty("Miss Rate", 5, () -> advanced.getValue() && missChance.getValue(), 0, 20, 1);
-    private final Property<Boolean> variableRotationSpeed = new Property<>("Variable Rotation Speed", true, advanced::getValue);
-    private final NumberProperty minRotSpeed = new NumberProperty("Min Rotation Speed", 3, () -> advanced.getValue() && variableRotationSpeed.getValue(), 0, 10, 0.5);
-    private final NumberProperty maxRotSpeed = new NumberProperty("Max Rotation Speed", 7, () -> advanced.getValue() && variableRotationSpeed.getValue(), 0, 10, 0.5);
+    private final NumberProperty minRotSpeed = new NumberProperty("Min Rotation Speed", 3, advanced::getValue, 0, 10, 0.5);
+    private final NumberProperty maxRotSpeed = new NumberProperty("Max Rotation Speed", 7, advanced::getValue, 0, 10, 0.5);
 
     public static ModeProperty<Rotations> rotations = new ModeProperty<>("Rotations", Rotations.Regular);
-    private final NumberProperty speed = new NumberProperty("Rotation Speed", 5, () -> !advanced.getValue() && !variableRotationSpeed.getValue(), 0, 10, 1);
+    private final NumberProperty speed = new NumberProperty("Rotation Speed", 5, () -> !advanced.getValue(), 0, 10, 1);
     public static final Property<Boolean> jitter = new Property<>("Jitter Rotations", false);
     public static final Property<Boolean> fix = new Property<>("Move Fix", true);
     public static final Property<Boolean> sprint = new Property<>("Keep Sprint", false);
@@ -85,6 +84,7 @@ public final class KillAuraModule extends Module {
     public enum Rotations {
         Regular,
         Puhfy, // omg i did it @puhfy! r u proud?
+        Polar,
         Snap,
         Player,
         None
@@ -112,6 +112,7 @@ public final class KillAuraModule extends Module {
     private boolean shouldMiss = false;
     private boolean wasBlocking = false;
     private int blockCooldown = 0;
+    private Noise noise;
 
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
@@ -207,30 +208,43 @@ public final class KillAuraModule extends Module {
         float targetPitch = rotation.y;
         float rotSpeed;
 
+        if (advanced.getValue()) {
+            rotSpeed = (float) MathUtils.getRandom(minRotSpeed.getValue(), maxRotSpeed.getValue());
+        } else {
+            final double minRotationSpeed = this.speed.getValue();
+            final double maxRotationSpeed = this.speed.getValue() * Math.random();
+            rotSpeed = (float) MathUtils.getRandom(minRotationSpeed, maxRotationSpeed);
+        }
+
         switch (rotations.getValue()) {
             case Regular:
             case Puhfy:
-                if (advanced.getValue() && variableRotationSpeed.getValue()) {
-                    rotSpeed = (float) MathUtils.getRandom(minRotSpeed.getValue(), maxRotSpeed.getValue());
-                } else {
-                    final double minRotationSpeed = this.speed.getValue();
-                    final double maxRotationSpeed = this.speed.getValue() * Math.random();
-                    rotSpeed = (float) MathUtils.getRandom(minRotationSpeed, maxRotationSpeed);
-                }
                 RotationProcess.setRotations(new Vector2f(targetYaw, targetPitch), rotSpeed, fix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
                 break;
+            case Polar:
+                int sped = 8;
+                int existed = mc.thePlayer.ticksExisted * sped;
+
+                float horizontalScaleDevide = (float) (1.9f
+                        + Math.max(-0.65, ((3 - mc.thePlayer.getDistanceToEntity(target)) / 3)));
+                float verticalScaleDevide = (float) (1.5f
+                        + Math.max(-0.65, ((3 - mc.thePlayer.getDistanceToEntity(target)) / 3)));
+
+                double randomizedX = target.posX + (noise.GetNoise(existed + 50, existed + 250) / horizontalScaleDevide);
+                double randomizedY = target.posY + 0.7
+                        + (noise.GetNoise(existed + 100, existed + 100) / verticalScaleDevide);
+                double randomizedZ = target.posZ + (noise.GetNoise(existed + 0, existed + 150) / horizontalScaleDevide);
+
+                Vector2f rots = new Vector2f(RotationUtils.getNormalRotationsFromPosition(randomizedX, randomizedY, randomizedZ,
+                        RotationProcess.rotations.getX(), RotationProcess.rotations.getY(), rotSpeed, rotSpeed)[0], RotationUtils.getNormalRotationsFromPosition(randomizedX, randomizedY, randomizedZ,
+                        RotationProcess.rotations.getX(), RotationProcess.rotations.getY(), rotSpeed, rotSpeed)[1]);
+
+                RotationProcess.setRotations(rots, rotSpeed, fix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
+                break;
             case Snap:
-                if (!hitTimerDone()) {
-                    RotationProcess.setRotations(new Vector2f(targetYaw, targetPitch), 10, fix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
-                }
+                RotationProcess.setRotations(new Vector2f(targetYaw, targetPitch), 180, fix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
                 break;
             case Player:
-                if (advanced.getValue() && variableRotationSpeed.getValue()) {
-                    rotSpeed = (float) MathUtils.getRandom(minRotSpeed.getValue(), maxRotSpeed.getValue());
-                } else {
-                    rotSpeed = speed.getValue().floatValue();
-                }
-
                 float yawDiff = MathHelper.wrapAngleTo180_float(targetYaw - mc.thePlayer.rotationYaw);
                 float pitchDiff = targetPitch - mc.thePlayer.rotationPitch;
 
@@ -257,27 +271,30 @@ public final class KillAuraModule extends Module {
                 autoBlocking = true;
                 break;
 
-           case Legit:
+            case Legit:
                 int interval = legitBlockInterval.getValue().intValue();
                 if (legitRandomize.getValue()) {
                     interval += (mc.thePlayer.ticksExisted % 3) - 1;
                     interval = Math.max(2, interval);
                 }
 
-                // Only change blocking state when crossing interval boundary
                 if (mc.thePlayer.ticksExisted % interval == 0) {
                     if (!wasBlocking && blockCooldown == 0) {
-                        mc.gameSettings.keyBindUseItem.setPressed(true);
+                        mc.thePlayer.setItemInUse(mc.thePlayer.getHeldItem(), mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                         autoBlocking = true;
                         wasBlocking = true;
-                        blockCooldown = 2; // Prevent rapid toggling
+                        blockCooldown = 2;
                     }
                     canAttack = false;
                 } else {
                     if (wasBlocking && blockCooldown == 0) {
-                        unblock();
-                        wasBlocking = false;
-                        blockCooldown = 2; // Prevent rapid toggling
+                        if (!hitTimerDone() || mc.thePlayer.getDistanceToEntity(target) > killRange.getValue()) {
+                            mc.thePlayer.stopUsingItem();
+                            wasBlocking = false;
+                            autoBlocking = false;
+                            canAttack = true;
+                        }
+                        blockCooldown = 2;
                     }
                 }
 
@@ -287,31 +304,24 @@ public final class KillAuraModule extends Module {
             case Predictive:
                 boolean shouldBlock = shouldBlockPredictive();
 
-                // Only toggle blocking state when it actually changes
                 if (shouldBlock && !wasBlocking && blockCooldown == 0) {
-                    mc.gameSettings.keyBindUseItem.setPressed(true);
+                    mc.thePlayer.setItemInUse(mc.thePlayer.getHeldItem(), mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                     autoBlocking = true;
                     wasBlocking = true;
                     canAttack = false;
-                    blockCooldown = 3; // Cooldown to prevent rapid toggling
+                    blockCooldown = 3;
                 } else if (!shouldBlock && wasBlocking && blockCooldown == 0) {
-                    unblock();
-                    wasBlocking = false;
-                    blockCooldown = 3; // Cooldown to prevent rapid toggling
+                    // Only unblock if not about to attack
+                    if (!hitTimerDone() || mc.thePlayer.getDistanceToEntity(target) > killRange.getValue()) {
+                        mc.thePlayer.stopUsingItem();
+                        wasBlocking = false;
+                        autoBlocking = false;
+                        canAttack = true;
+                    }
+                    blockCooldown = 3;
                 }
 
                 if (blockCooldown > 0) blockCooldown--;
-                break;
-
-            case NCP:
-                if (mc.objectMouseOver.entityHit != null) {
-                    PacketUtils.sendPacket(new C02PacketUseEntity(mc.objectMouseOver.entityHit, C02PacketUseEntity.Action.INTERACT));
-                } else if (interactable(mc.theWorld.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock())) {
-                    mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(),
-                            mc.objectMouseOver.getBlockPos(), Block.getFacingDirection(mc.objectMouseOver.getBlockPos()), mc.objectMouseOver.hitVec);
-                }
-                PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
-                autoBlocking = true;
                 break;
 
             case Vanilla:
@@ -370,7 +380,7 @@ public final class KillAuraModule extends Module {
         }
 
         if ((ab.getValue() == AutoBlock.Legit || ab.getValue() == AutoBlock.Predictive) && wasBlocking) {
-            mc.gameSettings.keyBindUseItem.setPressed(false);
+            mc.thePlayer.stopUsingItem();
             canAttack = true;
             autoBlocking = false;
             wasBlocking = false;
@@ -501,6 +511,7 @@ public final class KillAuraModule extends Module {
     @Override
     public void onEnable() {
         delay = (long) (1000 / MathUtils.getRandom(max.getValue().floatValue(), Math.max(min.getValue().floatValue(), max.getValue().floatValue() - 1)));
+        noise = new Noise();
         super.onEnable();
     }
 

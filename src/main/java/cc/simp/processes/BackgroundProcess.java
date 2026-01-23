@@ -3,12 +3,11 @@ package cc.simp.processes;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.MinMotionEvent;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
-import cc.simp.api.events.impl.packet.PacketReceiveEvent;
 import cc.simp.api.events.impl.packet.PacketSendEvent;
 import cc.simp.api.events.impl.player.StrafeEvent;
 import cc.simp.api.events.impl.player.TeleportEvent;
 import cc.simp.api.events.impl.world.BlockCollisionEvent;
-import cc.simp.api.events.impl.world.WorldLoadEvent;
+import cc.simp.modules.impl.client.FpsEnhancerModule;
 import cc.simp.utils.client.Logger;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.mc.PacketUtils;
@@ -27,7 +26,6 @@ import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
-import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -43,7 +41,11 @@ public class BackgroundProcess {
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
 
-        if (this.cfgTimer.hasTimeElapsed(30000, true)) Simp.INSTANCE.getConfigManager().saveConfig("default");
+        if (this.cfgTimer.hasTimeElapsed(30000, true)) {
+            if (Simp.INSTANCE.getModuleManager().getModule(FpsEnhancerModule.class).isEnabled() && FpsEnhancerModule.disableConfigAutoSave.getValue()) return;
+            Simp.INSTANCE.getConfigManager().saveConfig("default");
+            Simp.INSTANCE.getBindsConfig().saveToFile();
+        }
 
         DraggingProcess.update();
 

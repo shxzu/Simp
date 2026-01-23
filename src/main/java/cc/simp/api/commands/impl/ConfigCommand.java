@@ -8,7 +8,7 @@ import cc.simp.utils.client.Logger;
 public class ConfigCommand extends Command {
 
     public ConfigCommand() {
-        super("config", "Saves or Loads Configs.", ".config save/load/remove [config] or .config list", "c");
+        super("config", "Saves or Loads Configs.", ".config save/load/remove [config] or .config list or .config binds save/load", "c");
     }
 
     @Override
@@ -19,6 +19,23 @@ public class ConfigCommand extends Command {
         }
 
         String command = Simp.requireNonNull(args[0]);
+
+        if (command.equalsIgnoreCase("binds")) {
+            if (args.length != 2) {
+                usage();
+                return;
+            }
+            String subCommand = Simp.requireNonNull(args[1]);
+            if (subCommand.equalsIgnoreCase("save")) {
+                Simp.INSTANCE.getBindsConfig().saveToFile();
+                Logger.chatPrint("Binds have been saved.");
+            } else if (subCommand.equalsIgnoreCase("load")) {
+                Simp.INSTANCE.getBindsConfig().loadFromFile();
+                Logger.chatPrint("Binds have been loaded.");
+            } else {
+                usage();
+            }
+        }
 
         if (command.equalsIgnoreCase("save")) {
             if (args.length != 2) {

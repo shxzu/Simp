@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import paulscode.sound.*;
 import paulscode.sound.codecs.CodecJOrbis;
-import paulscode.sound.libraries.LibraryJavaSound;
+import paulscode.sound.libraries.LibraryLWJGLOpenAL;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,12 +54,14 @@ public class SoundManager
         this.sndHandler = p_i45119_1_;
         this.options = p_i45119_2_;
 
-        try {
-            SoundSystemConfig.addLibrary(paulscode.sound.libraries.LibraryLWJGLOpenAL.class);
-            SoundSystemConfig.addLibrary(LibraryJavaSound.class); // optional fallback
+        try
+        {
+            SoundSystemConfig.addLibrary(LibraryLWJGLOpenAL.class);
             SoundSystemConfig.setCodec("ogg", CodecJOrbis.class);
-        } catch (SoundSystemException e) {
-            logger.error(LOG_MARKER, "Error linking sound libraries", e);
+        }
+        catch (SoundSystemException soundsystemexception)
+        {
+            logger.error(LOG_MARKER, "Error linking with the LibraryJavaSound plug-in", soundsystemexception);
         }
 
     }

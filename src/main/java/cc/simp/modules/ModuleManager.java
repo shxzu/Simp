@@ -39,19 +39,26 @@ public final class ModuleManager {
                 new KeepSprintModule(),
                 new AimAssistModule(),
                 new AutoRodModule(),
+                new AutoProjectileModule(),
                 new AutoPotModule(),
                 new AutoGappleModule(),
                 new AutoSoupModule(),
                 new NoHitDelayModule(),
+                new ReachModule(),
+                new HitboxExpandModule(),
 
                 // Movement
                 new SprintModule(),
                 new SpeedModule(),
                 new FlightModule(),
+                new LongJumpModule(),
                 new NoSlowModule(),
+                new NoWebModule(),
+                new SafeWalkModule(),
                 new StepModule(),
                 new JesusModule(),
                 new NoJumpDelayModule(),
+                new StopMovementModule(),
                 new PhaseModule(),
 
                 // Player
@@ -71,9 +78,11 @@ public final class ModuleManager {
                 new LegitScaffoldModule(),
                 new BedNukerModule(),
                 new NoFireballModule(),
+                new GuiClickerModule(),
 
                 // Client
                 new ClientSettingsModule(),
+                new FpsEnhancerModule(),
                 new ToggleSoundsModule(),
                 new HitSoundsModule(),
                 new DiscordRPCModule(),
@@ -99,7 +108,6 @@ public final class ModuleManager {
                 new CameraModule(),
                 new AmbienceModule(),
                 new ESPModule(),
-                new NoHurtCamModule(),
                 new TargetInterfaceModule(),
                 new PostProcessingModule(),
                 new ScoreboardModule(),

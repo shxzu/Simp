@@ -15,35 +15,33 @@ import cc.simp.utils.misc.MovementFix;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemFishingRod;
+import net.minecraft.item.ItemEgg;
+import net.minecraft.item.ItemSnowball;
 import net.minecraft.item.ItemStack;
 import org.lwjgl.util.vector.Vector2f;
 
 import static cc.simp.utils.Util.mc;
 
-@ModuleInfo(label = "Auto Rod", category = ModuleCategory.COMBAT)
-public final class AutoRodModule extends Module {
+@ModuleInfo(label = "Auto Projectile", category = ModuleCategory.COMBAT)
+public final class AutoProjectileModule extends Module {
 
     public static ModeProperty<TargetSelectionProcess.Entities> entities = new ModeProperty<>("Entities", TargetSelectionProcess.Entities.Optimal);
     private final NumberProperty minRange = new NumberProperty("Min Range", 3.0, 1.0, 8.0, 0.1);
     private final NumberProperty maxRange = new NumberProperty("Max Range", 4.5, 1.0, 8.0, 0.1);
     private final NumberProperty maxDelay = new NumberProperty("Max Delay", 100.0, 0.0, 1000.0, 5.0);
-    private final NumberProperty maxRecastDelay = new NumberProperty("Max Recast Delay", 100.0, 0.0, 1000.0, 5.0);
     private final NumberProperty fov = new NumberProperty("FOV", 90.0, 0.0, 360.0, 1.0);
     private final Property<Boolean> ka = new Property<>("Only On Kill Aura", false);
     private final Property<Boolean> rotate = new Property<>("Rotate", true);
     private final NumberProperty predictSize = new NumberProperty("Predict Size", 2, rotate::getValue, 0.1f, 10, 0.1f);
 
     private EntityLivingBase currentTarget;
-    private boolean usingRod;
     private int oldSlot;
-    private long lastUseTime;
-    private long lastRecastTime;
+    private long lastThrowTime;
 
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
 
-        if ((!Simp.INSTANCE.getModuleManager().getModule((KillAuraModule.class)).isEnabled() && ka.getValue())) {
+        if ((!Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && ka.getValue())) {
             return;
         }
 
@@ -59,18 +57,10 @@ public final class AutoRodModule extends Module {
 
         if (range >= minRange.getValue() && range <= maxRange.getValue()) {
             if (getRotationDifference(currentTarget) <= fov.getValue()) {
-                if (!usingRod) {
-                    if (System.currentTimeMillis() - lastUseTime >= maxDelay.getValue() || currentTarget.hurtTime <= 3) {
-                        int rod = findRod();
-                        if (rod != -1) {
-                            useRod(rod);
-                            usingRod = true;
-                            lastRecastTime = System.currentTimeMillis();
-                        }
-                    }
-                } else {
-                    if (System.currentTimeMillis() - lastRecastTime >= maxRecastDelay.getValue() || currentTarget.hurtTime >= 9) {
-                        reset();
+                if (System.currentTimeMillis() - lastThrowTime >= maxDelay.getValue() || currentTarget.hurtTime <= 3) {
+                    int projectile = findProjectile();
+                    if (projectile != -1) {
+                        throwProjectile(projectile);
                     }
                 }
             }
@@ -104,21 +94,23 @@ public final class AutoRodModule extends Module {
         return new float[]{yaw, pitch};
     }
 
-    private int findRod() {
+    private int findProjectile() {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = mc.thePlayer.inventory.getStackInSlot(i);
-            if (stack != null && stack.getItem() instanceof ItemFishingRod) {
+            if (stack != null && (stack.getItem() instanceof ItemEgg || stack.getItem() instanceof ItemSnowball)) {
                 return i;
             }
         }
         return -1;
     }
 
-    private void useRod(int rodSlot) {
+    private void throwProjectile(int projectileSlot) {
         oldSlot = mc.thePlayer.inventory.currentItem;
-        mc.thePlayer.inventory.currentItem = rodSlot;
-        lastUseTime = System.currentTimeMillis();
+        mc.thePlayer.inventory.currentItem = projectileSlot;
+        lastThrowTime = System.currentTimeMillis();
         mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem());
+        mc.thePlayer.inventory.currentItem = oldSlot;
+        oldSlot = -1;
     }
 
     private void reset() {
@@ -126,16 +118,13 @@ public final class AutoRodModule extends Module {
             mc.thePlayer.inventory.currentItem = oldSlot;
             oldSlot = -1;
         }
-        usingRod = false;
     }
 
     @Override
     public void onEnable() {
         currentTarget = null;
-        usingRod = false;
         oldSlot = -1;
-        lastUseTime = 0;
-        lastRecastTime = 0;
+        lastThrowTime = 0;
     }
 
     @Override

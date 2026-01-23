@@ -119,6 +119,55 @@ public class RotationUtils extends Util {
         return new float[]{yaw, pitch};
     }
 
+    public static float[] getRotationFromPosition(double x, double y, double z) {
+        double xDiff = x - (Minecraft.getMinecraft()).thePlayer.posX;
+        double zDiff = z - (Minecraft.getMinecraft()).thePlayer.posZ;
+        double yDiff = y - (Minecraft.getMinecraft()).thePlayer.posY - 1.2D;
+        double dist = MathHelper.sqrt_double(xDiff * xDiff + zDiff * zDiff);
+        float yaw = (float) (Math.atan2(zDiff, xDiff) * 180.0D / Math.PI) - 90.0F;
+        float pitch = (float) -(Math.atan2(yDiff, dist) * 180.0D / Math.PI);
+        return new float[] { yaw, pitch };
+    }
+
+    public static float[] getNormalRotationsFromPosition(double x, double y, double z, float currentYaw,
+                                                         float currentPitch, float yawSpeed, float pitchSpeed) {
+        if (yawSpeed < 0) {
+            yawSpeed *= -1;
+        }
+
+        if (pitchSpeed < 0) {
+            pitchSpeed *= -1;
+        }
+
+        float sYaw = (float) updateRotation((float) currentYaw, (float) getRotationFromPosition(x, y, z)[0], yawSpeed);
+        float sPitch = (float) updateRotation((float) currentPitch, (float) getRotationFromPosition(x, y, z)[1],
+                pitchSpeed);
+        currentYaw = updateRotation(currentYaw, sYaw, 360);
+        currentPitch = updateRotation(currentPitch, sPitch, 360);
+
+        if (currentPitch > 90) {
+            currentPitch = 90;
+        } else if (currentPitch < -90) {
+            currentPitch = -90;
+        }
+
+        return new float[] { currentYaw, currentPitch };
+    }
+
+    public static float updateRotation(float current, float intended, float factor) {
+        float var4 = MathHelper.wrapAngleTo180_float(intended - current);
+
+        if (var4 > factor) {
+            var4 = factor;
+        }
+
+        if (var4 < -factor) {
+            var4 = -factor;
+        }
+
+        return current + var4;
+    }
+
     public static Vector2f move(final Vector2f targetRotation, final double speed) {
         return move(RotationProcess.lastRotations, targetRotation, speed);
     }

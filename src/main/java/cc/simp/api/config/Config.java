@@ -39,7 +39,7 @@ public final class Config implements Serializable {
         JsonObject draggingObject = new JsonObject();
 
         for (cc.simp.modules.Module module : Simp.INSTANCE.getModuleManager().getModules())
-            modulesObject.add(module.getLabel(), module.save());
+            modulesObject.add(module.getLabel(), module.save(false));
 
         for (String key : DraggingProcess.components.keySet()) {
             draggingObject.add(key, DraggingProcess.components.get(key).save());

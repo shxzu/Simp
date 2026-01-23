@@ -178,9 +178,15 @@ public class Module extends Manager<Property<?>> implements Toggleable, Serializ
 
     @Override
     public JsonObject save() {
+        return save(true);
+    }
+
+    public JsonObject save(boolean saveKey) {
         JsonObject object = new JsonObject();
         object.addProperty("toggled", isEnabled());
-        object.addProperty("key", getKey());
+        if (saveKey) {
+            object.addProperty("key", getKey());
+        }
         object.addProperty("hidden", isHidden());
         List<Property<?>> properties = getElements();
         if (!properties.isEmpty()) {
@@ -216,10 +222,14 @@ public class Module extends Manager<Property<?>> implements Toggleable, Serializ
     @Override
     @SuppressWarnings("unchecked")
     public void load(JsonObject object) {
+        load(object, false);
+    }
+
+    public void load(JsonObject object, boolean loadKey) {
         if (object.has("toggled"))
             setEnabled(object.get("toggled").getAsBoolean());
 
-        if (object.has("key"))
+        if (loadKey && object.has("key"))
             setKey(object.get("key").getAsInt());
 
         if (object.has("hidden"))
@@ -246,6 +256,7 @@ public class Module extends Manager<Property<?>> implements Toggleable, Serializ
             }
         }
     }
+
 
     private static <T extends Enum<T>> void findEnumValue(Property<?> property, JsonObject propertiesObject) {
         ModeProperty<T> ModeProperty = (ModeProperty<T>) property;

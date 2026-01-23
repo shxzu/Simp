@@ -18,6 +18,7 @@ public final class CameraModule extends Module {
     public static NumberProperty slowdown = new NumberProperty("Slowdown", 1, 1, 15, 1);
     public static Property<Boolean> fluxSwing = new Property<>("Flux Swing", false);
     public static Property<Boolean> swingEating = new Property<>("Swing While Eating", false);
+    public static Property<Boolean> noHurtCamera = new Property<>("No Hurt Camera", true);
     public static Property<Boolean> noSneakCamera = new Property<>("No Sneak Camera", false);
     public static Property<Boolean> noFireOverlay = new Property<>("No Fire Overlay", true);
     public static Property<Boolean> noBlindness = new Property<>("No Blindness", true);

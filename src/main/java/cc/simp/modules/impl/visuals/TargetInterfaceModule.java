@@ -40,6 +40,8 @@ public final class TargetInterfaceModule extends Module {
     private enum Mode {
         Simp("Simp"),
         Astolfo("Astolfo"),
+        Myau("Myau"),
+        RavenB4("Raven B4"),
         Exhibition("Exhibition"),
         BlueArchive("Blue Archive"),
         Rise("Rise");
@@ -65,6 +67,8 @@ public final class TargetInterfaceModule extends Module {
         setSuffix(mode.getValue().toString());
         switch (mode.getValue()) {
             case Astolfo -> drawAstolfoTargetInterface();
+            case Myau -> drawMyauTargetInterface();
+            case RavenB4 -> drawRavenB4TargetInterface();
             case Simp -> drawSimpTargetInterface();
             case Exhibition -> drawExhibitionTargetInterface();
             case Rise -> drawRiseTargetInterface();
@@ -77,6 +81,8 @@ public final class TargetInterfaceModule extends Module {
         switch (mode.getValue()) {
             case Astolfo -> drawAstolfoTargetInterface();
             case Simp -> drawSimpTargetInterface();
+            case Myau -> drawMyauTargetInterface();
+            case RavenB4 -> drawRavenB4TargetInterface();
             case Exhibition -> drawExhibitionTargetInterface();
             case Rise -> drawRiseTargetInterface();
             case BlueArchive -> drawBlueArchiveTargetInterface();
@@ -144,6 +150,165 @@ public final class TargetInterfaceModule extends Module {
 
         GlStateManager.popMatrix();
     }
+
+    private void drawRavenB4TargetInterface() {
+        target = KillAuraModule.target;
+
+        ScaledResolution sr = new ScaledResolution(mc);
+        initializePosition(sr);
+
+        if (mc.currentScreen instanceof GuiChat) {
+            target = mc.thePlayer;
+        } else {
+            if (target == null) return;
+        }
+
+        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        draggableComponent.setHeight(40);
+        draggableComponent.setWidth(150);
+
+        float x = (float) draggableComponent.getX();
+        float y = (float) draggableComponent.getY();
+
+        String playerInfo = target.getDisplayName().getFormattedText();
+        double health = target.getHealth() / target.getMaxHealth();
+        if (target.isDead) {
+            health = 0;
+        }
+
+        playerInfo += " " + String.format("%.1f❤", target.getHealth());
+
+        final int padding = 8;
+        final int targetStrWithPadding = mc.fontRendererObj.getStringWidth(playerInfo) + padding;
+        final int x1 = (int) x - padding;
+        final int y1 = (int) y - padding;
+        final int x2 = (int) x + targetStrWithPadding;
+        final int y2 = (int) y + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + padding;
+
+        draggableComponent.setWidth(Math.abs(x1 - x2));
+        draggableComponent.setHeight(Math.abs(y1 - (y2 + 13)));
+
+        Color mainColor = ColorProcess.getColor();
+        Color brighterColor = mainColor.brighter();
+
+        // Legacy gradient outline style
+        RenderUtils.drawRoundOutline(x1, y1, x2 - x1, y2 + 13 - y1, 10, 0.5f, new Color(0, 0, 0, 110), ColorProcess.getColor());
+
+        // Health bar background
+        final int barX1 = x1 + 6;
+        final int barX2 = x2 - 6;
+        final int barY = y2;
+
+        RenderUtils.drawRoundedRect(barX1, barY, barX2 - barX1, 5, 4, new Color(0, 0, 0, 110));
+
+        // Health bar with gradient
+        float healthBar = (float) (barX2 + (barX1 - barX2) * (1 - health));
+
+        RenderUtils.drawRoundedRect(barX1, barY, healthBar - barX1, 5, 4, ColorProcess.getColor());
+
+        // Draw text
+        GlStateManager.pushMatrix();
+        GlStateManager.enableBlend();
+        mc.fontRendererObj.drawString(playerInfo, x, y, new Color(220, 220, 220, 255).getRGB(), true);
+        GlStateManager.disableBlend();
+        GlStateManager.popMatrix();
+    }
+
+    private void drawMyauTargetInterface() {
+        target = KillAuraModule.target;
+
+        ScaledResolution sr = new ScaledResolution(mc);
+        initializePosition(sr);
+
+        if (mc.currentScreen instanceof GuiChat) {
+            target = mc.thePlayer;
+        } else {
+            if (target == null) return;
+        }
+
+        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        draggableComponent.setHeight(27);
+        draggableComponent.setWidth(150);
+
+        float x = (float) draggableComponent.getX();
+        float y = (float) draggableComponent.getY();
+
+        // Calculate health values
+        float health = target.getHealth() + target.getAbsorptionAmount();
+        float maxHealth = target.getMaxHealth() + target.getAbsorptionAmount();
+        float healthRatio = Math.min(Math.max(health / maxHealth, 0.0F), 1.0F);
+
+        // Get colors
+        Color targetColor = ColorProcess.getColor();
+        Color healthBarColor = interpolateHealthColor(healthRatio);
+
+        // Calculate text elements
+        String targetName = target.getName();
+        int targetNameWidth = mc.fontRendererObj.getStringWidth(targetName);
+
+        float abs = target.getAbsorptionAmount() / 2.0F;
+        String healthText = String.format("%.1f%s❤", health / 2.0F, abs > 0.0F ? "" : "");
+        int healthTextWidth = mc.fontRendererObj.getStringWidth(healthText);
+
+        float headIconOffset = 25.0F;
+        float barContentWidth = Math.max(targetNameWidth, healthTextWidth);
+        float barTotalWidth = Math.max(headIconOffset + 70.0F, headIconOffset + 2.0F + barContentWidth + 2.0F);
+
+        draggableComponent.setWidth((int) barTotalWidth);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, 0);
+
+        // Draw background
+        int backgroundColor = new Color(0, 0, 0, 150).getRGB();
+        RenderUtils.drawRoundedRect(0, 0, barTotalWidth, 27, 2, new Color(backgroundColor));
+
+        // Draw health bar background
+        Gui.drawRect((int) (headIconOffset + 2), 22, (int) (barTotalWidth - 2), 25, new Color(0, 0, 0, 200).getRGB());
+
+        // Draw health bar
+        float healthBarWidth = healthRatio * (barTotalWidth - 2.0F - headIconOffset - 2.0F);
+        Gui.drawRect((int) (headIconOffset + 2), 22, (int) (headIconOffset + 2 + healthBarWidth), 25, healthBarColor.getRGB());
+
+        // Draw player head
+        GlStateManager.pushMatrix();
+        GlStateManager.enableBlend();
+        GlStateManager.color(1, 1, 1, 1);
+
+        if (target instanceof AbstractClientPlayer) {
+            mc.getTextureManager().bindTexture(((AbstractClientPlayer) target).getLocationSkin());
+            Gui.drawScaledCustomSizeModalRect(2, 2, 8, 8, 8, 8, 23, 23, 64, 64);
+
+            if (((EntityPlayer) target).func_175148_a(EnumPlayerModelParts.HAT)) {
+                Gui.drawScaledCustomSizeModalRect(2, 2, 40, 8, 8, 8, 23, 23, 64, 64);
+            }
+        } else {
+            mc.getTextureManager().bindTexture(((AbstractClientPlayer) mc.thePlayer).getLocationSkin());
+            Gui.drawScaledCustomSizeModalRect(2, 2, 8, 8, 8, 8, 23, 23, 64, 64);
+
+            if (((EntityPlayer) mc.thePlayer).func_175148_a(EnumPlayerModelParts.HAT)) {
+                Gui.drawScaledCustomSizeModalRect(2, 2, 40, 8, 8, 8, 23, 23, 64, 64);
+            }
+        }
+
+        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.popMatrix();
+
+        // Draw text
+        mc.fontRendererObj.drawString(targetName, headIconOffset + 2, 2, -1, true);
+        mc.fontRendererObj.drawString(healthText, headIconOffset + 2, 12, abs > 0.0F ? new Color(255, 170, 0).getRGB() : new Color(255, 85, 85).getRGB(), true);
+
+        GlStateManager.popMatrix();
+    }
+
+    private Color interpolateHealthColor(float healthRatio) {
+        if (healthRatio > 0.5F) {
+            return RenderUtils.interpolateColorC(new Color(255, 255, 85), new Color(85, 255, 85), (healthRatio - 0.5F) / 0.5F);
+        } else {
+            return RenderUtils.interpolateColorC(new Color(255, 85, 85), new Color(255, 255, 85), healthRatio * 2);
+        }
+    }
+
 
     private void drawSimpTargetInterface() {
         target = KillAuraModule.target;

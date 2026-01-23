@@ -2,12 +2,14 @@ package cc.simp;
 
 import cc.simp.api.commands.CommandHandler;
 import cc.simp.api.commands.impl.*;
+import cc.simp.api.config.BindsConfig;
 import cc.simp.api.config.ConfigManager;
 import cc.simp.api.events.Event;
 import cc.simp.api.events.impl.game.ClientStartupEvent;
 import cc.simp.api.events.impl.game.KeyPressEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.interfaces.click.ClickInterface;
+import cc.simp.interfaces.click.WindowClickInterface;
 import cc.simp.modules.ModuleManager;
 import cc.simp.modules.impl.client.ClientSettingsModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
@@ -28,7 +30,7 @@ public class Simp {
     public static final Simp INSTANCE = new Simp();
     public static final String NAME = "Simp";
     public static final String BUILD = BuildType.RELEASE.getName();
-    public static final String VERSION = "1.2 " + BUILD;
+    public static final String VERSION = "1.2.1" + " " + BUILD;
     public static final String FULL = NAME + " " + VERSION;
 
     private EventBus<Event> eventBus;
@@ -37,11 +39,14 @@ public class Simp {
     @Getter
     private ConfigManager configManager;
     @Getter
+    private BindsConfig bindsConfig;
+    @Getter
     private CommandHandler commandHandler;
     private BackgroundProcess backgroundProcess;
     private RotationProcess rotationProcess;
     private ColorProcess colorProcess;
     private ClickInterface clickInterface;
+    private WindowClickInterface windowClickInterface;
     private LagProcess lagProcess;
     private BadPacketsProcess badPacketsProcess;
     private TargetSelectionProcess targetSelectionProcess;
@@ -59,6 +64,8 @@ public class Simp {
         moduleManager.postInit();
         configManager = new ConfigManager();
         getEventBus().subscribe(configManager);
+        bindsConfig = new BindsConfig();
+        getEventBus().subscribe(bindsConfig);
         backgroundProcess = new BackgroundProcess();
         getEventBus().subscribe(backgroundProcess);
         rotationProcess = new RotationProcess();
@@ -66,6 +73,7 @@ public class Simp {
         colorProcess = new ColorProcess();
         getEventBus().subscribe(colorProcess);
         configManager.loadConfig("default");
+        bindsConfig.loadFromFile();
         lagProcess = new LagProcess();
         getEventBus().subscribe(lagProcess);
         badPacketsProcess = new BadPacketsProcess();
@@ -108,10 +116,20 @@ public class Simp {
     @EventLink
     public final Listener<KeyPressEvent> keyPressEventListener = e -> {
         if (e.getKey() == Keyboard.KEY_RSHIFT) {
-            if (clickInterface == null) {
-                clickInterface = new ClickInterface();
+            switch (ClientSettingsModule.clickInterface.getValue()) {
+                case Normal -> {
+                    if (clickInterface == null) {
+                        clickInterface = new ClickInterface();
+                    }
+                    Minecraft.getMinecraft().displayGuiScreen(clickInterface);
+                }
+                case Window -> {
+                    if (windowClickInterface == null) {
+                        windowClickInterface = new WindowClickInterface();
+                    }
+                    Minecraft.getMinecraft().displayGuiScreen(windowClickInterface);
+                }
             }
-            Minecraft.getMinecraft().displayGuiScreen(clickInterface);
         }
     };
 

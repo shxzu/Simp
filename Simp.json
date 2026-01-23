@@ -1,98 +1,17 @@
 {
   "id": "Simp",
-  "time": "2015-12-09T00:00:00Z",
-  "releaseTime": "2015-12-09T00:00:00Z",
+  "time": "2026-01-22T00:00:00Z",
+  "releaseTime": "2026-01-22T00:00:00Z",
   "type": "release",
   "minecraftArguments": "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userProperties ${user_properties} --userType ${user_type}",
   "mainClass": "net.minecraft.client.main.Main",
   "minimumLauncherVersion": 21,
   "assets": "1.8.9",
+  "javaVersion": {
+    "component": "java-runtime-gamma",
+    "majorVersion": 22
+  },
   "libraries": [
-    {
-      "name": "net.minecraft:launchwrapper:1.12"
-    },
-    {
-      "name": "org.ow2.asm:asm-all:5.0.3"
-    },
-    {
-      "name": "com.mojang:netty:1.6"
-    },
-    {
-      "name": "oshi-project:oshi-core:1.1"
-    },
-    {
-      "name": "net.java.dev.jna:jna:3.4.0"
-    },
-    {
-      "name": "net.java.dev.jna:platform:3.4.0"
-    },
-    {
-      "name": "com.ibm.icu:icu4j-core-mojang:51.2"
-    },
-    {
-      "name": "net.sf.jopt-simple:jopt-simple:4.6"
-    },
-    {
-      "name": "com.paulscode:codecjorbis:20101023"
-    },
-    {
-      "name": "com.paulscode:codecwav:20101023"
-    },
-    {
-      "name": "com.paulscode:libraryjavasound:20101123"
-    },
-    {
-      "name": "com.paulscode:librarylwjglopenal:20100824"
-    },
-    {
-      "name": "com.github.Danixd12:Paulscode-SoundSystem-LWJGL3:master-SNAPSHOT",
-      "url": "https://jitpack.io"
-    },
-    {
-      "name": "io.netty:netty-all:4.0.23.Final"
-    },
-    {
-      "name": "com.google.guava:guava:17.0"
-    },
-    {
-      "name": "org.apache.commons:commons-lang3:3.3.2"
-    },
-    {
-      "name": "commons-io:commons-io:2.4"
-    },
-    {
-      "name": "commons-codec:commons-codec:1.9"
-    },
-    {
-      "name": "net.java.jinput:jinput:2.0.5"
-    },
-    {
-      "name": "net.java.jutils:jutils:1.0.0"
-    },
-    {
-      "name": "com.google.code.gson:gson:2.8.9"
-    },
-    {
-      "name": "com.mojang:authlib:1.5.21"
-    },
-    {
-      "name": "com.mojang:realms:1.7.24"
-    },
-    {
-      "name": "org.apache.commons:commons-compress:1.8.1"
-    },
-    {
-      "name": "org.apache.httpcomponents:httpclient:4.3.3"
-    },
-    {
-      "name": "commons-logging:commons-logging:1.1.3"
-    },
-    {
-      "name": "org.apache.httpcomponents:httpcore:4.3.2"
-    },
-    {
-      "name": "it.unimi.dsi:fastutil:7.0.12_mojang"
-    },
     {
       "name": "org.apache.logging.log4j:log4j-api:2.0-beta9"
     },

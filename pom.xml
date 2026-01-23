@@ -215,9 +215,27 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.Danixd12</groupId>
-            <artifactId>Paulscode-SoundSystem-LWJGL3</artifactId>
-            <version>master-SNAPSHOT</version>
+            <groupId>com.paulscode</groupId>
+            <artifactId>codecjorbis</artifactId>
+            <version>20101023</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.paulscode</groupId>
+            <artifactId>codecwav</artifactId>
+            <version>20101023</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.paulscode</groupId>
+            <artifactId>libraryjavasound</artifactId>
+            <version>20101123</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.paulscode</groupId>
+            <artifactId>soundsystem</artifactId>
+            <version>20120107</version>
         </dependency>
 
         <dependency>

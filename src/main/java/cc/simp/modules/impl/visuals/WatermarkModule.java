@@ -96,7 +96,7 @@ public final class WatermarkModule extends Module {
                 }
                 fr.drawStringWithShadow(text, 2, 2, ColorProcess.getColor().getRGB());
             } else if (type.getValue() == Type.GameSense) {
-                String serverInfo = (mc.getCurrentServerData() != null) ? mc.getCurrentServerData().serverIP : "Singleplayer";
+                String serverInfo = mc.getCurrentServerData() != null ? mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy") ? "LiquidProxy" : mc.getCurrentServerData().serverIP : "Singleplayer";
                 text = String.format(EnumChatFormatting.WHITE + "%s v%s | %d FPS | %s",
                         clientName, Simp.VERSION, Minecraft.getDebugFPS(), serverInfo);
                 RenderUtils.drawBorderedRect(0, 0.5f, fr.getStringWidth(text) + 4, 7 * sr.getScaleFactor(), 2, new Color(0, 0, 0, 100).getRGB(), ColorProcess.getColor().getRGB(), true, false, false, false);
@@ -166,7 +166,7 @@ public final class WatermarkModule extends Module {
                 }
                 fr.drawStringWithShadow(text, 2, 2, ColorProcess.getColor().getRGB());
             } else if (type.getValue() == Type.GameSense) {
-                String serverInfo = (mc.getCurrentServerData() != null) ? mc.getCurrentServerData().serverIP : "Singleplayer";
+                String serverInfo = mc.getCurrentServerData() != null ? mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy") ? "LiquidProxy" : mc.getCurrentServerData().serverIP : "Singleplayer";
                 text = String.format(EnumChatFormatting.WHITE + "%s v%s | %d FPS | %s",
                         clientName, Simp.VERSION, Minecraft.getDebugFPS(), serverInfo);
                 RenderUtils.drawBorderedRect(0, 0.5f, fr.getStringWidth(text) + 4, 7 * sr.getScaleFactor(), 2, new Color(0, 0, 0, 100).getRGB(), ColorProcess.getColor().getRGB(), true, false, false, false);
@@ -637,7 +637,7 @@ public final class WatermarkModule extends Module {
     }
 
     private void updateServerInfo() {
-        currentServer = mc.getCurrentServerData() != null ? mc.getCurrentServerData().serverIP : "Singleplayer";
+        currentServer = mc.getCurrentServerData() != null ? mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy") ? "LiquidProxy" : mc.getCurrentServerData().serverIP : "Singleplayer";
     }
 
     private static class ChestItemAnimation {

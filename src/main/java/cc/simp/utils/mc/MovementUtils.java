@@ -1,12 +1,14 @@
 package cc.simp.utils.mc;
 
+import cc.simp.Simp;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.player.MoveEvent;
+import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.utils.Util;
 import cc.simp.utils.client.MathUtils;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.MathHelper;
@@ -14,9 +16,34 @@ import net.minecraft.util.MovementInput;
 
 import java.util.Arrays;
 
-import static net.minecraft.potion.Potion.*;
+import static net.minecraft.potion.Potion.moveSlowdown;
 
 public class MovementUtils extends Util {
+
+    public static final double WALK_SPEED = 0.221;
+    public static final double BUNNY_SLOPE = 0.66;
+    public static final double MOD_SPRINTING = 1.3F;
+    public static final double MOD_SNEAK = 0.3F;
+    public static final double MOD_ICE = 2.5F;
+    public static final double MOD_WEB = 0.105 / WALK_SPEED;
+    public static final double JUMP_HEIGHT = 0.42F;
+    public static final double BUNNY_FRICTION = 159.9F;
+    public static final double Y_ON_GROUND_MIN = 0.00001;
+    public static final double Y_ON_GROUND_MAX = 0.0626;
+    public static final double LILYPAD_HEIGHT = 0.015625F;
+    public static final double AIR_FRICTION = 0.9800000190734863D;
+    public static final double WATER_FRICTION = 0.800000011920929D;
+    public static final double LAVA_FRICTION = 0.5D;
+    public static final double MOD_SWIM = 0.115F / WALK_SPEED;
+    public static final double[] MOD_DEPTH_STRIDER = {
+            1.0F,
+            0.1645F / MOD_SWIM / WALK_SPEED,
+            0.1995F / MOD_SWIM / WALK_SPEED,
+            1.0F / MOD_SWIM,
+    };
+
+    public static final double UNLOADED_CHUNK_MOTION = -0.09800000190735147;
+    public static final double HEAD_HITTER_MOTION = -0.0784000015258789;
 
     public static double getBaseMoveSpeed() {
         double baseSpeed = 0.2873;
@@ -170,6 +197,47 @@ public class MovementUtils extends Util {
         }
 
         return 0;
+    }
+
+    public static double getAllowedHorizontalDistance() {
+        double horizontalDistance;
+        boolean useBaseModifiers = false;
+
+        if (mc.thePlayer.isInWeb) {
+            horizontalDistance = MOD_WEB * WALK_SPEED;
+        } else if (PlayerUtils.onLiquid()) {
+            horizontalDistance = MOD_SWIM * WALK_SPEED;
+
+            final int depthStriderLevel = EnchantmentHelper.getDepthStriderModifier(mc.thePlayer);
+            if (depthStriderLevel > 0) {
+                horizontalDistance *= MOD_DEPTH_STRIDER[depthStriderLevel];
+                useBaseModifiers = true;
+            }
+
+        } else if (mc.thePlayer.isSneaking()) {
+            horizontalDistance = MOD_SNEAK * WALK_SPEED;
+        } else {
+            horizontalDistance = WALK_SPEED;
+            useBaseModifiers = true;
+        }
+
+        if (useBaseModifiers) {
+            if (canSprint(false)) {
+                horizontalDistance *= MOD_SPRINTING;
+            }
+
+            final ScaffoldModule scaffold = Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class);
+
+            if (mc.thePlayer.isPotionActive(Potion.moveSpeed) && mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getDuration() > 0 && !(scaffold.isEnabled())) {
+                horizontalDistance *= 1 + (0.2 * (mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1));
+            }
+
+            if (mc.thePlayer.isPotionActive(Potion.moveSlowdown)) {
+                horizontalDistance = 0.29;
+            }
+        }
+
+        return horizontalDistance;
     }
 
     public void strafe(MotionEvent event) {

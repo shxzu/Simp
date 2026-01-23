@@ -24,6 +24,7 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Client Settings", category = ModuleCategory.CLIENT)
 public final class ClientSettingsModule extends Module {
 
+    public static final ModeProperty<ClickInterface> clickInterface = new ModeProperty<>("Click Interface", ClickInterface.Normal);
     public static final ModeProperty<Font> font = new ModeProperty<>("Font", Font.MC);
     public static final ModeProperty<Color> color = new ModeProperty<>("Color", Color.Simp);
     public static final ModeProperty<Anime> anime = new ModeProperty<>("Anime", Anime.Onikata);
@@ -32,6 +33,11 @@ public final class ClientSettingsModule extends Module {
     public static final Property<Boolean> showInInventory = new Property<>("Show In Inventory", true, () -> anime.getValue() != Anime.None);
 
     private static final Map<String, ResourceLocation> cachedImages = new HashMap<>();
+
+    public enum ClickInterface {
+        Normal,
+        Window
+    }
 
     public enum Anime {
         Onikata("Onikata"),
@@ -69,6 +75,7 @@ public final class ClientSettingsModule extends Module {
 
     public enum Color {
         Rainbow,
+        Exhibition,
         Astolfo,
         Simp,
         Tenacity,

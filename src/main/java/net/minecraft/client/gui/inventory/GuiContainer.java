@@ -357,7 +357,7 @@ public abstract class GuiContainer extends GuiScreen
         return null;
     }
 
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         Slot slot = this.getSlotAtPosition(mouseX, mouseY);

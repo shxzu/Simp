@@ -34,6 +34,7 @@ public class ClickInterface extends GuiScreen {
     private String editingBuffer = "";
 
     // Visual theme
+
     private static final Color BG_COLOR = new Color(22, 22, 22, 220);
     private static final Color PANEL_BG = new Color(28, 28, 28, 230);
     private static Color ACCENT_COLOR = new Color(120, 145, 255);

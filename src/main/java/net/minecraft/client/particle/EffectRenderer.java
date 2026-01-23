@@ -1,13 +1,9 @@
 package net.minecraft.client.particle;
 
+import cc.simp.Simp;
+import cc.simp.modules.impl.client.FpsEnhancerModule;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.Callable;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -22,15 +18,14 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
 import net.minecraft.src.Config;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ReportedException;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
-import net.optifine.reflect.Reflector;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.Callable;
 
 public class EffectRenderer
 {
@@ -142,7 +137,7 @@ public class EffectRenderer
                 int i = effect.getFXLayer();
                 int j = effect.getAlpha() != 1.0F ? 0 : 1;
 
-                if (this.fxLayers[i][j].size() >= 4000)
+                if (this.fxLayers[i][j].size() >= limitParticle(4000))
                 {
                     this.fxLayers[i][j].remove(0);
                 }
@@ -150,6 +145,13 @@ public class EffectRenderer
                 this.fxLayers[i][j].add(effect);
             }
         }
+    }
+
+    private int limitParticle(int original) {
+
+        boolean limit = Simp.INSTANCE.getModuleManager().getModule(FpsEnhancerModule.class).isEnabled() && FpsEnhancerModule.reduceParticles.getValue();
+
+        return limit ? 100 : original;
     }
 
     public void updateEffects()

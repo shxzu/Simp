@@ -29,6 +29,11 @@ public class ColorProcess {
                 colors = Pair.of(RenderUtils.astolfoColors(15, 75), RenderUtils.astolfoColors(15, 75));
                 color = RenderUtils.astolfoColors(15, 75);
             }
+            case Exhibition -> {
+                float hue = (System.currentTimeMillis() % 3000) / 3000f;
+                color = Color.getHSBColor(hue, 0.55f, 0.9f);
+                colors = Pair.of(color, color);
+            }
             case Simp -> {
                 first = new Color(54, 59, 181);
                 second = new Color(98, 102, 217);

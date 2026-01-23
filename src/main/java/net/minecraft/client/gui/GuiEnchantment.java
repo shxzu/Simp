@@ -60,7 +60,7 @@ public class GuiEnchantment extends GuiContainer
         this.func_147068_g();
     }
 
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         int i = (this.width - this.xSize) / 2;

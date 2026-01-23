@@ -38,9 +38,12 @@ public final class AutoGappleModule extends Module {
             this.attackTicks = 0;
         }
 
-        if (mc.thePlayer.isPotionActive(Potion.regeneration) && eating && mc.gameSettings.keyBindUseItem.isPressed()) {
+        if (mc.thePlayer.isPotionActive(Potion.regeneration) && eating) {
             mc.gameSettings.keyBindUseItem.setPressed(false);
-            if (Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && KillAuraModule.target != null && !KillAuraModule.canAttack) KillAuraModule.canAttack = true;
+            eating = false;
+            if (Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && KillAuraModule.target != null && !KillAuraModule.canAttack) {
+                KillAuraModule.canAttack = true;
+            }
         }
 
         if (mc.thePlayer.onGroundTicks <= 1 || !stopWatch.hasTimeElapsed(nextEat) || attackTicks < 10 || Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled() || mc.thePlayer.isPotionActive(Potion.regeneration)) {

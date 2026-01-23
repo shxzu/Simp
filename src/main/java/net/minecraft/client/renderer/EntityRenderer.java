@@ -1,9 +1,9 @@
 package net.minecraft.client.renderer;
 
 import cc.simp.Simp;
+import cc.simp.api.events.impl.game.MouseOverEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
 import cc.simp.modules.impl.visuals.CameraModule;
-import cc.simp.modules.impl.visuals.NoHurtCamModule;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.gson.JsonSyntaxException;
@@ -392,7 +392,13 @@ public class EntityRenderer implements IResourceManagerReloadListener
             double d1 = d0;
             Vec3 vec3 = entity.getPositionEyes(partialTicks);
             boolean flag = false;
-            int i = 3;
+            double reach = 3.0D;
+            float expand = 0;
+
+            MouseOverEvent mouseOverEvent = new MouseOverEvent(reach, expand);
+            Simp.INSTANCE.getEventBus().post(mouseOverEvent);
+            reach = mouseOverEvent.getRange();
+            expand = mouseOverEvent.getExpand();
 
             if (this.mc.playerController.extendedReach())
             {
@@ -401,6 +407,10 @@ public class EntityRenderer implements IResourceManagerReloadListener
             }
             else if (d0 > 3.0D)
             {
+                flag = true;
+            }
+
+            if (reach > 3.0001) {
                 flag = true;
             }
 
@@ -426,7 +436,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
             for (int j = 0; j < list.size(); ++j)
             {
                 Entity entity1 = list.get(j);
-                float f1 = entity1.getCollisionBorderSize();
+                final float f1 = entity1.getCollisionBorderSize() + ((entity instanceof EntityPlayer && !entity.isInvisible()) ? expand : 0);
                 AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand(f1, f1, f1);
                 MovingObjectPosition movingobjectposition = axisalignedbb.calculateIntercept(vec3, vec32);
 
@@ -465,8 +475,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
                 }
             }
 
-            if (this.pointedEntity != null && flag && vec3.distanceTo(vec33) > 3.0D)
-            {
+            if (this.pointedEntity != null && flag && vec33 != null && vec3.distanceTo(vec33) > reach) {
                 this.pointedEntity = null;
                 this.mc.objectMouseOver = new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, vec33, null, new BlockPos(vec33));
             }
@@ -579,7 +588,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
     private void hurtCameraEffect(float partialTicks)
     {
 
-        if(Simp.INSTANCE.getModuleManager().getModule(NoHurtCamModule.class).isEnabled())
+        if (Simp.INSTANCE.getModuleManager().getModule(CameraModule.class).isEnabled() && CameraModule.noHurtCamera.getValue())
             return;
 
         if (this.mc.getRenderViewEntity() instanceof EntityLivingBase entitylivingbase)
