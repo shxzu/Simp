@@ -12,7 +12,7 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.BadPacketsProcess;
-import cc.simp.processes.LagProcess;
+import cc.simp.processes.LagProcess; 
 import cc.simp.processes.RotationProcess;
 import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.client.MathUtils;
