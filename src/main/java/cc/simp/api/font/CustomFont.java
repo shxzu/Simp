@@ -11,7 +11,8 @@ import java.awt.image.BufferedImage;
 
 public class CustomFont
 {
-    private float imgSize = 512;
+
+    private float imgSize = 1024;
     protected CharData[] charData = new CharData[256];
     protected Font font;
     protected boolean antiAlias;
@@ -34,7 +35,12 @@ public class CustomFont
 
         try
         {
-            return new DynamicTexture(img);
+            DynamicTexture texture = new DynamicTexture(img);
+            // Add proper texture filtering to prevent blur on scaling
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+            return texture;
         }
         catch (Exception e)
         {
