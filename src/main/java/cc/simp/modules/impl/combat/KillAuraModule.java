@@ -113,6 +113,7 @@ public final class KillAuraModule extends Module {
     private boolean wasBlocking = false;
     private int blockCooldown = 0;
     private Noise noise;
+    private int ticksSinceUnblock = 999;
 
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
@@ -139,6 +140,7 @@ public final class KillAuraModule extends Module {
         }
 
         calculateRotations();
+        if (ticksSinceUnblock < 999) ticksSinceUnblock++;
         if (ab.getValue() != AutoBlock.None) {
             if (mc.thePlayer.getDistanceToEntity(target) <= blockingRange.getValue() && InventoryUtils.isHoldingSword()) {
                 autoblock();
@@ -381,7 +383,8 @@ public final class KillAuraModule extends Module {
 
         if ((ab.getValue() == AutoBlock.Legit || ab.getValue() == AutoBlock.Predictive) && wasBlocking) {
             mc.thePlayer.stopUsingItem();
-            canAttack = true;
+            ticksSinceUnblock = 0;
+            canAttack = false;
             autoBlocking = false;
             wasBlocking = false;
             return;
@@ -395,6 +398,7 @@ public final class KillAuraModule extends Module {
 
     private void attack() {
         if (target == null || !canAttack) return;
+        if (ticksSinceUnblock <= 1) return;
 
         if (!hitTimerDone()) return;
 
@@ -433,7 +437,6 @@ public final class KillAuraModule extends Module {
             mc.clickMouse();
         }
     }
-
 
     private static boolean hitTimerDone() {
         boolean returnVal = false;
