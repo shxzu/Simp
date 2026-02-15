@@ -127,6 +127,7 @@ public class TargetSelectionProcess {
                 .filter(entity -> ((EntityLivingBase) entity).getHealth() > 0)
                 .filter(entity -> mc.thePlayer.getDistanceToEntity(entity) <= seekRange)
                 .filter(entity -> !AntiBotModule.botList.contains(entity))
+                .filter(entity -> !cc.simp.modules.impl.client.MCFModule.excludedPlayers.contains(entity))
                 .filter(this::isValidEntity)
                 .collect(Collectors.toList());
     }

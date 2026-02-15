@@ -1,11 +1,9 @@
 package net.minecraft.client;
 
 import cc.simp.Simp;
-import cc.simp.api.events.impl.game.ClickEvent;
-import cc.simp.api.events.impl.game.ClientStartupEvent;
-import cc.simp.api.events.impl.game.KeyPressEvent;
-import cc.simp.api.events.impl.game.RightClickEvent;
+import cc.simp.api.events.impl.game.*;
 import cc.simp.api.events.impl.player.AttackEvent;
+import cc.simp.api.events.impl.player.AvailableClickEvent;
 import cc.simp.api.events.impl.world.TickEvent;
 import cc.simp.api.events.impl.world.WorldLoadEvent;
 import cc.simp.modules.impl.visuals.MotionBlurModule;
@@ -1390,38 +1388,41 @@ public class Minecraft implements IThreadListener {
                 this.displayGuiScreen(new GuiChat("/"));
             }
 
-            if (this.thePlayer.isUsingItem()) {
-                if (!this.gameSettings.keyBindUseItem.isKeyDown()) {
-                    this.playerController.onStoppedUsingItem(this.thePlayer);
+            final AvailableClickEvent eventClick = new AvailableClickEvent(this.thePlayer.inventory.currentItem);
+            final int oldSlot = this.thePlayer.inventory.currentItem;
+            eventClick.setShouldRightClick(true);
+            Simp.INSTANCE.getEventBus().post(eventClick);
+            this.thePlayer.inventory.currentItem = eventClick.getSlot();
+            if (!eventClick.isCancelled()) {
+                if (this.thePlayer.isUsingItem()) {
+                    if (!this.gameSettings.keyBindUseItem.isKeyDown()) {
+                        this.playerController.onStoppedUsingItem(this.thePlayer);
+                    }
+                    while (this.gameSettings.keyBindAttack.isPressed()) {
+                    }
+                    while (this.gameSettings.keyBindUseItem.isPressed()) {
+                    }
+                    while (this.gameSettings.keyBindPickBlock.isPressed()) {
+                    }
+                } else {
+                    while (this.gameSettings.keyBindAttack.isPressed()) {
+                        this.clickMouse();
+                    }
+                    if (eventClick.isShouldRightClick()) {
+                        while (this.gameSettings.keyBindUseItem.isPressed()) {
+                            this.rightClickMouse();
+                        }
+                    }
+                    while (this.gameSettings.keyBindPickBlock.isPressed()) {
+                        this.middleClickMouse();
+                    }
                 }
-
-                while (this.gameSettings.keyBindAttack.isPressed()) {
-                }
-
-                while (this.gameSettings.keyBindUseItem.isPressed()) {
-                }
-
-                while (this.gameSettings.keyBindPickBlock.isPressed()) {
-                }
-            } else {
-                while (this.gameSettings.keyBindAttack.isPressed()) {
-                    this.clickMouse();
-                }
-
-                while (this.gameSettings.keyBindUseItem.isPressed()) {
+                if (eventClick.isShouldRightClick() && this.gameSettings.keyBindUseItem.isKeyDown() && this.rightClickDelayTimer == 0 && !this.thePlayer.isUsingItem()) {
                     this.rightClickMouse();
                 }
-
-                while (this.gameSettings.keyBindPickBlock.isPressed()) {
-                    this.middleClickMouse();
-                }
+                this.sendClickBlockToController(this.currentScreen == null && this.gameSettings.keyBindAttack.isKeyDown() && this.inGameHasFocus);
             }
-
-            if (this.gameSettings.keyBindUseItem.isKeyDown() && this.rightClickDelayTimer == 0 && !this.thePlayer.isUsingItem()) {
-                this.rightClickMouse();
-            }
-
-            this.sendClickBlockToController(this.currentScreen == null && this.gameSettings.keyBindAttack.isKeyDown() && this.inGameHasFocus);
+            this.thePlayer.inventory.currentItem = oldSlot;
         }
 
         if (this.theWorld != null) {
@@ -1689,6 +1690,10 @@ public class Minecraft implements IThreadListener {
     }
 
     private void middleClickMouse() {
+        MiddleClickEvent middleClickEvent = new MiddleClickEvent();
+        Simp.INSTANCE.getEventBus().post(middleClickEvent);
+        if (middleClickEvent.isCancelled()) return;
+
         if (this.objectMouseOver != null) {
             boolean flag = this.thePlayer.capabilities.isCreativeMode;
             int i = 0;

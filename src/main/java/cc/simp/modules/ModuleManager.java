@@ -24,6 +24,7 @@ public final class ModuleManager {
 
                 // Combat
                 new KillAuraModule(),
+                new AIFighterModule(),
                 new TPAuraModule(),
                 new TargetStrafeModule(),
                 new CriticalsModule(),
@@ -77,6 +78,7 @@ public final class ModuleManager {
                 new InvMoveModule(),
                 new LegitScaffoldModule(),
                 new BedNukerModule(),
+                new SpinBotModule(),
                 new NoFireballModule(),
                 new GuiClickerModule(),
 
@@ -87,6 +89,7 @@ public final class ModuleManager {
                 new HitSoundsModule(),
                 new DiscordRPCModule(),
                 new AntiBotModule(),
+                new MCFModule(),
                 new DisablerModule(),
                 new FakeLagModule(),
                 new ClientSpooferModule(),
@@ -117,6 +120,7 @@ public final class ModuleManager {
                 new StorageESPModule(),
                 new ChinaHatModule(),
                 new HaloModule(),
+                new TrajectoriesModule(),
                 new FullBrightModule(),
                 new MotionBlurModule(),
                 new ItemESPModule()
