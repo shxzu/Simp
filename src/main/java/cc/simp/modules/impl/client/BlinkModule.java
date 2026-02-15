@@ -9,7 +9,6 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.modules.impl.combat.BlinkRangeModule;
 import cc.simp.processes.ColorProcess;
 import cc.simp.processes.LagProcess;
 import cc.simp.utils.client.Timer;
@@ -19,7 +18,6 @@ import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.AxisAlignedBB;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
@@ -74,7 +72,7 @@ public class BlinkModule extends Module {
 
     @EventLink
     public Listener<Render3DEvent> render3DEventListener = event -> {
-        if (!hasStoredPosition || !renderBlinkPos.getValue()) return;
+        if (!hasStoredPosition || !renderBlinkPos.getValue() || mc.gameSettings.thirdPersonView == 0) return;
 
         double x = blinkedX - mc.getRenderManager().viewerPosX;
         double y = blinkedY - mc.getRenderManager().viewerPosY;
