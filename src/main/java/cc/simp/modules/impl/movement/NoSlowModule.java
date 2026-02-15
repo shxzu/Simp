@@ -31,15 +31,15 @@ public final class NoSlowModule extends Module {
 
     private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Vanilla);
     private final NumberProperty amount = new NumberProperty("Amount", 2, () -> mode.getValue() == Mode.Ticks, 2, 5, 1);
-    public final Property<Boolean> food = new Property<>("Food", true, () -> mode.getValue() != Mode.Blink && mode.getValue() != Mode.HypixelSword);
-    public final Property<Boolean> potion = new Property<>("Potion", true, () -> mode.getValue() != Mode.Blink && mode.getValue() != Mode.HypixelSword);
-    public final Property<Boolean> sword = new Property<>("Sword", true, () -> mode.getValue() != Mode.Blink && mode.getValue() != Mode.HypixelSword);
-    public final Property<Boolean> bow = new Property<>("Bow", true, () -> mode.getValue() != Mode.Blink && mode.getValue() != Mode.HypixelSword);
+    public final Property<Boolean> food = new Property<>("Food", true, () -> mode.getValue() != Mode.Blink && mode.getValue() != Mode.Hypixel);
+    public final Property<Boolean> potion = new Property<>("Potion", true, () -> mode.getValue() != Mode.Blink && mode.getValue() != Mode.Hypixel);
+    public final Property<Boolean> sword = new Property<>("Sword", true, () -> mode.getValue() != Mode.Blink && mode.getValue() != Mode.Hypixel);
+    public final Property<Boolean> bow = new Property<>("Bow", true, () -> mode.getValue() != Mode.Blink && mode.getValue() != Mode.Hypixel);
 
     private enum Mode {
         Vanilla("Vanilla"),
         UpdatedNCP("Updated NCP"),
-        HypixelSword("Hypixel Sword"),
+        Hypixel("Hypixel"),
         Blink("Blink"),
         Switch("Switch"),
         Ticks("Ticks");
@@ -80,7 +80,7 @@ public final class NoSlowModule extends Module {
         }
 
         if (mc.thePlayer.isUsingItem()) {
-            if (mode.getValue() == Mode.HypixelSword && this.tick == 0 && InventoryUtils.isHoldingSword()) {
+            if (mode.getValue() == Mode.Hypixel && this.tick == 0 && InventoryUtils.isHoldingSword()) {
                 PacketUtils.sendPacket(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem + 1) % 9));
                 PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                 ++this.tick;
@@ -108,7 +108,7 @@ public final class NoSlowModule extends Module {
                     e.setCancelled();
                 }
                 break;
-            case HypixelSword:
+            case Hypixel:
                 if (sword.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
                     e.setCancelled();
                 }
