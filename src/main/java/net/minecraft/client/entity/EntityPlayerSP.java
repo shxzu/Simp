@@ -7,6 +7,7 @@ import cc.simp.api.events.impl.player.ItemSlowdownEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.player.MovePlayerEvent;
 import cc.simp.api.events.impl.player.SprintEvent;
+import cc.simp.utils.client.ViaMCPFixes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MovingSoundMinecartRiding;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -120,6 +121,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
     public void onUpdateWalkingPlayer()
     {
+        ViaMCPFixes.handleEyeYHeight();
         final SprintEvent sprintEvent = new SprintEvent(isSprinting());
         Simp.INSTANCE.getEventBus().post(sprintEvent);
         final boolean clientSprintState = sprintEvent.isSprinting();
@@ -351,6 +353,10 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
     protected boolean pushOutOfBlocks(double x, double y, double z)
     {
+        if (ViaMCPFixes.shouldNotPushout()) {
+            return false;
+        }
+
         if (this.noClip)
         {
             return false;
@@ -591,6 +597,8 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
     public void onLivingUpdate()
     {
+        ViaMCPFixes.handlePlayerSize();
+
         if (this.sprintingTicksLeft > 0)
         {
             --this.sprintingTicksLeft;

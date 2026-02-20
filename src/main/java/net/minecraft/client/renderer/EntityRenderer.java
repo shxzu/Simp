@@ -4,6 +4,7 @@ import cc.simp.Simp;
 import cc.simp.api.events.impl.game.MouseOverEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
 import cc.simp.modules.impl.visuals.CameraModule;
+import cc.simp.utils.client.ViaMCPFixes;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.gson.JsonSyntaxException;
@@ -13,6 +14,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.renderer.chunk.RenderChunk;
@@ -296,8 +298,17 @@ public class EntityRenderer implements IResourceManagerReloadListener
         }
     }
 
+    private float viaCollision$height;
+    private float viaCollision$previousHeight;
+    private float animatedEyeHeight;
+
     public void updateRenderer()
     {
+        float eyeHeight = ViaMCPFixes.eyeHeight;
+        viaCollision$previousHeight = viaCollision$height;
+        viaCollision$height = eyeHeight < viaCollision$height ? eyeHeight : viaCollision$height + ((eyeHeight - viaCollision$height) * 0.5f);
+        animatedEyeHeight = viaCollision$height;
+
         if (OpenGlHelper.shadersSupported && ShaderLinkHelper.getStaticShaderLinkHelper() == null)
         {
             ShaderLinkHelper.setNewStaticShaderLinkHelper();
@@ -633,7 +644,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
     private void orientCamera(float partialTicks)
     {
         Entity entity = this.mc.getRenderViewEntity();
-        float f = entity.getEyeHeight();
+        float f = this.mc.getRenderViewEntity() instanceof EntityPlayerSP ? ViaMCPFixes.lerp(viaCollision$previousHeight, viaCollision$height, partialTicks) : entity.getEyeHeight();
         if (entity == mc.thePlayer && Simp.INSTANCE.getModuleManager().getModule(CameraModule.class).isEnabled() && CameraModule.noSneakCamera.getValue() && entity.isSneaking()) {
             f += 0.08F;
         }
