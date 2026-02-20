@@ -23,7 +23,6 @@ public final class LongJumpModule extends Module {
     private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Vanilla);
     private final NumberProperty height = new NumberProperty("Height", 0.5, () -> mode.getValue() == Mode.Vanilla, 0.1, 1, 0.01);
     private final NumberProperty speed = new NumberProperty("Speed", 1, () -> mode.getValue() == Mode.Vanilla, 0.1, 9.5, 0.1);
-    private final NumberProperty bunnyFriction = new NumberProperty("Bunny Friction", 159, () -> mode.getValue() == Mode.NCP, 59, 259, 1);
     private final NumberProperty groundSpeed = new NumberProperty("Ground Speed", 0.4, () -> mode.getValue() == Mode.NCP, 0.1, 3, 0.1);
     private final NumberProperty jumpSpeed = new NumberProperty("Jump Speed", 1.4, () -> mode.getValue() == Mode.NCP, 0, 3, 0.1);
     private final NumberProperty glide = new NumberProperty("Glide", 0, () -> mode.getValue() == Mode.NCP, 0, 3, 0.5);
