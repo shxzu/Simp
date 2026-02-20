@@ -9,11 +9,13 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.RotationProcess;
 import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.client.MathUtils;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.mc.PathFinderUtils;
 import cc.simp.utils.mc.RotationUtils;
+import cc.simp.utils.misc.MovementFix;
 import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -23,6 +25,7 @@ import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -37,6 +40,9 @@ public class AIFighterModule extends Module {
 
     public static ModeProperty<TargetSelectionProcess.Mode> mode = new ModeProperty<>("Mode", TargetSelectionProcess.Mode.Adaptive);
     public static ModeProperty<TargetSelectionProcess.Entities> entities = new ModeProperty<>("Entities", TargetSelectionProcess.Entities.Optimal);
+    public static ModeProperty<Rotations> rotations = new ModeProperty<>("Rotations", Rotations.Player);
+    private final NumberProperty speed = new NumberProperty("Rotation Speed", 5, 0, 10, 1);
+    public static final Property<Boolean> fix = new Property<>("Move Fix", true, () -> rotations.getValue() == Rotations.Server);
     public static final Property<Boolean> newCombat = new Property<>("New Combat Delays", false);
     private static final NumberProperty min = new NumberProperty("Min CPS", 9.0, () -> !newCombat.getValue(), 0.0, 20.0, 0.5);
     private static final NumberProperty max = new NumberProperty("Max CPS", 13.0, () -> !newCombat.getValue(), 0.0, 20.0, 0.5);
@@ -52,6 +58,11 @@ public class AIFighterModule extends Module {
     static long delay = 0;
     private static final Timer attackTimer = new Timer();
     static int elapsedTicks = 0;
+
+    public enum Rotations {
+        Player,
+        Server
+    }
 
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
@@ -80,8 +91,19 @@ public class AIFighterModule extends Module {
 
         Vector2f rotation = RotationUtils.calculate(target, mode.getValue() == TargetSelectionProcess.Mode.Adaptive, seekRange.getValue());
 
-        mc.thePlayer.rotationYaw = rotation.x;
-        mc.thePlayer.rotationPitch = rotation.y;
+        if (rotations.getValue() == Rotations.Player) {
+            float yawDiff = MathHelper.wrapAngleTo180_float(rotation.x - mc.thePlayer.rotationYaw);
+            float pitchDiff = rotation.y - mc.thePlayer.rotationPitch;
+
+            float maxRotationStep = speed.getValue().intValue() * 18.0f;
+            yawDiff = MathHelper.clamp_float(yawDiff, -maxRotationStep, maxRotationStep);
+            pitchDiff = MathHelper.clamp_float(pitchDiff, -maxRotationStep, maxRotationStep);
+
+            mc.thePlayer.rotationYaw += yawDiff;
+            mc.thePlayer.rotationPitch = MathHelper.clamp_float(mc.thePlayer.rotationPitch + pitchDiff, -90.0f, 90.0f);
+        } else {
+            RotationProcess.setRotations(rotation, speed.getValue().intValue(), fix.getValue() ? MovementFix.NORMAL : MovementFix.OFF);
+        }
 
         if (renderPath.getValue() && mc.thePlayer.getDistanceToEntity(target) <= seekRange.getValue()) {
             path = PathFinderUtils.computePath(
@@ -91,7 +113,7 @@ public class AIFighterModule extends Module {
             );
         }
 
-        mc.clickMouse();
+        attack();
     };
 
     @EventLink
