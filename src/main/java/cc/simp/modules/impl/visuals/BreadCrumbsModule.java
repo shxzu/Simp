@@ -53,6 +53,8 @@ public final class BreadCrumbsModule extends Module {
     };
 
     public void renderLine(final List<Vec3> path) {
+        GL11.glPushMatrix();
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 
         RenderUtils.setAlphaLimit(0);
         RenderUtils.resetColor();
@@ -66,10 +68,10 @@ public final class BreadCrumbsModule extends Module {
 
         GL11.glBegin(GL11.GL_LINE_STRIP);
         int count = 0;
-        int fadeOffset = 0;
+        int fadeOffset = path.size();
 
         for (Vec3 v : path) {
-            int alpha = Math.min(255, (int) ((count / (float) fadeOffset) * 255));
+            int alpha = fadeOffset > 0 ? Math.min(255, (int) ((count / (float) fadeOffset) * 255)) : 255;
 
             RenderUtils.color(ColorProcess.getColor().getRGB(), alpha / 255f);
 
@@ -80,10 +82,18 @@ public final class BreadCrumbsModule extends Module {
             GL11.glVertex3d(x, y, z);
             count++;
         }
-
         GL11.glEnd();
 
+        GL11.glShadeModel(GL11.GL_FLAT);
         GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        GlUtils.endBlend();
         GlUtils.end2DRendering();
+
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GlUtils.resetColor();
+        RenderUtils.resetColor();
+
+        GL11.glPopAttrib();
+        GL11.glPopMatrix();
     }
 }
