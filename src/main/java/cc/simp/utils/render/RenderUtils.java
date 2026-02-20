@@ -123,6 +123,20 @@ public class RenderUtils extends Util {
     public static void drawGradientRect(double v, double v1, double v2, double v3, boolean b, int rgb, int rgb1) {
     }
 
+    public static void drawOutline(float x, float y, float width, float height, final float outlineThickness, int outlineColor) {
+        glEnable(GL_LINE_SMOOTH);
+        color(outlineColor);
+        GlUtils.setup2DRendering();
+        glLineWidth(outlineThickness);
+        glBegin(GL_LINE_LOOP);
+        glVertex2d(x, y);
+        glVertex2d(x + width, y);
+        glVertex2d(x + width, y + height);
+        glVertex2d(x, y + height);
+        glEnd();
+        GlUtils.end2DRendering();
+        glDisable(GL_LINE_SMOOTH);
+    }
     public enum ArrowDirection {
         UP, DOWN, LEFT, RIGHT
     }

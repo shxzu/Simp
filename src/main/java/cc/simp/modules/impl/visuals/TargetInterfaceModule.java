@@ -44,7 +44,9 @@ public final class TargetInterfaceModule extends Module {
         RavenB4("Raven B4"),
         Exhibition("Exhibition"),
         BlueArchive("Blue Archive"),
-        Rise("Rise");
+        Rise("Rise"),
+        Novoline("Novoline"),
+        Adjust("Adjust");
 
         public String name;
         Mode(String name) {
@@ -73,6 +75,8 @@ public final class TargetInterfaceModule extends Module {
             case Exhibition -> drawExhibitionTargetInterface();
             case Rise -> drawRiseTargetInterface();
             case BlueArchive -> drawBlueArchiveTargetInterface();
+            case Novoline -> drawNovolineTargetInterface();
+            case Adjust -> drawAdjustTargetInterface();
         }
     };
 
@@ -86,6 +90,8 @@ public final class TargetInterfaceModule extends Module {
             case Exhibition -> drawExhibitionTargetInterface();
             case Rise -> drawRiseTargetInterface();
             case BlueArchive -> drawBlueArchiveTargetInterface();
+            case Novoline -> drawNovolineTargetInterface();
+            case Adjust -> drawAdjustTargetInterface();
         }
     };
 
@@ -446,23 +452,6 @@ public final class TargetInterfaceModule extends Module {
         GlStateManager.enableBlend();
         GuiInventory.drawEntityOnScreen((int) (x + 3 + size / 2f), (int) (y + size + 1), 18, target.rotationYaw, -target.rotationPitch, target);
         GlStateManager.popMatrix();
-
-        // Draw armor
-        RenderHelper.enableGUIStandardItemLighting();
-        float separation = healthBarWidth / 5;
-
-        for (int i = 0; i <= 3; i++) {
-            if (target.getCurrentArmor(i) != null) {
-                mc.getRenderItem().renderItemAndEffectIntoGUI(target.getCurrentArmor(i),
-                        (int) (x + size + 7 + (separation * (3 - i))), (int) (y + 28));
-            }
-        }
-
-        // Draw held item
-        if (target.getHeldItem() != null) {
-            mc.getRenderItem().renderItemAndEffectIntoGUI(target.getHeldItem(),
-                    (int) (x + size + 7 + (separation * 4)), (int) (y + 28));
-        }
 
         RenderHelper.disableStandardItemLighting();
     }
@@ -838,4 +827,218 @@ public final class TargetInterfaceModule extends Module {
         }
     }
 
+    private void drawNovolineTargetInterface() {
+        target = KillAuraModule.target;
+
+        ScaledResolution sr = new ScaledResolution(mc);
+        initializePosition(sr);
+
+        if (mc.currentScreen instanceof GuiChat) {
+            target = mc.thePlayer;
+        } else {
+            if (target == null) return;
+        }
+
+        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        draggableComponent.setHeight(40);
+        draggableComponent.setWidth(150);
+
+        float x = (float) draggableComponent.getX();
+        float y = (float) draggableComponent.getY();
+
+        int headSize = 24;
+        int maxL = 100;
+
+        String name = target.getName();
+
+        Color backgroundColor = new Color(45, 45, 45);
+        Color backgroundColor2 = new Color(21, 21, 21);
+
+        // Outer border
+        Gui.drawRect((int) (x - 1), (int) (y - 1), (int) (x + 2 + headSize + maxL + 1), (int) (y + 2 + headSize + 2 + 1), backgroundColor2.getRGB());
+
+        // Main background
+        Gui.drawRect((int) x, (int) y, (int) (x + 2 + headSize + maxL), (int) (y + 2 + headSize + 2), backgroundColor.getRGB());
+
+        // Draw player head
+        if (target instanceof AbstractClientPlayer) {
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.color(1, 1, 1, 1);
+
+            mc.getTextureManager().bindTexture(((AbstractClientPlayer) target).getLocationSkin());
+            Gui.drawScaledCustomSizeModalRect((int) (x + 2), (int) (y + 2), 8, 8, 8, 8, headSize, headSize, 64, 64);
+
+            if (((EntityPlayer) target).func_175148_a(EnumPlayerModelParts.HAT)) {
+                Gui.drawScaledCustomSizeModalRect((int) (x + 2), (int) (y + 2), 40, 8, 8, 8, headSize, headSize, 64, 64);
+            }
+
+            GlStateManager.popMatrix();
+        } else {
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.color(1, 1, 1, 1);
+
+            mc.getTextureManager().bindTexture(((AbstractClientPlayer) mc.thePlayer).getLocationSkin());
+            Gui.drawScaledCustomSizeModalRect((int) (x + 2), (int) (y + 2), 8, 8, 8, 8, headSize, headSize, 64, 64);
+
+            if (((EntityPlayer) mc.thePlayer).func_175148_a(EnumPlayerModelParts.HAT)) {
+                Gui.drawScaledCustomSizeModalRect((int) (x + 2), (int) (y + 2), 40, 8, 8, 8, headSize, headSize, 64, 64);
+            }
+
+            GlStateManager.popMatrix();
+        }
+
+        // Draw name
+        mc.fontRendererObj.drawString(name, (int) (x + 2 + headSize + 2), (int) (y + 4), -1, true);
+
+        // Health bar coordinates
+        int healthBarStartX = (int) (x + 2 + headSize + 2);
+        int healthBarStartY = (int) (y + 4 + mc.fontRendererObj.FONT_HEIGHT + 2);
+        int healthBarEndX = (int) (x + 2 + headSize + maxL - 2);
+        int healthBarEndY = healthBarStartY + mc.fontRendererObj.FONT_HEIGHT + 2;
+
+        // Calculate health
+        double health = target.getHealth();
+        double maxHealth = target.getMaxHealth();
+        double healthPercentage = health / maxHealth;
+
+        String healthPercentageText = String.format("%.1f%%", healthPercentage * 100);
+
+        // Draw health bar background
+        Gui.drawRect(healthBarStartX, healthBarStartY, healthBarEndX, healthBarEndY, backgroundColor.darker().getRGB());
+
+        // Draw filled health bar
+        int filledHealthBarEndX = (int) (healthBarStartX + (healthBarEndX - healthBarStartX) * healthPercentage);
+
+        // Draw health bar with outline
+        Gui.drawRect(healthBarStartX, healthBarStartY, filledHealthBarEndX, healthBarEndY, ColorProcess.getColor().getRGB());
+
+        // Draw health percentage text centered
+        int textWidth = mc.fontRendererObj.getStringWidth(healthPercentageText);
+        int textHeight = mc.fontRendererObj.FONT_HEIGHT;
+
+        double rectCenterX = (healthBarStartX + healthBarEndX) / 2.0;
+        double rectCenterY = (healthBarStartY + healthBarEndY) / 2.0;
+
+        double textX = rectCenterX - textWidth / 2.0;
+        double textY = rectCenterY - textHeight / 2.0;
+
+        mc.fontRendererObj.drawString(healthPercentageText, (int) textX, (int) textY + 1, 0xFFFFFFFF, true);
+
+        draggableComponent.setWidth((int) (2 + headSize + maxL));
+        draggableComponent.setHeight((int) (2 + headSize + 2));
+    }
+
+    private void drawAdjustTargetInterface() {
+        target = KillAuraModule.target;
+
+        ScaledResolution sr = new ScaledResolution(mc);
+        initializePosition(sr);
+
+        if (mc.currentScreen instanceof GuiChat) {
+            target = mc.thePlayer;
+        } else {
+            if (target == null) return;
+        }
+
+        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        draggableComponent.setHeight(40);
+        draggableComponent.setWidth(150);
+
+        float x = (float) draggableComponent.getX();
+        float y = (float) draggableComponent.getY();
+
+        String name = target.getName();
+
+        int maxL = 100;
+        int totalWidth = 3 + 24 + 3 + maxL + 3;
+        int totalHeight = 3 + 24 + 8 + 3;
+
+        // Main background
+        Gui.drawRect((int) x, (int) y, (int) (x + totalWidth), (int) (y + totalHeight), new Color(43, 43, 43, 200).getRGB());
+
+        // Draw player head
+        if (target instanceof AbstractClientPlayer) {
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.color(1, 1, 1, 1);
+
+            mc.getTextureManager().bindTexture(((AbstractClientPlayer) target).getLocationSkin());
+            Gui.drawScaledCustomSizeModalRect((int) (x + 3), (int) (y + 3), 8, 8, 8, 8, 24, 24, 64, 64);
+
+            if (((EntityPlayer) target).func_175148_a(EnumPlayerModelParts.HAT)) {
+                Gui.drawScaledCustomSizeModalRect((int) (x + 3), (int) (y + 3), 40, 8, 8, 8, 24, 24, 64, 64);
+            }
+
+            GlStateManager.popMatrix();
+        } else {
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.color(1, 1, 1, 1);
+
+            mc.getTextureManager().bindTexture(((AbstractClientPlayer) mc.thePlayer).getLocationSkin());
+            Gui.drawScaledCustomSizeModalRect((int) (x + 3), (int) (y + 3), 8, 8, 8, 8, 24, 24, 64, 64);
+
+            if (((EntityPlayer) mc.thePlayer).func_175148_a(EnumPlayerModelParts.HAT)) {
+                Gui.drawScaledCustomSizeModalRect((int) (x + 3), (int) (y + 3), 40, 8, 8, 8, 24, 24, 64, 64);
+            }
+
+            GlStateManager.popMatrix();
+        }
+
+        // Draw name
+        Color gray = Color.WHITE.darker();
+        FontProcess.getFont("bold").drawString(name, (float) (x + 3 + 24 + 3), (float) (y + 2), gray.getRGB());
+
+        // Draw armor (if exists)
+        RenderHelper.enableGUIStandardItemLighting();
+        for (int i = 0; i <= 3; i++) {
+            if (target.getCurrentArmor(i) != null) {
+                mc.getRenderItem().renderItemAndEffectIntoGUI(target.getCurrentArmor(i),
+                        (int) (x + 3 + 24 + 3 + (i * 16)), (int) (y + 3 + mc.fontRendererObj.FONT_HEIGHT + 2));
+            }
+        }
+        RenderHelper.disableStandardItemLighting();
+
+        // Health bar coordinates
+        int healthBarStartX = (int) (x + 3);
+        int healthBarStartY = (int) (y + 3 + 24 + 3);
+        int healthBarEndX = (int) (x + 3 + 24 + 3 + maxL);
+        int healthBarEndY = (int) (y + 3 + 24 + 8);
+
+        // Draw health bar background
+        Gui.drawRect(healthBarStartX, healthBarStartY, healthBarEndX, healthBarEndY, new Color(0, 0, 0, 80).getRGB());
+
+        // Calculate health
+        double health = target.getHealth();
+        double maxHealth = target.getMaxHealth();
+        double healthPercentage = health / maxHealth;
+
+        int filledHealthBarEndX = (int) (healthBarStartX + (healthBarEndX - healthBarStartX) * healthPercentage);
+
+        // Draw filled health bar with outline
+        Gui.drawRect(healthBarStartX, healthBarStartY, filledHealthBarEndX, healthBarEndY, ColorProcess.getColor().getRGB());
+
+        // Draw outline
+        RenderUtils.drawOutline(healthBarStartX, healthBarStartY, filledHealthBarEndX - healthBarStartX,
+                healthBarEndY - healthBarStartY, 0.5f, Color.DARK_GRAY.getRGB());
+
+        // Calculate and draw health difference
+        String healthDiffStr = String.format("%.1f", Math.abs(mc.thePlayer.getHealth() - target.getHealth()));
+        String healthDiff = mc.thePlayer.getHealth() < target.getHealth() ? "-" + healthDiffStr : "+" + healthDiffStr;
+
+        int healthDiffWidth = FontProcess.getFont("simp").getStringWidth(healthDiff);
+        int healthDiffHeight = FontProcess.getFont("simp").getHeight();
+
+        FontProcess.getFont("simp").drawString(healthDiff,
+                (float) (x + 3 + 24 + 3 + maxL - healthDiffWidth),
+                (float) (y + 3 + 24 - 9 - healthDiffHeight),
+                gray.getRGB());
+
+        draggableComponent.setWidth(totalWidth);
+        draggableComponent.setHeight(totalHeight);
+    }
+
 }
+
