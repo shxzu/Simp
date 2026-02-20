@@ -12,7 +12,7 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.BadPacketsProcess;
-import cc.simp.processes.LagProcess; 
+import cc.simp.processes.LagProcess;
 import cc.simp.processes.RotationProcess;
 import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.client.MathUtils;
@@ -23,8 +23,6 @@ import cc.simp.utils.mc.PacketUtils;
 import cc.simp.utils.mc.RayCastUtils;
 import cc.simp.utils.mc.RotationUtils;
 import cc.simp.utils.misc.MovementFix;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.block.Block;
@@ -426,13 +424,8 @@ public final class KillAuraModule extends Module {
 
         if (!legit.getValue()) {
             if (!canAttack) return;
-            if (ViaLoadingBase.getInstance().getTargetVersion().newerThan(ProtocolVersion.v1_8)) {
-                mc.playerController.attackEntity(mc.thePlayer, target);
-                mc.thePlayer.swingItem();
-            } else {
-                mc.thePlayer.swingItem();
-                mc.playerController.attackEntity(mc.thePlayer, target);
-            }
+            mc.thePlayer.swingItem();
+            mc.playerController.attackEntity(mc.thePlayer, target);
         } else {
             mc.clickMouse();
         }
