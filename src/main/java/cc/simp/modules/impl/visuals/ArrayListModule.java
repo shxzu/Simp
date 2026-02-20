@@ -42,11 +42,11 @@ public final class ArrayListModule extends Module {
     private final ModeProperty<SuffixMode> suffixMode = new ModeProperty<>("Suffix Mode", SuffixMode.Space, showSuffix::getValue);
     private final Property<Boolean> lowercase = new Property<>("Lowercase", true);
     private final ModeProperty<ColorMode> colorMode = new ModeProperty<>("Color Mode", ColorMode.Fade);
-    private final NumberProperty offsetX = new NumberProperty("Offset X", 0, -100, 100, 1);
-    private final NumberProperty offsetY = new NumberProperty("Offset Y", 0, -100, 100, 1);
+    private final NumberProperty offsetX = new NumberProperty("Offset X", 0, -50, 50, 1);
+    private final NumberProperty offsetY = new NumberProperty("Offset Y", 0, -50, 50, 1);
     private final Property<Boolean> roundedBg = new Property<>("Rounded Background", false);
-    private final NumberProperty roundRadius = new NumberProperty("Round Radius", 3, roundedBg::getValue, 0, 10, 0.5);
-    private final NumberProperty roundedSpacing = new NumberProperty("Rounded Spacing", 1, roundedBg::getValue, 0, 5, 0.5);
+    private final NumberProperty roundRadius = new NumberProperty("Round Radius", 3, roundedBg::getValue, 0, 10, 0.1);
+    private final NumberProperty roundedSpacing = new NumberProperty("Rounded Spacing", 1, roundedBg::getValue, 0, 5, 0.1);
 
     private static final Map<Module, String> displayLabelCache = new HashMap<>();
     private static List<Module> moduleCache;
