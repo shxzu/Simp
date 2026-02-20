@@ -59,6 +59,10 @@ public class FontProcess {
         registerFont("sans", createFont("sans", 18));
         registerFont("convection", createFont("convection", 18));
         registerFont("icon", createFont("icon", 40));
+        registerFont("verdana", createFont("verdana", 18));
+        registerFont("sfui", createFont("sfui", 18));
+        registerFont("intellij", createFont("intellij", 18));
+        registerFont("tahoma", createFont("tahoma", 18));
         registerFont("mc", createFont("mc", 18));
     }
 

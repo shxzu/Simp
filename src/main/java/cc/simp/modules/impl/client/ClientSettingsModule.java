@@ -70,6 +70,10 @@ public final class ClientSettingsModule extends Module {
         Apple,
         Sans,
         Convection,
+        Tahoma,
+        SFUI,
+        IntelliJ,
+        Verdana,
         MC
     }
 
