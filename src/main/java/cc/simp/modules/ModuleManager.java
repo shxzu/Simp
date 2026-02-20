@@ -128,6 +128,7 @@ public final class ModuleManager {
                 new BreadCrumbsModule(),
                 new TrajectoriesModule(),
                 new FullBrightModule(),
+                new FreeLookModule(),
                 new BarrierVisionModule(),
                 new MotionBlurModule(),
                 new ItemESPModule()

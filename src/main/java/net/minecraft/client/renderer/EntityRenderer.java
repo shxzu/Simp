@@ -4,6 +4,7 @@ import cc.simp.Simp;
 import cc.simp.api.events.impl.game.MouseOverEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
 import cc.simp.modules.impl.visuals.CameraModule;
+import cc.simp.modules.impl.visuals.FreeLookModule;
 import cc.simp.utils.client.ViaMCPFixes;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -652,6 +653,19 @@ public class EntityRenderer implements IResourceManagerReloadListener
         double d1 = entity.prevPosY + (entity.posY - entity.prevPosY) * (double)partialTicks + (double)f;
         double d2 = entity.prevPosZ + (entity.posZ - entity.prevPosZ) * (double)partialTicks;
 
+        float rotationYaw = entity.rotationYaw;
+        float rotationPitch = entity.rotationPitch;
+        float prevRotationYaw = entity.prevRotationYaw;
+        float prevRotationPitch = entity.prevRotationPitch;
+
+        FreeLookModule freeLookModule = Simp.INSTANCE.getModuleManager().getModule(FreeLookModule.class);
+        if (freeLookModule.isEnabled() && freeLookModule.freeLooked()) {
+            rotationYaw = freeLookModule.getCameraYaw();
+            prevRotationYaw = freeLookModule.getCameraYaw();
+            rotationPitch = freeLookModule.getCameraPitch();
+            prevRotationPitch = freeLookModule.getCameraPitch();
+        }
+
         if (entity instanceof EntityLivingBase && ((EntityLivingBase)entity).isPlayerSleeping())
         {
             f = (float)((double)f + 1.0D);
@@ -669,8 +683,8 @@ public class EntityRenderer implements IResourceManagerReloadListener
                     GlStateManager.rotate((float)(j * 90), 0.0F, 1.0F, 0.0F);
                 }
 
-                GlStateManager.rotate(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks + 180.0F, 0.0F, -1.0F, 0.0F);
-                GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, -1.0F, 0.0F, 0.0F);
+                GlStateManager.rotate(prevRotationYaw + (rotationYaw - prevRotationYaw) * partialTicks + 180.0F, 0.0F, -1.0F, 0.0F);
+                GlStateManager.rotate(prevRotationPitch + (rotationPitch - prevRotationPitch) * partialTicks, -1.0F, 0.0F, 0.0F);
             }
         }
         else if (this.mc.gameSettings.thirdPersonView > 0)
@@ -683,8 +697,8 @@ public class EntityRenderer implements IResourceManagerReloadListener
             }
             else
             {
-                float f1 = entity.rotationYaw;
-                float f2 = entity.rotationPitch;
+                float f1 = rotationYaw;
+                float f2 = rotationPitch;
 
                 if (this.mc.gameSettings.thirdPersonView == 2)
                 {
@@ -721,11 +735,11 @@ public class EntityRenderer implements IResourceManagerReloadListener
                     GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
                 }
 
-                GlStateManager.rotate(entity.rotationPitch - f2, 1.0F, 0.0F, 0.0F);
-                GlStateManager.rotate(entity.rotationYaw - f1, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotate(rotationPitch - f2, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotate(rotationYaw - f1, 0.0F, 1.0F, 0.0F);
                 GlStateManager.translate(0.0F, 0.0F, (float)(-d3));
-                GlStateManager.rotate(f1 - entity.rotationYaw, 0.0F, 1.0F, 0.0F);
-                GlStateManager.rotate(f2 - entity.rotationPitch, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotate(f1 - rotationYaw, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotate(f2 - rotationPitch, 1.0F, 0.0F, 0.0F);
             }
         }
         else
@@ -735,15 +749,16 @@ public class EntityRenderer implements IResourceManagerReloadListener
 
         if (!this.mc.gameSettings.debugCamEnable)
         {
-            GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(prevRotationPitch + (rotationPitch - prevRotationPitch) * partialTicks, 1.0F, 0.0F, 0.0F);
 
-            if (entity instanceof EntityAnimal entityanimal)
+            if (entity instanceof EntityAnimal)
             {
+                EntityAnimal entityanimal = (EntityAnimal)entity;
                 GlStateManager.rotate(entityanimal.prevRotationYawHead + (entityanimal.rotationYawHead - entityanimal.prevRotationYawHead) * partialTicks + 180.0F, 0.0F, 1.0F, 0.0F);
             }
             else
             {
-                GlStateManager.rotate(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks + 180.0F, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotate(prevRotationYaw + (rotationYaw - prevRotationYaw) * partialTicks + 180.0F, 0.0F, 1.0F, 0.0F);
             }
         }
 
@@ -1172,21 +1187,26 @@ public class EntityRenderer implements IResourceManagerReloadListener
                 i = -1;
             }
 
-            if (this.mc.gameSettings.smoothCamera)
-            {
+            FreeLookModule freeLookModule = Simp.INSTANCE.getModuleManager().getModule(FreeLookModule.class);
+            if (freeLookModule.isEnabled() && freeLookModule.freeLooked()) {
+                float newYaw = freeLookModule.getCameraYaw() + f2 * 0.15F;
+                float newPitch = freeLookModule.getCameraPitch() - f3 * 0.15F * i;
+                if (newPitch > 90) newPitch = 90.0F;
+                if (newPitch < -90) newPitch = -90.0F;
+                freeLookModule.setCameraYaw(newYaw);
+                freeLookModule.setCameraPitch(newPitch);
+            } else if (this.mc.gameSettings.smoothCamera) {
                 this.smoothCamYaw += f2;
                 this.smoothCamPitch += f3;
                 float f4 = partialTicks - this.smoothCamPartialTicks;
                 this.smoothCamPartialTicks = partialTicks;
                 f2 = this.smoothCamFilterX * f4;
                 f3 = this.smoothCamFilterY * f4;
-                this.mc.thePlayer.setAngles(f2, f3 * (float)i);
-            }
-            else
-            {
+                this.mc.thePlayer.setAngles(f2, f3 * (float) i);
+            } else {
                 this.smoothCamYaw = 0.0F;
                 this.smoothCamPitch = 0.0F;
-                this.mc.thePlayer.setAngles(f2, f3 * (float)i);
+                this.mc.thePlayer.setAngles(f2, f3 * (float) i);
             }
         }
 
