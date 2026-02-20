@@ -1,8 +1,6 @@
 package cc.simp.modules.impl.combat;
 
 import cc.simp.api.events.impl.game.PreUpdateEvent;
-import cc.simp.api.events.impl.player.MotionEvent;
-import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
@@ -66,6 +64,7 @@ public final class AutoClickerModule extends Module {
 
             if (currentTime - leftLastClick >= delay) {
                 mc.clickMouse();
+                mc.leftClickCounter = 0;
                 leftLastClick = currentTime;
             }
         }
