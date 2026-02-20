@@ -39,6 +39,7 @@ public final class ModuleManager {
                 new AutoClickerModule(),
                 new KeepSprintModule(),
                 new AimAssistModule(),
+                new TriggerBotModule(),
                 new AutoRodModule(),
                 new AutoProjectileModule(),
                 new AutoPotModule(),
@@ -61,6 +62,8 @@ public final class ModuleManager {
                 new NoJumpDelayModule(),
                 new StopMovementModule(),
                 new PhaseModule(),
+                new SpiderModule(),
+                new ClickTeleportModule(),
 
                 // Player
                 new ScaffoldModule(),
@@ -85,6 +88,8 @@ public final class ModuleManager {
                 // Client
                 new ClientSettingsModule(),
                 new FpsEnhancerModule(),
+                new NoCrashModule(),
+                new PluginDetectorModule(),
                 new ToggleSoundsModule(),
                 new HitSoundsModule(),
                 new DiscordRPCModule(),
@@ -120,8 +125,10 @@ public final class ModuleManager {
                 new StorageESPModule(),
                 new ChinaHatModule(),
                 new HaloModule(),
+                new BreadCrumbsModule(),
                 new TrajectoriesModule(),
                 new FullBrightModule(),
+                new BarrierVisionModule(),
                 new MotionBlurModule(),
                 new ItemESPModule()
         );

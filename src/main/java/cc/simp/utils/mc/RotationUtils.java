@@ -240,6 +240,7 @@ public class RotationUtils extends Util {
         final float pitch = mc.thePlayer.rotationPitch;
         return new Vector2f(yaw, pitch);
     }
+
     public static Vector2f smooth(final Vector2f targetRotation, final double speed) {
         return smooth(RotationProcess.lastRotations, targetRotation, speed);
     }
