@@ -69,7 +69,7 @@ public final class CriticalsModule extends Module {
         }
 
         if (mode.getValue() == Mode.Legit) {
-            if (mc.thePlayer.onGround && !mc.thePlayer.isOnLadder() && !mc.thePlayer.isInWater() && !mc.thePlayer.isRiding()) {
+            if (mc.thePlayer.onGround && !mc.thePlayer.isOnLadder() && !mc.thePlayer.isInWater() && !mc.thePlayer.isRiding() && !mc.gameSettings.keyBindJump.isKeyDown()) {
                 activateJump = true;
             }
         }

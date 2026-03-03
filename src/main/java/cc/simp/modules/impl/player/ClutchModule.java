@@ -1,166 +1,126 @@
 package cc.simp.modules.impl.player;
 
-import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
+import cc.simp.api.events.impl.world.WorldLoadEvent;
+import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.processes.BadPacketsProcess;
-import cc.simp.processes.RotationProcess;
-import cc.simp.utils.client.EnumFacingOffset;
-import cc.simp.utils.client.MathUtils;
-import cc.simp.utils.mc.*;
-import cc.simp.utils.misc.MovementFix;
+import cc.simp.modules.ModuleManager;
+import cc.simp.utils.mc.PlayerUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
-import net.minecraft.network.play.client.C0APacketAnimation;
-import net.minecraft.util.*;
-import org.lwjgl.util.vector.Vector2f;
+import net.minecraft.block.BlockAir;
+import net.minecraft.util.BlockPos;
 
 import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Clutch", category = ModuleCategory.PLAYER)
-public class ClutchModule extends Module {
+public final class ClutchModule extends Module {
 
-    private final NumberProperty minRotationSpeed = new NumberProperty("Min Rotation Speed", 5, 0, 10, 1);
-    private final NumberProperty maxRotationSpeed = new NumberProperty("Max Rotation Speed", 8, 0, 10, 1);
-    private final NumberProperty placeDelay = new NumberProperty("Place Delay", 0, 0, 10, 1);
+    private final NumberProperty voidDistance = new NumberProperty("Void Distance", 10, 5, 50, 1);
+    private final NumberProperty blockSearchRadius = new NumberProperty("Block Search Radius", 3, 1, 5, 1);
+    private final Property<Boolean> autoDisable = new Property<>("Auto Disable", true);
 
-    private Vec3 targetBlock;
-    private EnumFacingOffset enumFacing;
-    private BlockPos blockFace;
-    private float targetYaw, targetPitch;
-    private int ticksOnAir;
-    private int toggle;
+    private ScaffoldModule scaffoldModule;
+    private boolean wasScaffoldEnabled = false;
 
     @Override
     public void onEnable() {
-        targetYaw = mc.thePlayer.rotationYaw - 180;
-        targetPitch = 90;
-
-        targetBlock = null;
+        super.onEnable();
+        scaffoldModule = ModuleManager.getInstance(ScaffoldModule.class);
+        wasScaffoldEnabled = false;
     }
 
-    public void calculateRotations() {
-        if (ticksOnAir > 0 && !RayCastUtils.overBlock(RotationProcess.rotations, enumFacing.getEnumFacing(), blockFace, true)) {
-            getRotations(0);
-        }
-
-        /* Smoothing rotations */
-        final double minRotationSpeed = this.maxRotationSpeed.getValue();
-        final double maxRotationSpeed = this.minRotationSpeed.getValue();
-        float rotationSpeed = (float) MathUtils.getRandom(minRotationSpeed, maxRotationSpeed);
-
-        if (rotationSpeed != 0) {
-            RotationProcess.setRotations(new Vector2f(targetYaw, targetPitch), rotationSpeed, MovementFix.NORMAL);
+    @Override
+    public void onDisable() {
+        super.onDisable();
+        // Disable scaffold if we enabled it
+        if (scaffoldModule != null && wasScaffoldEnabled && scaffoldModule.isEnabled()) {
+            scaffoldModule.toggle();
+            wasScaffoldEnabled = false;
         }
     }
 
     @EventLink
+    public final Listener<WorldLoadEvent> worldLoadEventListener = event -> {
+        if (scaffoldModule != null && wasScaffoldEnabled && scaffoldModule.isEnabled()) {
+            scaffoldModule.toggle();
+            wasScaffoldEnabled = false;
+        }
+    };
+
+    @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
-        if (mc.thePlayer.ticksExisted <= 50 ||
-                BadPacketsProcess.bad() || Simp.INSTANCE.getModuleManager().getModule(ScaffoldModule.class).isEnabled() ||
-                (!mc.gameSettings.keyBindSneak.isKeyDown())) return;
-
-        if (mc.thePlayer.offGroundTicks > 3 && !PlayerUtils.isBlockUnder()) {
-            toggle = 10;
+        if (mc.thePlayer == null || mc.theWorld == null || mc.thePlayer.isDead) {
+            if (scaffoldModule != null && wasScaffoldEnabled && scaffoldModule.isEnabled()) {
+                scaffoldModule.toggle();
+                wasScaffoldEnabled = false;
+            }
+            return;
         }
 
-        if (toggle-- < 0) return;
+        // Check if we're above void
+        boolean isAboveVoid = !PlayerUtils.isBlockUnder(voidDistance.getValue(), true);
 
-        // Getting ItemSlot
-        if (InventoryUtils.findBlock() != -1) {
-            mc.thePlayer.inventory.currentItem = InventoryUtils.findBlock();
+        if (!isAboveVoid) {
+            // Not above void, make sure scaffold is off if we enabled it
+            if (wasScaffoldEnabled && scaffoldModule != null && scaffoldModule.isEnabled()) {
+                scaffoldModule.toggle();
+                wasScaffoldEnabled = false;
+            }
+            return;
         }
 
-        final Vec3i offset = new Vec3i(0, 0, 0);
+        // We're above void, check if there are blocks nearby to clutch on
+        boolean hasNearbyBlocks = hasBlocksNearby();
 
-        //Used to detect when to place a block, if over air, allow placement of blocks
-        if (PlayerUtils.blockRelativeToPlayer(offset.getX(), -1 + offset.getY(), offset.getZ()).isReplaceable(mc.theWorld, new BlockPos(mc.thePlayer).down())) {
-            ticksOnAir++;
+        if (hasNearbyBlocks) {
+            // Enable scaffold if not already enabled
+            if (scaffoldModule != null && !scaffoldModule.isEnabled()) {
+                scaffoldModule.toggle();
+                wasScaffoldEnabled = true;
+            }
         } else {
-            ticksOnAir = 0;
-        }
+            // No blocks nearby, disable scaffold if we enabled it
+            if (wasScaffoldEnabled && scaffoldModule != null && scaffoldModule.isEnabled()) {
+                scaffoldModule.toggle();
+                wasScaffoldEnabled = false;
+            }
 
-        // Gets block to place
-        targetBlock = PlayerUtils.getPlacePossibility(offset.getX(), offset.getY(), offset.getZ());
-
-        if (targetBlock == null) {
-            return;
-        }
-
-        //Gets EnumFacing
-        enumFacing = PlayerUtils.getEnumFacing(targetBlock);
-
-        if (enumFacing == null) {
-            return;
-        }
-
-        final BlockPos position = new BlockPos(targetBlock.xCoord, targetBlock.yCoord, targetBlock.zCoord);
-
-        blockFace = position.add(enumFacing.getOffset().xCoord, enumFacing.getOffset().yCoord, enumFacing.getOffset().zCoord);
-
-        if (blockFace == null || enumFacing == null) {
-            return;
-        }
-
-        this.calculateRotations();
-
-        if (targetBlock == null || enumFacing == null || blockFace == null) {
-            return;
-        }
-
-        if (mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock) {
-            if (!BadPacketsProcess.bad(false, true, false, false, true) &&
-                    ticksOnAir > MathUtils.getRandom(placeDelay.getValue().intValue(), placeDelay.getValue().intValue() * Math.random()) &&
-                    (RayCastUtils.overBlock(enumFacing.getEnumFacing(), blockFace, true))) {
-
-                Vec3 hitVec = RayCastUtils.rayCast(RotationProcess.rotations, mc.playerController.getBlockReachDistance()).hitVec;
-
-                if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.inventory.getCurrentItem(), blockFace, enumFacing.getEnumFacing(), hitVec)) {
-                    PacketUtils.sendPacket(new C0APacketAnimation());
-                }
-
-                mc.rightClickDelayTimer = 0;
-                ticksOnAir = 0;
-            } else if (Math.random() > 0.92 && mc.rightClickDelayTimer <= 0) {
-                PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.inventory.getCurrentItem()));
-                mc.rightClickDelayTimer = 0;
+            // Auto disable clutch if configured
+            if (autoDisable.getValue()) {
+                this.toggle();
             }
         }
     };
 
-    public void getRotations(final int yawOffset) {
+    /**
+     * Checks if there are solid blocks nearby that the player could clutch onto
+     */
+    private boolean hasBlocksNearby() {
+        int radius = blockSearchRadius.getValue().intValue();
+        BlockPos playerPos = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
 
-        EntityPlayer entityPlayer = mc.thePlayer;
-        double difference = entityPlayer.posY + entityPlayer.getEyeHeight() - targetBlock.yCoord - 0.1 - Math.random() * 0.8;
+        // Check in a radius around the player (horizontal only, and a few blocks down)
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -2; y <= 1; y++) {
+                for (int z = -radius; z <= radius; z++) {
+                    // Skip the block directly below the player as we're looking for blocks to clutch onto
+                    if (x == 0 && y == -1 && z == 0) continue;
 
-        MovingObjectPosition movingObjectPosition;
-
-        for (int offset = -180 + yawOffset; offset <= 180; offset += 45) {
-            entityPlayer.setPosition(entityPlayer.posX, entityPlayer.posY - difference, entityPlayer.posZ);
-            movingObjectPosition = RayCastUtils.rayCast(new Vector2f(entityPlayer.rotationYaw + offset, 0), 4.5);
-            entityPlayer.setPosition(entityPlayer.posX, entityPlayer.posY + difference, entityPlayer.posZ);
-
-            if (movingObjectPosition != null && new BlockPos(blockFace).equals(movingObjectPosition.getBlockPos()) &&
-                    enumFacing.getEnumFacing() == movingObjectPosition.sideHit) {
-                Vector2f rotations = RotationUtils.calculate(movingObjectPosition.hitVec);
-
-                targetYaw = rotations.x;
-                targetPitch = rotations.y;
-                return;
+                    BlockPos checkPos = playerPos.add(x, y, z);
+                    if (!(mc.theWorld.getBlockState(checkPos).getBlock() instanceof BlockAir)) {
+                        // Found a non-air block nearby
+                        return true;
+                    }
+                }
             }
         }
 
-        // Backup Rotations
-        final Vector2f rotations = RotationUtils.calculate(
-                new Vector3d(blockFace.getX(), blockFace.getY(), blockFace.getZ()), enumFacing.getEnumFacing());
-
-        targetYaw = rotations.x;
-        targetPitch = rotations.y;
+        return false;
     }
 }
+
+

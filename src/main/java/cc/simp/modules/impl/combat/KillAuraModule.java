@@ -11,10 +11,7 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.processes.BadPacketsProcess;
-import cc.simp.processes.LagProcess;
-import cc.simp.processes.RotationProcess;
-import cc.simp.processes.TargetSelectionProcess;
+import cc.simp.processes.*;
 import cc.simp.utils.client.MathUtils;
 import cc.simp.utils.client.Noise;
 import cc.simp.utils.client.Timer;
@@ -108,10 +105,8 @@ public final class KillAuraModule extends Module {
     static long delay = 0;
     static int elapsedTicks = 0;
     private boolean shouldMiss = false;
-    private boolean wasBlocking = false;
-    private int blockCooldown = 0;
     private Noise noise;
-    private int ticksSinceUnblock = 999;
+    int count = 0;
 
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
@@ -138,7 +133,6 @@ public final class KillAuraModule extends Module {
         }
 
         calculateRotations();
-        if (ticksSinceUnblock < 999) ticksSinceUnblock++;
         if (ab.getValue() != AutoBlock.None) {
             if (mc.thePlayer.getDistanceToEntity(target) <= blockingRange.getValue() && InventoryUtils.isHoldingSword()) {
                 autoblock();
@@ -161,6 +155,7 @@ public final class KillAuraModule extends Module {
         canAttack = true;
         target = null;
         targetList.clear();
+        blockTicks = -1;
     };
 
     @EventLink
@@ -270,7 +265,6 @@ public final class KillAuraModule extends Module {
             case Fake:
                 autoBlocking = true;
                 break;
-
             case Legit:
                 int interval = legitBlockInterval.getValue().intValue();
                 if (legitRandomize.getValue()) {
@@ -278,50 +272,29 @@ public final class KillAuraModule extends Module {
                     interval = Math.max(2, interval);
                 }
 
-                if (mc.thePlayer.ticksExisted % interval == 0) {
-                    if (!wasBlocking && blockCooldown == 0) {
-                        mc.thePlayer.setItemInUse(mc.thePlayer.getHeldItem(), mc.thePlayer.getHeldItem().getMaxItemUseDuration());
-                        autoBlocking = true;
-                        wasBlocking = true;
-                        blockCooldown = 2;
-                    }
+                if (mc.thePlayer.ticksExisted % interval == 0 && !mc.gameSettings.keyBindUseItem.isKeyDown() && !autoBlocking) {
+                    mc.gameSettings.keyBindUseItem.setPressed(true);
+                    autoBlocking = true;
                     canAttack = false;
-                } else {
-                    if (wasBlocking && blockCooldown == 0) {
-                        if (!hitTimerDone() || mc.thePlayer.getDistanceToEntity(target) > killRange.getValue()) {
-                            mc.thePlayer.stopUsingItem();
-                            wasBlocking = false;
-                            autoBlocking = false;
-                            canAttack = true;
-                        }
-                        blockCooldown = 2;
-                    }
+                } else if (autoBlocking) {
+                    unblock();
                 }
 
-                if (blockCooldown > 0) blockCooldown--;
+                if (!autoBlocking) canAttack = true;
                 break;
 
             case Predictive:
                 boolean shouldBlock = shouldBlockPredictive();
 
-                if (shouldBlock && !wasBlocking && blockCooldown == 0) {
-                    mc.thePlayer.setItemInUse(mc.thePlayer.getHeldItem(), mc.thePlayer.getHeldItem().getMaxItemUseDuration());
+                if (shouldBlock && !autoBlocking && !mc.gameSettings.keyBindUseItem.isKeyDown()) {
+                    mc.gameSettings.keyBindUseItem.setPressed(true);
                     autoBlocking = true;
-                    wasBlocking = true;
                     canAttack = false;
-                    blockCooldown = 3;
-                } else if (!shouldBlock && wasBlocking && blockCooldown == 0) {
-                    // Only unblock if not about to attack
-                    if (!hitTimerDone() || mc.thePlayer.getDistanceToEntity(target) > killRange.getValue()) {
-                        mc.thePlayer.stopUsingItem();
-                        wasBlocking = false;
-                        autoBlocking = false;
-                        canAttack = true;
-                    }
-                    blockCooldown = 3;
+                } else if (!shouldBlock && autoBlocking) {
+                    unblock();
                 }
 
-                if (blockCooldown > 0) blockCooldown--;
+                if (!autoBlocking) canAttack = true;
                 break;
 
             case Vanilla:
@@ -340,10 +313,10 @@ public final class KillAuraModule extends Module {
                     case 1:
                         PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         autoBlocking = true;
-                        LagProcess.dispatch();
+                        BlinkProcess.disable();
                     case 2:
                         if (mc.thePlayer.ticksExisted % 2 == 0) {
-                            LagProcess.blink();
+                            BlinkProcess.enable();
                         }
                         break;
                 }
@@ -374,17 +347,21 @@ public final class KillAuraModule extends Module {
     private void unblock() {
         if (!autoBlocking) return;
 
+        blockTicks = -1;
+
+        if (ab.getValue() == AutoBlock.Blink) {
+            BlinkProcess.disable();
+        }
+
         if (ab.getValue() == AutoBlock.Fake) {
             autoBlocking = false;
             return;
         }
 
-        if ((ab.getValue() == AutoBlock.Legit || ab.getValue() == AutoBlock.Predictive) && wasBlocking) {
-            mc.thePlayer.stopUsingItem();
-            ticksSinceUnblock = 0;
-            canAttack = false;
+        if ((ab.getValue() == AutoBlock.Legit || ab.getValue() == AutoBlock.Predictive) && autoBlocking && mc.gameSettings.keyBindUseItem.isKeyDown()) {
+            mc.gameSettings.keyBindUseItem.setPressed(false);
             autoBlocking = false;
-            wasBlocking = false;
+            count = 0;
             return;
         }
 
@@ -396,7 +373,6 @@ public final class KillAuraModule extends Module {
 
     private void attack() {
         if (target == null || !canAttack) return;
-        if (ticksSinceUnblock <= 1) return;
 
         if (!hitTimerDone()) return;
 
@@ -516,8 +492,8 @@ public final class KillAuraModule extends Module {
         target = null;
         shouldMiss = false;
         targetList.clear();
-        wasBlocking = false;
-        blockCooldown = 0;
+        count = 0;
+        blockTicks = -1;
         unblock();
         super.onDisable();
     }

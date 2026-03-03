@@ -52,6 +52,7 @@ public final class AntiVoidModule extends Module {
                     mc.thePlayer.rotationPitch = rotation.y;
                     mc.thePlayer.fallDistance = 0;
                     LagProcess.packets.removeIf(timedPacket -> !(timedPacket.getPacket() instanceof C0FPacketConfirmTransaction || timedPacket.getPacket() instanceof C00PacketKeepAlive));
+                    LagProcess.disable();
                     LagProcess.dispatch();
                 }
             } else {

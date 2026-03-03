@@ -30,7 +30,7 @@ public class Simp {
     public static final Simp INSTANCE = new Simp();
     public static final String NAME = "Simp";
     public static final String BUILD = BuildType.RELEASE.getName();
-    public static final String VERSION = "1.2.1" + " " + BUILD;
+    public static final String VERSION = "1.3" + " " + BUILD;
     public static final String FULL = NAME + " " + VERSION;
 
     private EventBus<Event> eventBus;
@@ -48,6 +48,7 @@ public class Simp {
     private ClickInterface clickInterface;
     private WindowClickInterface windowClickInterface;
     private LagProcess lagProcess;
+    private BlinkProcess blinkProcess;
     private BadPacketsProcess badPacketsProcess;
     private TargetSelectionProcess targetSelectionProcess;
     @Getter
@@ -76,6 +77,8 @@ public class Simp {
         bindsConfig.loadFromFile();
         lagProcess = new LagProcess();
         getEventBus().subscribe(lagProcess);
+        blinkProcess = new BlinkProcess();
+        getEventBus().subscribe(blinkProcess);
         badPacketsProcess = new BadPacketsProcess();
         getEventBus().subscribe(badPacketsProcess);
         targetSelectionProcess = new TargetSelectionProcess();

@@ -18,15 +18,25 @@ public class HideCommand extends Command {
             try {
                 String moduleName = String.join(" ", args);
                 Module module = Simp.INSTANCE.getModuleManager().getModule(moduleName);
-                if (module != null) {
-                	module.setHidden(!module.isHidden());
-                    if(module.isHidden()) {
-                    	sendChatWithPrefix("Hid " + module.getLabel() + "!");
+                if (moduleName.equalsIgnoreCase("all")) {
+                    if (Simp.INSTANCE.getModuleManager().getModules().stream().anyMatch(Module::isHidden)) {
+                        Simp.INSTANCE.getModuleManager().getModules().forEach(m -> m.setHidden(false));
+                        sendChatWithPrefix("Unhid all modules!");
                     } else {
-                    	sendChatWithPrefix("Unhid " + module.getLabel() + "!");
+                        Simp.INSTANCE.getModuleManager().getModules().forEach(m -> m.setHidden(true));
+                        sendChatWithPrefix("Hid all modules!");
                     }
                 } else {
-                    sendChatWithPrefix("Cannot find module \"" + moduleName + "\"");
+                    if (module != null) {
+                        module.setHidden(!module.isHidden());
+                        if (module.isHidden()) {
+                            sendChatWithPrefix("Hid " + module.getLabel() + "!");
+                        } else {
+                            sendChatWithPrefix("Unhid " + module.getLabel() + "!");
+                        }
+                    } else {
+                        sendChatWithPrefix("Cannot find module \"" + moduleName + "\"");
+                    }
                 }
           
             } catch (Exception e) {

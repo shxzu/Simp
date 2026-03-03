@@ -31,6 +31,7 @@ public final class ClientSettingsModule extends Module {
     public static final Property<String> customAnimeUrl = new Property<>("Custom URL", "", () -> anime.getValue() == Anime.Custom);
     public static final Property<Boolean> showInGame = new Property<>("Show In-Game", false, () -> anime.getValue() != Anime.None);
     public static final Property<Boolean> showInInventory = new Property<>("Show In Inventory", true, () -> anime.getValue() != Anime.None);
+    public static final Property<Boolean> blinkCancelsIncoming = new Property<>("Blink Cancels Incoming", true);
 
     private static final Map<String, ResourceLocation> cachedImages = new HashMap<>();
 

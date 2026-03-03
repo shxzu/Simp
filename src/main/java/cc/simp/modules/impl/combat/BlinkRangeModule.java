@@ -13,10 +13,7 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.processes.ColorProcess;
-import cc.simp.processes.FontProcess;
-import cc.simp.processes.LagProcess;
-import cc.simp.processes.TargetSelectionProcess;
+import cc.simp.processes.*;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.mc.MovementUtils;
 import cc.simp.utils.render.GlUtils;
@@ -163,10 +160,9 @@ public final class BlinkRangeModule extends Module {
 
     public void blinkToggle(boolean toggle) {
         if (toggle) {
-            LagProcess.blink();
+            BlinkProcess.enable();
         } else {
-            LagProcess.dispatch();
-            LagProcess.disable();
+            BlinkProcess.disable();
         }
     }
 

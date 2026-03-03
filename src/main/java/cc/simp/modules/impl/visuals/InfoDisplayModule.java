@@ -1,10 +1,12 @@
 package cc.simp.modules.impl.visuals;
 
+import cc.simp.Simp;
 import cc.simp.api.events.impl.game.ClickEvent;
-import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.events.impl.render.ShaderEvent;
+import cc.simp.api.events.impl.world.TickEvent;
 import cc.simp.api.properties.Property;
+import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -30,9 +32,17 @@ public class InfoDisplayModule extends Module {
 
     // god, I love AI -shxzu, 11/01/2025
 
+    public enum DisplayMode {
+        Draggable,
+        Classic
+    }
+
+    private final ModeProperty<DisplayMode> mode = new ModeProperty<>("Mode", DisplayMode.Draggable);
     private final Property<Boolean> cps = new Property<>("CPS", true);
     private final Property<Boolean> fps = new Property<>("FPS", true);
     private final Property<Boolean> bps = new Property<>("BPS", true);
+    private final Property<Boolean> version = new Property<>("Version", true, () -> mode.getValue() == DisplayMode.Classic);
+    private final Property<Boolean> username = new Property<>("Username", true, () -> mode.getValue() == DisplayMode.Classic);
 
     private static final int BUBBLE_HEIGHT = 15;
     private static final int BUBBLE_PADDING = 2;
@@ -62,7 +72,7 @@ public class InfoDisplayModule extends Module {
     };
 
     @EventLink
-    public final Listener<MotionEvent> onPreMotionEvent = event -> {
+    public final Listener<TickEvent> onPreMotionEvent = event -> {
         cpsValue = 0;
         clicks.add(clicked);
         clicks.forEach((click) -> {
@@ -101,7 +111,6 @@ public class InfoDisplayModule extends Module {
 
     private void drawInfoBubbles() {
         ScaledResolution sr = new ScaledResolution(mc);
-        initializePositions(sr);
 
         if (mc.thePlayer != null) {
             double deltaX = mc.thePlayer.posX - mc.thePlayer.prevPosX;
@@ -109,19 +118,58 @@ public class InfoDisplayModule extends Module {
             bpsValue = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ) * 20.0;
         }
 
-        boolean isInChat = mc.currentScreen instanceof GuiChat;
+        if (mode.getValue() == DisplayMode.Classic) {
+            drawClassic(sr);
+        } else {
+            initializePositions(sr);
+            boolean isInChat = mc.currentScreen instanceof GuiChat;
 
-        if (cps.getValue()) {
-            drawBubble("CPS", String.valueOf(cpsValue), "InfoDisplay_CPS", isInChat);
+            if (cps.getValue()) {
+                drawBubble("CPS", String.valueOf(cpsValue), "InfoDisplay_CPS", isInChat);
+            }
+
+            if (fps.getValue()) {
+                int fpsValue = mc.getDebugFPS();
+                drawBubble("FPS", String.valueOf(fpsValue), "InfoDisplay_FPS", isInChat);
+            }
+
+            if (bps.getValue()) {
+                drawBubble("BPS", String.format("%.2f", bpsValue), "InfoDisplay_BPS", isInChat);
+            }
+        }
+    }
+
+    private void drawClassic(ScaledResolution sr) {
+        int yOffset = sr.getScaledHeight() - 2;
+        int xPos = 2;
+        int lineHeight = FontProcess.getCurrentFont().getHeight() + 2;
+
+        List<String> lines = new ArrayList<>();
+
+        if (bps.getValue()) {
+            lines.add(String.format("BPS: %.2f", bpsValue));
         }
 
         if (fps.getValue()) {
             int fpsValue = mc.getDebugFPS();
-            drawBubble("FPS", String.valueOf(fpsValue), "InfoDisplay_FPS", isInChat);
+            lines.add("FPS: " + fpsValue);
         }
 
-        if (bps.getValue()) {
-            drawBubble("BPS", String.format("%.2f", bpsValue), "InfoDisplay_BPS", isInChat);
+        if (cps.getValue()) {
+            lines.add("CPS: " + cpsValue);
+        }
+
+        if (version.getValue()) {
+            lines.add("Version: " + Simp.VERSION);
+        }
+
+        if (username.getValue()) {
+            lines.add("Version: " + mc.getSession().getUsername());
+        }
+
+        // Draw from bottom to top
+        for (int i = lines.size() - 1; i >= 0; i--) {
+            FontProcess.getCurrentFont().drawStringWithShadow(lines.get(i), xPos, yOffset - (lines.size() - i) * lineHeight, Color.WHITE.getRGB());
         }
     }
 

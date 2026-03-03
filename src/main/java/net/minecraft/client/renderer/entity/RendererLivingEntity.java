@@ -1,20 +1,15 @@
 package net.minecraft.client.renderer.entity;
 
 import cc.simp.Simp;
+import cc.simp.modules.impl.visuals.ChamsModule;
 import cc.simp.modules.impl.visuals.NameTagsModule;
 import com.google.common.collect.Lists;
-import java.nio.FloatBuffer;
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelSpider;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -28,11 +23,13 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.optifine.EmissiveTextures;
 import net.optifine.entity.model.CustomEntityModels;
-import net.optifine.reflect.Reflector;
 import net.optifine.shaders.Shaders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
+
+import java.nio.FloatBuffer;
+import java.util.List;
 
 public abstract class RendererLivingEntity<T extends EntityLivingBase> extends Render<T>
 {
@@ -101,6 +98,11 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
 
     public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
+        if (Simp.INSTANCE.getModuleManager().getModule(ChamsModule.class).isEnabled() && ChamsModule.shouldRender(entity)) {
+            GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
+            GL11.glPolygonOffset(1.0F, -1000000F);
+        }
+
         if (animateModelLiving)
         {
             entity.limbSwingAmount = 1.0F;
@@ -263,6 +265,11 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
         if (!this.renderOutlines)
         {
             super.doRender(entity, x, y, z, entityYaw, partialTicks);
+        }
+
+        if (Simp.INSTANCE.getModuleManager().getModule(ChamsModule.class).isEnabled() && ChamsModule.shouldRender(entity)) {
+            GL11.glPolygonOffset(1.0F, 1000000F);
+            GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
         }
     }
 

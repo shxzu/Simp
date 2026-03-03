@@ -564,7 +564,7 @@ public final class ScaffoldModule extends Module {
                 boolean diagonal = RotationUtils.getMovementYaw() % 90.0f > 10.0f && RotationUtils.getMovementYaw() % 90.0f < 80.0f;
                 if (recursion == 0) {
                     mc.entityRenderer.getMouseOver(1);
-                    if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
+                    if (mc.thePlayer.onGround && MovementUtils.isMoving() && !mc.gameSettings.keyBindJump.isKeyDown()) {
                         rotSpeed = 5f;
                         this.targetYaw = mc.thePlayer.rotationYaw;
                         canPlace = false;

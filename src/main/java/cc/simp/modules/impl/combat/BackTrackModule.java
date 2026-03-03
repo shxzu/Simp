@@ -58,14 +58,14 @@ public final class BackTrackModule extends Module {
         setSuffix(ping + " ms");
 
         if (mc.thePlayer.isDead) {
-            LagProcess.disable();
             LagProcess.dispatch();
+            LagProcess.disable();
             return;
         }
 
         if (!(TargetSelectionProcess.getTarget() instanceof EntityPlayer)) {
-            LagProcess.disable();
             LagProcess.dispatch();
+            LagProcess.disable();
             return;
         }
 
@@ -85,12 +85,12 @@ public final class BackTrackModule extends Module {
                 ping = (int) MathUtils.getRandom(minDelayProperty.getValue().intValue(), maxDelayProperty.getValue().intValue());
                 LagProcess.spoof(ping, true, true, true, true, cancelClientPacketsProperty.getValue(), cancelClientPacketsProperty.getValue());
             } else {
-                LagProcess.disable();
                 LagProcess.dispatch();
+                LagProcess.disable();
             }
         } else {
-            LagProcess.disable();
             LagProcess.dispatch();
+            LagProcess.disable();
         }
     };
 

@@ -1,11 +1,11 @@
 package cc.simp.modules.impl.player;
 
-import cc.simp.Simp;
+import cc.simp.api.events.impl.player.AttackEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
+import cc.simp.api.properties.Property;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.modules.impl.combat.KillAuraModule;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.block.Block;
@@ -18,30 +18,14 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Auto Tool", category = ModuleCategory.PLAYER)
 public class AutoToolModule extends Module {
 
+    private static final Property<Boolean> sneakOnly = new Property<>("Sneak Only", false);
+
     public static boolean shouldSwap = true;
 
     @EventLink
     public final Listener<MotionEvent> motionEventListener = e -> {
-        if (Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && KillAuraModule.target != null) {
-            float bestStr = 0.0F;
-            int itemToUse = -1;
 
-            for (int i = 0; i < 9; i++) {
-                ItemStack itemStack = mc.thePlayer.inventory.mainInventory[i];
-                if (itemStack == null) continue;
-
-                if (!(itemStack.getItem() instanceof ItemSword)) continue;
-
-                ItemSword item = (ItemSword) itemStack.getItem();
-
-                if (item.attackDamage > bestStr) {
-                    bestStr = item.attackDamage;
-                    itemToUse = i;
-                }
-            }
-            if (itemToUse != -1) mc.thePlayer.inventory.currentItem = itemToUse;
-            return;
-        }
+        if (sneakOnly.getValue() && !mc.thePlayer.isSneaking()) return;
 
         if (!mc.gameSettings.keyBindAttack.isKeyDown() || mc.objectMouseOver == null) return;
 
@@ -54,6 +38,27 @@ public class AutoToolModule extends Module {
         if (shouldSwap) {
             mc.thePlayer.inventory.currentItem = itemToUse;
         }
+    };
+
+    @EventLink
+    public final Listener<AttackEvent> attackEventListener = e -> {
+        float bestStr = 0.0F;
+        int itemToUse = -1;
+
+        for (int i = 0; i < 9; i++) {
+            ItemStack itemStack = mc.thePlayer.inventory.mainInventory[i];
+            if (itemStack == null) continue;
+
+            if (!(itemStack.getItem() instanceof ItemSword)) continue;
+
+            ItemSword item = (ItemSword) itemStack.getItem();
+
+            if (item.attackDamage > bestStr) {
+                bestStr = item.attackDamage;
+                itemToUse = i;
+            }
+        }
+        if (itemToUse != -1) mc.thePlayer.inventory.currentItem = itemToUse;
     };
 
     private int getBestToolSlot(BlockPos pos) {

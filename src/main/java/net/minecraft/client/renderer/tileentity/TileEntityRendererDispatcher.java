@@ -1,7 +1,8 @@
 package net.minecraft.client.renderer.tileentity;
 
+import cc.simp.Simp;
+import cc.simp.modules.impl.visuals.ChamsModule;
 import com.google.common.collect.Maps;
-import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -14,22 +15,14 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityBanner;
-import net.minecraft.tileentity.TileEntityBeacon;
-import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.tileentity.TileEntityEnchantmentTable;
-import net.minecraft.tileentity.TileEntityEndPortal;
-import net.minecraft.tileentity.TileEntityEnderChest;
-import net.minecraft.tileentity.TileEntityMobSpawner;
-import net.minecraft.tileentity.TileEntityPiston;
-import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.tileentity.TileEntitySkull;
+import net.minecraft.tileentity.*;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
 import net.optifine.EmissiveTextures;
-import net.optifine.reflect.Reflector;
+import org.lwjgl.opengl.GL11;
+
+import java.util.Map;
 
 public class TileEntityRendererDispatcher
 {
@@ -111,6 +104,11 @@ public class TileEntityRendererDispatcher
         {
             boolean flag = true;
 
+            if (Simp.INSTANCE.getModuleManager().getModule(ChamsModule.class).isEnabled() && ChamsModule.doRenderTileEntities()) {
+                GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
+                GL11.glPolygonOffset(1.0F, -1000000F);
+            }
+
             if (flag)
             {
                 RenderHelper.enableStandardItemLighting();
@@ -145,6 +143,11 @@ public class TileEntityRendererDispatcher
                 }
 
                 EmissiveTextures.endRender();
+            }
+
+            if (Simp.INSTANCE.getModuleManager().getModule(ChamsModule.class).isEnabled() && ChamsModule.doRenderTileEntities()) {
+                GL11.glPolygonOffset(1.0F, 1000000F);
+                GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
             }
         }
     }

@@ -20,10 +20,8 @@ import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.Priorities;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
-import net.minecraft.network.play.server.S19PacketEntityStatus;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
@@ -68,10 +66,9 @@ public final class VelocityModule extends Module {
     }
 
     boolean delayed = false;
-    private boolean realVelocity, velocity;
+    private boolean velocity;
     private int limit = 0;
     private boolean reset = false;
-    private int counter;
 
     @Override
     public void onEnable() {
@@ -152,8 +149,8 @@ public final class VelocityModule extends Module {
 
         if (modeProperty.getValue() == Mode.Delay && delayed && !event.isPre()) {
             if (mc.thePlayer.hurtTime == 0 || mc.thePlayer.isBurning()) {
-                LagProcess.disable();
                 LagProcess.dispatch();
+                LagProcess.disable();
                 delayed = false;
             }
         }
@@ -172,26 +169,9 @@ public final class VelocityModule extends Module {
     @EventLink(value = Priorities.VERY_LOW)
     public final Listener<PacketReceiveEvent> onReceiveLow = event -> {
         if (modeProperty.getValue() != Mode.Grim) return;
-        final Packet<?> packet = event.getPacket();
-        if (event.isCancelled()) return;
-
-        if (packet instanceof S19PacketEntityStatus) {
-            final S19PacketEntityStatus wrapper = (S19PacketEntityStatus) event.getPacket();
-
-            if (wrapper.getEntity(mc.theWorld) != mc.thePlayer || wrapper.getOpCode() != 2) {
-                return;
-            }
-
-            realVelocity = true;
-        }
-
-        if (packet instanceof S12PacketEntityVelocity && realVelocity) {
-            final S12PacketEntityVelocity wrapper = (S12PacketEntityVelocity) packet;
-
+        if (event.getPacket() instanceof S12PacketEntityVelocity wrapper) {
             if (wrapper.getEntityID() == mc.thePlayer.getEntityId()) {
-                event.setCancelled();
-
-                realVelocity = false;
+                event.setCancelled(true);
                 velocity = true;
             }
         }
@@ -270,7 +250,6 @@ public final class VelocityModule extends Module {
         if (modeProperty.getValue() == Mode.Legit) {
             limit = 0;
             reset = false;
-            counter = 0;
         }
     }
 

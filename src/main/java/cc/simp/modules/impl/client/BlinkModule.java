@@ -9,8 +9,8 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.BlinkProcess;
 import cc.simp.processes.ColorProcess;
-import cc.simp.processes.LagProcess;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.render.GlUtils;
 import cc.simp.utils.render.RenderUtils;
@@ -48,14 +48,13 @@ public class BlinkModule extends Module {
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
         if (mode.getValue() == Mode.Constant) {
-            LagProcess.blink();
+            BlinkProcess.enable();
         } else if (mode.getValue() == Mode.Pulse) {
             if (timer.hasTimeElapsed(delay.getValue().longValue() * 10)) {
-                LagProcess.dispatch();
-                LagProcess.disable();
+                BlinkProcess.disable();
                 timer.reset();
             } else {
-                LagProcess.blink();
+                BlinkProcess.enable();
             }
         }
     };
@@ -103,8 +102,8 @@ public class BlinkModule extends Module {
 
     @Override
     public void onDisable() {
-        LagProcess.dispatch();
-        LagProcess.disable();
+        BlinkProcess.disable();
+        
         hasStoredPosition = false;
         super.onDisable();
     }

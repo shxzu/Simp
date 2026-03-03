@@ -11,7 +11,7 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.BadPacketsProcess;
-import cc.simp.processes.LagProcess;
+import cc.simp.processes.BlinkProcess;
 import cc.simp.utils.mc.InventoryUtils;
 import cc.simp.utils.mc.MovementUtils;
 import cc.simp.utils.mc.PacketUtils;
@@ -69,12 +69,11 @@ public final class NoSlowModule extends Module {
         if (mode.getValue() == Mode.Blink) {
             if (mc.thePlayer.isUsingItem()) {
                 if (mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemFood) {
-                    LagProcess.blink();
+                    BlinkProcess.enable();
                     isUsing = true;
                 }
             } else if (isUsing) {
-                LagProcess.disable();
-                LagProcess.dispatch();
+                BlinkProcess.disable();
                 isUsing = false;
             }
         }
