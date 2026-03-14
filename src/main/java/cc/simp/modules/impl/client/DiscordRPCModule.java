@@ -15,8 +15,8 @@ import net.arikia.dev.drpc.DiscordRichPresence;
 public class DiscordRPCModule extends Module {
     private static final String APPLICATION_ID = "1140815918478409770";
 
-    public DiscordRPCModule() {
-        super();
+    @Override
+    public void onEnable() {
         DiscordEventHandlers handlers = new DiscordEventHandlers.Builder()
                 .setReadyEventHandler(user -> System.out.println("[Discord RPC] Logged in as: " + user.username + " " + user.userId))
                 .build();
@@ -25,7 +25,7 @@ public class DiscordRPCModule extends Module {
 
         Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::discordShutdown));
     }
-
+    
     @Override
     public void onDisable() {
         DiscordRPC.discordClearPresence();
