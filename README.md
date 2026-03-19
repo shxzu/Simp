@@ -43,7 +43,7 @@ As of release ``Simp 1.2``
 > 
 > MultiMC: ❓
 > 
-> Pojav Launcher: ❓
+> Pojav/Mojo Launcher: ✅ (use beta mojo launcher and set rendering to vulkan)
 
 ### 3. I have this error!
 No one is obliged to help you. Make an issue or join the [Discord](https://discord.gg/RV6UN7b8T8).
