@@ -1,11 +1,11 @@
 # Simp Client
 
-[![Download](https://img.shields.io/github/v/release/shxzu/Simp?style=for-the-badge)](https://github.com/shxzu/Simp/releases)
-[![License](https://img.shields.io/github/license/shxzu/Simp?style=for-the-badge)](LICENSE)
-[![Build](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)](https://github.com/shxzu/Simp)
+[![Download](https://img.shields.io/github/v/release/x0lumie/Simp?style=for-the-badge)](https://github.com/x0lumie/Simp/releases)
+[![License](https://img.shields.io/github/license/x0lumie/Simp?style=for-the-badge)](LICENSE)
+[![Build](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)](https://github.com/x0lumie/Simp)
 
 **Simp Client** is a free, open-source Minecraft client built for any Anti-Cheat but mainly focuses on Polar, Grim, Watchdog, and Verus.
-<img width="800" src="https://raw.githubusercontent.com/shxzu/Simp/recode/image.png">
+<img width="800" src="https://raw.githubusercontent.com/x0lumie/Simp/recode/image.png">
 
 ---
 
@@ -21,9 +21,9 @@
 
 ## Download
 
-Get the latest release at [Releases Page](https://github.com/shxzu/Simp/releases).
+Get the latest release at [Releases Page](https://github.com/x0lumie/Simp/releases).
 
-... or get a unstable nightly build at the [Actions Page](https://github.com/shxzu/Simp/actions)
+... or get a unstable nightly build at the [Actions Page](https://github.com/x0lumie/Simp/actions)
 
 ---
 
@@ -76,7 +76,7 @@ Post your crash log in the [Discord](https://discord.gg/RV6UN7b8T8) help channel
 **Steps**
 
 ```bash
-git clone https://github.com/shxzu/Simp.git
+git clone https://github.com/x0lumie/Simp.git
 cd Simp
 ```
 
@@ -90,7 +90,7 @@ cd Simp
 
 **Example Run Configuration**
 
-![run_config](https://github.com/shxzu/Simp/blob/main/assets/setup.png)
+![run_config](https://github.com/x0lumie/Simp/blob/main/assets/setup.png)
 
 ---
 
@@ -127,7 +127,7 @@ Licensed under the [MIT License](LICENSE).
 
 ---
 
-![Last Commit](https://img.shields.io/github/last-commit/shxzu/Simp)
-![Contributors](https://img.shields.io/github/contributors/shxzu/Simp)
+![Last Commit](https://img.shields.io/github/last-commit/x0lumie/Simp)
+![Contributors](https://img.shields.io/github/contributors/x0lumie/Simp)
 
 ![Alt](https://repobeats.axiom.co/api/embed/b2ed272e1429e6f0f6fe07b3047e737f32073590.svg "Repobeats analytics image")
