@@ -37,7 +37,7 @@ public class DiscordRPCModule extends Module {
                 .Builder("making kids simp since 2025..")
                 .setStartTimestamps(Simp.getStartTime())
                 .setDetails("Simp [ " + Simp.VERSION + " ]")
-                .setBigImage("icon", "https://github.com/shxzu/Simp")
+                .setBigImage("icon", "https://github.com/x0lumie/Simp")
                 .build();
 
         DiscordRPC.discordUpdatePresence(presence);

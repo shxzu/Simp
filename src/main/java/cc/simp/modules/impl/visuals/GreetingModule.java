@@ -26,7 +26,7 @@ public class GreetingModule extends Module {
 
         String text = "Hello §b" + user + "!";
 
-        if(user.equalsIgnoreCase("shxzu_")) {
+        if(user.equalsIgnoreCase("x0lumie")) {
             text = "Hello §bDeveloper!";
         } else if(user.equalsIgnoreCase("TheAdamMC")) {
             text = "Hello §bDeveloper!";

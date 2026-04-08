@@ -68,7 +68,7 @@ public class CustomMainMenu extends GuiScreen {
 
         new Thread(() -> {
             try {
-                ArrayList<String> entries = fetchLatestCommitMessages("shxzu", "Simp", 4);
+                ArrayList<String> entries = fetchLatestCommitMessages("x0lumie", "Simp", 4);
                 commitBuffer = new ArrayList<>(entries);
                 commitBufferLife = System.currentTimeMillis();
                 mc.addScheduledTask(() -> changelogEntries = entries);

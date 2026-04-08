@@ -20,7 +20,7 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Nick Hider", category = ModuleCategory.VISUALS)
 public class NickHiderModule extends Module {
 
-    private final Property<String> fakeNameProp = new Property<>("Fake Name", "shxzu");
+    private final Property<String> fakeNameProp = new Property<>("Fake Name", "x0lumie");
 
     private String fakeName = " ";
 

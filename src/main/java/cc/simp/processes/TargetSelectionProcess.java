@@ -26,7 +26,7 @@ import static cc.simp.utils.Util.mc;
 
 public class TargetSelectionProcess {
 
-    // made by yours truly -shxzu
+    // made by yours truly -lumie
 
     @Getter
     @Setter

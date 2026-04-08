@@ -30,7 +30,7 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Info Display", category = ModuleCategory.VISUALS)
 public class InfoDisplayModule extends Module {
 
-    // god, I love AI -shxzu, 11/01/2025
+    // god, I love AI -lumie, 11/01/2025
 
     public enum DisplayMode {
         Draggable,

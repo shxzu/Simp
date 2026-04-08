@@ -95,7 +95,7 @@ public class Simp {
         ));
         getEventBus().subscribe(commandHandler);
 
-        // I hate the way minecraft handles rotations when the player is null so much -shxzu
+        // I hate the way minecraft handles rotations when the player is null so much -lumie
 
         if (moduleManager.getModule(KillAuraModule.class).isEnabled()) {
             moduleManager.getModule(KillAuraModule.class).setEnabled(false);
