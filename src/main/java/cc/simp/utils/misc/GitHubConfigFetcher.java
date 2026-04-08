@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GitHubConfigFetcher {
-    private static final String REPO_API_URL = "https://api.github.com/repos/shxzu/configs/contents";
-    private static final String RAW_URL = "https://raw.githubusercontent.com/shxzu/configs/main/";
+    private static final String REPO_API_URL = "https://api.github.com/repos/x0lumie/configs/contents";
+    private static final String RAW_URL = "https://raw.githubusercontent.com/x0lumie/configs/main/";
 
     public static List<String> fetchConfigList() {
         List<String> configs = new ArrayList<>();
