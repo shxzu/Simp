@@ -1,5 +1,15 @@
 # Simp Client
 
+**AS OF APRIL 14TH, 2026 I (lumie AKA the owner of Simp) WILL NOT BE COMMITING TOWARDS THIS CLIENT'S REPO ANYMORE!**
+
+I cannot compete with other clients to make the "best" free bypasses anymore. Even when Simp had very good bypasses, the devs and myself
+still got harassed because of how "bad" Simp is. Simp all in all is a great client I would've loved to continue it, but
+I nor the client cannot get ANY support from the community besides harassment no matter how hard I tried when this client is indeed community driven.
+All features included in the Simp 1.3 update are final. If someone wants to continue the legacy of Simp Client, go right ahead, just
+provide proper crediting towards us or I will file a DMCA takedown.
+
+Sincerely, lumie/shxzu.
+
 [![Download](https://img.shields.io/github/v/release/x0lumie/Simp?style=for-the-badge)](https://github.com/x0lumie/Simp/releases)
 [![License](https://img.shields.io/github/license/x0lumie/Simp?style=for-the-badge)](LICENSE)
 [![Build](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)](https://github.com/x0lumie/Simp)
@@ -33,8 +43,8 @@ Get the latest release at [Releases Page](https://github.com/x0lumie/Simp/releas
 Watch this [video](https://youtu.be/If5PMPH4jLk)
 
 ### 2. What launchers are supported?
-Just HMCL. No help will be provided for any other launcher (because I can't be bothered!).
-As of release ``Simp 1.2``
+HMCL is the only officially supported launcher. No help will be provided for any other launcher. (because I can't be bothered!)
+As of release ``Simp 1.3``
 > HMCL: ✅
 > 
 > Vanilla Launcher: ✅
