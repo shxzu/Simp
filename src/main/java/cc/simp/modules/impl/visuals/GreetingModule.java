@@ -5,7 +5,7 @@ import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.FontUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.gui.ScaledResolution;
@@ -19,7 +19,7 @@ public class GreetingModule extends Module {
 
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = e -> {
-        CustomFontRenderer fr = FontProcess.getCurrentFont();
+        CustomFontRenderer fr = FontUtils.getCurrentFont();
         ScaledResolution sr = new ScaledResolution(mc);
 
         String user = mc.thePlayer.getName();

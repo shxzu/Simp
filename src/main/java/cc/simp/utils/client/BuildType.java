@@ -10,7 +10,7 @@ public enum BuildType {
     RELEASE("Release"),
     ALPHA("Alpha"),
     BETA("Beta"),
-    DEV("Dev");
+    DEV("Development");
 
     private final String name;
 

@@ -62,11 +62,13 @@ public final class AutoPotModule extends Module {
                 final ItemPotion potion = (ItemPotion) item;
                 final PotionEffect effect = potion.getEffects(stack).get(0);
 
-                if (!ItemPotion.isSplash(stack.getMetadata()) ||
-                        !PlayerUtils.goodPotion(effect.getPotionID()) ||
-                        (effect.getPotionID() == Potion.regeneration.id ||
-                                effect.getPotionID() == Potion.heal.id) &&
-                                mc.thePlayer.getHealth() > this.health.getValue().floatValue()) {
+                final int potId = effect.getPotionID();
+                final boolean isSplash = ItemPotion.isSplash(stack.getMetadata());
+                final boolean isSpeedOrJump = potId == Potion.moveSpeed.id || potId == Potion.jump.id;
+                final boolean isHealOrRegen = potId == Potion.regeneration.id || potId == Potion.heal.id;
+                final boolean isGood = PlayerUtils.goodPotion(potId) || isSpeedOrJump;
+
+                if (!isSplash || !isGood || (isHealOrRegen && mc.thePlayer.getHealth() > this.health.getValue().floatValue())) {
                     continue;
                 }
 

@@ -2,10 +2,12 @@ package cc.simp.processes;
 
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
+import cc.simp.api.events.impl.packet.PacketSendEvent;
 import cc.simp.api.events.impl.world.WorldLoadEvent;
 import cc.simp.modules.impl.client.FpsEnhancerModule;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.client.ViaMCPFixes;
+import cc.simp.utils.render.DragUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 
@@ -21,11 +23,14 @@ public class BackgroundProcess {
             Simp.INSTANCE.getBindsConfig().saveToFile();
         }
 
-        DraggingProcess.update();
+        DragUtils.update();
     };
 
     @EventLink
     public final Listener<WorldLoadEvent> worldLoadEventListener = e -> {
         ViaMCPFixes.initialized = false;
     };
+
+    @EventLink
+    public final Listener<PacketSendEvent> packetSendEventListener = ViaMCPFixes::handleFixedSendPackets;
 }

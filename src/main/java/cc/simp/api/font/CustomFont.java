@@ -50,6 +50,16 @@ public class CustomFont
         return null;
     }
 
+    public int getCharOffset()
+    {
+        return this.charOffset;
+    }
+
+    public void setCharOffset(int charOffset)
+    {
+        this.charOffset = charOffset;
+    }
+
     protected BufferedImage generateFontImage(Font font, boolean antiAlias, boolean fractionalMetrics, CharData[] chars)
     {
         int imgSize = (int) this.imgSize;

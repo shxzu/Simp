@@ -119,7 +119,7 @@ public class Module extends Manager<Property<?>> implements Toggleable, Serializ
     public void toggle() {
         setEnabled(!enabled);
         if (Minecraft.getMinecraft().thePlayer != null) {
-            if (Simp.INSTANCE.getModuleManager().getModule(NotificationsModule.class).isEnabled()) {
+            if (Simp.INSTANCE.getModuleManager().getModule(NotificationsModule.class).isEnabled() && NotificationsModule.toggleNotifications.getValue()) {
                 String titleToggle = "Module toggled";
                 String descriptionToggleOn = this.getLabel() + " was " + "§aenabled!";
                 String descriptionToggleOff = this.getLabel() + " was " + "§cdisabled!";

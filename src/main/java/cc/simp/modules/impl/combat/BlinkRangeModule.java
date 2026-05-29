@@ -16,6 +16,7 @@ import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.*;
 import cc.simp.utils.client.Timer;
 import cc.simp.utils.mc.MovementUtils;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.utils.render.GlUtils;
 import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
@@ -36,13 +37,6 @@ public final class BlinkRangeModule extends Module {
     public static final Property<Boolean> displayProperty = new Property<>("Display", true);
     public static final Property<Boolean> onlyWithKillaura = new Property<>("Only With Killaura", true);
     public static final Property<Boolean> renderBlinkPos = new Property<>("Render Blink Pos", true);
-    public static ModeProperty<RenderMode> renderModeProperty = new ModeProperty<>("Render Mode", RenderMode.Box, () -> renderBlinkPos.getValue());
-
-    private enum RenderMode {
-        Box,
-        Player
-    }
-
 
     private Timer timer = new Timer();
     private boolean blinked = false;
@@ -66,8 +60,12 @@ public final class BlinkRangeModule extends Module {
     public Listener<MotionEvent> motionEventListener = event -> {
         if (event.isPre()) return;
 
-        if (onlyWithKillaura.getValue() && !Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled() && KillAuraModule.target == null) {
-            if (blinked) blinkToggle(false);
+        if (onlyWithKillaura.getValue() && !Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class).isEnabled()) {
+            if (blinked) {
+                blinkToggle(false);
+                blinked = false;
+                timer.reset();
+            }
             return;
         }
 
@@ -119,7 +117,7 @@ public final class BlinkRangeModule extends Module {
 
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = event -> {
-        CustomFontRenderer fr = FontProcess.getCurrentFont();
+        CustomFontRenderer fr = FontUtils.getCurrentFont();
         ScaledResolution sr = new ScaledResolution(mc);
         if (blinked && displayProperty.getValue()) {
             fr.drawStringWithShadow("Blinking..", (float) sr.getScaledWidth() / 2 - (float) fr.getStringWidth("Blinking..") / 2, sr.getScaledHeight() / 10f - fr.FONT_HEIGHT, Color.YELLOW.getRGB());
@@ -134,27 +132,18 @@ public final class BlinkRangeModule extends Module {
         double y = blinkedY - mc.getRenderManager().viewerPosY;
         double z = blinkedZ - mc.getRenderManager().viewerPosZ;
 
-        if (renderModeProperty.getValue() == RenderMode.Box) {
-            AxisAlignedBB bb = new AxisAlignedBB(
-                    x - 0.3, y, z - 0.3,
-                    x + 0.3, y + 1.8, z + 0.3
-            );
+        AxisAlignedBB bb = new AxisAlignedBB(
+                x - 0.3, y, z - 0.3,
+                x + 0.3, y + 1.8, z + 0.3
+        );
 
-            Color color = ColorProcess.getColor();
-            RenderUtils.start3D();
-            GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f,
-                    color.getBlue() / 255f, color.getAlpha() / 255f);
-            RenderUtils.drawBoundingBox(bb);
-            RenderUtils.stop3D();
-            GlUtils.resetColor();
-        } else {
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(x, y, z);
-
-            mc.getRenderManager().renderEntityStatic(mc.thePlayer, mc.timer.renderPartialTicks, false);
-
-            GlStateManager.popMatrix();
-        }
+        Color color = ColorProcess.getColor();
+        RenderUtils.start3D();
+        GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f,
+                color.getBlue() / 255f, color.getAlpha() / 255f);
+        RenderUtils.drawBoundingBox(bb);
+        RenderUtils.stop3D();
+        GlUtils.resetColor();
     };
 
 

@@ -9,7 +9,7 @@ import java.security.SecureRandom;
 
 import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.processes.ColorProcess;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.utils.render.RenderUtils;
 import org.lwjgl.input.Keyboard;
 
@@ -30,8 +30,8 @@ public class GuiLogin extends GuiScreen {
     private final int buttonSpacing = 8;
 
     public GuiLogin() {
-        titleFont = FontProcess.getFont("simp");
-        buttonFont = FontProcess.getFont("simp");
+        titleFont = FontUtils.getFont("simp");
+        buttonFont = FontUtils.getFont("simp");
     }
 
     @Override

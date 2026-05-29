@@ -11,8 +11,8 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.ColorProcess;
-import cc.simp.processes.DraggingProcess;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.DragUtils;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.utils.client.EvictingList;
 import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
@@ -88,21 +88,21 @@ public class InfoDisplayModule extends Module {
             int yOffset = 50;
             int xPos = 10;
 
-            if (cps.getValue() && !DraggingProcess.components.containsKey("InfoDisplay_CPS")) {
-                DraggingProcess.components.put("InfoDisplay_CPS",
-                        new DraggingProcess.DraggableComponent(xPos, yOffset));
+            if (cps.getValue() && !DragUtils.components.containsKey("InfoDisplay_CPS")) {
+                DragUtils.components.put("InfoDisplay_CPS",
+                        new DragUtils.DraggableComponent(xPos, yOffset));
             }
             if (cps.getValue()) yOffset += BUBBLE_HEIGHT + 5;
 
-            if (fps.getValue() && !DraggingProcess.components.containsKey("InfoDisplay_FPS")) {
-                DraggingProcess.components.put("InfoDisplay_FPS",
-                        new DraggingProcess.DraggableComponent(xPos, yOffset));
+            if (fps.getValue() && !DragUtils.components.containsKey("InfoDisplay_FPS")) {
+                DragUtils.components.put("InfoDisplay_FPS",
+                        new DragUtils.DraggableComponent(xPos, yOffset));
             }
             if (fps.getValue()) yOffset += BUBBLE_HEIGHT + 5;
 
-            if (bps.getValue() && !DraggingProcess.components.containsKey("InfoDisplay_BPS")) {
-                DraggingProcess.components.put("InfoDisplay_BPS",
-                        new DraggingProcess.DraggableComponent(xPos, yOffset));
+            if (bps.getValue() && !DragUtils.components.containsKey("InfoDisplay_BPS")) {
+                DragUtils.components.put("InfoDisplay_BPS",
+                        new DragUtils.DraggableComponent(xPos, yOffset));
             }
 
             positionInitialized = true;
@@ -142,7 +142,7 @@ public class InfoDisplayModule extends Module {
     private void drawClassic(ScaledResolution sr) {
         int yOffset = sr.getScaledHeight() - 2;
         int xPos = 2;
-        int lineHeight = FontProcess.getCurrentFont().getHeight() + 2;
+        int lineHeight = FontUtils.getCurrentFont().getHeight() + 2;
 
         List<String> lines = new ArrayList<>();
 
@@ -164,21 +164,21 @@ public class InfoDisplayModule extends Module {
         }
 
         if (username.getValue()) {
-            lines.add("Version: " + mc.getSession().getUsername());
+            lines.add("Username: " + mc.getSession().getUsername());
         }
 
         // Draw from bottom to top
         for (int i = lines.size() - 1; i >= 0; i--) {
-            FontProcess.getCurrentFont().drawStringWithShadow(lines.get(i), xPos, yOffset - (lines.size() - i) * lineHeight, Color.WHITE.getRGB());
+            FontUtils.getCurrentFont().drawStringWithShadow(lines.get(i), xPos, yOffset - (lines.size() - i) * lineHeight, Color.WHITE.getRGB());
         }
     }
 
     private void drawBubble(String label, String value, String componentKey, boolean isInChat) {
-        DraggingProcess.DraggableComponent component = DraggingProcess.components.get(componentKey);
+        DragUtils.DraggableComponent component = DragUtils.components.get(componentKey);
         if (component == null) return;
 
         String displayText = label + ": " + value;
-        int textWidth = FontProcess.getCurrentFont().getStringWidth(displayText);
+        int textWidth = FontUtils.getCurrentFont().getStringWidth(displayText);
         int bubbleWidth = textWidth + BUBBLE_PADDING * 2;
 
         component.setWidth(bubbleWidth);
@@ -193,8 +193,8 @@ public class InfoDisplayModule extends Module {
                 isInChat ? 60 : 100);
         RenderUtils.drawRoundedRect(0, 0, bubbleWidth, BUBBLE_HEIGHT, RADIUS, bgColor);
 
-        int textY = (BUBBLE_HEIGHT - FontProcess.getCurrentFont().getHeight()) / 2;
-        FontProcess.getCurrentFont().drawStringWithShadow(displayText, BUBBLE_PADDING, textY, Color.WHITE.getRGB());
+        int textY = (BUBBLE_HEIGHT - FontUtils.getCurrentFont().getHeight()) / 2;
+        FontUtils.getCurrentFont().drawStringWithShadow(displayText, BUBBLE_PADDING, textY, Color.WHITE.getRGB());
 
         GlStateManager.popMatrix();
     }

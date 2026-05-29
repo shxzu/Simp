@@ -2,8 +2,8 @@ package cc.simp.interfaces.menu.main;
 
 import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.interfaces.menu.alt.AltManagerGui;
-import cc.simp.processes.BgProcess;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.client.BgUtils;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.utils.render.RenderUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -40,11 +40,11 @@ public class CustomMainMenu extends GuiScreen {
     ArrayList<String> changelogEntries;
 
     public CustomMainMenu() {
-        logoImage = new ResourceLocation("simp/images/simp_light.png");
+        logoImage = new ResourceLocation("simp/images/simp.png");
         startTime = System.currentTimeMillis();
-        buttonFont = FontProcess.getFont("simp");
-        changelogFont = FontProcess.getFont("simp");
-        timeFont = FontProcess.getFont("big");
+        buttonFont = FontUtils.getFont("simp");
+        changelogFont = FontUtils.getFont("simp");
+        timeFont = FontUtils.getFont("big");
     }
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
@@ -96,7 +96,7 @@ public class CustomMainMenu extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         GlStateManager.disableAlpha();
 
-        RenderUtils.drawImage(BgProcess.getInstance().getCurrentBackground(), 0, 0, this.width, this.height);
+        RenderUtils.drawImage(BgUtils.getInstance().getCurrentBackground(), 0, 0, this.width, this.height);
 
         GlStateManager.enableAlpha();
 
@@ -237,7 +237,7 @@ public class CustomMainMenu extends GuiScreen {
             }
 
             if (isMouseOverButton(mouseX, mouseY, startX + (buttonWidth + buttonSpacing) * 2, startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight)) {
-                BgProcess.getInstance().cycleBackground();
+                BgUtils.getInstance().cycleBackground();
             }
 
             if (isMouseOverButton(mouseX, mouseY, startX, startY + (buttonHeight + buttonSpacing), buttonWidth, buttonHeight)) {

@@ -89,6 +89,7 @@ public final class ModuleManager {
                 // Client
                 new ClientSettingsModule(),
                 new FpsEnhancerModule(),
+                new AutoDisableModule(),
                 new NoCrashModule(),
                 new PluginDetectorModule(),
                 new ToggleSoundsModule(),
@@ -119,10 +120,13 @@ public final class ModuleManager {
                 new AmbienceModule(),
                 new ESPModule(),
                 new ChamsModule(),
+                new TracersModule(),
+                new DamageFXModule(),
                 new TargetInterfaceModule(),
                 new PostProcessingModule(),
                 new ScoreboardModule(),
                 new SessionInformationModule(),
+                new NeverloseConsoleModule(),
                 new NickHiderModule(),
                 new NameTagsModule(),
                 new StorageESPModule(),
@@ -133,6 +137,7 @@ public final class ModuleManager {
                 new FullBrightModule(),
                 new FreeLookModule(),
                 new BarrierVisionModule(),
+                new BlockOutlineModule(),
                 new MotionBlurModule(),
                 new ItemESPModule()
         );

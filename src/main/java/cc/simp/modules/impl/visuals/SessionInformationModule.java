@@ -8,8 +8,8 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.ColorProcess;
-import cc.simp.processes.DraggingProcess;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.DragUtils;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -87,8 +87,8 @@ public final class SessionInformationModule extends Module {
     };
 
     private void initializePosition(ScaledResolution sr, int width) {
-        if (!positionInitialized && !DraggingProcess.components.containsKey("TargetInterface")) {
-            DraggingProcess.components.put("TargetInterface", new DraggingProcess.DraggableComponent((sr.getScaledWidth() - width) / 2.0,
+        if (!positionInitialized && !DragUtils.components.containsKey("SessionInformation")) {
+            DragUtils.components.put("SessionInformation", new DragUtils.DraggableComponent((sr.getScaledWidth() - width) / 2.0,
                     sr.getScaledHeight() - HUD_HEIGHT - LABEL_HEIGHT - VANILLA_BAR_HEIGHT - 5));
             positionInitialized = true;
         }
@@ -100,14 +100,14 @@ public final class SessionInformationModule extends Module {
         String playingOnText = "Playing on " + currentServer;
         String playTimeText = "Play Time: " + getFormattedPlayTime();
 
-        int playingOnWidth = FontProcess.getFont("simp").getStringWidth(playingOnText);
-        int playTimeWidth = FontProcess.getFont("simp").getStringWidth(playTimeText);
+        int playingOnWidth = FontUtils.getFont("simp").getStringWidth(playingOnText);
+        int playTimeWidth = FontUtils.getFont("simp").getStringWidth(playTimeText);
         int maxTextWidth = Math.max(playingOnWidth, playTimeWidth);
         int hudWidth = Math.max(MIN_WIDTH, 38 + maxTextWidth + 5);
 
         initializePosition(sr, hudWidth);
 
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("SessionInformation");
         draggableComponent.setHeight(HUD_HEIGHT + LABEL_HEIGHT);
         draggableComponent.setWidth(hudWidth);
 
@@ -119,8 +119,8 @@ public final class SessionInformationModule extends Module {
         Gui.drawRect(0, 0, hudWidth, LABEL_HEIGHT, new Color(0, 0, 0, 220).getRGB());
 
         String labelText = "Session Info";
-        int labelTextWidth = FontProcess.getFont("simp").getStringWidth(labelText);
-        FontProcess.getFont("simp").drawString(labelText, (hudWidth - labelTextWidth) / 2, 2, color.getRGB());
+        int labelTextWidth = FontUtils.getFont("simp").getStringWidth(labelText);
+        FontUtils.getFont("simp").drawString(labelText, (hudWidth - labelTextWidth) / 2, 2, color.getRGB());
 
         Gui.drawRect(0, LABEL_HEIGHT, hudWidth, LABEL_HEIGHT + 36, new Color(0, 0, 0, 180).getRGB());
 
@@ -128,11 +128,11 @@ public final class SessionInformationModule extends Module {
 
         renderPlayerSkin(mc.thePlayer, 2, LABEL_HEIGHT + 2);
 
-        FontProcess.getFont("bold").drawString(mc.thePlayer.getName(), 38, LABEL_HEIGHT + 2, color.getRGB());
+        FontUtils.getFont("bold").drawString(mc.thePlayer.getName(), 38, LABEL_HEIGHT + 2, color.getRGB());
 
-        FontProcess.getFont("simp").drawString(playingOnText, 38, LABEL_HEIGHT + 13, color.getRGB());
+        FontUtils.getFont("simp").drawString(playingOnText, 38, LABEL_HEIGHT + 13, color.getRGB());
 
-        FontProcess.getFont("simp").drawString(playTimeText, 38, LABEL_HEIGHT + 23, color.getRGB());
+        FontUtils.getFont("simp").drawString(playTimeText, 38, LABEL_HEIGHT + 23, color.getRGB());
 
         RenderUtils.resetColor();
 
@@ -145,14 +145,14 @@ public final class SessionInformationModule extends Module {
         String playingOnText = "Playing on " + currentServer;
         String playTimeText = "Play Time: " + getFormattedPlayTime();
 
-        int playingOnWidth = FontProcess.getFont("simp").getStringWidth(playingOnText);
-        int playTimeWidth = FontProcess.getFont("simp").getStringWidth(playTimeText);
+        int playingOnWidth = FontUtils.getFont("simp").getStringWidth(playingOnText);
+        int playTimeWidth = FontUtils.getFont("simp").getStringWidth(playTimeText);
         int maxTextWidth = Math.max(playingOnWidth, playTimeWidth);
         int hudWidth = Math.max(MIN_WIDTH, 38 + maxTextWidth + 5);
 
         initializePosition(sr, hudWidth);
 
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("SessionInformation");
         draggableComponent.setHeight(HUD_HEIGHT + LABEL_HEIGHT);
         draggableComponent.setWidth(hudWidth);
 
@@ -167,18 +167,18 @@ public final class SessionInformationModule extends Module {
         RenderUtils.drawRoundedRect(2, LABEL_HEIGHT - 1, hudWidth - 4, 1, 0.5f, gradientStart.brighter());
 
         String labelText = "Session Info";
-        int labelTextWidth = FontProcess.getFont("simp").getStringWidth(labelText);
-        FontProcess.getFont("simp").drawString(labelText, (hudWidth - labelTextWidth) / 2, 2, color.getRGB());
+        int labelTextWidth = FontUtils.getFont("simp").getStringWidth(labelText);
+        FontUtils.getFont("simp").drawString(labelText, (hudWidth - labelTextWidth) / 2, 2, color.getRGB());
 
         RenderUtils.resetColor();
 
         renderPlayerSkin(mc.thePlayer, 2, LABEL_HEIGHT + 2);
 
-        FontProcess.getFont("bold").drawString(mc.thePlayer.getName(), 38, LABEL_HEIGHT + 2, color.getRGB());
+        FontUtils.getFont("bold").drawString(mc.thePlayer.getName(), 38, LABEL_HEIGHT + 2, color.getRGB());
 
-        FontProcess.getFont("simp").drawString(playingOnText, 38, LABEL_HEIGHT + 13, new Color(180, 180, 180).getRGB());
+        FontUtils.getFont("simp").drawString(playingOnText, 38, LABEL_HEIGHT + 13, new Color(180, 180, 180).getRGB());
 
-        FontProcess.getFont("simp").drawString(playTimeText, 38, LABEL_HEIGHT + 23, new Color(180, 180, 180).getRGB());
+        FontUtils.getFont("simp").drawString(playTimeText, 38, LABEL_HEIGHT + 23, new Color(180, 180, 180).getRGB());
 
         RenderUtils.resetColor();
 

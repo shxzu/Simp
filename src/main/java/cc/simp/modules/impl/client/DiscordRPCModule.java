@@ -15,8 +15,8 @@ import net.arikia.dev.drpc.DiscordRichPresence;
 public class DiscordRPCModule extends Module {
     private static final String APPLICATION_ID = "1140815918478409770";
 
-    @Override
-    public void onEnable() {
+    public DiscordRPCModule() {
+        super();
         DiscordEventHandlers handlers = new DiscordEventHandlers.Builder()
                 .setReadyEventHandler(user -> System.out.println("[Discord RPC] Logged in as: " + user.username + " " + user.userId))
                 .build();

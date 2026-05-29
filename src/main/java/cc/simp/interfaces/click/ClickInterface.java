@@ -9,7 +9,7 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.impl.client.ClientSettingsModule;
 import cc.simp.processes.ColorProcess;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.utils.misc.GitHubConfigFetcher;
 import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.gui.GuiScreen;
@@ -27,7 +27,7 @@ import java.util.List;
 public class ClickInterface extends GuiScreen {
 
     private final List<CategoryPanel> panels = new ArrayList<>();
-    private final CustomFontRenderer font = FontProcess.getFont("simp");
+    private final CustomFontRenderer font = FontUtils.getFont("simp");
     private Module listeningModule = null;
     private SettingComponent draggingSlider = null;
     private SettingComponent editingString = null;

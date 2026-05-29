@@ -29,7 +29,7 @@ public class Shadow extends Util {
         }
     };
 
-    public static void renderShadow(int sourceTexture, int radius, int offset) {
+    public static void renderShadow(int sourceTexture, int radius, int offset, float strength) {
         if (radius < 0) return;
 
         bloomFramebuffer = RenderUtils.createFrameBuffer(bloomFramebuffer, true);
@@ -42,13 +42,13 @@ public class Shadow extends Util {
         bloomFramebuffer.framebufferClear();
         bloomFramebuffer.bindFramebuffer(true);
         bloomShader.init();
-        setUniforms(radius, offset, 0);
+        setUniforms(radius, offset, 0, strength);
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, sourceTexture);
         ShaderUtils.drawQuads();
 
         mc.getFramebuffer().bindFramebuffer(true);
-        setUniforms(radius, 0, offset);
+        setUniforms(radius, 0, offset, strength);
         GL13.glActiveTexture(GL13.GL_TEXTURE16);
         glBindTexture(GL_TEXTURE_2D, sourceTexture);
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
@@ -59,7 +59,7 @@ public class Shadow extends Util {
         GlStateManager.bindTexture(0);
     }
 
-    private static void setUniforms(int radius, int dirX, int dirY) {
+    private static void setUniforms(int radius, int dirX, int dirY, float strength) {
         float[] weights = getGaussianWeights(radius);
         weightBuffer.clear();
         for (float w : weights) {
@@ -72,6 +72,7 @@ public class Shadow extends Util {
         bloomShader.setUniformf("texelSize", 1.0f / mc.displayWidth, 1.0f / mc.displayHeight);
         bloomShader.setUniformf("radius", radius);
         bloomShader.setUniformf("direction", dirX, dirY);
+        bloomShader.setUniformf("strength", strength);
         glUniform1fv(bloomShader.getUniform("weights"), weightBuffer);
     }
 

@@ -1,4 +1,4 @@
-package cc.simp.processes;
+package cc.simp.utils.render;
 
 import cc.simp.api.config.Serializable;
 import com.google.gson.JsonObject;
@@ -12,7 +12,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class DraggingProcess implements Serializable {
+public class DragUtils implements Serializable {
 
     public static final Map<String, DraggableComponent> components = new HashMap<>();
     private static String draggingComponent = null;

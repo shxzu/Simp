@@ -12,6 +12,7 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
@@ -445,7 +446,7 @@ public class PlayerControllerMP
 
     public void attackEntity(EntityPlayer playerIn, Entity targetEntity)
     {
-        AttackEvent attackEntityEvent = new AttackEvent(targetEntity);
+        AttackEvent attackEntityEvent = new AttackEvent((EntityLivingBase) targetEntity);
 
         Simp.INSTANCE.getEventBus().post(attackEntityEvent);
 

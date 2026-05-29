@@ -3,10 +3,9 @@ package net.minecraft.client.gui;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.font.CustomFontRenderer;
-import cc.simp.modules.impl.client.ClientSettingsModule;
 import cc.simp.modules.impl.visuals.PostProcessingModule;
 import cc.simp.modules.impl.visuals.ScoreboardModule;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.FontUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -443,10 +442,10 @@ public class GuiIngame extends Gui {
     public void renderSimpScoreboard(ScoreObjective scoreObjective, ScaledResolution resolution) {
         net.minecraft.scoreboard.Scoreboard scoreboard = scoreObjective.getScoreboard();
         Collection<Score> scores = scoreboard.getSortedScores(scoreObjective);
-        CustomFontRenderer customFr = FontProcess.getCurrentFont();
+        CustomFontRenderer customFr = FontUtils.getCurrentFont();
 
         // Check if we should use MC's default font
-        boolean useMcFont = FontProcess.getCurrentFont() == FontProcess.getFont("mc");
+        boolean useMcFont = FontUtils.getCurrentFont() == FontUtils.getFont("mc") || ScoreboardModule.mcFont.getValue();
 
         // Filter out scores with null player names or names starting with '#'
         List<Score> filteredScores = Lists.newArrayList(Iterables.filter(scores, new Predicate<Score>() {

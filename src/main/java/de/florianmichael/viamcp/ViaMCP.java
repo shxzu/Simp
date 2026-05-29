@@ -1,7 +1,4 @@
 /*
- * This file is part of ViaMCP - https://github.com/FlorianMichael/ViaMCP
- * Copyright (C) 2020-2024 FlorianMichael/EnZaXD <florian.michael07@gmail.com> and contributors
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,20 +15,32 @@
 
 package de.florianmichael.viamcp;
 
+import cc.simp.utils.client.ViaMCPFixes;
+import com.mojang.authlib.GameProfile;
 import com.viaversion.viabackwards.protocol.v1_17to1_16_4.Protocol1_17To1_16_4;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ServerboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
+import com.viaversion.viabackwards.protocol.v1_20_3to1_20_2.Protocol1_20_3To1_20_2;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
+
 import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import de.florianmichael.viamcp.gui.AsyncVersionSlider;
+import net.minecraft.client.Minecraft;
 
 import java.io.File;
+import java.util.UUID;
 
 public class ViaMCP {
     public final static int NATIVE_VERSION = 47;
     public static ViaMCP INSTANCE;
+    public UserConnection user;
 
     public static void create() {
         INSTANCE = new ViaMCP();
@@ -45,14 +54,11 @@ public class ViaMCP {
                 getAsyncVersionSlider().setVersion(protocolVersion.getVersion());
             }
         }).build();
-        // fixTransactions();
-    }
 
-    private void fixTransactions() {
-        // We handle the differences between those versions in the net code, so we can make the Via handlers pass through
-        final Protocol1_17To1_16_4 protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_17To1_16_4.class);
-        protocol.registerClientbound(ClientboundPackets1_17.PING, ClientboundPackets1_16_2.CONTAINER_ACK, wrapper -> {}, true);
-        protocol.registerServerbound(ServerboundPackets1_16_2.CONTAINER_ACK, ServerboundPackets1_17.PONG, wrapper -> {}, true);
+        ViaMCPFixes.applyNibblesPatches();
+
+        System.setProperty("com.viaversion.handlePingsAsInvAcknowledgements", "true");
+
     }
 
     public void initAsyncSlider() {

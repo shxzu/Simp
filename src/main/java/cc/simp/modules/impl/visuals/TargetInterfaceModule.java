@@ -8,8 +8,8 @@ import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.processes.ColorProcess;
-import cc.simp.processes.DraggingProcess;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.DragUtils;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -46,6 +46,7 @@ public final class TargetInterfaceModule extends Module {
         BlueArchive("Blue Archive"),
         Rise("Rise"),
         Novoline("Novoline"),
+        Astralis("Astralis"),
         Adjust("Adjust");
 
         public String name;
@@ -77,6 +78,7 @@ public final class TargetInterfaceModule extends Module {
             case BlueArchive -> drawBlueArchiveTargetInterface();
             case Novoline -> drawNovolineTargetInterface();
             case Adjust -> drawAdjustTargetInterface();
+            case Astralis -> drawAstralisTargetInterface();
         }
     };
 
@@ -92,12 +94,13 @@ public final class TargetInterfaceModule extends Module {
             case BlueArchive -> drawBlueArchiveTargetInterface();
             case Novoline -> drawNovolineTargetInterface();
             case Adjust -> drawAdjustTargetInterface();
+            case Astralis -> drawAstralisTargetInterface();
         }
     };
 
     private void initializePosition(ScaledResolution sr) {
-        if (!positionInitialized && !DraggingProcess.components.containsKey("TargetInterface")) {
-            DraggingProcess.components.put("TargetInterface", new DraggingProcess.DraggableComponent((sr.getScaledWidth() - HUD_WIDTH) / 2.0,
+        if (!positionInitialized && !DragUtils.components.containsKey("TargetInterface")) {
+            DragUtils.components.put("TargetInterface", new DragUtils.DraggableComponent((sr.getScaledWidth() - HUD_WIDTH) / 2.0,
                     sr.getScaledHeight() - HUD_HEIGHT - VANILLA_BAR_HEIGHT - 5));
             positionInitialized = true;
         }
@@ -115,7 +118,7 @@ public final class TargetInterfaceModule extends Module {
             if (target == null) return;
         }
 
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("TargetInterface");
         draggableComponent.setHeight(HUD_HEIGHT);
         draggableComponent.setWidth(HUD_WIDTH);
 
@@ -169,7 +172,7 @@ public final class TargetInterfaceModule extends Module {
             if (target == null) return;
         }
 
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("TargetInterface");
         draggableComponent.setHeight(40);
         draggableComponent.setWidth(150);
 
@@ -232,7 +235,7 @@ public final class TargetInterfaceModule extends Module {
             if (target == null) return;
         }
 
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("TargetInterface");
         draggableComponent.setHeight(27);
         draggableComponent.setWidth(150);
 
@@ -328,7 +331,7 @@ public final class TargetInterfaceModule extends Module {
             if (target == null) return;
         }
 
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("TargetInterface");
         draggableComponent.setHeight(HUD_HEIGHT);
         draggableComponent.setWidth(HUD_WIDTH);
 
@@ -356,9 +359,9 @@ public final class TargetInterfaceModule extends Module {
             renderPlayerSkin(mc.thePlayer, 2, 2);
         }
 
-        FontProcess.getFont("bold").drawString(target.getName(), 38, 2, color.getRGB());
+        FontUtils.getFont("bold").drawString(target.getName(), 38, 2, color.getRGB());
 
-        FontProcess.getFont("bold").drawString((Math.round(target.getHealth() * 10f) / 10f + "").replace(".0", ""), 38,
+        FontUtils.getFont("bold").drawString((Math.round(target.getHealth() * 10f) / 10f + "").replace(".0", ""), 38,
                 13, color.getRGB());
 
         GlStateManager.popMatrix();
@@ -376,7 +379,7 @@ public final class TargetInterfaceModule extends Module {
             if (target == null) return;
         }
 
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("TargetInterface");
         draggableComponent.setHeight(42);
         draggableComponent.setWidth(150);
 
@@ -410,7 +413,7 @@ public final class TargetInterfaceModule extends Module {
         Gui.drawRect((int) (x + 3), (int) (y + 3), (int) (x + 3 + size), (int) (y + 3.5), lightest.getRGB());
 
         // Draw name
-        FontProcess.getFont("bold").drawString(name, (float) (x + 8 + size), (float) (y + 6), textColor.getRGB());
+        FontUtils.getFont("bold").drawString(name, (float) (x + 8 + size), (float) (y + 6), textColor.getRGB());
 
         // Calculate health
         float health = target.getHealth() + target.getAbsorptionAmount();
@@ -445,7 +448,7 @@ public final class TargetInterfaceModule extends Module {
         // Draw health and distance text
         float distance = mc.thePlayer.getDistanceToEntity(target);
         String statsText = String.format("HP: %.1f | Dist: %.1f", health, distance);
-        FontProcess.getFont("simp").drawString(statsText, (float) (x + 8 + size), (float) (y + 25), textColor.getRGB());
+        FontUtils.getFont("simp").drawString(statsText, (float) (x + 8 + size), (float) (y + 25), textColor.getRGB());
 
         // Draw player model
         GlStateManager.pushMatrix();
@@ -468,7 +471,7 @@ public final class TargetInterfaceModule extends Module {
             if (target == null) return;
         }
 
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("TargetInterface");
         draggableComponent.setHeight(55);
         draggableComponent.setWidth(180);
 
@@ -536,12 +539,12 @@ public final class TargetInterfaceModule extends Module {
         // Draw name
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
-        FontProcess.getFont("bold").drawString(target.getName(), x + 55, y + 12, baWhite.getRGB());
+        FontUtils.getFont("bold").drawString(target.getName(), x + 55, y + 12, baWhite.getRGB());
         GlStateManager.popMatrix();
 
         // HP label
         GlStateManager.pushMatrix();
-        FontProcess.getFont("bold").drawString("HP", x + 55, y + 25, baAccent.getRGB());
+        FontUtils.getFont("bold").drawString("HP", x + 55, y + 25, baAccent.getRGB());
         GlStateManager.popMatrix();
 
         // Health bar background
@@ -579,12 +582,12 @@ public final class TargetInterfaceModule extends Module {
 
         // Health text with background
         String healthText = String.format("%.1f / %.1f", health, maxHealth);
-        int healthTextWidth = FontProcess.getFont("noto").getStringWidth(healthText);
+        int healthTextWidth = FontUtils.getFont("noto").getStringWidth(healthText);
         RenderUtils.drawRoundedRect(x + 110 - healthTextWidth / 2f - 2, y + 47, healthTextWidth + 4, 7, 2,
                 new Color(15, 20, 35, 200));
 
         GlStateManager.pushMatrix();
-        FontProcess.getFont("noto").drawString(healthText, x + 110 - healthTextWidth / 2f, y + 48, baWhite.getRGB());
+        FontUtils.getFont("noto").drawString(healthText, x + 110 - healthTextWidth / 2f, y + 48, baWhite.getRGB());
         GlStateManager.popMatrix();
 
         // Distance indicator
@@ -594,7 +597,7 @@ public final class TargetInterfaceModule extends Module {
         RenderUtils.drawRoundedRect(x + 148, y + 10, 25, 10, 2, new Color(30, 40, 60, 180));
 
         GlStateManager.pushMatrix();
-        FontProcess.getFont("noto").drawString(distText, x + 152, y + 12, baLightBlue.getRGB());
+        FontUtils.getFont("noto").drawString(distText, x + 152, y + 12, baLightBlue.getRGB());
         GlStateManager.popMatrix();
 
         // Hurt indicator
@@ -652,7 +655,7 @@ public final class TargetInterfaceModule extends Module {
             if (target == null) return;
         }
 
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("TargetInterface");
         draggableComponent.setHeight(50);
         draggableComponent.setWidth(150);
 
@@ -744,15 +747,15 @@ public final class TargetInterfaceModule extends Module {
 
             // Draw health text
             double healthNum = Math.round(health * 10.0) / 10.0;
-            FontProcess.getFont("simp").drawString(String.valueOf(healthNum), (float) (x + animatedHealthBar + 8), (float) (y + 38), textColor);
+            FontUtils.getFont("simp").drawString(String.valueOf(healthNum), (float) (x + animatedHealthBar + 8), (float) (y + 38), textColor);
 
             // Draw name
-            FontProcess.getFont("bold").drawString("Name: " + name, (float) (x + 40), (float) (y + 10), textColor);
+            FontUtils.getFont("bold").drawString("Name: " + name, (float) (x + 40), (float) (y + 10), textColor);
 
             // Draw distance and hurt time
             float distance = mc.thePlayer.getDistanceToEntity(target);
             String statsText = String.format("Distance: %.1f Hurt: %d", distance, target.hurtTime);
-            FontProcess.getFont("simp").drawString(statsText, (float) (x + 40), (float) (y + 22), textColor);
+            FontUtils.getFont("simp").drawString(statsText, (float) (x + 40), (float) (y + 22), textColor);
 
             // Spawn particles on hit
             if (target.hurtTime == 9 && !sentParticles) {
@@ -839,7 +842,7 @@ public final class TargetInterfaceModule extends Module {
             if (target == null) return;
         }
 
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("TargetInterface");
         draggableComponent.setHeight(40);
         draggableComponent.setWidth(150);
 
@@ -930,6 +933,139 @@ public final class TargetInterfaceModule extends Module {
         draggableComponent.setHeight((int) (2 + headSize + 2));
     }
 
+    private void drawAstralisTargetInterface() {
+        target = KillAuraModule.target;
+
+        ScaledResolution sr = new ScaledResolution(mc);
+        initializePosition(sr);
+
+        if (mc.currentScreen instanceof GuiChat) {
+            target = mc.thePlayer;
+        } else {
+            if (target == null) return;
+        }
+
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("TargetInterface");
+        draggableComponent.setHeight(40);
+        draggableComponent.setWidth(140);
+
+        float x = (float) draggableComponent.getX();
+        float y = (float) draggableComponent.getY();
+
+        float width = 140;
+        float height = 40;
+        float padding = 6;
+        float faceSize = height - padding * 2;
+
+        float health = Math.max(0.0F, target.getHealth());
+        float maxHealth = Math.max(1.0F, target.getMaxHealth());
+        float healthPercent = Math.min(health / maxHealth, 1.0F);
+        float astralisHealthAnimation = 0f;
+
+        astralisHealthAnimation += (healthPercent - astralisHealthAnimation) * 0.18F;
+
+        Color accent = ColorProcess.getColor();
+        Color background = new Color(5, 5, 10, 145);
+        Color panel = new Color(30, 30, 35, 150);
+
+        RenderUtils.drawRoundedRect(x, y, width, height, 8, background);
+        RenderUtils.drawRoundOutline(x, y, width, height, 8, 0.5f, new Color(0, 0, 0, 0), new Color(255, 255, 255, 25));
+
+        if (target instanceof AbstractClientPlayer) {
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.color(1, 1, 1, 1);
+
+            mc.getTextureManager().bindTexture(((AbstractClientPlayer) target).getLocationSkin());
+
+            Gui.drawScaledCustomSizeModalRect(
+                    (int) (x + padding),
+                    (int) (y + padding),
+                    8,
+                    8,
+                    8,
+                    8,
+                    (int) faceSize,
+                    (int) faceSize,
+                    64,
+                    64
+            );
+
+            if (((EntityPlayer) target).func_175148_a(EnumPlayerModelParts.HAT)) {
+                Gui.drawScaledCustomSizeModalRect(
+                        (int) (x + padding),
+                        (int) (y + padding),
+                        40,
+                        8,
+                        8,
+                        8,
+                        (int) faceSize,
+                        (int) faceSize,
+                        64,
+                        64
+                );
+            }
+
+            GlStateManager.color(1, 1, 1, 1);
+            GlStateManager.popMatrix();
+        } else {
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.color(1, 1, 1, 1);
+
+            mc.getTextureManager().bindTexture(((AbstractClientPlayer) mc.thePlayer).getLocationSkin());
+
+            Gui.drawScaledCustomSizeModalRect(
+                    (int) (x + padding),
+                    (int) (y + padding),
+                    8,
+                    8,
+                    8,
+                    8,
+                    (int) faceSize,
+                    (int) faceSize,
+                    64,
+                    64
+            );
+
+            GlStateManager.color(1, 1, 1, 1);
+            GlStateManager.popMatrix();
+        }
+
+        float textX = x + faceSize + padding * 2;
+        float contentWidth = width - faceSize - padding * 3;
+
+        String targetName = target.getName();
+
+        if (FontUtils.getFont("bold").getStringWidth(targetName) > contentWidth) {
+            targetName = targetName.substring(0, Math.min(targetName.length(), 12)) + "...";
+        }
+
+        FontUtils.getFont("bold").drawString(targetName, textX, y + padding, Color.WHITE.getRGB());
+
+        String healthText = String.format("%.1f", health);
+        FontUtils.getFont("simp").drawString(healthText, textX, y + padding + 12, new Color(220, 220, 230).getRGB());
+
+        float barHeight = 6;
+        float barY = y + height - padding - barHeight;
+
+        RenderUtils.drawRoundedRect(textX, barY, contentWidth, barHeight, barHeight / 2.0F, panel);
+
+        float barWidth = contentWidth * Math.min(Math.max(astralisHealthAnimation, 0.0F), 1.0F);
+
+        if (barWidth > 0.0F) {
+            RenderUtils.drawRoundedRect(textX, barY, barWidth, barHeight, 3, accent);
+        }
+
+        if (target.hurtTime > 0) {
+            RenderUtils.drawRoundedRect(x, y, width, height, 8,
+                    new Color(255, 60, 60, target.hurtTime * 8));
+        }
+
+        draggableComponent.setWidth((int) width);
+        draggableComponent.setHeight((int) height);
+    }
+
     private void drawAdjustTargetInterface() {
         target = KillAuraModule.target;
 
@@ -942,7 +1078,7 @@ public final class TargetInterfaceModule extends Module {
             if (target == null) return;
         }
 
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("TargetInterface");
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("TargetInterface");
         draggableComponent.setHeight(40);
         draggableComponent.setWidth(150);
 
@@ -989,7 +1125,7 @@ public final class TargetInterfaceModule extends Module {
 
         // Draw name
         Color gray = Color.WHITE.darker();
-        FontProcess.getFont("bold").drawString(name, (float) (x + 3 + 24 + 3), (float) (y + 2), gray.getRGB());
+        FontUtils.getFont("bold").drawString(name, (float) (x + 3 + 24 + 3), (float) (y + 2), gray.getRGB());
 
         // Draw armor (if exists)
         RenderHelper.enableGUIStandardItemLighting();
@@ -1028,10 +1164,10 @@ public final class TargetInterfaceModule extends Module {
         String healthDiffStr = String.format("%.1f", Math.abs(mc.thePlayer.getHealth() - target.getHealth()));
         String healthDiff = mc.thePlayer.getHealth() < target.getHealth() ? "-" + healthDiffStr : "+" + healthDiffStr;
 
-        int healthDiffWidth = FontProcess.getFont("simp").getStringWidth(healthDiff);
-        int healthDiffHeight = FontProcess.getFont("simp").getHeight();
+        int healthDiffWidth = FontUtils.getFont("simp").getStringWidth(healthDiff);
+        int healthDiffHeight = FontUtils.getFont("simp").getHeight();
 
-        FontProcess.getFont("simp").drawString(healthDiff,
+        FontUtils.getFont("simp").drawString(healthDiff,
                 (float) (x + 3 + 24 + 3 + maxL - healthDiffWidth),
                 (float) (y + 3 + 24 - 9 - healthDiffHeight),
                 gray.getRGB());

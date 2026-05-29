@@ -165,7 +165,7 @@ public class ShaderUtils extends Util {
         return stringBuilder.toString();
     }
 
-    private final String shadow = """
+            private final String shadow = """
             #version 120
             
             uniform sampler2D inTexture;
@@ -173,6 +173,7 @@ public class ShaderUtils extends Util {
             uniform vec2 texelSize;
             uniform vec2 direction;
             uniform float radius;
+              uniform float strength;
             uniform float weights[256];
             
             void main() {
@@ -194,7 +195,7 @@ public class ShaderUtils extends Util {
                     weightSum += 2.0 * w;
                 }
             
-                alpha = (alpha / weightSum) * 0.8;
+                alpha = (alpha / weightSum) * strength;
                 gl_FragColor = vec4(0.0, 0.0, 0.0, alpha);
             }
             """;
@@ -290,6 +291,7 @@ public class ShaderUtils extends Util {
             uniform sampler2D inTexture, textureToCheck;
             uniform vec2 halfpixel, offset, iResolution;
             uniform int check;
+            uniform float strength;
             
             void main() {
               //  if(check && texture2D(textureToCheck, gl_TexCoord[0].st).a > 0.0) discard;
@@ -319,7 +321,8 @@ public class ShaderUtils extends Util {
                 smp7.rgb *= smp7.a;
                 sum += smp7 * 2.0;
                 vec4 result = sum / 12.0;
-                gl_FragColor = vec4(result.rgb / result.a, mix(result.a, result.a * (1.0 - texture2D(textureToCheck, gl_TexCoord[0].st).a),check));
+                vec3 boosted = (result.rgb / result.a) * strength;
+                gl_FragColor = vec4(boosted, mix(result.a, result.a * (1.0 - texture2D(textureToCheck, gl_TexCoord[0].st).a),check));
             }""";
 
     private final String kawaseDownBloom = """
@@ -517,6 +520,7 @@ public class ShaderUtils extends Util {
             uniform sampler2D textureIn;
             uniform vec2 texelSize;
             uniform vec2 direction;
+            uniform float strength;
             uniform float radius;
             uniform float weights[128];
             
@@ -534,7 +538,8 @@ public class ShaderUtils extends Util {
                     color += texture2D(textureIn, uv - delta).rgb * weights[i];
                 }
             
-                gl_FragColor = vec4(color, 1.0);
+                // apply strength to control blur intensity
+                gl_FragColor = vec4(color * strength, 1.0);
             }
             """;
 

@@ -2,7 +2,6 @@ package cc.simp.modules.impl.visuals;
 
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.events.impl.render.ShaderEvent;
-import cc.simp.api.font.CustomFont;
 import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.api.notifications.Notification;
 import cc.simp.api.notifications.NotificationManager;
@@ -10,13 +9,12 @@ import cc.simp.api.properties.Property;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
-import cc.simp.processes.DraggingProcess;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.DragUtils;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.utils.render.animations.Animation;
 import cc.simp.utils.render.animations.Direction;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
-import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
 
 import static cc.simp.utils.Util.mc;
@@ -25,6 +23,7 @@ import static cc.simp.utils.Util.mc;
 public final class NotificationsModule extends Module {
 
     public static Property<Boolean> customFont  = new Property<>("Custom Font", false);
+    public static Property<Boolean> toggleNotifications  = new Property<>("Toggle Notifications", true);
 
     private static boolean positionInitialized = false;
     private static final int NOTIFICATION_HEIGHT = 30;
@@ -42,9 +41,9 @@ public final class NotificationsModule extends Module {
     };
 
     private void initializePosition(ScaledResolution sr) {
-        if (!positionInitialized && !DraggingProcess.components.containsKey("Notifications")) {
-            DraggingProcess.components.put("Notifications",
-                    new DraggingProcess.DraggableComponent(
+        if (!positionInitialized && !DragUtils.components.containsKey("Notifications")) {
+            DragUtils.components.put("Notifications",
+                    new DragUtils.DraggableComponent(
                             sr.getScaledWidth() - MIN_NOTIFICATION_WIDTH - 10,
                             10
                     )
@@ -55,7 +54,7 @@ public final class NotificationsModule extends Module {
 
     private void renderNotifications() {
         ScaledResolution sr = new ScaledResolution(mc);
-        CustomFontRenderer fr =  customFont.getValue() ? FontProcess.getCurrentFont() : FontProcess.getFont("mc");
+        CustomFontRenderer fr =  customFont.getValue() ? FontUtils.getCurrentFont() : FontUtils.getFont("mc");
 
         NotificationManager.setToggleTime(2f);
 
@@ -65,7 +64,7 @@ public final class NotificationsModule extends Module {
         for (Notification notification : NotificationManager.getNotifications()) {
             int titleWidth = fr.getStringWidth(notification.getTitle());
             int descWidth = fr.getStringWidth(notification.getDescription());
-            int iconWidth = FontProcess.getFont("icon").getStringWidth(notification.getNotificationType().getIcon());
+            int iconWidth = FontUtils.getFont("icon").getStringWidth(notification.getNotificationType().getIcon());
             int notificationWidth = Math.max(titleWidth, descWidth) + iconWidth + 15;
             maxWidth = Math.max(maxWidth, notificationWidth);
         }
@@ -85,7 +84,7 @@ public final class NotificationsModule extends Module {
 
             int titleWidth = fr.getStringWidth(notification.getTitle());
             int descWidth = fr.getStringWidth(notification.getDescription());
-            int iconWidth = FontProcess.getFont("icon").getStringWidth(notification.getNotificationType().getIcon());
+            int iconWidth = FontUtils.getFont("icon").getStringWidth(notification.getNotificationType().getIcon());
             int notificationWidth = Math.max(titleWidth, descWidth) + iconWidth + 15;
 
             float slideOffset = (maxWidth - notificationWidth) * (1 - animation.getOutput().floatValue());

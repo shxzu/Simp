@@ -4,6 +4,7 @@ import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.packet.PacketReceiveEvent;
 import cc.simp.api.events.impl.player.AttackEvent;
 import cc.simp.api.events.impl.player.MotionEvent;
+import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.events.impl.player.StrafeEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
@@ -13,13 +14,16 @@ import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.BadPacketsProcess;
 import cc.simp.processes.LagProcess;
+import cc.simp.utils.client.Logger;
 import cc.simp.utils.client.MathUtils;
 import cc.simp.utils.mc.MovementUtils;
 import cc.simp.utils.mc.PacketUtils;
+import com.sun.jdi.BooleanValue;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.Priorities;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.util.BlockPos;
@@ -36,11 +40,8 @@ public final class VelocityModule extends Module {
 
     public static final ModeProperty<Mode> modeProperty = new ModeProperty<>("Mode", Mode.Edit);
 
-    private ModeProperty<LegitMode> legitMode = new ModeProperty<>("Legit Mode", LegitMode.Tick, () -> modeProperty.getValue() == Mode.Legit);
-    private Property<Boolean> onlyCombat = new Property<>("Enable only during combat", true, () -> modeProperty.getValue() == Mode.Legit);
-    private NumberProperty chance = new NumberProperty("Chance", 100, () -> modeProperty.getValue() == Mode.Legit, 0, 100, 1);
-    private NumberProperty tickTicks = new NumberProperty("Ticks", 0, () -> modeProperty.getValue() == Mode.Legit && legitMode.getValue() == LegitMode.Tick, 0, 20, 1);
-    private NumberProperty hitHits = new NumberProperty("Hits", 0, () -> modeProperty.getValue() == Mode.Legit && legitMode.getValue() == LegitMode.Hit, 0, 20, 1);
+    public final NumberProperty chance = new NumberProperty("Chance", 100, () -> modeProperty.getValue() == Mode.Legit, 0, 100, 1);
+    public final Property<Boolean> legitTiming = new Property<Boolean>("Legit Timing",  false, () -> modeProperty.getValue() == Mode.Legit);
 
     public NumberProperty horizontal = new NumberProperty("Horizontal", 100, () -> modeProperty.getValue() == Mode.Edit, 0, 100, 1);
     public NumberProperty vertical = new NumberProperty("Vertical", 100, () -> modeProperty.getValue() == Mode.Edit, 0, 100, 1);
@@ -61,24 +62,18 @@ public final class VelocityModule extends Module {
         Delay
     }
 
-    public enum LegitMode {
-        Tick, Hit
-    }
 
     boolean delayed = false;
     private boolean velocity;
-    private int limit = 0;
-    private boolean reset = false;
+    private boolean jump;
 
     @Override
     public void onEnable() {
-        stop();
         super.onEnable();
     }
 
     @Override
     public void onDisable() {
-        stop();
         super.onDisable();
     }
 
@@ -101,7 +96,6 @@ public final class VelocityModule extends Module {
                 if (p.getEntityID() == mc.thePlayer.getEntityId()) {
                     p.setMotionX(p.getMotionX() * -1);
                     p.setMotionZ(p.getMotionZ() * -1);
-                    p.setMotionY(p.getMotionY() * -1);
                 }
             }
         }
@@ -116,29 +110,41 @@ public final class VelocityModule extends Module {
         }
 
         if (modeProperty.getValue() == Mode.Legit) {
-            if (event.getPacket() instanceof S12PacketEntityVelocity) {
-                S12PacketEntityVelocity p = (S12PacketEntityVelocity) event.getPacket();
-                if (p.getEntityID() == mc.thePlayer.getEntityId()) {
-                    if (legitMode.getValue() == LegitMode.Tick || legitMode.getValue() == LegitMode.Hit) {
-                        double direction = Math.atan2(p.getMotionX(), p.getMotionZ());
-                        double degreePlayer = MovementUtils.direction();
-                        double degreePacket = Math.floorMod((int) Math.toDegrees(direction), 360);
-                        double angle = Math.abs(degreePacket + degreePlayer);
-                        double threshold = 120.0;
-                        angle = Math.floorMod((int) angle, 360);
-                        boolean inRange = angle >= 180 - threshold / 2 && angle <= 180 + threshold / 2;
-                        if (inRange) {
-                            reset = true;
-                        }
-                    }
+            if (mc.thePlayer == null) {
+                return;
+            }
+
+            if (!mc.thePlayer.onGround) {
+                return;
+            }
+
+            final Packet<?> p = event.getPacket();
+
+            if (p instanceof S12PacketEntityVelocity) {
+                final S12PacketEntityVelocity wrapper = (S12PacketEntityVelocity) p;
+
+                if (wrapper.getEntityID() == mc.thePlayer.getEntityId() && wrapper.getMotionY() > 0 && (!legitTiming.getValue() || mc.thePlayer.ticksSinceVelocity <= 14 || mc.thePlayer.onGroundTicks <= 1)) {
+                    jump = true;
                 }
             }
         }
     };
 
     @EventLink
+    public final Listener<MoveEvent> onMove = event -> {
+        if (jump && MovementUtils.isMoving() && Math.random() * 100 < chance.getValue().doubleValue()) {
+            event.setJump(true);
+        }
+    };
+
+
+    @EventLink
     private final Listener<MotionEvent> motionEventListener = event -> {
         setSuffix(modeProperty.getValue().toString());
+
+        if (event.isPre() && modeProperty.getValue() == Mode.Legit) {
+            jump = false;
+        }
 
         if (modeProperty.getValue() == Mode.Delay) {
             if (mc.thePlayer.hurtTime != 0 && !mc.thePlayer.isBurning()) {
@@ -159,7 +165,7 @@ public final class VelocityModule extends Module {
     @EventLink(value = Priorities.VERY_LOW)
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
         if (modeProperty.getValue() == Mode.Grim) {
-            if (velocity && !BadPacketsProcess.bad()) {
+            if (velocity) {
                 PacketUtils.sendSilentPacket(new C07PacketPlayerDigging((mc.objectMouseOver != null && mc.thePlayer.isSwingInProgress && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK ? C07PacketPlayerDigging.Action.START_DESTROY_BLOCK : C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK),
                         new BlockPos(mc.thePlayer), EnumFacing.UP));
                 velocity = false;
@@ -186,81 +192,4 @@ public final class VelocityModule extends Module {
             }
         }
     };
-
-    @EventLink
-    private final Listener<StrafeEvent> strafeEventListener = event -> {
-        if (checkLiquids() || !applyChance())
-            return;
-
-        if (legitMode.getValue() == LegitMode.Tick || legitMode.getValue() == LegitMode.Hit && reset) {
-            if (!mc.gameSettings.keyBindJump.isKeyDown() && shouldJump() && mc.thePlayer.isSprinting()
-                    && mc.thePlayer.hurtTime == 9
-                    || (!onlyCombat.getValue() && mc.gameSettings.keyBindAttack.isKeyDown())
-                    || mc.thePlayer.onGround) {
-                mc.gameSettings.keyBindJump.setPressed(true);
-                limit = 0;
-            }
-            reset = false;
-            return;
-        }
-
-        switch (legitMode.getValue()) {
-            case Tick: {
-                limit++;
-            }
-            break;
-
-            case Hit: {
-                if (mc.thePlayer.hurtTime == 9) {
-                    limit++;
-                }
-            }
-            break;
-        }
-    };
-
-    private boolean shouldJump() {
-        if (modeProperty.getValue() == Mode.Legit) {
-            return switch (legitMode.getValue()) {
-                case Tick -> {
-                    double random = MathUtils.getRandom(tickTicks.getValue(), tickTicks.getValue() + 0.1);
-                    yield limit >= random;
-                }
-                case Hit -> {
-                    double random = MathUtils.getRandom(hitHits.getValue(), hitHits.getValue() + 0.1);
-                    yield limit >= random;
-                }
-            };
-        }
-        return false;
-    }
-
-    private boolean checkLiquids() {
-        if (modeProperty.getValue() == Mode.Legit) {
-            if (mc.thePlayer == null || mc.theWorld == null) {
-                return false;
-            }
-            return Stream.<Supplier<Boolean>>of(mc.thePlayer::isInLava, mc.thePlayer::isBurning, mc.thePlayer::isInWater,
-                    () -> mc.thePlayer.isInWeb).map(Supplier::get).anyMatch(Boolean.TRUE::equals);
-        }
-        return false;
-    }
-
-    private void stop() {
-        if (modeProperty.getValue() == Mode.Legit) {
-            limit = 0;
-            reset = false;
-        }
-    }
-
-    private boolean applyChance() {
-        if (modeProperty.getValue() == Mode.Legit) {
-            Supplier<Boolean> chanceCheck = () -> {
-                return chance.getValue() != 100.0D && Math.random() >= chance.getValue() / 100.0D;
-            };
-
-            return Stream.of(chanceCheck).map(Supplier::get).anyMatch(Boolean.TRUE::equals);
-        }
-        return false;
-    }
 }

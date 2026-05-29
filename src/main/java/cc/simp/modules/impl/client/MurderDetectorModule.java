@@ -79,11 +79,7 @@ public class MurderDetectorModule extends Module {
         for (EntityPlayer player : mc.theWorld.playerEntities) {
             if (!player.getName().isEmpty() && player.getHeldItem() != null && (!murderers.contains(player) && items.contains(player.getHeldItem().getItem()))) {
                 murderers.add(player);
-                if (Simp.INSTANCE.getModuleManager().getModule(NotificationsModule.class).isEnabled()) {
-                    NotificationManager.post(NotificationType.WARNING, "Murder Detector", "Murderer " + player.getName() + " was detected!");
-                } else {
-                    Logger.chatPrint("Murderer " + player.getName() + " was detected!");
-                }
+                NotificationManager.post(NotificationType.WARNING, "Murder Detector", "Murderer " + player.getName() + " was detected!");
             }
         }
     };

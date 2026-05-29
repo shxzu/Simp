@@ -1,5 +1,6 @@
 package cc.simp.modules.impl.client;
 
+import cc.simp.Simp;
 import cc.simp.api.events.impl.render.Render2DEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
@@ -79,19 +80,33 @@ public final class ClientSettingsModule extends Module {
     }
 
     public enum Color {
-        Rainbow,
-        Exhibition,
-        Astolfo,
-        Simp,
-        Tenacity,
-        FDP,
-        Rise,
-        Vaporwave,
-        Sunset,
-        White,
-        Red,
-        Purple,
-        Pink
+        Rainbow ("Rainbow"),
+        Exhibition ("Exhibition"),
+        Astolfo ("Astolfo"),
+        Simp ("Simp"),
+        Tenacity ("Tenacity"),
+        FDP ("FDP"),
+        Rise ("Rise"),
+        Vaporwave ("Vaporwave"),
+        Sunset ("Sunset"),
+        White ("White"),
+        Ruby ("Ruby"),
+        Red ("Red"),
+        Purple ("Purple"),
+        DarkPurple ("Dark Purple"),
+        Lavender ("Lavender"),
+        HotPink ("Hot Pink"),
+        Pink ("Pink");
+
+        public String name;
+
+        Color(String name) {
+            this.name = name;
+        }
+
+        public String toString() {
+            return name;
+        }
     }
 
     public ClientSettingsModule() {

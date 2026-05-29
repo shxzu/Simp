@@ -153,20 +153,36 @@ public final class ESPModule extends Module {
 
     @EventLink
     public final Listener<Render2DEvent> render2DEventListener = event -> {
-        if (mode.getValue() == Mode.GameSense) {
+        if (mode.getValue() != Mode.GameSense || mc.theWorld == null || mc.thePlayer == null) {
+            return;
+        }
+
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GlStateManager.pushMatrix();
+        try {
             for (Entity entity : mc.theWorld.loadedEntityList) {
-                if (players.getValue() ? entity instanceof EntityPlayer && !entity.equals(mc.thePlayer) : entity != null && !entity.equals(mc.thePlayer) && !AntiBotModule.botList.contains(entity)) {
-                    ESPUtils.render2DESP(entity.getEntityBoundingBox()
-                                    .offset(-entity.posX, -entity.posY, -entity.posZ)
-                                    .offset(ESPUtils.interpolate(entity.lastTickPosX, entity.posX),
-                                            ESPUtils.interpolate(entity.lastTickPosY, entity.posY),
-                                            ESPUtils.interpolate(entity.lastTickPosZ, entity.posZ))
-                                    .offset(-mc.getRenderManager().viewerPosX,
-                                            -mc.getRenderManager().viewerPosY,
-                                            -mc.getRenderManager().viewerPosZ),
-                            ColorProcess.getColor(), 0.25f);
+                if (entity == null || entity.equals(mc.thePlayer) || AntiBotModule.botList.contains(entity)) {
+                    continue;
                 }
+
+                if (players.getValue() && !(entity instanceof EntityPlayer)) {
+                    continue;
+                }
+
+                ESPUtils.render2DESP(entity.getEntityBoundingBox()
+                                .offset(-entity.posX, -entity.posY, -entity.posZ)
+                                .offset(ESPUtils.interpolate(entity.lastTickPosX, entity.posX),
+                                        ESPUtils.interpolate(entity.lastTickPosY, entity.posY),
+                                        ESPUtils.interpolate(entity.lastTickPosZ, entity.posZ))
+                                .offset(-mc.getRenderManager().viewerPosX,
+                                        -mc.getRenderManager().viewerPosY,
+                                        -mc.getRenderManager().viewerPosZ),
+                        ColorProcess.getColor(), 0.25f);
             }
+        } finally {
+            GlStateManager.resetColor();
+            GlStateManager.popMatrix();
+            GL11.glPopAttrib();
         }
     };
 }

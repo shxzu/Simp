@@ -12,7 +12,7 @@ import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.player.ScaffoldModule;
 import cc.simp.modules.impl.player.StealerModule;
 import cc.simp.processes.ColorProcess;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -66,7 +66,7 @@ public final class WatermarkModule extends Module {
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = e -> {
         setSuffix(type.getValue().toString());
-        CustomFontRenderer fr = FontProcess.getCurrentFont();
+        CustomFontRenderer fr = FontUtils.getCurrentFont();
         ScaledResolution sr = new ScaledResolution(mc);
         customName = name.getValue();
         String clientName = customName;
@@ -137,7 +137,7 @@ public final class WatermarkModule extends Module {
 
     @EventLink
     public Listener<ShaderEvent> shaderEventListener = e -> {
-        CustomFontRenderer fr = FontProcess.getCurrentFont();
+        CustomFontRenderer fr = FontUtils.getCurrentFont();
         ScaledResolution sr = new ScaledResolution(mc);
         String clientName = customName;
 
@@ -199,7 +199,7 @@ public final class WatermarkModule extends Module {
     };
 
     private void renderDynamicIsland(ScaledResolution sr, String clientName) {
-        CustomFontRenderer fr = FontProcess.getCurrentFont();
+        CustomFontRenderer fr = FontUtils.getCurrentFont();
         if (System.currentTimeMillis() - lastServerTime > 5000) {
             updateServerInfo();
             lastServerTime = System.currentTimeMillis();
@@ -227,7 +227,7 @@ public final class WatermarkModule extends Module {
 
 
     private void renderNormalIsland(ScaledResolution sr, int centerX, int yPos, String clientName) {
-        CustomFontRenderer fr = FontProcess.getCurrentFont();
+        CustomFontRenderer fr = FontUtils.getCurrentFont();
 
         String serverText = currentServer != null ? currentServer : "Loading...";
         String versionText = "v" + Simp.VERSION;
@@ -301,7 +301,7 @@ public final class WatermarkModule extends Module {
     private float displayBPS = 0;
 
     private void renderScaffoldIsland(ScaledResolution sr, int centerX, int yPos) {
-        CustomFontRenderer fr = FontProcess.getCurrentFont();
+        CustomFontRenderer fr = FontUtils.getCurrentFont();
 
         // Get block count - count ALL blocks first to establish the total
         int currentBlockCount = 0;
@@ -435,7 +435,7 @@ public final class WatermarkModule extends Module {
     }
 
     private void renderStealerIsland(ScaledResolution sr, int centerX, int yPos) {
-        CustomFontRenderer fr = FontProcess.getCurrentFont();
+        CustomFontRenderer fr = FontUtils.getCurrentFont();
 
         if (!(mc.currentScreen instanceof net.minecraft.client.gui.inventory.GuiChest)) {
             wasInChest = false;

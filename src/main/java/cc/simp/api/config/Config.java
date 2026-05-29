@@ -1,7 +1,7 @@
 package cc.simp.api.config;
 
 import cc.simp.Simp;
-import cc.simp.processes.DraggingProcess;
+import cc.simp.utils.render.DragUtils;
 import com.google.gson.JsonObject;
 
 import java.io.File;
@@ -41,8 +41,8 @@ public final class Config implements Serializable {
         for (cc.simp.modules.Module module : Simp.INSTANCE.getModuleManager().getModules())
             modulesObject.add(module.getLabel(), module.save(false));
 
-        for (String key : DraggingProcess.components.keySet()) {
-            draggingObject.add(key, DraggingProcess.components.get(key).save());
+        for (String key : DragUtils.components.keySet()) {
+            draggingObject.add(key, DragUtils.components.get(key).save());
         }
 
         jsonObject.add("Modules", modulesObject);
@@ -64,10 +64,10 @@ public final class Config implements Serializable {
             JsonObject draggingObject = object.getAsJsonObject("Dragging");
             for (String key : draggingObject.keySet()) {
                 JsonObject componentData = draggingObject.getAsJsonObject(key);
-                if (!DraggingProcess.components.containsKey(key)) {
-                    DraggingProcess.components.put(key, new DraggingProcess.DraggableComponent(0, 0));
+                if (!DragUtils.components.containsKey(key)) {
+                    DragUtils.components.put(key, new DragUtils.DraggableComponent(0, 0));
                 }
-                DraggingProcess.components.get(key).load(componentData);
+                DragUtils.components.get(key).load(componentData);
             }
         }
     }

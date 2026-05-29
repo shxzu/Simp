@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.shader.Framebuffer;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
@@ -137,6 +138,26 @@ public class RenderUtils extends Util {
         GlUtils.end2DRendering();
         glDisable(GL_LINE_SMOOTH);
     }
+
+
+    public static void drawFilledCircleNoGL(final int x, final int y, final double r, final int c, final int quality) {
+        final float f = ((c >> 24) & 0xff) / 255F;
+        final float f1 = ((c >> 16) & 0xff) / 255F;
+        final float f2 = ((c >> 8) & 0xff) / 255F;
+        final float f3 = (c & 0xff) / 255F;
+
+        GL11.glColor4f(f1, f2, f3, f);
+        GL11.glBegin(GL11.GL_TRIANGLE_FAN);
+
+        for (int i = 0; i <= 360 / quality; i++) {
+            final double x2 = Math.sin(((i * quality * Math.PI) / 180)) * r;
+            final double y2 = Math.cos(((i * quality * Math.PI) / 180)) * r;
+            GL11.glVertex2d(x + x2, y + y2);
+        }
+
+        GL11.glEnd();
+    }
+
     public enum ArrowDirection {
         UP, DOWN, LEFT, RIGHT
     }
@@ -562,6 +583,22 @@ public class RenderUtils extends Util {
 
     public static void resetColor() {
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    public static void drawLine(Entity entity, double[] color, double x, double y, double z) {
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        if (color.length >= 4) {
+            if (color[3] <= 0.1) return;
+            GL11.glColor4d(color[0], color[1], color[2], color[3]);
+        } else {
+            GL11.glColor3d(color[0], color[1], color[2]);
+        }
+        GL11.glLineWidth(1.5f);
+        GL11.glBegin(1);
+        GL11.glVertex3d(0.0D, mc.thePlayer.getEyeHeight(), 0.0D);
+        GL11.glVertex3d(x, y, z);
+        GL11.glEnd();
+        GL11.glDisable(GL11.GL_LINE_SMOOTH);
     }
 
     public static void drawLine(double x, double y, double z, double x1, double y1, double z1, final Color color, final float width) {

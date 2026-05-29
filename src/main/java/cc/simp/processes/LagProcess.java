@@ -38,6 +38,9 @@ public class LagProcess {
 
     // Track last entity action to prevent duplicates
     private static C0BPacketEntityAction.Action lastEntityAction = null;
+    // Last position that was actually sent to the server (server-side player position)
+    public static double serverX, serverY, serverZ;
+    public static boolean hasServerPosition = false;
 
     @EventLink
     public final Listener<PacketSendEvent> send = event -> event.setCancelled(onPacket(event.getPacket(), event).isCancelled());
@@ -57,6 +60,17 @@ public class LagProcess {
 
             event.setCancelled();
             packets.add(new PacketUtils.TimedPacket(packet));
+        }
+
+        // Update last known server position when movement packets are allowed to be sent
+        if (packet instanceof C03PacketPlayer) {
+            C03PacketPlayer movement = (C03PacketPlayer) packet;
+            if (!event.isCancelled() && movement.isMoving()) {
+                serverX = movement.getPositionX();
+                serverY = movement.getPositionY();
+                serverZ = movement.getPositionZ();
+                hasServerPosition = true;
+            }
         }
 
         return event;
@@ -127,7 +141,8 @@ public class LagProcess {
     }
 
     public static void spoof(int amount, boolean regular, boolean velocity, boolean teleports, boolean players, boolean blink) {
-        spoof(amount, regular, velocity, teleports, players, blink, false);
+        // Default movement to true unless explicitly provided by the 7-arg overload.
+        spoof(amount, regular, velocity, teleports, players, blink, true);
     }
 
     public static void blink() {

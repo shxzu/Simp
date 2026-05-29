@@ -1,6 +1,8 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
+
+import lombok.Setter;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
@@ -12,6 +14,7 @@ public class C02PacketUseEntity implements Packet<INetHandlerPlayServer>
 {
     public int entityId;
     private C02PacketUseEntity.Action action;
+    @Setter
     private Vec3 hitVec;
 
     public C02PacketUseEntity()

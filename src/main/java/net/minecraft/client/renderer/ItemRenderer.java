@@ -338,6 +338,7 @@ public class ItemRenderer {
                             break;
 
                         case BLOCK:
+                            if (Simp.INSTANCE.getModuleManager().getModule(CameraModule.class).isEnabled() && CameraModule.dontResetBlock.getValue()) f = 0.0f;
                             if (Simp.INSTANCE.getModuleManager().getModule(CameraModule.class).isEnabled()) {
                                 switch (CameraModule.mode.getValue()) {
                                     case Slide:

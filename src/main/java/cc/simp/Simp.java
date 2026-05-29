@@ -14,8 +14,10 @@ import cc.simp.modules.ModuleManager;
 import cc.simp.modules.impl.client.ClientSettingsModule;
 import cc.simp.modules.impl.combat.KillAuraModule;
 import cc.simp.modules.impl.player.ScaffoldModule;
+import cc.simp.modules.impl.visuals.NotificationsModule;
 import cc.simp.processes.*;
 import cc.simp.utils.client.BuildType;
+import cc.simp.utils.render.FontUtils;
 import de.florianmichael.viamcp.ViaMCP;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
@@ -30,7 +32,7 @@ public class Simp {
     public static final Simp INSTANCE = new Simp();
     public static final String NAME = "Simp";
     public static final String BUILD = BuildType.RELEASE.getName();
-    public static final String VERSION = "1.3" + " " + BUILD;
+    public static final String VERSION = "1.4" + " " + BUILD;
     public static final String FULL = NAME + " " + VERSION;
 
     private EventBus<Event> eventBus;
@@ -139,12 +141,15 @@ public class Simp {
     @EventLink
     public Listener<Render2DEvent> render2DEventListener = e -> {
         if(!Simp.INSTANCE.getModuleManager().getModule(ClientSettingsModule.class).isEnabled()) Simp.INSTANCE.getModuleManager().getModule(ClientSettingsModule.class).setEnabled(true);
+        if(!Simp.INSTANCE.getModuleManager().getModule(NotificationsModule.class).isEnabled()) Simp.INSTANCE.getModuleManager().getModule(NotificationsModule.class).setEnabled(true);
+        if(!Simp.INSTANCE.getModuleManager().getModule(ClientSettingsModule.class).isHidden()) Simp.INSTANCE.getModuleManager().getModule(ClientSettingsModule.class).setHidden(true);
+        if(!Simp.INSTANCE.getModuleManager().getModule(NotificationsModule.class).isHidden()) Simp.INSTANCE.getModuleManager().getModule(NotificationsModule.class).setHidden(true);
 
-        String currentFont = FontProcess.getCurrentFont().getNameFontTTF().toLowerCase();
+        String currentFont = FontUtils.getCurrentFont().getNameFontTTF().toLowerCase();
         String desiredFont = ClientSettingsModule.font.getValue().toString().toLowerCase();
 
         if (!currentFont.equals(desiredFont)) {
-            FontProcess.setCurrentFont(desiredFont);
+            FontUtils.setCurrentFont(desiredFont);
         }
     };
 

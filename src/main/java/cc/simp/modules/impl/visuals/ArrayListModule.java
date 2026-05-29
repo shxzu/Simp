@@ -8,12 +8,13 @@ import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
 import cc.simp.api.properties.impl.NumberProperty;
+import cc.simp.api.properties.impl.Representation;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.client.ClientSettingsModule;
 import cc.simp.processes.ColorProcess;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.utils.render.RenderUtils;
 import cc.simp.utils.render.Translate;
 import io.github.nevalackin.homoBus.Listener;
@@ -38,6 +39,7 @@ public final class ArrayListModule extends Module {
     private final Property<Boolean> hideVisuals = new Property<>("Hide Visuals", false);
     private static final Property<Boolean> useMcFont = new Property<>("Use MC Font", false);
     private final Property<Boolean> noSpaces = new Property<>("No Spaces", false);
+    private final NumberProperty characterSpacing = new NumberProperty("Char Spacing", 0, -5, 10, 1, Representation.INT);
     private final Property<Boolean> showSuffix = new Property<>("Show Suffix", true);
     private final ModeProperty<SuffixMode> suffixMode = new ModeProperty<>("Suffix Mode", SuffixMode.Space, showSuffix::getValue);
     private final Property<Boolean> lowercase = new Property<>("Lowercase", true);
@@ -100,10 +102,28 @@ public final class ArrayListModule extends Module {
     @EventLink
     public Listener<PreUpdateEvent> preUpdateEventListener = e -> {
         if (moduleCache != null) {
+            CustomFontRenderer fr = getActiveFont();
+            if (fr == null) {
+                return;
+            }
+
+            boolean mcFont = isMcFontActive();
+            int previousCharOffset = fr.getCharOffset();
+
+            if (!mcFont) {
+                fr.setCharOffset(getCharacterSpacing());
+            }
+
             for (Module module : moduleCache)
                 displayLabelCache.put(module, getDisplayLabel(module));
 
-            moduleCache.sort(new LengthComparator());
+            try {
+                moduleCache.sort(new LengthComparator());
+            } finally {
+                if (!mcFont) {
+                    fr.setCharOffset(previousCharOffset);
+                }
+            }
         }
     };
 
@@ -113,11 +133,116 @@ public final class ArrayListModule extends Module {
     @EventLink
     public Listener<ShaderEvent> shaderEventListener = e -> renderArrayList();
 
+    private CustomFontRenderer getActiveFont() {
+        CustomFontRenderer fr = FontUtils.getCurrentFont();
+        if (useMcFont.getValue()) fr = FontUtils.getFont("mc");
+        return fr;
+    }
+
+    private boolean isMcFontActive() {
+        return useMcFont.getValue() || getActiveFont() == FontUtils.getFont("mc");
+    }
+
+    private int getCharacterSpacing() {
+        return characterSpacing.getValue().intValue();
+    }
+
+    private int getVisibleCharacterCount(String text) {
+        if (text == null) {
+            return 0;
+        }
+
+        int visibleCharacters = 0;
+        boolean formatting = false;
+
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+
+            if (formatting) {
+                formatting = false;
+                continue;
+            }
+
+            if (c == '\u00A7') {
+                formatting = true;
+                continue;
+            }
+
+            visibleCharacters++;
+        }
+
+        return visibleCharacters;
+    }
+
+    private int getTextWidth(CustomFontRenderer fr, String text) {
+        if (text == null) {
+            return 0;
+        }
+
+        if (isMcFontActive()) {
+            return mc.fontRendererObj.getStringWidth(text) + (getVisibleCharacterCount(text) * getCharacterSpacing());
+        }
+
+        return fr == null ? 0 : fr.getStringWidth(text);
+    }
+
+    private float drawText(CustomFontRenderer fr, String text, float x, float y, int color) {
+        if (text == null) {
+            return x;
+        }
+
+        if (isMcFontActive()) {
+            return drawMcText(text, x, y, color);
+        }
+
+        return fr.drawStringWithShadow(text, x, y, color);
+    }
+
+    private float drawMcText(String text, float x, float y, int color) {
+        int spacing = getCharacterSpacing();
+
+        if (spacing == 0) {
+            return mc.fontRendererObj.drawStringWithShadow(text, x, y, color);
+        }
+
+        float cursorX = x;
+        int currentColor = color;
+
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+
+            if (c == '\u00A7' && i + 1 < text.length()) {
+                char code = Character.toLowerCase(text.charAt(++i));
+
+                if (code == 'r') {
+                    currentColor = color;
+                } else if ("0123456789abcdef".indexOf(code) >= 0) {
+                    currentColor = mc.fontRendererObj.getColorCode(code);
+                }
+
+                continue;
+            }
+
+            mc.fontRendererObj.drawStringWithShadow(String.valueOf(c), cursorX, y, currentColor);
+            cursorX += mc.fontRendererObj.getCharWidth(c) + spacing;
+        }
+
+        return cursorX;
+    }
+
     private void renderArrayList() {
-        CustomFontRenderer fr = FontProcess.getCurrentFont();
+        CustomFontRenderer fr = getActiveFont();
         ScaledResolution sr = new ScaledResolution(mc);
 
-        if (useMcFont.getValue()) fr = FontProcess.getFont("mc");
+        if (fr == null) return;
+
+        int previousCharOffset = fr.getCharOffset();
+        boolean mcFont = isMcFontActive();
+        if (!mcFont) {
+            fr.setCharOffset(getCharacterSpacing());
+        }
+
+        try {
 
         float screenX = sr.getScaledWidth() - offsetX.getValue().floatValue();
         float startY = 2 + offsetY.getValue().floatValue();
@@ -154,7 +279,7 @@ public final class ArrayListModule extends Module {
             final Module module = filteredModules.get(i);
             final Translate translate = module.getTranslate();
             final String name = displayLabelCache.get(module);
-            final float moduleWidth = fr.getStringWidth(name);
+            final float moduleWidth = getTextWidth(fr, name);
             final boolean visible = module.isVisible();
 
             if (visible) {
@@ -191,10 +316,10 @@ public final class ArrayListModule extends Module {
                     }
                 }
 
-                fr.drawStringWithShadow(
+                drawText(fr,
                         name,
-                        (float) translateX,
-                        (float) translateY - (fr == FontProcess.getFont("mc") || useMcFont.getValue() ? 0 : 1),
+                        (float) translateX - (!mcFont ? 0.5f : 0.0f),
+                        (float) translateY,
                         aColor);
 
                 if (outline.getValue() && !roundedBg.getValue()) {
@@ -229,7 +354,7 @@ public final class ArrayListModule extends Module {
 
                         if (nextModule != null) {
                             String nextModuleName = displayLabelCache.get(nextModule);
-                            float nextModuleWidth = fr.getStringWidth(nextModuleName);
+                            float nextModuleWidth = getTextWidth(fr, nextModuleName);
 
                             if (moduleWidth - nextModuleWidth > 0.5)
                                 Gui.drawRect(translateX - 2,
@@ -367,6 +492,11 @@ public final class ArrayListModule extends Module {
                 visibleModuleCount++;
             }
         }
+        } finally {
+            if (!mcFont) {
+                fr.setCharOffset(previousCharOffset);
+            }
+        }
     }
 
     private Color getColorForBG() {
@@ -436,8 +566,8 @@ public final class ArrayListModule extends Module {
     }
 
     private void updateModulePositions(ScaledResolution scaledResolution) {
-        CustomFontRenderer fr = FontProcess.getCurrentFont();
-        if (useMcFont.getValue()) fr = FontProcess.getFont("mc");
+        CustomFontRenderer fr = getActiveFont();
+        if (fr == null) return;
         if (moduleCache == null)
             moduleCache = new ArrayList<>(Simp.INSTANCE.getModuleManager().getModules());
 
@@ -452,7 +582,7 @@ public final class ArrayListModule extends Module {
 
             if (module.isEnabled()) {
                 module.getTranslate().setX(screenX -
-                        fr.getStringWidth(getDisplayLabel(module)) + 2);
+                        getTextWidth(fr, getDisplayLabel(module)) + 2);
             } else
                 module.getTranslate().setX(screenX);
             module.getTranslate().setY(y);
@@ -476,14 +606,13 @@ public final class ArrayListModule extends Module {
         }
     }
 
-    private static class LengthComparator extends ModuleComparator {
+    private class LengthComparator extends ModuleComparator {
         @Override
         public int compare(Module o1, Module o2) {
-            CustomFontRenderer fr = FontProcess.getCurrentFont();
-            if (useMcFont.getValue()) fr = FontProcess.getFont("mc");
+            CustomFontRenderer fr = getActiveFont();
             return Float.compare(
-                    fr.getStringWidth(displayLabelCache.get(o2)),
-                    fr.getStringWidth(displayLabelCache.get(o1)));
+                    getTextWidth(fr, displayLabelCache.get(o2)),
+                    getTextWidth(fr, displayLabelCache.get(o1)));
         }
     }
 }

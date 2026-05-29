@@ -23,8 +23,6 @@ public final class NoFireballModule extends Module {
 
     @EventLink
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
-        if (BadPacketsProcess.bad()) return;
-
         for (Entity entity : mc.theWorld.loadedEntityList) {
             if (entity instanceof EntityFireball && entity.getDistanceToEntity(mc.thePlayer) < 5) {
                 if (this.rotate.getValue()) {

@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import cc.simp.Simp;
+import cc.simp.api.events.impl.game.LivingUpdateEvent;
 import cc.simp.api.events.impl.player.PostStrafeEvent;
 import cc.simp.api.events.impl.player.StrafeEvent;
 import cc.simp.utils.mc.MovementUtils;
@@ -50,6 +51,7 @@ public abstract class Entity implements ICommandSender
     private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
     private static int nextEntityID;
     public int offGroundTicks, onGroundTicks;
+    public int ticksSinceVelocity;
     private int entityId;
     public double renderDistanceWeight;
     public boolean preventEntitySpawning;
@@ -289,6 +291,8 @@ public abstract class Entity implements ICommandSender
         this.prevPosZ = this.posZ;
         this.prevRotationPitch = this.rotationPitch;
         this.prevRotationYaw = this.rotationYaw;
+
+        Simp.INSTANCE.getEventBus().post(new LivingUpdateEvent(this));
 
         if (!this.worldObj.isRemote && this.worldObj instanceof WorldServer)
         {

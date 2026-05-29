@@ -29,7 +29,6 @@ public class BlinkModule extends Module {
     public ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Constant);
     public NumberProperty delay = new NumberProperty("Delay", 20, () -> mode.getValue() == Mode.Pulse, 0, 100, 1);
     public static final Property<Boolean> renderBlinkPos = new Property<>("Render Blink Pos", true);
-    public static ModeProperty<RenderMode> renderModeProperty = new ModeProperty<>("Render Mode", RenderMode.Box, () -> renderBlinkPos.getValue());
 
     public enum Mode {
         Constant,
@@ -39,11 +38,6 @@ public class BlinkModule extends Module {
     private double blinkedX, blinkedY, blinkedZ;
     private boolean hasStoredPosition = false;
     Timer timer = new Timer();
-
-    private enum RenderMode {
-        Box,
-        Player
-    }
 
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
@@ -76,34 +70,24 @@ public class BlinkModule extends Module {
         double x = blinkedX - mc.getRenderManager().viewerPosX;
         double y = blinkedY - mc.getRenderManager().viewerPosY;
         double z = blinkedZ - mc.getRenderManager().viewerPosZ;
+        AxisAlignedBB bb = new AxisAlignedBB(
+                x - 0.3, y, z - 0.3,
+                x + 0.3, y + 1.8, z + 0.3
+        );
 
-        if (renderModeProperty.getValue() == RenderMode.Box) {
-            AxisAlignedBB bb = new AxisAlignedBB(
-                    x - 0.3, y, z - 0.3,
-                    x + 0.3, y + 1.8, z + 0.3
-            );
-
-            Color color = ColorProcess.getColor();
-            RenderUtils.start3D();
-            GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f,
-                    color.getBlue() / 255f, color.getAlpha() / 255f);
-            RenderUtils.drawBoundingBox(bb);
-            RenderUtils.stop3D();
-            GlUtils.resetColor();
-        } else {
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(x, y, z);
-
-            mc.getRenderManager().renderEntityStatic(mc.thePlayer, mc.timer.renderPartialTicks, false);
-
-            GlStateManager.popMatrix();
-        }
+        Color color = ColorProcess.getColor();
+        RenderUtils.start3D();
+        GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f,
+                color.getBlue() / 255f, color.getAlpha() / 255f);
+        RenderUtils.drawBoundingBox(bb);
+        RenderUtils.stop3D();
+        GlUtils.resetColor();
     };
 
     @Override
     public void onDisable() {
         BlinkProcess.disable();
-        
+
         hasStoredPosition = false;
         super.onDisable();
     }

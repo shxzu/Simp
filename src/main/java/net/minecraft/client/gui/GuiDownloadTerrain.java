@@ -6,6 +6,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.network.play.client.C00PacketKeepAlive;
 import net.optifine.CustomLoadingScreen;
 import net.optifine.CustomLoadingScreens;
+import org.lwjgl.input.Keyboard;
 
 public class GuiDownloadTerrain extends GuiScreen
 {
@@ -20,6 +21,9 @@ public class GuiDownloadTerrain extends GuiScreen
 
     protected void keyTyped(char typedChar, int keyCode) throws IOException
     {
+        if (keyCode == Keyboard.KEY_ESCAPE) {
+            mc.currentScreen = null;
+        }
     }
 
     public void initGui()

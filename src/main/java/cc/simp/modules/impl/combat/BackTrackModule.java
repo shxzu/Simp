@@ -9,13 +9,16 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.processes.ColorProcess;
 import cc.simp.processes.LagProcess;
 import cc.simp.processes.TargetSelectionProcess;
 import cc.simp.utils.client.MathUtils;
+import cc.simp.utils.render.GlUtils;
 import cc.simp.utils.render.RenderUtils;
 import cc.simp.utils.render.animations.impl.ContinualAnimation;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S14PacketEntity;
@@ -132,7 +135,13 @@ public final class BackTrackModule extends Module {
 
             AxisAlignedBB box = mc.thePlayer.getEntityBoundingBox().expand(0.1D, 0.1, 0.1);
             AxisAlignedBB axis = new AxisAlignedBB(box.minX - mc.thePlayer.posX + animatedX.getOutput(), box.minY - mc.thePlayer.posY + animatedY.getOutput(), box.minZ - mc.thePlayer.posZ + animatedZ.getOutput(), box.maxX - mc.thePlayer.posX + animatedX.getOutput(), box.maxY - mc.thePlayer.posY + animatedY.getOutput(), box.maxZ - mc.thePlayer.posZ + animatedZ.getOutput());
-            RenderUtils.renderBoundingBox(axis, target.hurtTime != 0 ? Color.RED : Color.GREEN, 160);
+            Color color = ColorProcess.getColor();
+            RenderUtils.start3D();
+            GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f,
+                    color.getBlue() / 255f, 160f / 255f);
+            RenderUtils.drawBoundingBox(axis);
+            RenderUtils.stop3D();
+            GlUtils.resetColor();
         }
     };
 

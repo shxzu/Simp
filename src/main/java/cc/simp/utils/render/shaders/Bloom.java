@@ -50,7 +50,7 @@ public class Bloom {
     }
 
 
-    public static void renderBloom(int framebufferTexture, int iterations, int offset) {
+    public static void renderBloom(int framebufferTexture, int iterations, int offset, float strength) {
         if (currentIterations != iterations || (framebuffer.framebufferWidth != mc.displayWidth || framebuffer.framebufferHeight != mc.displayHeight)) {
             initFramebuffers(iterations);
             currentIterations = iterations;
@@ -61,16 +61,16 @@ public class Bloom {
         GlStateManager.blendFunc(GL_ONE, GL_ONE);
 
         GL11.glClearColor(0, 0, 0, 0);
-        renderFBO(framebufferList.get(1), framebufferTexture, kawaseDown, offset);
+        renderFBO(framebufferList.get(1), framebufferTexture, kawaseDown, offset, strength);
 
         //Downsample
         for (int i = 1; i < iterations; i++) {
-            renderFBO(framebufferList.get(i + 1), framebufferList.get(i).framebufferTexture, kawaseDown, offset);
+            renderFBO(framebufferList.get(i + 1), framebufferList.get(i).framebufferTexture, kawaseDown, offset, strength);
         }
 
         //Upsample
         for (int i = iterations; i > 1; i--) {
-            renderFBO(framebufferList.get(i - 1), framebufferList.get(i).framebufferTexture, kawaseUp, offset);
+            renderFBO(framebufferList.get(i - 1), framebufferList.get(i).framebufferTexture, kawaseUp, offset, strength);
         }
 
         Framebuffer lastBuffer = framebufferList.get(0);
@@ -83,6 +83,7 @@ public class Bloom {
         kawaseUp.setUniformi("textureToCheck", 16);
         kawaseUp.setUniformf("halfpixel", 1.0f / lastBuffer.framebufferWidth, 1.0f / lastBuffer.framebufferHeight);
         kawaseUp.setUniformf("iResolution", lastBuffer.framebufferWidth, lastBuffer.framebufferHeight);
+        kawaseUp.setUniformf("strength", strength);
         GlStateManager.setActiveTexture(GL13.GL_TEXTURE16);
         RenderUtils.bindTexture(framebufferTexture);
         GlStateManager.setActiveTexture(GL13.GL_TEXTURE0);
@@ -102,7 +103,7 @@ public class Bloom {
         GlUtils.startBlend();
     }
 
-    private static void renderFBO(Framebuffer framebuffer, int framebufferTexture, ShaderUtils shader, float offset) {
+    private static void renderFBO(Framebuffer framebuffer, int framebufferTexture, ShaderUtils shader, float offset, float strength) {
         framebuffer.framebufferClear();
         framebuffer.bindFramebuffer(false);
         shader.init();
@@ -112,6 +113,7 @@ public class Bloom {
         shader.setUniformi("check", 0);
         shader.setUniformf("halfpixel", 1.0f / framebuffer.framebufferWidth, 1.0f / framebuffer.framebufferHeight);
         shader.setUniformf("iResolution", framebuffer.framebufferWidth, framebuffer.framebufferHeight);
+        shader.setUniformf("strength", strength);
         ShaderUtils.drawQuads();
         shader.unload();
     }

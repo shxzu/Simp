@@ -49,11 +49,12 @@ public class Blur extends Util {
         });
     }
 
-    private static void setupUniforms(float dirX, float dirY, float radius) {
+    private static void setupUniforms(float dirX, float dirY, float radius, float strength) {
         GAUSSIAN_BLUR_SHADER.setUniformi("textureIn", 0);
         GAUSSIAN_BLUR_SHADER.setUniformf("texelSize", 1.0f / mc.displayWidth, 1.0f / mc.displayHeight);
         GAUSSIAN_BLUR_SHADER.setUniformf("direction", dirX, dirY);
         GAUSSIAN_BLUR_SHADER.setUniformf("radius", radius);
+        GAUSSIAN_BLUR_SHADER.setUniformf("strength", strength);
 
         glUniform1fv(GAUSSIAN_BLUR_SHADER.getUniform("weights"), getGaussianWeights(radius));
     }
@@ -62,7 +63,7 @@ public class Blur extends Util {
         StencilUtils.initStencilToWrite();
     }
 
-    public static void endBlur(float radius, float compression) {
+    public static void endBlur(float radius, float compression, float strength) {
         if (radius <= 0.0f || compression <= 0.0f) {
             StencilUtils.uninitStencilBuffer();
             return;
@@ -73,20 +74,20 @@ public class Blur extends Util {
 
         framebuffer.framebufferClear();
         framebuffer.bindFramebuffer(false);
-        applyBlurPass(compression, 0.0f, radius, mc.getFramebuffer().framebufferTexture);
+        applyBlurPass(compression, 0.0f, radius, strength, mc.getFramebuffer().framebufferTexture);
         framebuffer.unbindFramebuffer();
 
         mc.getFramebuffer().bindFramebuffer(false);
-        applyBlurPass(0.0f, compression, radius, framebuffer.framebufferTexture);
+        applyBlurPass(0.0f, compression, radius, strength, framebuffer.framebufferTexture);
 
         StencilUtils.uninitStencilBuffer();
         RenderUtils.resetColor();
         GlStateManager.bindTexture(0);
     }
 
-    private static void applyBlurPass(float dirX, float dirY, float radius, int texture) {
+    private static void applyBlurPass(float dirX, float dirY, float radius, float strength, int texture) {
         GAUSSIAN_BLUR_SHADER.init();
-        setupUniforms(dirX, dirY, radius);
+        setupUniforms(dirX, dirY, radius, strength);
         GlStateManager.bindTexture(texture);
         ShaderUtils.drawQuads();
         GAUSSIAN_BLUR_SHADER.unload();

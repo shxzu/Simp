@@ -10,10 +10,13 @@ import cc.simp.utils.render.GlUtils;
 import cc.simp.utils.render.RenderUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
 import static cc.simp.utils.Util.mc;
@@ -53,47 +56,75 @@ public final class BreadCrumbsModule extends Module {
     };
 
     public void renderLine(final List<Vec3> path) {
-        GL11.glPushMatrix();
-        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 
-        RenderUtils.setAlphaLimit(0);
-        RenderUtils.resetColor();
-        GlUtils.setup2DRendering();
-        GlUtils.startBlend();
-
+        GlStateManager.disableDepth();
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
-        GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
-        GL11.glShadeModel(GL11.GL_SMOOTH);
-        GL11.glLineWidth(4);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        GL11.glBegin(GL11.GL_LINE_STRIP);
-        int count = 0;
-        int fadeOffset = path.size();
+        int i = 0;
+        try {
+            for (final Vec3 v : path) {
 
-        for (Vec3 v : path) {
-            int alpha = fadeOffset > 0 ? Math.min(255, (int) ((count / (float) fadeOffset) * 255)) : 255;
+                i++;
 
-            RenderUtils.color(ColorProcess.getColor().getRGB(), alpha / 255f);
+                boolean draw = true;
 
-            final double x = v.xCoord - mc.getRenderManager().renderPosX;
-            final double y = v.yCoord - mc.getRenderManager().renderPosY;
-            final double z = v.zCoord - mc.getRenderManager().renderPosZ;
+                final double x = v.xCoord - (mc.getRenderManager()).renderPosX;
+                final double y = v.yCoord - (mc.getRenderManager()).renderPosY;
+                final double z = v.zCoord - (mc.getRenderManager()).renderPosZ;
 
-            GL11.glVertex3d(x, y, z);
-            count++;
+                final double distanceFromPlayer = mc.thePlayer.getDistance(v.xCoord, v.yCoord - 1, v.zCoord);
+                int quality = (int) (distanceFromPlayer * 4 + 10);
+
+                if (quality > 350)
+                    quality = 350;
+
+                if (i % 10 != 0 && distanceFromPlayer > 25) {
+                    draw = false;
+                }
+
+                if (i % 3 == 0 && distanceFromPlayer > 15) {
+                    draw = false;
+                }
+
+                if (draw) {
+
+                    GL11.glPushMatrix();
+                    GL11.glTranslated(x, y, z);
+
+                    final float scale = 0.04f;
+                    GL11.glScalef(-scale, -scale, -scale);
+
+                    GL11.glRotated(-(mc.getRenderManager()).playerViewY, 0.0D, 1.0D, 0.0D);
+                    GL11.glRotated((mc.getRenderManager()).playerViewX, 1.0D, 0.0D, 0.0D);
+
+                    final Color c = ColorProcess.getColor();
+
+                    RenderUtils.drawFilledCircleNoGL(0, 0, 0.7, c.hashCode(), quality);
+
+                    if (distanceFromPlayer < 4)
+                        RenderUtils.drawFilledCircleNoGL(0, 0, 1.4, new Color(c.getRed(), c.getGreen(), c.getBlue(), 50).hashCode(), quality);
+
+                    if (distanceFromPlayer < 20)
+                        RenderUtils.drawFilledCircleNoGL(0, 0, 2.3, new Color(c.getRed(), c.getGreen(), c.getBlue(), 30).hashCode(), quality);
+
+                    GL11.glScalef(0.8f, 0.8f, 0.8f);
+
+                    GL11.glPopMatrix();
+
+                }
+
+            }
+        } catch (final ConcurrentModificationException ignored) {
         }
-        GL11.glEnd();
 
-        GL11.glShadeModel(GL11.GL_FLAT);
         GL11.glDisable(GL11.GL_LINE_SMOOTH);
-        GlUtils.endBlend();
-        GlUtils.end2DRendering();
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_BLEND);
+        GlStateManager.enableDepth();
 
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GlUtils.resetColor();
-        RenderUtils.resetColor();
-
-        GL11.glPopAttrib();
-        GL11.glPopMatrix();
+        GL11.glColor3d(255, 255, 255);
     }
 }

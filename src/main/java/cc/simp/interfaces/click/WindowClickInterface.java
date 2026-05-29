@@ -8,8 +8,9 @@ import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.impl.client.ClientSettingsModule;
+import cc.simp.utils.client.Logger;
 import cc.simp.processes.ColorProcess;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.utils.misc.GitHubConfigFetcher;
 import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.gui.GuiScreen;
@@ -28,14 +29,14 @@ import java.util.Map;
 
 public class WindowClickInterface extends GuiScreen {
 
-    private final CustomFontRenderer font = FontProcess.getFont("bold");
-    private final CustomFontRenderer titleFont = FontProcess.getFont("big");
+    private final CustomFontRenderer font = FontUtils.getFont("bold");
+    private final CustomFontRenderer titleFont = FontUtils.getFont("big");
 
     // Window properties
     private int windowX = 100;
     private int windowY = 100;
-    private int windowWidth = 480;
-    private int windowHeight = 300;
+    private final int windowWidth = 480;
+    private final int windowHeight = 300;
     private boolean dragging = false;
     private int dragX, dragY;
 
@@ -66,8 +67,9 @@ public class WindowClickInterface extends GuiScreen {
     private String editingBuffer = "";
 
     // Config state
-    private final List<ConfigItem> configList = new ArrayList<>();
-    private boolean configsLoading = true;
+    private volatile List<ConfigItem> configList = new ArrayList<>();
+    private volatile boolean configsLoading = true;
+    private boolean configLoadStarted = false;
 
     // Scrolling
     private float moduleScrollOffset = 0f;
@@ -85,24 +87,28 @@ public class WindowClickInterface extends GuiScreen {
         if (selectedModule == null) {
             List<Module> modules = Simp.INSTANCE.getModuleManager().getModulesForCategory(selectedCategory);
             if (!modules.isEmpty()) {
-                selectedModule = modules.get(0);
+                selectedModule = modules.getFirst();
             }
         }
 
-        // Load configs asynchronously
-        if (configList.isEmpty()) {
+        // Load configs asynchronously once.
+        if (!configLoadStarted) {
+            configLoadStarted = true;
+            configsLoading = true;
             new Thread(() -> {
                 try {
                     List<String> configs = GitHubConfigFetcher.fetchConfigList();
+                    List<ConfigItem> loadedConfigs = new ArrayList<>(configs.size());
                     for (String configName : configs) {
-                        configList.add(new ConfigItem(configName));
+                        loadedConfigs.add(new ConfigItem(configName));
                     }
+                    configList = loadedConfigs;
                     configsLoading = false;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Logger.chatError("Failed to load configs: " + e.getMessage());
                     configsLoading = false;
                 }
-            }).start();
+            }, "Simp-Config-Loader").start();
         }
     }
 
@@ -116,8 +122,8 @@ public class WindowClickInterface extends GuiScreen {
 
         // Update dragging
         if (dragging) {
-            windowX = mouseX - dragX;
-            windowY = mouseY - dragY;
+            windowX = clamp(mouseX - dragX, 0, Math.max(0, width - windowWidth));
+            windowY = clamp(mouseY - dragY, 0, Math.max(0, height - windowHeight));
         }
 
         // Update slider drag
@@ -219,7 +225,7 @@ public class WindowClickInterface extends GuiScreen {
         List<Module> modules = Simp.INSTANCE.getModuleManager().getModulesForCategory(selectedCategory);
         int totalHeight = modules.size() * MODULE_ITEM_HEIGHT;
         int maxScroll = Math.max(0, totalHeight - (height - CONTENT_PADDING * 2));
-        moduleTargetScroll = Math.max(0, Math.min(moduleTargetScroll, maxScroll));
+        moduleTargetScroll = clamp(moduleTargetScroll, 0f, maxScroll);
 
         RenderUtils.startScissor(x, y + CONTENT_PADDING, width, height - CONTENT_PADDING * 2);
 
@@ -264,7 +270,7 @@ public class WindowClickInterface extends GuiScreen {
 
         // Scrollbar
         if (totalHeight > height - CONTENT_PADDING * 2) {
-            drawScrollbar(x + width - 8, y + CONTENT_PADDING, 6, height - CONTENT_PADDING * 2, totalHeight, moduleScrollOffset);
+            drawScrollbar(x + width - 8, y + CONTENT_PADDING, height - CONTENT_PADDING * 2, totalHeight, moduleScrollOffset);
         }
     }
 
@@ -274,20 +280,20 @@ public class WindowClickInterface extends GuiScreen {
         if (configsLoading) {
             String loadingText = "Loading configs...";
             int textWidth = font.getStringWidth(loadingText);
-            font.drawString(loadingText, x + (width - textWidth) / 2, y + height / 2 - 5, SECONDARY_TEXT.getRGB());
+            font.drawString(loadingText, x + (width - textWidth) / 2.0f, y + height / 2.0f - 5, SECONDARY_TEXT.getRGB());
             return;
         }
 
         if (configList.isEmpty()) {
             String emptyText = "No configs available";
             int textWidth = font.getStringWidth(emptyText);
-            font.drawString(emptyText, x + (width - textWidth) / 2, y + height / 2 - 5, SECONDARY_TEXT.getRGB());
+            font.drawString(emptyText, x + (width - textWidth) / 2.0f, y + height / 2.0f - 5, SECONDARY_TEXT.getRGB());
             return;
         }
 
         int totalHeight = configList.size() * CONFIG_ITEM_HEIGHT;
         int maxScroll = Math.max(0, totalHeight - (height - CONTENT_PADDING * 2));
-        configTargetScroll = Math.max(0, Math.min(configTargetScroll, maxScroll));
+        configTargetScroll = clamp(configTargetScroll, 0f, maxScroll);
 
         RenderUtils.startScissor(x, y + CONTENT_PADDING, width, height - CONTENT_PADDING * 2);
 
@@ -320,7 +326,7 @@ public class WindowClickInterface extends GuiScreen {
 
             String buttonText = config.downloading ? "Loading..." : "Download";
             int textWidth = font.getStringWidth(buttonText);
-            font.drawString(buttonText, buttonX + (75 - textWidth) / 2, buttonY + 4, Color.WHITE.getRGB());
+            font.drawString(buttonText, buttonX + (75 - textWidth) / 2.0f, buttonY + 4, Color.WHITE.getRGB());
 
             configY += CONFIG_ITEM_HEIGHT;
         }
@@ -329,7 +335,7 @@ public class WindowClickInterface extends GuiScreen {
 
         // Scrollbar
         if (totalHeight > height - CONTENT_PADDING * 2) {
-            drawScrollbar(x + width - 8, y + CONTENT_PADDING, 6, height - CONTENT_PADDING * 2, totalHeight, configScrollOffset);
+            drawScrollbar(x + width - 8, y + CONTENT_PADDING, height - CONTENT_PADDING * 2, totalHeight, configScrollOffset);
         }
     }
 
@@ -339,7 +345,7 @@ public class WindowClickInterface extends GuiScreen {
         if (selectedModule == null) {
             String text = "Select a module";
             int textWidth = font.getStringWidth(text);
-            font.drawString(text, x + (width - textWidth) / 2, y + height / 2 - 5, SECONDARY_TEXT.getRGB());
+            font.drawString(text, x + (width - textWidth) / 2.0f, y + height / 2.0f - 5, SECONDARY_TEXT.getRGB());
             return;
         }
 
@@ -365,7 +371,7 @@ public class WindowClickInterface extends GuiScreen {
         }
 
         int maxScroll = Math.max(0, totalHeight - availableHeight);
-        settingTargetScroll = Math.max(0, Math.min(settingTargetScroll, maxScroll));
+        settingTargetScroll = clamp(settingTargetScroll, 0f, maxScroll);
 
         RenderUtils.startScissor(x, settingsY, width, availableHeight);
 
@@ -383,18 +389,20 @@ public class WindowClickInterface extends GuiScreen {
 
         // Scrollbar
         if (totalHeight > availableHeight) {
-            drawScrollbar(x + width - 8, settingsY, 6, availableHeight, totalHeight, settingScrollOffset);
+            drawScrollbar(x + width - 8, settingsY, availableHeight, totalHeight, settingScrollOffset);
         }
     }
 
-    private void drawScrollbar(int x, int y, int width, int height, int totalHeight, float scrollOffset) {
-        RenderUtils.drawRoundedRect(x, y, width, height, 3, new Color(30, 30, 30, 100));
+    private void drawScrollbar(int x, int y, int height, int totalHeight, float scrollOffset) {
+        int scrollbarWidth = 6;
+        RenderUtils.drawRoundedRect(x, y, scrollbarWidth, height, 3, new Color(30, 30, 30, 100));
 
-        float thumbSize = Math.max(20f, (float) height / totalHeight * height);
+        float trackHeight = Math.max(1, height);
+        float thumbSize = Math.max(20f, trackHeight / totalHeight * trackHeight);
         float maxScroll = Math.max(0, totalHeight - height);
         float thumbPos = maxScroll > 0 ? (scrollOffset / maxScroll) * (height - thumbSize) : 0f;
 
-        RenderUtils.drawRoundedRect(x + 1, y + thumbPos, width - 2, thumbSize, 2, ACCENT_COLOR);
+        RenderUtils.drawRoundedRect(x + 1, y + thumbPos, scrollbarWidth - 2, thumbSize, 2, ACCENT_COLOR);
     }
 
     private int getPropertyHeight(Property<?> property) {
@@ -414,17 +422,17 @@ public class WindowClickInterface extends GuiScreen {
         font.drawString(property.getLabel(), x, y + 2, TEXT_COLOR.getRGB());
 
         if (property.getType() == Boolean.class) {
-            drawBooleanProperty(property, x, y, width, mouseX, mouseY);
+            drawBooleanProperty(property, x, y, width);
         } else if (property instanceof NumberProperty) {
             drawNumberProperty((NumberProperty) property, component, x, y, width, mouseX, mouseY);
         } else if (property instanceof ModeProperty) {
             drawModeProperty((ModeProperty<?>) property, component, x, y, width, mouseX, mouseY);
         } else if (property.getType() == String.class) {
-            drawStringProperty(property, component, x, y, width, mouseX, mouseY);
+            drawStringProperty(property, component, x, y, width);
         }
     }
 
-    private void drawBooleanProperty(Property<?> property, int x, int y, int width, int mouseX, int mouseY) {
+    private void drawBooleanProperty(Property<?> property, int x, int y, int width) {
         boolean value = (Boolean) property.getValue();
         int switchWidth = 32;
         int switchHeight = 16;
@@ -454,7 +462,7 @@ public class WindowClickInterface extends GuiScreen {
 
         // Thumb
         int thumbSize = 12;
-        int thumbX = (int) (x + width * percent - thumbSize / 2);
+        int thumbX = (int) (x + width * percent - thumbSize / 2.0);
         boolean thumbHovered = mouseX >= thumbX && mouseX <= thumbX + thumbSize &&
                 mouseY >= sliderY - 3 && mouseY <= sliderY + sliderHeight + 3;
         Color thumbColor = draggingSlider == component || thumbHovered ? ACCENT_COLOR.brighter() : ACCENT_COLOR;
@@ -462,7 +470,6 @@ public class WindowClickInterface extends GuiScreen {
 
         component.componentX = x;
         component.componentWidth = width;
-        component.sliderY = sliderY;
     }
 
     private void drawModeProperty(ModeProperty<?> property, SettingComponent component, int x, int y, int width, int mouseX, int mouseY) {
@@ -494,7 +501,7 @@ public class WindowClickInterface extends GuiScreen {
         }
     }
 
-    private void drawStringProperty(Property<?> property, SettingComponent component, int x, int y, int width, int mouseX, int mouseY) {
+    private void drawStringProperty(Property<?> property, SettingComponent component, int x, int y, int width) {
         String displayValue;
         Color valueColor;
 
@@ -509,13 +516,12 @@ public class WindowClickInterface extends GuiScreen {
 
         int boxWidth = width - font.getStringWidth(property.getLabel()) - 8;
         int boxX = x + width - boxWidth;
-        int boxY = y;
 
         Color boxColor = editingString == component ? new Color(40, 40, 40) : new Color(35, 35, 35);
-        RenderUtils.drawRoundedRect(boxX, boxY, boxWidth, 18, 3, boxColor);
+        RenderUtils.drawRoundedRect(boxX, y, boxWidth, 18, 3, boxColor);
 
         int textWidth = font.getStringWidth(displayValue);
-        font.drawString(displayValue, boxX + (boxWidth - textWidth) / 2, boxY + 5, valueColor.getRGB());
+        font.drawString(displayValue, boxX + (boxWidth - textWidth) / 2.0f, y + 5, valueColor.getRGB());
     }
 
     private String formatNumber(double value) {
@@ -530,6 +536,8 @@ public class WindowClickInterface extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        clearTransientState();
+
         // Close button
         int closeX = windowX + windowWidth - 25;
         int closeY = windowY + 8;
@@ -554,13 +562,14 @@ public class WindowClickInterface extends GuiScreen {
                     mouseY >= sidebarY && mouseY <= sidebarY + 28) {
                 selectedCategory = category;
                 selectedModule = null;
+                listeningModule = null;
                 moduleTargetScroll = 0;
                 settingTargetScroll = 0;
                 configTargetScroll = 0;
                 if (selectedCategory != ModuleCategory.CONFIGS) {
                     List<Module> modules = Simp.INSTANCE.getModuleManager().getModulesForCategory(selectedCategory);
                     if (!modules.isEmpty()) {
-                        selectedModule = modules.get(0);
+                        selectedModule = modules.getFirst();
                     }
                 }
                 return;
@@ -575,7 +584,7 @@ public class WindowClickInterface extends GuiScreen {
             handleConfigClick(contentX, contentY, mouseX, mouseY, mouseButton);
         } else {
             handleModuleClick(contentX, contentY, mouseX, mouseY, mouseButton);
-            handleSettingsClick(mouseX, mouseY, mouseButton);
+            handleSettingsClick(mouseX, mouseY);
         }
     }
 
@@ -631,7 +640,7 @@ public class WindowClickInterface extends GuiScreen {
         }
     }
 
-    private void handleSettingsClick(int mouseX, int mouseY, int mouseButton) {
+    private void handleSettingsClick(int mouseX, int mouseY) {
         if (selectedModule == null) return;
 
         int contentX = windowX + SIDEBAR_WIDTH + 1;
@@ -658,8 +667,7 @@ public class WindowClickInterface extends GuiScreen {
                     property.setValueObj(!(Boolean) property.getValue());
                     return;
                 }
-            } else if (property instanceof NumberProperty) {
-                NumberProperty numProp = (NumberProperty) property;
+            } else if (property instanceof NumberProperty numProp) {
                 int sliderY = currentY + 20;
                 if (mouseX >= component.componentX && mouseX <= component.componentX + component.componentWidth &&
                         mouseY >= sliderY - 3 && mouseY <= sliderY + 9) {
@@ -667,8 +675,7 @@ public class WindowClickInterface extends GuiScreen {
                     updateSlider(numProp, component, mouseX);
                     return;
                 }
-            } else if (property instanceof ModeProperty) {
-                ModeProperty<?> modeProp = (ModeProperty<?>) property;
+            } else if (property instanceof ModeProperty<?> modeProp) {
                 if (component.dropdownOpen) {
                     int dropdownY = currentY + 22;
                     for (Object value : modeProp.getValues()) {
@@ -715,12 +722,10 @@ public class WindowClickInterface extends GuiScreen {
         int wheel = Mouse.getEventDWheel();
         if (wheel != 0) {
             int mouseX = Mouse.getEventX() * width / mc.displayWidth;
-            int mouseY = height - Mouse.getEventY() * height / mc.displayHeight - 1;
 
             int scrollAmount = wheel > 0 ? -20 : 20;
 
             int contentX = windowX + SIDEBAR_WIDTH + 1;
-            int contentY = windowY + HEADER_HEIGHT + 1;
 
             if (selectedCategory == ModuleCategory.CONFIGS) {
                 configTargetScroll += scrollAmount;
@@ -752,12 +757,15 @@ public class WindowClickInterface extends GuiScreen {
             } else if (isCtrlKeyDown()) {
                 if (keyCode == Keyboard.KEY_V) {
                     String clipboard = GuiScreen.getClipboardString();
-                    if (clipboard != null && !clipboard.isEmpty()) {
+                    if (!clipboard.isEmpty()) {
+                        StringBuilder builder = new StringBuilder(editingBuffer.length() + clipboard.length());
+                        builder.append(editingBuffer);
                         for (char c : clipboard.toCharArray()) {
                             if (ChatAllowedCharacters.isAllowedCharacter(c)) {
-                                editingBuffer += c;
+                                builder.append(c);
                             }
                         }
+                        editingBuffer = builder.toString();
                     }
                 } else if (keyCode == Keyboard.KEY_A) {
                     editingBuffer = "";
@@ -784,13 +792,38 @@ public class WindowClickInterface extends GuiScreen {
     }
 
     private void updateSlider(NumberProperty property, SettingComponent component, int mouseX) {
-        double percent = Math.max(0, Math.min(1, (mouseX - component.componentX) / (double) component.componentWidth));
+        if (component.componentWidth <= 0) {
+            return;
+        }
+
+        double percent = clamp((mouseX - component.componentX) / (double) component.componentWidth, 0.0, 1.0);
         double range = property.getMax() - property.getMin();
-        double rawValue = property.getMin() + range * percent;
+        double rawValue = range == 0 ? property.getMin() : property.getMin() + range * percent;
         double increment = property.getIncrement();
         if (increment > 0) rawValue = Math.round(rawValue / increment) * increment;
-        double finalValue = Math.max(property.getMin(), Math.min(property.getMax(), rawValue));
+        double finalValue = clamp(rawValue, property.getMin(), property.getMax());
         property.setValue(finalValue);
+    }
+
+    private void clearTransientState() {
+        dragging = false;
+        draggingSlider = null;
+        if (editingString != null) {
+            editingString = null;
+            editingBuffer = "";
+        }
+    }
+
+    private static float clamp(float value, float min, float max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    private static int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    private static double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
     }
 
     private static class SettingComponent {
@@ -798,21 +831,23 @@ public class WindowClickInterface extends GuiScreen {
         private boolean dropdownOpen = false;
         private int componentX = 0;
         private int componentWidth = 0;
-        private int sliderY = 0;
 
         public SettingComponent(Property<?> property) {
             this.property = property;
         }
 
         public void updateDrag(int mouseX) {
-            if (property instanceof NumberProperty) {
-                NumberProperty numProp = (NumberProperty) property;
-                double percent = Math.max(0, Math.min(1, (mouseX - componentX) / (double) componentWidth));
+            if (property instanceof NumberProperty numProp) {
+                if (componentWidth <= 0) {
+                    return;
+                }
+
+                double percent = clamp((mouseX - componentX) / (double) componentWidth, 0.0, 1.0);
                 double range = numProp.getMax() - numProp.getMin();
-                double rawValue = numProp.getMin() + range * percent;
+                double rawValue = range == 0 ? numProp.getMin() : numProp.getMin() + range * percent;
                 double increment = numProp.getIncrement();
                 if (increment > 0) rawValue = Math.round(rawValue / increment) * increment;
-                double finalValue = Math.max(numProp.getMin(), Math.min(numProp.getMax(), rawValue));
+                double finalValue = clamp(rawValue, numProp.getMin(), numProp.getMax());
                 numProp.setValue(finalValue);
             }
         }

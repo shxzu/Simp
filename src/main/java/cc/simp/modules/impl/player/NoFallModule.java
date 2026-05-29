@@ -32,7 +32,6 @@ public class NoFallModule extends Module {
         Vulcan,
         Clutch,
         Edit,
-        Edit2,
         Round
     }
 
@@ -50,14 +49,8 @@ public class NoFallModule extends Module {
             }
         }
         if (mode.getValue() == Mode.Edit) {
-            if (mc.thePlayer.fallDistance >= 3) {
-                e.setOnGround(false);
-            }
-        }
-        if (mode.getValue() == Mode.Edit2) {
-            if (mc.thePlayer.fallDistance >= 3) {
-                e.setOnGround(true);
-            }
+            e.setOnGround(false);
+            e.setPosY(e.getPosY() + Math.random() / 100000000000000000000f);
         }
         if (mode.getValue() == Mode.Round) {
             if (mc.thePlayer.fallDistance >= 3) {

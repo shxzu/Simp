@@ -1,6 +1,8 @@
 package cc.simp.modules.impl.combat;
 
 import cc.simp.Simp;
+import cc.simp.api.events.impl.player.AttackEvent;
+import cc.simp.api.events.impl.player.MotionEvent;
 import cc.simp.api.events.impl.player.MoveEvent;
 import cc.simp.api.properties.Property;
 import cc.simp.api.properties.impl.ModeProperty;
@@ -12,6 +14,7 @@ import cc.simp.utils.mc.PacketUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.util.MovingObjectPosition;
@@ -22,110 +25,74 @@ import static cc.simp.utils.Util.mc;
 public class WTapModule extends Module {
 
     public ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Legit);
-    public static final Property<Boolean> onlyWithKillaura = new Property<>("Only With Killaura", false);
-    public static final NumberProperty wtapChance = new NumberProperty("WTap Chance", 100, 0, 100, 1);
+    public static final NumberProperty chance = new NumberProperty("Chance", 100, 0, 100, 1);
 
     private enum Mode {
-        Legit,
-        Packet,
-        Silent
+        Legit ("Legit"),
+        Packet ("Packet");
+
+        public String name;
+
+        Mode(String name) {
+            this.name = name;
+        }
+
+        public String toString() {
+            return name;
+        }
     }
 
-    private boolean shouldWTap;
-    private int wtapTicks;
-    private boolean hasAttacked;
-    private boolean wasPressingForward;
+    private boolean unsprint, wTap;
+    private EntityLivingBase target;
 
     @EventLink
-    public Listener<MoveEvent> moveEventListener = event -> {
-        if (mc.thePlayer == null || mc.theWorld == null) return;
+    public Listener<AttackEvent> attackEventListener = event -> {
 
-        setSuffix(mode.getValue().toString());
-
-        if (mode.getValue() == Mode.Legit) {
-            if (shouldWTap && wtapTicks > 0) {
-                if (wtapTicks == 2) {
-                    wasPressingForward = mc.gameSettings.keyBindForward.isKeyDown();
-                    mc.gameSettings.keyBindForward.setPressed(false);
-                } else if (wtapTicks == 1) {
-                    mc.gameSettings.keyBindForward.setPressed(wasPressingForward);
-                    shouldWTap = false;
-                }
-                wtapTicks--;
-            }
-        }
+        if (event.target == null) return;
 
         if (mode.getValue() == Mode.Packet) {
-            if (shouldWTap && wtapTicks > 0) {
-                if (wtapTicks == 2) {
-                    PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
-                } else if (wtapTicks == 1) {
-                    PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
-                    shouldWTap = false;
-                }
-                wtapTicks--;
-            }
+            target = event.target;
         }
+        if (mode.getValue() == Mode.Legit) {
+            wTap = Math.random() * 100 < chance.getValue() && event.target.hurtTime >= 6;
 
-        if (mode.getValue() == Mode.Silent) {
-            if (shouldWTap && wtapTicks > 0) {
-                if (wtapTicks == 2) {
-                    mc.thePlayer.setSprinting(false);
-                } else if (wtapTicks == 1) {
-                    mc.getNetHandler().addToSendQueue(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
-                    mc.thePlayer.serverSprintState = true;
-                    mc.thePlayer.setSprinting(true);
-                    shouldWTap = false;
-                }
-                wtapTicks--;
+            if (!wTap || unsprint) return;
+
+            if (mc.thePlayer.isSprinting() || mc.gameSettings.keyBindSprint.isKeyDown()) {
+                mc.gameSettings.keyBindSprint.setPressed(true);
+                unsprint = true;
             }
-        }
-
-        // Only trigger WTap once per attack
-        if (mc.thePlayer.isSwingInProgress && !hasAttacked && mc.objectMouseOver != null &&
-                mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-
-            Entity target = mc.objectMouseOver.entityHit;
-
-            if (target instanceof EntityPlayer) {
-                int chance = Math.max(0, Math.min(100, wtapChance.getValue().intValue()));
-                if (mc.theWorld.rand.nextInt(100) < chance) {
-                    if (!onlyWithKillaura.getValue() || isKillauraActive()) {
-                        triggerWTap();
-                        hasAttacked = true;
-                    }
-                }
-            }
-        } else if (!mc.thePlayer.isSwingInProgress) {
-            hasAttacked = false;
         }
     };
 
-    private void triggerWTap() {
-        shouldWTap = true;
-        wtapTicks = 2;
-    }
+    @EventLink
+    public Listener<MotionEvent> motionEventListener = event -> {
+        if (!event.isPre()) return;
+        if (mode.getValue() == Mode.Legit) {
+            if (!wTap) return;
 
-    private boolean isKillauraActive() {
-        Module killAura = Simp.INSTANCE.getModuleManager().getModule(KillAuraModule.class);
-        return killAura != null && killAura.isEnabled();
-    }
+            if (unsprint && Math.random() * 100 < chance.getValue()) {
+                mc.gameSettings.keyBindSprint.setPressed(false);
+                unsprint = false;
+            }
+        }
+        if (mode.getValue() == Mode.Packet) {
+            if (target != null && target.hurtTime == 9) {
+                if (Math.random() * 100 < chance.getValue()) {
+                    PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
+                }
+            }
+        }
+    };
 
     @Override
     public void onEnable() {
-        shouldWTap = false;
-        wtapTicks = 0;
-        hasAttacked = false;
-        wasPressingForward = false;
+
         super.onEnable();
     }
 
     @Override
     public void onDisable() {
-        shouldWTap = false;
-        wtapTicks = 0;
-        hasAttacked = false;
-        wasPressingForward = false;
         super.onDisable();
     }
 }

@@ -3,9 +3,9 @@ package cc.simp.interfaces.menu.alt;
 
 import cc.simp.api.font.CustomFontRenderer;
 import cc.simp.interfaces.menu.alt.microsoft.MicrosoftOAuthTranslation;
-import cc.simp.processes.BgProcess;
+import cc.simp.utils.client.BgUtils;
 import cc.simp.processes.ColorProcess;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.utils.render.GlUtils;
 import cc.simp.utils.render.RenderUtils;
 import net.minecraft.client.Minecraft;
@@ -76,10 +76,10 @@ public class AltManagerGui extends GuiScreen {
 
     public AltManagerGui() {
         startTime = System.currentTimeMillis();
-        titleFont = FontProcess.getFont("semi-big");
-        buttonFont = FontProcess.getFont("simp");
-        altFont = FontProcess.getFont("simp");
-        infoFont = FontProcess.getFont("small");
+        titleFont = FontUtils.getFont("semi-big");
+        buttonFont = FontUtils.getFont("simp");
+        altFont = FontUtils.getFont("simp");
+        infoFont = FontUtils.getFont("small");
     }
 
     @Override
@@ -180,7 +180,7 @@ public class AltManagerGui extends GuiScreen {
         password.setWidth(LOGIN_WIDTH - PADDING * 2);
         password.setHeight(textFeildHeight);
 
-        RenderUtils.drawImage(BgProcess.getInstance().getCurrentBackground(), 0, 0, this.width, this.height);
+        RenderUtils.drawImage(BgUtils.getInstance().getCurrentBackground(), 0, 0, this.width, this.height);
         Gui.drawRect(0, 0, this.width, this.height, new Color(0, 0, 0, 130).getRGB());
 
         // Draw current user box

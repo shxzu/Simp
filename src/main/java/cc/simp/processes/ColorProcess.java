@@ -47,20 +47,44 @@ public class ColorProcess {
                 color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
             }
             case Red -> {
+                first = new Color(255, 57, 57);
+                second = new Color(168, 14, 14);
+                colors = Pair.of(first, second);
+                color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
+            }
+            case Ruby -> {
                 first = new Color(255, 0, 0);
                 second = new Color(100, 0, 0);
                 colors = Pair.of(first, second);
                 color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
             }
-            case Purple -> {
+            case DarkPurple -> {
                 first = new Color(100, 0, 180);
                 second = new Color(50, 0, 130);
+                colors = Pair.of(first, second);
+                color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
+            }
+            case Purple -> {
+                first = new Color(199, 139, 255);
+                second = new Color(132, 26, 236);
+                colors = Pair.of(first, second);
+                color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
+            }
+            case Lavender -> {
+                first = new Color(194, 156, 255);
+                second = new Color(131, 101, 182);
                 colors = Pair.of(first, second);
                 color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
             }
             case Pink -> {
                 first = new Color(255, 90, 255);
                 second = new Color(255, 205, 255);
+                colors = Pair.of(first, second);
+                color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
+            }
+            case HotPink -> {
+                first = new Color(255, 0, 255);
+                second = new Color(154, 51, 154);
                 colors = Pair.of(first, second);
                 color = RenderUtils.interpolateColorsBackAndForth(15, 75, colors.getFirst(), colors.getSecond(), false);
             }

@@ -15,6 +15,18 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+import com.viaversion.viabackwards.protocol.v1_20_3to1_20_2.Protocol1_20_3To1_20_2;
+import com.viaversion.viabackwards.protocol.v1_21_2to1_21.Protocol1_21_2To1_21;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
+import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
+import de.florianmichael.vialoadingbase.ViaLoadingBase;
+import de.florianmichael.viamcp.ViaMCP;
 import de.florianmichael.viamcp.fixes.AttackOrder;
 import lombok.Getter;
 import lombok.Setter;
@@ -61,6 +73,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.item.*;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.init.Items;
@@ -1488,6 +1501,38 @@ public class Minecraft implements IThreadListener {
             }
         } else if (this.myNetworkManager != null) {
             this.myNetworkManager.processReceivedPackets();
+            if (ViaLoadingBase.getInstance().getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_21_2)) {
+                UserConnection connection = Via.getManager().getConnectionManager().getConnections().iterator().next();
+                PacketWrapper packet = PacketWrapper.create(ServerboundPackets1_21_2.CLIENT_TICK_END, null, connection);
+                packet.sendToServer(Protocol1_21_2To1_21.class);
+            }
+
+            PacketWrapperImpl packet = null;
+            PacketWrapperImpl packetInfo = null;
+            int modelParts = 0;
+            // Hypixel only allow 1.21.4+ client to login.
+            if (ViaLoadingBase.getInstance().getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_21_4)) {
+                packet = (PacketWrapperImpl) PacketWrapper.create(ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD, ViaMCP.INSTANCE.user);
+                packet.write(Types.STRING, "minecraft:brand");
+                packet.write(Types.STRING, "vanilla");
+                packet.sendToServer(Protocol1_20_3To1_20_2.class);
+
+                packetInfo = (PacketWrapperImpl) PacketWrapper.create(ServerboundConfigurationPackets1_20_2.CLIENT_INFORMATION, ViaMCP.INSTANCE.user);
+                packetInfo.write(Types.STRING, Minecraft.getMinecraft().gameSettings.language.toLowerCase());
+                packetInfo.write(Types.BYTE, (byte) Minecraft.getMinecraft().gameSettings.renderDistanceChunks);
+                packetInfo.write(Types.VAR_INT, Minecraft.getMinecraft().gameSettings.chatVisibility.ordinal());
+                packetInfo.write(Types.BOOLEAN, Minecraft.getMinecraft().gameSettings.chatColours);
+
+                for (EnumPlayerModelParts parts : Minecraft.getMinecraft().gameSettings.getModelParts()) {
+                    modelParts |= parts.getPartMask();
+                }
+
+                packetInfo.write(Types.UNSIGNED_BYTE, (short) modelParts);
+                packetInfo.write(Types.VAR_INT, 1);
+                packetInfo.write(Types.BOOLEAN, true);
+                packetInfo.write(Types.BOOLEAN, true);
+                packetInfo.sendToServer(Protocol1_20_3To1_20_2.class);
+            }
         }
 
         this.systemTime = getSystemTime();

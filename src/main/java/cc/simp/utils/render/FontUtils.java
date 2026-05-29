@@ -1,4 +1,4 @@
-package cc.simp.processes;
+package cc.simp.utils.render;
 
 import cc.simp.api.font.CustomFontRenderer;
 
@@ -6,7 +6,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FontProcess {
+public class FontUtils {
     private static final Map<String, CustomFontRenderer> fontRegistry = new HashMap<>();
     private static final Map<String, CustomFontRenderer> scaledFontCache = new HashMap<>();
     private static String currentFont = "simp";

@@ -3,6 +3,7 @@ package cc.simp.modules.impl.movement;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.player.*;
 import cc.simp.api.properties.impl.ModeProperty;
+import cc.simp.api.properties.impl.NumberProperty;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
@@ -24,20 +25,21 @@ import static cc.simp.utils.Util.mc;
 @ModuleInfo(label = "Speed", category = ModuleCategory.MOVEMENT)
 public final class SpeedModule extends Module {
 
-    private static final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.LegitRotate);
+    private static final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Legit);
+    private static final NumberProperty vanillaSpeed = new NumberProperty("Vanilla Speed", 1, () -> mode.getValue() == Mode.Vanilla, 0.1, 9.5, 0.1);
 
     private enum Mode {
+        Vanilla("Vanilla"),
         Legit("Legit"),
-        LegitRotate("Legit Rotate"),
-        LegitTimerExploit("Legit Timer Exploit"),
+        LegitExploit("Legit Exploit"),
         VerusGround("Verus Ground"),
         VerusLowHop("Verus Low Hop"),
         UpdatedNCP("Updated NCP"),
         NCP("NCP"),
         Strafe("Strafe"),
-        GroundStrafe("Ground Strafe"),
+        OldHypixel("Old Hypixel"),
         Intave("Intave"),
-        CollisionExploit("Collision Exploit");
+        OldGrim("Old Grim");
 
         public String name;
 
@@ -54,7 +56,7 @@ public final class SpeedModule extends Module {
     @EventLink
     public final Listener<MotionEvent> motionEventListener = e -> {
         setSuffix(mode.getValue().toString());
-        if (mc.gameSettings.keyBindJump.isKeyDown() && mode.getValue() != Mode.Legit && mode.getValue() != Mode.LegitRotate && mode.getValue() != Mode.LegitTimerExploit && mode.getValue() != Mode.CollisionExploit)
+        if (mc.gameSettings.keyBindJump.isKeyDown() && mode.getValue() != Mode.Legit && mode.getValue() != Mode.LegitExploit && mode.getValue() != Mode.OldGrim)
             mc.gameSettings.keyBindJump.setPressed(false);
         if (!e.isPre()) return;
         switch (mode.getValue()) {
@@ -77,6 +79,14 @@ public final class SpeedModule extends Module {
                     mc.thePlayer.motionY = -0.1f;
                 }
                 break;
+            case Vanilla:
+                if (MovementUtils.isMoving()) {
+                    MovementUtils.setSpeed(vanillaSpeed.getValue().floatValue());
+                    if (MovementUtils.isOnGround()) {
+                        mc.thePlayer.jump();
+                    }
+                }
+                break;
             case VerusLowHop:
                 PacketUtils.sendSilentPacket(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 255, new ItemStack(Items.water_bucket), 0, 0.5f, 0));
                 if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
@@ -95,7 +105,7 @@ public final class SpeedModule extends Module {
                     }
                 }
                 break;
-            case GroundStrafe:
+            case OldHypixel:
                 if (MovementUtils.isMoving()) {
                     if (MovementUtils.isOnGround()) {
                         mc.thePlayer.jump();
@@ -119,11 +129,10 @@ public final class SpeedModule extends Module {
                 }
                 break;
             case Legit:
-            case LegitRotate:
-            case CollisionExploit:
+            case OldGrim:
                 mc.gameSettings.keyBindJump.setPressed(MovementUtils.isMoving() && MovementUtils.isOnGround());
                 break;
-            case LegitTimerExploit:
+            case LegitExploit:
                 mc.gameSettings.keyBindJump.setPressed(MovementUtils.isMoving() && MovementUtils.isOnGround());
                 mc.timer.timerSpeed = 1.0075f;
                 break;
@@ -207,14 +216,14 @@ public final class SpeedModule extends Module {
 
     @EventLink
     public final Listener<PreUpdateEvent> preUpdateEventListener = e -> {
-        if (!MovementUtils.isOnGround() && mode.getValue() == Mode.LegitRotate) {
+        if (!MovementUtils.isOnGround() && mode.getValue() == Mode.LegitExploit) {
             RotationProcess.setRotations(new Vector2f(mc.thePlayer.rotationYaw + 45, mc.thePlayer.rotationPitch), 10, MovementFix.NORMAL);
         }
     };
 
     @EventLink(value = Priorities.VERY_HIGH)
     public final Listener<StrafeEvent> strafe = event -> {
-        if (mode.getValue() == Mode.CollisionExploit) {
+        if (mode.getValue() == Mode.OldGrim) {
             mc.theWorld.playerEntities.stream()
                     .filter(entityPlayer -> entityPlayer != mc.thePlayer &&
                             mc.thePlayer.getEntityBoundingBox().expand(1, 1, 1)
@@ -231,11 +240,9 @@ public final class SpeedModule extends Module {
         }
         if (mode.getValue() == Mode.Legit && mc.gameSettings.keyBindJump.isPressed())
             mc.gameSettings.keyBindJump.setPressed(false);
-        if (mode.getValue() == Mode.LegitRotate && mc.gameSettings.keyBindJump.isPressed())
+        if (mode.getValue() == Mode.LegitExploit && mc.gameSettings.keyBindJump.isPressed())
             mc.gameSettings.keyBindJump.setPressed(false);
-        if (mode.getValue() == Mode.LegitTimerExploit && mc.gameSettings.keyBindJump.isPressed())
-            mc.gameSettings.keyBindJump.setPressed(false);
-        if (mode.getValue() == Mode.CollisionExploit && mc.gameSettings.keyBindJump.isPressed())
+        if (mode.getValue() == Mode.OldGrim && mc.gameSettings.keyBindJump.isPressed())
             mc.gameSettings.keyBindJump.setPressed(false);
     }
 }

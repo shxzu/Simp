@@ -19,7 +19,7 @@ import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.modules.impl.movement.SpeedModule;
 import cc.simp.processes.ColorProcess;
-import cc.simp.processes.FontProcess;
+import cc.simp.utils.render.FontUtils;
 import cc.simp.processes.RotationProcess;
 import cc.simp.utils.client.EnumFacingOffset;
 import cc.simp.utils.client.Logger;
@@ -332,9 +332,9 @@ public final class ScaffoldModule extends Module {
             GL11.glDisable(3553);
             GlStateManager.disableCull();
             GL11.glDepthMask(false);
-            final float red = ColorProcess.getColor().getRed();
-            final float green = ColorProcess.getColor().getGreen();
-            final float blue = ColorProcess.getColor().getBlue();
+            final float red = ColorProcess.getColor().getRed() / 255f;
+            final float green = ColorProcess.getColor().getGreen() / 255f;
+            final float blue = ColorProcess.getColor().getBlue() / 255f;
             float lineWidth = 0.0f;
             if (this.blockFace != null) {
                 if (mc.thePlayer.getDistance(this.blockFace.getX(), this.blockFace.getY(), this.blockFace.getZ()) > 1.0) {
@@ -409,7 +409,7 @@ public final class ScaffoldModule extends Module {
                 float blockWH = mc.thePlayer.inventory.getCurrentItem() != null ? 15 : -2;
                 int spacing = 3;
                 String text = "§l" + blockCount + "§r block" + (blockCount != 1 ? "s" : "");
-                float textWidth = FontProcess.getFont("bold").getStringWidth(text);
+                float textWidth = FontUtils.getFont("bold").getStringWidth(text);
 
                 float totalWidth = ((textWidth + blockWH + spacing) + 6) * output;
                 x = sr.getScaledWidth() / 2f - (totalWidth / 2f);
@@ -419,7 +419,7 @@ public final class ScaffoldModule extends Module {
 
                 RenderUtils.drawRoundedRect(x, y, totalWidth, height, 5, new Color(ColorProcess.getColor().darker().getRed(), ColorProcess.getColor().darker().getGreen(), ColorProcess.getColor().darker().getBlue(), 130));
 
-                FontProcess.getFont("bold").drawString(text, x + 3 + blockWH + spacing, y + height / 2f - FontProcess.getFont("bold").getHeight() / 2f + .5f, -1);
+                FontUtils.getFont("bold").drawString(text, x + 3 + blockWH + spacing, y + height / 2f - FontUtils.getFont("bold").getHeight() / 2f + .5f, -1);
                 RenderHelper.enableGUIStandardItemLighting();
                 mc.getRenderItem().renderItemAndEffectIntoGUI(mc.thePlayer.inventory.getCurrentItem(), (int) x + 3, (int) (y + 10 - (blockWH / 2)));
                 RenderHelper.disableStandardItemLighting();
@@ -565,15 +565,15 @@ public final class ScaffoldModule extends Module {
                 if (recursion == 0) {
                     mc.entityRenderer.getMouseOver(1);
                     if (mc.thePlayer.onGround && MovementUtils.isMoving() && !mc.gameSettings.keyBindJump.isKeyDown()) {
-                        rotSpeed = 5f;
+                        rotSpeed = 10f;
                         this.targetYaw = mc.thePlayer.rotationYaw;
                         canPlace = false;
                     } else {
                         if (canPlace && !mc.gameSettings.keyBindPickBlock.isKeyDown()) {
                             if (mc.objectMouseOver.sideHit != enumFacing.getEnumFacing() || !mc.objectMouseOver.getBlockPos().equals(blockFace)) {
-                                rotSpeed = 0.8f;
+                                rotSpeed = 0.9f;
                                 if (diagonal) {
-                                    rotSpeed = 0.9f;
+                                    rotSpeed = 1.0f;
                                 }
                                 getBaseRotations();
                                 canPlace = true;

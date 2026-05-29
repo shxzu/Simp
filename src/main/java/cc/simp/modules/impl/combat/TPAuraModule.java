@@ -134,7 +134,7 @@ public final class TPAuraModule extends Module {
     private void attack(Entity target) {
         mc.playerController.syncCurrentPlayItem();
 
-        final AttackEvent event = new AttackEvent(target);
+        final AttackEvent event = new AttackEvent((EntityLivingBase) target);
         Simp.INSTANCE.getEventBus().post(event);
 
         if (event.isCancelled()) {

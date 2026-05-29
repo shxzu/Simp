@@ -7,7 +7,12 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.mojang.authlib.GameProfile;
+import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import io.netty.buffer.Unpooled;
 import java.io.File;
@@ -644,6 +649,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         }
 
         entityplayer.setPositionAndRotation(d0, d1, d2, f, f1);
+
         this.netManager.sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(
                 d0,
                 d1,
@@ -971,6 +977,9 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         this.gameController.thePlayer.motionX += packetIn.func_149149_c();
         this.gameController.thePlayer.motionY += packetIn.func_149144_d();
         this.gameController.thePlayer.motionZ += packetIn.func_149147_e();
+        if (packetIn.func_149149_c() != 0 && packetIn.func_149144_d() != 0 && packetIn.func_149147_e() != 0) {
+            this.gameController.thePlayer.ticksSinceVelocity = 0;
+        }
     }
 
     public void handleOpenWindow(S2DPacketOpenWindow packetIn)

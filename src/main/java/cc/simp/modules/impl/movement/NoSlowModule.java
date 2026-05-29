@@ -136,37 +136,29 @@ public final class NoSlowModule extends Module {
             case Switch:
                 if (food.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemFood) {
                     e.setCancelled();
-                    if (!BadPacketsProcess.bad(false, true, true, false, false)) {
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-                    }
                 }
                 if (potion.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemPotion) {
                     e.setCancelled();
-                    if (!BadPacketsProcess.bad(false, true, true, false, false)) {
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-                    }
                 }
                 if (sword.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
                     e.setCancelled();
-                    if (!BadPacketsProcess.bad(false, true, true, false, false)) {
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-                    }
                 }
                 if (bow.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemBow) {
                     e.setCancelled();
-                    if (!BadPacketsProcess.bad(false, true, true, false, false)) {
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-                    }
                 }
                 break;
             case UpdatedNCP:
                 if (food.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemFood) {
                     e.setCancelled();
-                    if (this.disable > 10 && !BadPacketsProcess.bad(false, true, true, false, false)) {
+                    if (this.disable > 10) {
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                         PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
@@ -174,7 +166,7 @@ public final class NoSlowModule extends Module {
                 }
                 if (potion.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemPotion) {
                     e.setCancelled();
-                    if (this.disable > 10 && !BadPacketsProcess.bad(false, true, true, false, false)) {
+                    if (this.disable > 10) {
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                         PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
@@ -182,7 +174,7 @@ public final class NoSlowModule extends Module {
                 }
                 if (sword.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
                     e.setCancelled();
-                    if (this.disable > 10 && !BadPacketsProcess.bad(false, true, true, false, false)) {
+                    if (this.disable > 10) {
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                         PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
@@ -190,7 +182,7 @@ public final class NoSlowModule extends Module {
                 }
                 if (bow.getValue() && mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemBow) {
                     e.setCancelled();
-                    if (this.disable > 10 && !BadPacketsProcess.bad(false, true, true, false, false)) {
+                    if (this.disable > 10) {
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
                         PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                         PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));

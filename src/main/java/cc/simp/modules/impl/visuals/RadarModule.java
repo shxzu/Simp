@@ -7,12 +7,10 @@ import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.ColorProcess;
-import cc.simp.processes.DraggingProcess;
-import cc.simp.utils.render.RenderUtils;
+import cc.simp.utils.render.DragUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,9 +40,9 @@ public class RadarModule extends Module {
     };
 
     private void initializePosition(ScaledResolution sr) {
-        if (!positionInitialized && !DraggingProcess.components.containsKey("Radar")) {
-            DraggingProcess.components.put("Radar",
-                    new DraggingProcess.DraggableComponent(
+        if (!positionInitialized && !DragUtils.components.containsKey("Radar")) {
+            DragUtils.components.put("Radar",
+                    new DragUtils.DraggableComponent(
                             125,
                             sr.getScaledHeight() / 2.0 - DEFAULT_SIZE / 2.0
                     )
@@ -57,7 +55,7 @@ public class RadarModule extends Module {
         ScaledResolution sr = new ScaledResolution(mc);
         initializePosition(sr);
 
-        DraggingProcess.DraggableComponent draggableComponent = DraggingProcess.components.get("Radar");
+        DragUtils.DraggableComponent draggableComponent = DragUtils.components.get("Radar");
 
         int radarSize = size.getValue().intValue();
         draggableComponent.setWidth(radarSize);
