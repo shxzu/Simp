@@ -589,6 +589,10 @@ public class WorldRenderer
         }
     }
 
+    public WorldRenderer pos(double x, double y) {
+        return this.pos(x, y, 0.0);
+    }
+
     public WorldRenderer pos(double x, double y, double z)
     {
         if (Config.isShaders())

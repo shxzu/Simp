@@ -44,4 +44,12 @@ public class MathUtils extends Util {
         double output = 1.0 / Math.sqrt(2.0 * PI * (sigma * sigma));
         return (float) (output * Math.exp(-(x * x) / (2.0 * (sigma * sigma))));
     }
+
+    public static double lerp(double pct, double start, double end) {
+        return start + pct * (end - start);
+    }
+
+    public static float lerp(float min, float max, float delta) {
+        return min + (max - min) * delta;
+    }
 }

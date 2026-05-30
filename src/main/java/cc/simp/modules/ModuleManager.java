@@ -132,6 +132,7 @@ public final class ModuleManager {
                 new StorageESPModule(),
                 new ChinaHatModule(),
                 new HaloModule(),
+                new FireFliesModule(),
                 new BreadCrumbsModule(),
                 new TrajectoriesModule(),
                 new FullBrightModule(),

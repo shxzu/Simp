@@ -158,6 +158,15 @@ public class RenderUtils extends Util {
         GL11.glEnd();
     }
 
+
+    public static int darker(int color, float factor) {
+        int r = (int) ((color >> 16 & 0xFF) * factor);
+        int g = (int) ((color >> 8 & 0xFF) * factor);
+        int b = (int) ((color & 0xFF) * factor);
+        int a = color >> 24 & 0xFF;
+        return (r & 0xFF) << 16 | (g & 0xFF) << 8 | b & 0xFF | (a & 0xFF) << 24;
+    }
+
     public enum ArrowDirection {
         UP, DOWN, LEFT, RIGHT
     }
@@ -500,6 +509,11 @@ public class RenderUtils extends Util {
     public static Color applyOpacity(Color color, float opacity) {
         opacity = Math.min(1, Math.max(0, opacity));
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (color.getAlpha() * opacity));
+    }
+
+    public static int applyOpacity(int color, float opacity) {
+        Color old = new Color(color);
+        return applyOpacity(old, opacity).getRGB();
     }
 
     public static Color interpolateColorC(Color color1, Color color2, float amount) {
