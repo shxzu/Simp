@@ -16,7 +16,10 @@ public final class CapesModule extends Module {
         Simp,
         Rise,
         Gato,
-        MineCon,
+        Minecon,
+        Kitty,
+        Blonde,
+        Epstien,
         OMG
     }
 
