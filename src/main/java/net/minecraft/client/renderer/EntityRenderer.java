@@ -3,6 +3,7 @@ package net.minecraft.client.renderer;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.MouseOverEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
+import cc.simp.modules.impl.visuals.AspectRatioModule;
 import cc.simp.modules.impl.visuals.CameraModule;
 import cc.simp.modules.impl.visuals.FreeLookModule;
 import cc.simp.utils.client.ViaMCPFixes;
@@ -805,7 +806,8 @@ public class EntityRenderer implements IResourceManagerReloadListener
             GlStateManager.scale(this.cameraZoom, this.cameraZoom, 1.0D);
         }
 
-        Project.gluPerspective(this.getFOVModifier(partialTicks, true), (float)this.mc.displayWidth / (float)this.mc.displayHeight, 0.05F, this.clipDistance);
+        float aspect = Simp.INSTANCE.getModuleManager().getModule(AspectRatioModule.class).isEnabled() ? AspectRatioModule.aspect.getValue().floatValue() :(float)this.mc.displayWidth / (float)this.mc.displayHeight;
+        Project.gluPerspective(this.getFOVModifier(partialTicks, true), aspect, 0.05F, this.clipDistance);
         GlStateManager.matrixMode(5888);
         GlStateManager.loadIdentity();
 
@@ -890,7 +892,8 @@ public class EntityRenderer implements IResourceManagerReloadListener
                 Shaders.applyHandDepth();
             }
 
-            Project.gluPerspective(this.getFOVModifier(p_renderHand_1_, false), (float)this.mc.displayWidth / (float)this.mc.displayHeight, 0.05F, this.farPlaneDistance * 2.0F);
+            float aspect = Simp.INSTANCE.getModuleManager().getModule(AspectRatioModule.class).isEnabled() ? AspectRatioModule.aspect.getValue().floatValue() :(float)this.mc.displayWidth / (float)this.mc.displayHeight;
+            Project.gluPerspective(this.getFOVModifier(p_renderHand_1_, false), aspect, 0.05F, this.farPlaneDistance * 2.0F);
             GlStateManager.matrixMode(5888);
             GlStateManager.loadIdentity();
 
@@ -1488,7 +1491,8 @@ public class EntityRenderer implements IResourceManagerReloadListener
             this.setupFog(-1, partialTicks);
             GlStateManager.matrixMode(5889);
             GlStateManager.loadIdentity();
-            Project.gluPerspective(this.getFOVModifier(partialTicks, true), (float)this.mc.displayWidth / (float)this.mc.displayHeight, 0.05F, this.clipDistance);
+            float aspect = Simp.INSTANCE.getModuleManager().getModule(AspectRatioModule.class).isEnabled() ? AspectRatioModule.aspect.getValue().floatValue() :(float)this.mc.displayWidth / (float)this.mc.displayHeight;
+            Project.gluPerspective(this.getFOVModifier(partialTicks, true), aspect ,0.05F, this.clipDistance);
             GlStateManager.matrixMode(5888);
 
             if (flag)
@@ -1505,7 +1509,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
 
             GlStateManager.matrixMode(5889);
             GlStateManager.loadIdentity();
-            Project.gluPerspective(this.getFOVModifier(partialTicks, true), (float)this.mc.displayWidth / (float)this.mc.displayHeight, 0.05F, this.clipDistance);
+            Project.gluPerspective(this.getFOVModifier(partialTicks, true), aspect, 0.05F, this.clipDistance);
             GlStateManager.matrixMode(5888);
         }
         else
@@ -1765,9 +1769,10 @@ public class EntityRenderer implements IResourceManagerReloadListener
     {
         if (this.mc.gameSettings.renderDistanceChunks >= 4 && !Config.isCloudsOff() && Shaders.shouldRenderClouds(this.mc.gameSettings))
         {
+            float aspect = Simp.INSTANCE.getModuleManager().getModule(AspectRatioModule.class).isEnabled() ? AspectRatioModule.aspect.getValue().floatValue() :(float)this.mc.displayWidth / (float)this.mc.displayHeight;
             GlStateManager.matrixMode(5889);
             GlStateManager.loadIdentity();
-            Project.gluPerspective(this.getFOVModifier(partialTicks, true), (float)this.mc.displayWidth / (float)this.mc.displayHeight, 0.05F, this.clipDistance * 4.0F);
+            Project.gluPerspective(this.getFOVModifier(partialTicks, true), aspect, 0.05F, this.clipDistance * 4.0F);
             GlStateManager.matrixMode(5888);
             GlStateManager.pushMatrix();
             this.setupFog(0, partialTicks);
@@ -1776,7 +1781,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
             GlStateManager.popMatrix();
             GlStateManager.matrixMode(5889);
             GlStateManager.loadIdentity();
-            Project.gluPerspective(this.getFOVModifier(partialTicks, true), (float)this.mc.displayWidth / (float)this.mc.displayHeight, 0.05F, this.clipDistance);
+            Project.gluPerspective(this.getFOVModifier(partialTicks, true), aspect, 0.05F, this.clipDistance);
             GlStateManager.matrixMode(5888);
         }
     }

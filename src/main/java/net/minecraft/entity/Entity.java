@@ -1156,6 +1156,12 @@ public abstract class Entity implements ICommandSender
         return MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
     }
 
+
+    public double getDistance(BlockPos pos) {
+        double x = posX - pos.getX(), y = posY - pos.getY(), z = posZ - pos.getZ();
+        return MathHelper.sqrt_double(x * x + y * y + z * z);
+    }
+
     public double getDistanceSqToEntity(Entity entityIn)
     {
         double d0 = this.posX - entityIn.posX;

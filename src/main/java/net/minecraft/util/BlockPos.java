@@ -304,5 +304,13 @@ public class BlockPos extends Vec3i
             this.z = zIn;
             return this;
         }
+
+        public BlockPos.MutableBlockPos set(Vec3i vec3i) {
+            return this.set(vec3i.getX(), vec3i.getY(), vec3i.getZ());
+        }
+
+        public BlockPos.MutableBlockPos move(int xDist, int yDist, int zDist) {
+            return this.set(this.getX() + xDist, this.getY() + yDist, this.getZ() + zDist);
+        }
     }
 }
