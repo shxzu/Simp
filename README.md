@@ -49,7 +49,7 @@ No one is obliged to help you. Make an issue or join the [Discord](https://disco
 
 ### 4. Known bugs/errors:
 - No sound or crash on certain systems relating to SoundSystem.
-- Legit and Predictive auto block modes kicking in servers due to sending too many packets.
+- Legit auto block mode kicking certain servers due to sending too many packets. (Mostly fixed as of 1.4 update)
 - Latest HMCL not launching the client until skipping Java compatibility checks.
 
 **THESS BUGS WILL BE FIXED IN FUTURE VERSIONS! WE CANNOT FIX THEM NOW DUE TO UNKNOWN CAUSES OR LOSS OF TIME/FOCUS!**
