@@ -934,6 +934,8 @@ public final class TargetInterfaceModule extends Module {
     }
 
     private void drawAstralisTargetInterface() {
+        // @milly.rock_ da best for ts right here.
+
         target = KillAuraModule.target;
 
         ScaledResolution sr = new ScaledResolution(mc);

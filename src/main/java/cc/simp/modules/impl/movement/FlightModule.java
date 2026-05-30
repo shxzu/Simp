@@ -28,7 +28,7 @@ import static cc.simp.utils.Util.mc;
 public final class FlightModule extends Module {
 
     private final ModeProperty<Mode> mode = new ModeProperty<>("Mode", Mode.Motion);
-    private final NumberProperty motionSpeed = new NumberProperty("Motion Speed", 0.9, () -> mode.getValue() == Mode.Motion, 0.1, 2.0, 0.1);
+    private final NumberProperty motionSpeed = new NumberProperty("Motion Speed", 0.9, () -> mode.getValue() == Mode.Motion, 0.1, 5.0, 0.1);
     private final NumberProperty teleportDelay = new NumberProperty("Teleport Delay", 5, () -> mode.getValue() == Mode.Packet, 1, 20, 1);
     private final NumberProperty teleportLength = new NumberProperty("Teleport Length", 5, () -> mode.getValue() == Mode.Packet, 1, 20, 1);
     private final NumberProperty timerAmount = new NumberProperty("Timer Amount", 1, 0.1, 3, 0.1);

@@ -2,14 +2,12 @@ package net.minecraft.client.renderer.entity.layers;
 
 import cc.simp.Simp;
 import cc.simp.modules.impl.visuals.CapesModule;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Session;
 
 import static cc.simp.utils.Util.mc;
 
@@ -85,7 +83,7 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
                 case Minecon:
                     this.playerRenderer.bindTexture(new ResourceLocation("simp/images/MineConCape.png"));
                     break;
-                case Epstien:
+                case Epstein:
                     this.playerRenderer.bindTexture(new ResourceLocation("simp/images/EpstienCape.png"));
                     break;
                 case Kitty:
