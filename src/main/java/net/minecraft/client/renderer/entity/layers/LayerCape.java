@@ -86,7 +86,7 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
                     this.playerRenderer.bindTexture(new ResourceLocation("simp/images/MineConCape.png"));
                     break;
                 case Epstien:
-                    this.playerRenderer.bindTexture(new ResourceLocation("simp/images/EpsteinCape.png"));
+                    this.playerRenderer.bindTexture(new ResourceLocation("simp/images/EpstienCape.png"));
                     break;
                 case Kitty:
                     this.playerRenderer.bindTexture(new ResourceLocation("simp/images/HelloKittyCape.png"));

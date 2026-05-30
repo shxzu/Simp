@@ -3,9 +3,11 @@ package cc.simp.modules.impl.visuals;
 import cc.simp.api.events.impl.game.LivingUpdateEvent;
 import cc.simp.api.events.impl.game.PreUpdateEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
+import cc.simp.api.properties.Property;
 import cc.simp.modules.Module;
 import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
+import cc.simp.utils.render.FontUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import lombok.Getter;
@@ -24,6 +26,9 @@ import static cc.simp.utils.Util.mc;
 
 @ModuleInfo(label = "Damage FX", category = ModuleCategory.VISUALS)
 public final class DamageFXModule extends Module {
+
+    public Property<Boolean> customFont = new Property<>("Custom Font", false);
+
     private final HashMap<EntityLivingBase, Float> healthMap = new HashMap<>();
     private final ArrayDeque<Particles> particles = new ArrayDeque<>();
 
@@ -83,8 +88,13 @@ public final class DamageFXModule extends Module {
             final double size = 0.03;
             GlStateManager.scale(-size, -size, size);
             GL11.glDepthMask(false);
-            mc.fontRendererObj.drawStringWithShadow(p.text, (float) -(mc.fontRendererObj.getStringWidth(p.text) / 2), (float) -(mc.fontRendererObj.FONT_HEIGHT - 1), 0);
-            mc.fontRendererObj.drawStringWithShadow(p.text, (float) -(mc.fontRendererObj.getStringWidth(p.text) / 2), (float) -(mc.fontRendererObj.FONT_HEIGHT - 1), 0);
+            if (customFont.getValue()) {
+                FontUtils.getCurrentFont().drawStringWithShadow(p.text, (float) -(FontUtils.getCurrentFont().getStringWidth(p.text) / 2), (float) -(FontUtils.getCurrentFont().FONT_HEIGHT - 1), 0);
+                FontUtils.getCurrentFont().drawStringWithShadow(p.text, (float) -(FontUtils.getCurrentFont().getStringWidth(p.text) / 2), (float) -(FontUtils.getCurrentFont().FONT_HEIGHT - 1), 0);
+            } else {
+                mc.fontRendererObj.drawStringWithShadow(p.text, (float) -(mc.fontRendererObj.getStringWidth(p.text) / 2), (float) -(mc.fontRendererObj.FONT_HEIGHT - 1), 0);
+                mc.fontRendererObj.drawStringWithShadow(p.text, (float) -(mc.fontRendererObj.getStringWidth(p.text) / 2), (float) -(mc.fontRendererObj.FONT_HEIGHT - 1), 0);
+            }
             GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
             GL11.glDepthMask(true);
             GlStateManager.doPolygonOffset(1.0f, 1500000.0f);
