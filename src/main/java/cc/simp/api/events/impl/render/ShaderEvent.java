@@ -14,6 +14,6 @@ public class ShaderEvent implements Event {
     }
 
     public enum ShaderType {
-        BLUR, SHADOW, BLOOM
+        BLUR, SHADOW, BLOOM, SKY
     }
 }

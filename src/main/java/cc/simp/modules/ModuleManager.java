@@ -21,7 +21,6 @@ public final class ModuleManager {
 
     public ModuleManager() {
         instanceMap = putInInstanceMap(
-
                 // Combat
                 new KillAuraModule(),
                 new AIFighterModule(),
@@ -119,8 +118,11 @@ public final class ModuleManager {
                 new CameraModule(),
                 new AmbienceModule(),
                 new ESPModule(),
+                new ShaderESPModule(),
+                new SkeletonsModule(),
                 new ChamsModule(),
                 new TracersModule(),
+                new JumpCircleModule(),
                 new DamageFXModule(),
                 new TargetInterfaceModule(),
                 new PostProcessingModule(),
@@ -133,6 +135,7 @@ public final class ModuleManager {
                 new ChinaHatModule(),
                 new HaloModule(),
                 new FireFliesModule(),
+                new ShaderSkyModule(),
                 new BreadCrumbsModule(),
                 new AspectRatioModule(),
                 new TrajectoriesModule(),

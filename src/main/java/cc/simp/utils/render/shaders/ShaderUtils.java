@@ -9,7 +9,7 @@ import java.io.*;
 import static org.lwjgl.opengl.GL20.*;
 
 public class ShaderUtils extends Util {
-    private final int programID;
+    public final int programID;
 
     public ShaderUtils(String fragmentShaderLoc, String vertexShaderLoc) {
         int program = glCreateProgram();

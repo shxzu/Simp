@@ -564,7 +564,7 @@ public final class ScaffoldModule extends Module {
                 boolean diagonal = RotationUtils.getMovementYaw() % 90.0f > 10.0f && RotationUtils.getMovementYaw() % 90.0f < 80.0f;
                 if (recursion == 0) {
                     mc.entityRenderer.getMouseOver(1);
-                    if (mc.thePlayer.onGround && MovementUtils.isMoving() && !mc.gameSettings.keyBindJump.isKeyDown()) {
+                    if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
                         rotSpeed = 10f;
                         this.targetYaw = mc.thePlayer.rotationYaw;
                         canPlace = false;
@@ -574,6 +574,13 @@ public final class ScaffoldModule extends Module {
                                 rotSpeed = 0.9f;
                                 if (diagonal) {
                                     rotSpeed = 1.0f;
+                                }
+                                if (mc.gameSettings.keyBindJump.isKeyDown()) {
+                                    mc.gameSettings.keyBindSneak.setPressed(lumieHasALongDih());
+                                } else {
+                                  if (mc.gameSettings.keyBindSneak.isPressed()) {
+                                      mc.gameSettings.keyBindSneak.setPressed(false);
+                                  }
                                 }
                                 getBaseRotations();
                                 canPlace = true;
@@ -972,6 +979,23 @@ public final class ScaffoldModule extends Module {
                 if (dx != 0.0 || dz != 0.0) {
                     final BlockPos pos = new BlockPos(x + dx, y, z + dz);
                     if (!mc.theWorld.getBlockState(pos).getBlock().isFullBlock()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean lumieHasALongDih() {
+        final double x = mc.thePlayer.posX;
+        final double z = mc.thePlayer.posZ;
+        final int y = (int) Math.floor(mc.thePlayer.posY) - 2;
+        for (double expand = 7, dx = -expand; dx <= expand; dx += expand) {
+            for (double dz = -expand; dz <= expand; dz += expand) {
+                if (dx != 0.0 || dz != 0.0) {
+                    final BlockPos pos = new BlockPos(x + dx, y, z + dz);
+                    if (mc.theWorld.getBlockState(pos).getBlock().isFullBlock()) {
                         return true;
                     }
                 }

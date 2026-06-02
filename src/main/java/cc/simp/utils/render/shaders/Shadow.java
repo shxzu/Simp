@@ -29,6 +29,7 @@ public class Shadow extends Util {
         }
     };
 
+
     public static void renderShadow(int sourceTexture, int radius, int offset, float strength) {
         if (radius < 0) return;
 

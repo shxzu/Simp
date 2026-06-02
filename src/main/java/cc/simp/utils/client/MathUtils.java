@@ -1,6 +1,8 @@
 package cc.simp.utils.client;
 
 import cc.simp.utils.Util;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Vec3;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -51,5 +53,63 @@ public class MathUtils extends Util {
 
     public static float lerp(float min, float max, float delta) {
         return min + (max - min) * delta;
+    }
+    public static double incValue(double val, double inc) {
+        double one = 1.0 / inc;
+        return Math.round(val * one) / one;
+    }
+
+    public static float interpolate(float current, float target) {
+        return interpolate(current, target, mc.timer.renderPartialTicks);
+    }
+
+    public static float interpolate(float current, float target, float multiple) {
+        if (multiple == mc.timer.renderPartialTicks) {
+            return current + (target - current) * multiple;
+        }
+
+        return current;
+    }
+
+    public static double interpolate(double current, double target) {
+        return interpolate(current, target, mc.timer.renderPartialTicks);
+    }
+
+    public static double interpolate(double current, double target, float multiple) {
+        return interpolate((float) current, (float) target, multiple);
+    }
+
+    public static Vec3 interpolate(Vec3 current, Vec3 target) {
+        return interpolate(current, target, mc.timer.renderPartialTicks);
+    }
+
+    public static Vec3 interpolate(Vec3 current, Vec3 target, float multiple) {
+        if (multiple == mc.timer.renderPartialTicks) {
+            return new Vec3(
+                    interpolate(current.xCoord, target.xCoord, multiple),
+                    interpolate(current.yCoord, target.yCoord, multiple),
+                    interpolate(current.zCoord, target.zCoord, multiple));
+        }
+
+        return current;
+    }
+
+    public static AxisAlignedBB interpolate(AxisAlignedBB current, AxisAlignedBB target) {
+        return interpolate(current, target, mc.timer.renderPartialTicks);
+    }
+
+    public static AxisAlignedBB interpolate(AxisAlignedBB current, AxisAlignedBB target, float multiple) {
+        if (multiple == mc.timer.renderPartialTicks) {
+            return new AxisAlignedBB(
+                    interpolate(current.minX, target.minX, multiple),
+                    interpolate(current.minY, target.minY, multiple),
+                    interpolate(current.minZ, target.minZ, multiple),
+                    interpolate(current.maxX, target.maxX, multiple),
+                    interpolate(current.maxY, target.maxY, multiple),
+                    interpolate(current.maxZ, target.maxZ, multiple)
+            );
+        }
+
+        return current;
     }
 }

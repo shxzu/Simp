@@ -109,6 +109,8 @@ import net.optifine.shaders.ShadowUtils;
 import net.optifine.shaders.gui.GuiShaderOptions;
 import net.optifine.util.ChunkUtils;
 import net.optifine.util.RenderChunkUtils;
+import cc.simp.Simp;
+import cc.simp.api.events.impl.render.ShaderEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -1690,6 +1692,12 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
             GlStateManager.color(1.0F, 1.0F, 1.0F, f15);
             GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
             CustomSky.renderSky(this.theWorld, this.renderEngine, partialTicks);
+
+            // Post a SKY shader event so modules can render sky-specific shaders
+            try {
+                Simp.INSTANCE.getEventBus().post(new ShaderEvent(ShaderEvent.ShaderType.SKY));
+            } catch (Throwable ignored) {
+            }
 
             if (flag)
             {

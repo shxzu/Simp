@@ -3,6 +3,7 @@ package net.minecraft.client.renderer;
 import cc.simp.Simp;
 import cc.simp.api.events.impl.game.MouseOverEvent;
 import cc.simp.api.events.impl.render.Render3DEvent;
+import cc.simp.api.events.impl.render.Shader3DEvent;
 import cc.simp.modules.impl.visuals.AspectRatioModule;
 import cc.simp.modules.impl.visuals.CameraModule;
 import cc.simp.modules.impl.visuals.FreeLookModule;
@@ -1462,6 +1463,9 @@ public class EntityRenderer implements IResourceManagerReloadListener
         }
 
         this.setupCameraTransform(partialTicks, pass);
+
+        final Shader3DEvent shader3DEvent = new Shader3DEvent(partialTicks);
+        Simp.INSTANCE.getEventBus().post(shader3DEvent);
 
         if (flag)
         {

@@ -63,6 +63,7 @@ public final class KillAuraModule extends Module {
     private final NumberProperty missRate = new NumberProperty("Miss Rate", 5, () -> advanced.getValue() && missChance.getValue(), 0, 20, 1);
 
     public static ModeProperty<Rotations> rotations = new ModeProperty<>("Rotations", Rotations.Regular);
+    private final Property<Boolean> predictiveRotations = new Property<>("Predictive Rotations", true, () -> rotations.getValue() == Rotations.Regular);
     private final NumberProperty minRotSpeed = new NumberProperty("Min Rotation Speed", 3, 0, 10, 0.5);
     private final NumberProperty maxRotSpeed = new NumberProperty("Max Rotation Speed", 7, 0, 10, 0.5);
     public static final Property<Boolean> jitter = new Property<>("Jitter Rotations", false);
@@ -183,7 +184,7 @@ public final class KillAuraModule extends Module {
     private void calculateRotations() {
         if (mc.thePlayer == null || target == null || rotations.getValue() == Rotations.None) return;
 
-        Vector2f rotation = RotationUtils.calculate(target, mode.getValue() == TargetSelectionProcess.Mode.Adaptive, seekRange.getValue());
+        Vector2f rotation = RotationUtils.calculate(target, predictiveRotations.getValue(), seekRange.getValue());
 
         if (jitter.getValue()) {
             float jitterAmount = jitterFactor.getValue().floatValue();

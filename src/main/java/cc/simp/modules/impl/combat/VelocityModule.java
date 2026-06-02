@@ -14,21 +14,25 @@ import cc.simp.modules.ModuleCategory;
 import cc.simp.modules.ModuleInfo;
 import cc.simp.processes.BadPacketsProcess;
 import cc.simp.processes.LagProcess;
+import cc.simp.processes.RotationProcess;
 import cc.simp.utils.client.Logger;
 import cc.simp.utils.client.MathUtils;
 import cc.simp.utils.mc.MovementUtils;
 import cc.simp.utils.mc.PacketUtils;
+import cc.simp.utils.misc.MovementFix;
 import com.sun.jdi.BooleanValue;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.Priorities;
 import io.github.nevalackin.homoBus.annotations.EventLink;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
+import org.lwjgl.util.vector.Vector2f;
 
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -146,8 +150,8 @@ public final class VelocityModule extends Module {
             jump = false;
         }
 
-        if (modeProperty.getValue() == Mode.Delay) {
-            if (mc.thePlayer.hurtTime != 0 && !mc.thePlayer.isBurning()) {
+        if (!event.isPre() && modeProperty.getValue() == Mode.Delay) {
+            if (mc.thePlayer.hurtTime > 0 && !mc.thePlayer.isBurning()) {
                 LagProcess.spoof(delay.getValue().intValue() * 10, legit.getValue(), true, legit.getValue(), false);
                 delayed = true;
             }
@@ -162,12 +166,14 @@ public final class VelocityModule extends Module {
         }
     };
 
-    @EventLink(value = Priorities.VERY_LOW)
+    @EventLink(value = Priorities.VERY_HIGH)
     public final Listener<PreUpdateEvent> onPreUpdate = event -> {
         if (modeProperty.getValue() == Mode.Grim) {
             if (velocity) {
-                PacketUtils.sendSilentPacket(new C07PacketPlayerDigging((mc.objectMouseOver != null && mc.thePlayer.isSwingInProgress && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK ? C07PacketPlayerDigging.Action.START_DESTROY_BLOCK : C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK),
-                        new BlockPos(mc.thePlayer), EnumFacing.UP));
+                RotationProcess.setRotations(new Vector2f(mc.thePlayer.rotationYaw, 90), 10, MovementFix.NORMAL);
+                if (mc.objectMouseOver != null) {
+                    mc.clickMouse();
+                }
                 velocity = false;
             }
         }

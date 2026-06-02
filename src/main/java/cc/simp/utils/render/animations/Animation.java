@@ -114,6 +114,7 @@ public abstract class Animation {
         }
     }
 
+
     private double interpolate(double start, double end, double factor) {
         return start + (end - start) * factor;
     }

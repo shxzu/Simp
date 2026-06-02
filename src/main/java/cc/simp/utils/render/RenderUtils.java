@@ -11,9 +11,11 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
@@ -30,6 +32,7 @@ public class RenderUtils extends Util {
 
     public static RoundedShader roundedShader = new RoundedShader("roundedRect");
     public static RoundedShader roundedOutlineShader = new RoundedShader("roundRectOutline");
+    private static final Frustum frustrum = new Frustum();
 
     private static void setupRoundedRectUniforms(float x, float y, float width, float height, float radius, RoundedShader roundedTexturedShader) {
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
@@ -165,6 +168,16 @@ public class RenderUtils extends Util {
         int b = (int) ((color & 0xFF) * factor);
         int a = color >> 24 & 0xFF;
         return (r & 0xFF) << 16 | (g & 0xFF) << 8 | b & 0xFF | (a & 0xFF) << 24;
+    }
+
+    public static boolean isInViewFrustrum(final Entity entity) {
+        return (isInViewFrustrum(entity.getEntityBoundingBox()) || entity.ignoreFrustumCheck);
+    }
+
+    private static boolean isInViewFrustrum(final AxisAlignedBB bb) {
+        final Entity current = mc.getRenderViewEntity();
+        frustrum.setPosition(current.posX, current.posY, current.posZ);
+        return frustrum.isBoundingBoxInFrustum(bb);
     }
 
     public enum ArrowDirection {
