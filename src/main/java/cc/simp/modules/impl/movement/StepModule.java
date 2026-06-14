@@ -22,6 +22,7 @@ public class StepModule extends Module {
         mc.thePlayer.stepHeight = stepHeight.getValue().floatValue();
     };
 
+    @Override
     public void onDisable() {
         mc.thePlayer.stepHeight = 0.5f;
         super.onDisable();
