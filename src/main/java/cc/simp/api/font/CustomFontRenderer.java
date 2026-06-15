@@ -475,11 +475,13 @@ public class CustomFontRenderer extends CustomFont {
         }
     }
 
+    // fixed: this errors and tries to parse it as a pfa font file, but i fixed it! - nazunawtf 
     public static Font getFontFromTTF(ResourceLocation fontLocation, float fontSize, int fontType) {
         Font output = null;
         try {
-            output = Font.createFont(fontType, Minecraft.getMinecraft().getResourceManager().getResource(fontLocation).getInputStream());
-            output = output.deriveFont(fontSize);
+            output = Font.createFont(Font.TRUETYPE_FONT, Minecraft.getMinecraft().getResourceManager().getResource(fontLocation).getInputStream());
+
+            output = output.deriveFont(fontType, fontSize);
         } catch (Exception e) {
             e.printStackTrace();
             return new Font("Default", fontType, (int) fontSize);
