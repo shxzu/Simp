@@ -10,6 +10,7 @@ import cc.simp.utils.client.ViaMCPFixes;
 import cc.simp.utils.render.DragUtils;
 import io.github.nevalackin.homoBus.Listener;
 import io.github.nevalackin.homoBus.annotations.EventLink;
+import cc.simp.api.events.impl.render.Render2DEvent;
 
 public class BackgroundProcess {
 
@@ -22,7 +23,12 @@ public class BackgroundProcess {
             Simp.INSTANCE.getConfigManager().saveConfig("default");
             Simp.INSTANCE.getBindsConfig().saveToFile();
         }
+    };
 
+    // dragging would make you lag because you are doing it every tick!!! 
+    // not on the Render 2D event - nazuna
+    @EventLink
+    public Listener<Render2DEvent> render2DEventListener = e -> {
         DragUtils.update();
     };
 
